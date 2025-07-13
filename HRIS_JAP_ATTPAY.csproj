@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3D2A2C2B-E5FB-43AD-9EB8-52F7A5AAB916}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>HRIS_JAP_ATTPAY</RootNamespace>
+    <AssemblyName>HRIS_JAP_ATTPAY</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AdminAttendance.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AdminAttendance.Designer.cs">
+      <DependentUpon>AdminAttendance.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AdminEmployee.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AdminEmployee.Designer.cs">
+      <DependentUpon>AdminEmployee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AdminMenu.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AdminMenu.Designer.cs">
+      <DependentUpon>AdminMenu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AdminNotification.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AdminNotification.Designer.cs">
+      <DependentUpon>AdminNotification.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AdminOverview.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AdminOverview.Designer.cs">
+      <DependentUpon>AdminOverview.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AdminPage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AdminPage.Designer.cs">
+      <DependentUpon>AdminPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AdminPayroll.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AdminPayroll.Designer.cs">
+      <DependentUpon>AdminPayroll.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AttributesClassAlt.cs" />
+    <Compile Include="HRAttendance.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="HRAttendance.Designer.cs">
+      <DependentUpon>HRAttendance.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HREmployee.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="HREmployee.Designer.cs">
+      <DependentUpon>HREmployee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HRMenu.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="HRMenu.Designer.cs">
+      <DependentUpon>HRMenu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HRNotification.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HRNotification.Designer.cs">
+      <DependentUpon>HRNotification.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HROverview.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="HROverview.Designer.cs">
+      <DependentUpon>HROverview.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HRPage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HRPage.Designer.cs">
+      <DependentUpon>HRPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LoginInfo.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LoginInfo.Designer.cs">
+      <DependentUpon>LoginInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LoginRectangle.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LoginRectangle.Designer.cs">
+      <DependentUpon>LoginRectangle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LoginPage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoginPage.Designer.cs">
+      <DependentUpon>LoginPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LogOut.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LogOut.Designer.cs">
+      <DependentUpon>LogOut.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AttributesClass.cs" />
+    <Compile Include="UserProfile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserProfile.Designer.cs">
+      <DependentUpon>UserProfile.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="AdminAttendance.resx">
+      <DependentUpon>AdminAttendance.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdminEmployee.resx">
+      <DependentUpon>AdminEmployee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdminMenu.resx">
+      <DependentUpon>AdminMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdminNotification.resx">
+      <DependentUpon>AdminNotification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdminOverview.resx">
+      <DependentUpon>AdminOverview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdminPage.resx">
+      <DependentUpon>AdminPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdminPayroll.resx">
+      <DependentUpon>AdminPayroll.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HRAttendance.resx">
+      <DependentUpon>HRAttendance.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HREmployee.resx">
+      <DependentUpon>HREmployee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HRMenu.resx">
+      <DependentUpon>HRMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HRNotification.resx">
+      <DependentUpon>HRNotification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HROverview.resx">
+      <DependentUpon>HROverview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HRPage.resx">
+      <DependentUpon>HRPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoginInfo.resx">
+      <DependentUpon>LoginInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoginRectangle.resx">
+      <DependentUpon>LoginRectangle.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoginPage.resx">
+      <DependentUpon>LoginPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LogOut.resx">
+      <DependentUpon>LogOut.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserProfile.resx">
+      <DependentUpon>UserProfile.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Roboto-Black.ttf" />
+    <EmbeddedResource Include="Roboto-BlackItalic.ttf" />
+    <EmbeddedResource Include="Roboto-Bold.ttf" />
+    <EmbeddedResource Include="Roboto-BoldCondensed.ttf" />
+    <EmbeddedResource Include="Roboto-BoldCondensedItalic.ttf" />
+    <EmbeddedResource Include="Roboto-BoldItalic.ttf" />
+    <EmbeddedResource Include="Roboto-Condensed.ttf" />
+    <EmbeddedResource Include="Roboto-CondensedItalic.ttf" />
+    <EmbeddedResource Include="Roboto-Italic.ttf" />
+    <EmbeddedResource Include="Roboto-Light.ttf" />
+    <EmbeddedResource Include="Roboto-LightItalic.ttf" />
+    <EmbeddedResource Include="Roboto-Medium.ttf" />
+    <EmbeddedResource Include="Roboto-MediumItalic.ttf" />
+    <EmbeddedResource Include="Roboto-Regular.ttf" />
+    <EmbeddedResource Include="Roboto-Thin.ttf" />
+    <EmbeddedResource Include="Roboto-ThinItalic.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\LoginBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\LoginLogo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Notification.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UserProfile.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\XButton.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
