@@ -39,8 +39,9 @@ namespace HRIS_JAP_ATTPAY
             this.HRMenuPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(153)))), ((int)(((byte)(137)))), ((int)(((byte)(207)))));
             this.HRMenuPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.HRMenuPanel.Location = new System.Drawing.Point(0, 0);
+            this.HRMenuPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.HRMenuPanel.Name = "HRMenuPanel";
-            this.HRMenuPanel.Size = new System.Drawing.Size(1422, 182);
+            this.HRMenuPanel.Size = new System.Drawing.Size(1028, 148);
             this.HRMenuPanel.TabIndex = 1;
             // 
             // HRViewPanel
@@ -48,18 +49,20 @@ namespace HRIS_JAP_ATTPAY
             this.HRViewPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.HRViewPanel.AutoScroll = true;
-            this.HRViewPanel.Location = new System.Drawing.Point(0, 182);
+            this.HRViewPanel.Location = new System.Drawing.Point(0, 148);
+            this.HRViewPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.HRViewPanel.Name = "HRViewPanel";
-            this.HRViewPanel.Size = new System.Drawing.Size(1422, 793);
+            this.HRViewPanel.Size = new System.Drawing.Size(1028, 644);
             this.HRViewPanel.TabIndex = 2;
             // 
             // HRForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1422, 977);
+            this.ClientSize = new System.Drawing.Size(1028, 609);
             this.Controls.Add(this.HRViewPanel);
             this.Controls.Add(this.HRMenuPanel);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "HRForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "HRPage";

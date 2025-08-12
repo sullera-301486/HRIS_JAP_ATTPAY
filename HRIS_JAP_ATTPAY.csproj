@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddNewEmployee.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddNewEmployee.Designer.cs">
+      <DependentUpon>AddNewEmployee.cs</DependentUpon>
+    </Compile>
     <Compile Include="AdminAttendance.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -89,6 +95,108 @@
       <DependentUpon>AdminPayroll.cs</DependentUpon>
     </Compile>
     <Compile Include="AttributesClassAlt.cs" />
+    <Compile Include="ConfirmAddEmployee.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmAddEmployee.Designer.cs">
+      <DependentUpon>ConfirmAddEmployee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfirmArchive.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmArchive.Designer.cs">
+      <DependentUpon>ConfirmArchive.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfirmLeaveEntry.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmLeaveEntry.Designer.cs">
+      <DependentUpon>ConfirmLeaveEntry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfirmPayrollExportAll.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmPayrollExportAll.Designer.cs">
+      <DependentUpon>ConfirmPayrollExportAll.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfirmPayrollExportIndividual.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmPayrollExportIndividual.Designer.cs">
+      <DependentUpon>ConfirmPayrollExportIndividual.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfirmPayrollUpdate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmPayrollUpdate.Designer.cs">
+      <DependentUpon>ConfirmPayrollUpdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfirmProfileUpdate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmProfileUpdate.Designer.cs">
+      <DependentUpon>ConfirmProfileUpdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditAttendance.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditAttendance.Designer.cs">
+      <DependentUpon>EditAttendance.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditEmployeeProfile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditEmployeeProfile.Designer.cs">
+      <DependentUpon>EditEmployeeProfile.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditEmployeeProfileHR.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditEmployeeProfileHR.Designer.cs">
+      <DependentUpon>EditEmployeeProfileHR.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EmployeeProfile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmployeeProfile.Designer.cs">
+      <DependentUpon>EmployeeProfile.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EmployeeProfileHR.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmployeeProfileHR.Designer.cs">
+      <DependentUpon>EmployeeProfileHR.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FilterHREmployee.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FilterHREmployee.Designer.cs">
+      <DependentUpon>FilterHREmployee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ManualAttendanceRequest.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ManualAttendanceRequest.Designer.cs">
+      <DependentUpon>ManualAttendanceRequest.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditAttendanceConfirm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditAttendanceConfirm.Designer.cs">
+      <DependentUpon>EditAttendanceConfirm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FilterAdminEmployee.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FilterAdminEmployee.Designer.cs">
+      <DependentUpon>FilterAdminEmployee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FilterAdminPayroll.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FilterAdminPayroll.Designer.cs">
+      <DependentUpon>FilterAdminPayroll.cs</DependentUpon>
+    </Compile>
     <Compile Include="HRAttendance.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -125,6 +233,18 @@
     <Compile Include="HRPage.Designer.cs">
       <DependentUpon>HRPage.cs</DependentUpon>
     </Compile>
+    <Compile Include="LeaveRequest.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LeaveRequest.Designer.cs">
+      <DependentUpon>LeaveRequest.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LeaveRequestConfirm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LeaveRequestConfirm.Designer.cs">
+      <DependentUpon>LeaveRequestConfirm.cs</DependentUpon>
+    </Compile>
     <Compile Include="LoginInfo.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -149,15 +269,48 @@
     <Compile Include="LogOut.Designer.cs">
       <DependentUpon>LogOut.cs</DependentUpon>
     </Compile>
+    <Compile Include="NewLeave.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewLeave.Designer.cs">
+      <DependentUpon>NewLeave.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PayrollSummary.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PayrollSummary.Designer.cs">
+      <DependentUpon>PayrollSummary.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PayrollSummaryEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PayrollSummaryEdit.Designer.cs">
+      <DependentUpon>PayrollSummaryEdit.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AttributesClass.cs" />
+    <Compile Include="FilterAdminAttendance.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FilterAdminAttendance.Designer.cs">
+      <DependentUpon>FilterAdminAttendance.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UpdateConfirmationEditAttendance.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UpdateConfirmationEditAttendance.Designer.cs">
+      <DependentUpon>UpdateConfirmationEditAttendance.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserProfile.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UserProfile.Designer.cs">
       <DependentUpon>UserProfile.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="AddNewEmployee.resx">
+      <DependentUpon>AddNewEmployee.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AdminAttendance.resx">
       <DependentUpon>AdminAttendance.cs</DependentUpon>
     </EmbeddedResource>
@@ -179,6 +332,57 @@
     <EmbeddedResource Include="AdminPayroll.resx">
       <DependentUpon>AdminPayroll.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmAddEmployee.resx">
+      <DependentUpon>ConfirmAddEmployee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmArchive.resx">
+      <DependentUpon>ConfirmArchive.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmLeaveEntry.resx">
+      <DependentUpon>ConfirmLeaveEntry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmPayrollExportAll.resx">
+      <DependentUpon>ConfirmPayrollExportAll.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmPayrollExportIndividual.resx">
+      <DependentUpon>ConfirmPayrollExportIndividual.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmPayrollUpdate.resx">
+      <DependentUpon>ConfirmPayrollUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmProfileUpdate.resx">
+      <DependentUpon>ConfirmProfileUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditAttendance.resx">
+      <DependentUpon>EditAttendance.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditEmployeeProfile.resx">
+      <DependentUpon>EditEmployeeProfile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditEmployeeProfileHR.resx">
+      <DependentUpon>EditEmployeeProfileHR.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmployeeProfile.resx">
+      <DependentUpon>EmployeeProfile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmployeeProfileHR.resx">
+      <DependentUpon>EmployeeProfileHR.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FilterHREmployee.resx">
+      <DependentUpon>FilterHREmployee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ManualAttendanceRequest.resx">
+      <DependentUpon>ManualAttendanceRequest.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditAttendanceConfirm.resx">
+      <DependentUpon>EditAttendanceConfirm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FilterAdminEmployee.resx">
+      <DependentUpon>FilterAdminEmployee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FilterAdminPayroll.resx">
+      <DependentUpon>FilterAdminPayroll.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="HRAttendance.resx">
       <DependentUpon>HRAttendance.cs</DependentUpon>
     </EmbeddedResource>
@@ -197,6 +401,12 @@
     <EmbeddedResource Include="HRPage.resx">
       <DependentUpon>HRPage.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="LeaveRequest.resx">
+      <DependentUpon>LeaveRequest.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LeaveRequestConfirm.resx">
+      <DependentUpon>LeaveRequestConfirm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LoginInfo.resx">
       <DependentUpon>LoginInfo.cs</DependentUpon>
     </EmbeddedResource>
@@ -209,10 +419,25 @@
     <EmbeddedResource Include="LogOut.resx">
       <DependentUpon>LogOut.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="NewLeave.resx">
+      <DependentUpon>NewLeave.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PayrollSummary.resx">
+      <DependentUpon>PayrollSummary.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PayrollSummaryEdit.resx">
+      <DependentUpon>PayrollSummaryEdit.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FilterAdminAttendance.resx">
+      <DependentUpon>FilterAdminAttendance.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UpdateConfirmationEditAttendance.resx">
+      <DependentUpon>UpdateConfirmationEditAttendance.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserProfile.resx">
       <DependentUpon>UserProfile.cs</DependentUpon>
@@ -265,6 +490,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\XButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Filter.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\search.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\filter %281%29 1.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

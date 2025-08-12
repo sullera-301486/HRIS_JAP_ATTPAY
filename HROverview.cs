@@ -16,5 +16,19 @@ namespace HRIS_JAP_ATTPAY
         {
             InitializeComponent();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            ManualAttendanceRequest editAttendanceForm = new ManualAttendanceRequest();
+            AttributesClass.ShowWithOverlay(parentForm, editAttendanceForm);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            LeaveRequest leaveRequestForm = new LeaveRequest();
+            AttributesClass.ShowWithOverlay(parentForm, leaveRequestForm);
+        }
     }
 }

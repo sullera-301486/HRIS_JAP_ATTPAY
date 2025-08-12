@@ -21,5 +21,19 @@ namespace HRIS_JAP_ATTPAY
         {
 
         }
+
+        private void pictureBox2_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            FilterHREmployee filterHREmployeeForm = new FilterHREmployee();
+            AttributesClass.ShowWithOverlay(parentForm, filterHREmployeeForm);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            EmployeeProfileHR employeeProfileHRForm = new EmployeeProfileHR();
+            AttributesClass.ShowWithOverlay(parentForm, employeeProfileHRForm);
+        }
     }
 }

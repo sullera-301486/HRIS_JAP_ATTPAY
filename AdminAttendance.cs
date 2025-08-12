@@ -21,5 +21,29 @@ namespace HRIS_JAP_ATTPAY
         {
 
         }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            EditAttendance editAttendanceForm = new EditAttendance();
+            AttributesClass.ShowWithOverlay(parentForm, editAttendanceForm);
+        }
+
+        private void pictureBox2_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            FilterAdminAttendance filterAdminAttendanceForm = new FilterAdminAttendance();
+            AttributesClass.ShowWithOverlay(parentForm, filterAdminAttendanceForm);
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }
