@@ -36,6 +36,7 @@
             // 
             // XpictureBox
             // 
+            this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
             this.XpictureBox.Location = new System.Drawing.Point(995, 29);
             this.XpictureBox.Name = "XpictureBox";

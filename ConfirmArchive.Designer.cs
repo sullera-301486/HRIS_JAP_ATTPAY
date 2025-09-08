@@ -39,25 +39,30 @@
             // buttonCancel
             // 
             this.buttonCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(154)))), ((int)(((byte)(154)))));
+            this.buttonCancel.Cursor = System.Windows.Forms.Cursors.Hand;
             this.buttonCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonCancel.ForeColor = System.Drawing.Color.White;
-            this.buttonCancel.Location = new System.Drawing.Point(164, 142);
+            this.buttonCancel.Location = new System.Drawing.Point(219, 178);
+            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(101, 30);
+            this.buttonCancel.Size = new System.Drawing.Size(135, 37);
             this.buttonCancel.TabIndex = 27;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = false;
+            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
             // 
             // buttonConfirm
             // 
             this.buttonConfirm.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(34)))), ((int)(((byte)(31)))));
+            this.buttonConfirm.Cursor = System.Windows.Forms.Cursors.Hand;
             this.buttonConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonConfirm.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonConfirm.ForeColor = System.Drawing.Color.White;
-            this.buttonConfirm.Location = new System.Drawing.Point(45, 142);
+            this.buttonConfirm.Location = new System.Drawing.Point(60, 178);
+            this.buttonConfirm.Margin = new System.Windows.Forms.Padding(4);
             this.buttonConfirm.Name = "buttonConfirm";
-            this.buttonConfirm.Size = new System.Drawing.Size(101, 30);
+            this.buttonConfirm.Size = new System.Drawing.Size(135, 37);
             this.buttonConfirm.TabIndex = 26;
             this.buttonConfirm.Text = "Confirm";
             this.buttonConfirm.UseVisualStyleBackColor = false;
@@ -66,12 +71,13 @@
             // 
             this.labelMessage.AutoSize = true;
             this.labelMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelMessage.Location = new System.Drawing.Point(31, 72);
+            this.labelMessage.Location = new System.Drawing.Point(32, 91);
+            this.labelMessage.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelMessage.Name = "labelMessage";
-            this.labelMessage.Size = new System.Drawing.Size(252, 54);
+            this.labelMessage.Size = new System.Drawing.Size(341, 72);
             this.labelMessage.TabIndex = 25;
-            this.labelMessage.Text = "Are you sure you want to archive Ej \r\nSullera from the system? This action \r\ncann" +
-    "ot be undone.";
+            this.labelMessage.Text = "Are you sure you want to archive this\r\nemployee from the system? This action \r\nca" +
+    "nnot be undone.";
             this.labelMessage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelRequestConfirm
@@ -79,35 +85,40 @@
             this.labelRequestConfirm.AutoSize = true;
             this.labelRequestConfirm.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelRequestConfirm.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(34)))), ((int)(((byte)(31)))));
-            this.labelRequestConfirm.Location = new System.Drawing.Point(24, 42);
+            this.labelRequestConfirm.Location = new System.Drawing.Point(31, 52);
+            this.labelRequestConfirm.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelRequestConfirm.Name = "labelRequestConfirm";
-            this.labelRequestConfirm.Size = new System.Drawing.Size(265, 25);
+            this.labelRequestConfirm.Size = new System.Drawing.Size(334, 31);
             this.labelRequestConfirm.TabIndex = 24;
             this.labelRequestConfirm.Text = "Confirm Employee Archive";
             // 
             // XpictureBox
             // 
+            this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
-            this.XpictureBox.Location = new System.Drawing.Point(271, 1);
-            this.XpictureBox.Margin = new System.Windows.Forms.Padding(2);
+            this.XpictureBox.Location = new System.Drawing.Point(361, 1);
+            this.XpictureBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.XpictureBox.Name = "XpictureBox";
-            this.XpictureBox.Size = new System.Drawing.Size(38, 41);
+            this.XpictureBox.Size = new System.Drawing.Size(51, 50);
             this.XpictureBox.TabIndex = 28;
             this.XpictureBox.TabStop = false;
+            this.XpictureBox.Click += new System.EventHandler(this.XpictureBox_Click);
             // 
             // ConfirmArchive
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(311, 192);
+            this.ClientSize = new System.Drawing.Size(415, 236);
             this.Controls.Add(this.XpictureBox);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonConfirm);
             this.Controls.Add(this.labelMessage);
             this.Controls.Add(this.labelRequestConfirm);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ConfirmArchive";
+            this.ShowInTaskbar = false;
             this.Text = "ConfirmArchive";
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).EndInit();
             this.ResumeLayout(false);

@@ -52,6 +52,12 @@
     <Compile Include="AddNewEmployee.Designer.cs">
       <DependentUpon>AddNewEmployee.cs</DependentUpon>
     </Compile>
+    <Compile Include="AddNewTask.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddNewTask.Designer.cs">
+      <DependentUpon>AddNewTask.cs</DependentUpon>
+    </Compile>
     <Compile Include="AdminAttendance.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -95,11 +101,23 @@
       <DependentUpon>AdminPayroll.cs</DependentUpon>
     </Compile>
     <Compile Include="AttributesClassAlt.cs" />
+    <Compile Include="Calendar.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Calendar.Designer.cs">
+      <DependentUpon>Calendar.cs</DependentUpon>
+    </Compile>
     <Compile Include="ConfirmAddEmployee.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ConfirmAddEmployee.Designer.cs">
       <DependentUpon>ConfirmAddEmployee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfirmDeleteTask.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmDeleteTask.Designer.cs">
+      <DependentUpon>ConfirmDeleteTask.cs</DependentUpon>
     </Compile>
     <Compile Include="ConfirmArchive.cs">
       <SubType>Form</SubType>
@@ -172,6 +190,12 @@
     </Compile>
     <Compile Include="FilterHREmployee.Designer.cs">
       <DependentUpon>FilterHREmployee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ManageLeave.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ManageLeave.Designer.cs">
+      <DependentUpon>ManageLeave.cs</DependentUpon>
     </Compile>
     <Compile Include="ManualAttendanceRequest.cs">
       <SubType>Form</SubType>
@@ -296,6 +320,11 @@
     <Compile Include="FilterAdminAttendance.Designer.cs">
       <DependentUpon>FilterAdminAttendance.cs</DependentUpon>
     </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="UpdateConfirmationEditAttendance.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -310,6 +339,9 @@
     </Compile>
     <EmbeddedResource Include="AddNewEmployee.resx">
       <DependentUpon>AddNewEmployee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddNewTask.resx">
+      <DependentUpon>AddNewTask.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="AdminAttendance.resx">
       <DependentUpon>AdminAttendance.cs</DependentUpon>
@@ -332,8 +364,14 @@
     <EmbeddedResource Include="AdminPayroll.resx">
       <DependentUpon>AdminPayroll.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Calendar.resx">
+      <DependentUpon>Calendar.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ConfirmAddEmployee.resx">
       <DependentUpon>ConfirmAddEmployee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmDeleteTask.resx">
+      <DependentUpon>ConfirmDeleteTask.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ConfirmArchive.resx">
       <DependentUpon>ConfirmArchive.cs</DependentUpon>
@@ -370,6 +408,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FilterHREmployee.resx">
       <DependentUpon>FilterHREmployee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ManageLeave.resx">
+      <DependentUpon>ManageLeave.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ManualAttendanceRequest.resx">
       <DependentUpon>ManualAttendanceRequest.cs</DependentUpon>
@@ -446,11 +487,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -499,6 +535,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\filter %281%29 1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SystemLogo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\MenuLogoAlt.png" />
+    <None Include="Resources\TrashBin.png" />
+    <None Include="Resources\VerticalThreeDots.png" />
+    <None Include="Resources\ExpandRight.png" />
+    <Content Include="Resources\MenuLogo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

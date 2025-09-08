@@ -32,7 +32,7 @@ namespace HRIS_JAP_ATTPAY
                 labelLogOutDetails2.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelLogOutDetails3.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 buttonLogOut.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
-                buttonCancel.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
+                buttonCancel.Font = AttributesClass.GetFont("Roboto-Light", 15f);
             }
             catch (Exception ex)
             {

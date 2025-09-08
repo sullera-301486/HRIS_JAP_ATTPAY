@@ -40,6 +40,7 @@
             // 
             // XpictureBox
             // 
+            this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
             this.XpictureBox.Location = new System.Drawing.Point(423, 12);
             this.XpictureBox.Name = "XpictureBox";
@@ -51,10 +52,11 @@
             // labelLogOutConfirm
             // 
             this.labelLogOutConfirm.AutoSize = true;
+            this.labelLogOutConfirm.Font = new System.Drawing.Font("Microsoft Sans Serif", 21F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelLogOutConfirm.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(36)))), ((int)(((byte)(30)))));
-            this.labelLogOutConfirm.Location = new System.Drawing.Point(72, 65);
+            this.labelLogOutConfirm.Location = new System.Drawing.Point(73, 65);
             this.labelLogOutConfirm.Name = "labelLogOutConfirm";
-            this.labelLogOutConfirm.Size = new System.Drawing.Size(125, 16);
+            this.labelLogOutConfirm.Size = new System.Drawing.Size(329, 39);
             this.labelLogOutConfirm.TabIndex = 2;
             this.labelLogOutConfirm.Text = "Logout Confirmation";
             this.labelLogOutConfirm.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -62,10 +64,11 @@
             // labelLogOutDetails1
             // 
             this.labelLogOutDetails1.AutoSize = true;
+            this.labelLogOutDetails1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelLogOutDetails1.ForeColor = System.Drawing.Color.Black;
-            this.labelLogOutDetails1.Location = new System.Drawing.Point(107, 120);
+            this.labelLogOutDetails1.Location = new System.Drawing.Point(101, 120);
             this.labelLogOutDetails1.Name = "labelLogOutDetails1";
-            this.labelLogOutDetails1.Size = new System.Drawing.Size(189, 16);
+            this.labelLogOutDetails1.Size = new System.Drawing.Size(281, 25);
             this.labelLogOutDetails1.TabIndex = 3;
             this.labelLogOutDetails1.Text = "Please confirm that you want to";
             this.labelLogOutDetails1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -73,10 +76,11 @@
             // labelLogOutDetails2
             // 
             this.labelLogOutDetails2.AutoSize = true;
+            this.labelLogOutDetails2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelLogOutDetails2.ForeColor = System.Drawing.Color.Black;
-            this.labelLogOutDetails2.Location = new System.Drawing.Point(100, 150);
+            this.labelLogOutDetails2.Location = new System.Drawing.Point(94, 150);
             this.labelLogOutDetails2.Name = "labelLogOutDetails2";
-            this.labelLogOutDetails2.Size = new System.Drawing.Size(196, 16);
+            this.labelLogOutDetails2.Size = new System.Drawing.Size(289, 25);
             this.labelLogOutDetails2.TabIndex = 4;
             this.labelLogOutDetails2.Text = "log out of the system to securely";
             this.labelLogOutDetails2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -84,10 +88,11 @@
             // labelLogOutDetails3
             // 
             this.labelLogOutDetails3.AutoSize = true;
+            this.labelLogOutDetails3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelLogOutDetails3.ForeColor = System.Drawing.Color.Black;
-            this.labelLogOutDetails3.Location = new System.Drawing.Point(124, 180);
+            this.labelLogOutDetails3.Location = new System.Drawing.Point(126, 181);
             this.labelLogOutDetails3.Name = "labelLogOutDetails3";
-            this.labelLogOutDetails3.Size = new System.Drawing.Size(155, 16);
+            this.labelLogOutDetails3.Size = new System.Drawing.Size(230, 25);
             this.labelLogOutDetails3.TabIndex = 5;
             this.labelLogOutDetails3.Text = "end your current session.";
             this.labelLogOutDetails3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -95,12 +100,13 @@
             // buttonLogOut
             // 
             this.buttonLogOut.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(81)))), ((int)(((byte)(148)))));
+            this.buttonLogOut.Cursor = System.Windows.Forms.Cursors.Hand;
             this.buttonLogOut.FlatAppearance.BorderSize = 0;
             this.buttonLogOut.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonLogOut.ForeColor = System.Drawing.Color.White;
             this.buttonLogOut.Location = new System.Drawing.Point(85, 240);
             this.buttonLogOut.Name = "buttonLogOut";
-            this.buttonLogOut.Size = new System.Drawing.Size(142, 38);
+            this.buttonLogOut.Size = new System.Drawing.Size(142, 41);
             this.buttonLogOut.TabIndex = 6;
             this.buttonLogOut.Text = "Log Out";
             this.buttonLogOut.UseVisualStyleBackColor = false;
@@ -109,12 +115,13 @@
             // buttonCancel
             // 
             this.buttonCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(154)))), ((int)(((byte)(154)))));
+            this.buttonCancel.Cursor = System.Windows.Forms.Cursors.Hand;
             this.buttonCancel.FlatAppearance.BorderSize = 0;
             this.buttonCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCancel.ForeColor = System.Drawing.Color.White;
             this.buttonCancel.Location = new System.Drawing.Point(275, 240);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(142, 38);
+            this.buttonCancel.Size = new System.Drawing.Size(142, 41);
             this.buttonCancel.TabIndex = 7;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = false;

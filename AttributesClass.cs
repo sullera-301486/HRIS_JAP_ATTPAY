@@ -82,19 +82,6 @@ public static class AttributesClass
         form.MinimumSize = fullSize;
     }
 
-    public static void CenterControl(Control control, Control container)
-    {
-        if (control == null || container == null) return;
-
-        control.Left = (container.Width - control.Width) / 2;
-        control.Top = (container.Height - control.Height) / 2;
-    }
-
-    public static Form GetTopLevelForm(Control ctrl)
-    {
-        return ctrl?.FindForm();
-    }
-
     public static void ShowWithOverlay(Form owner, Form dialog)
     {
         Form formBackground = null;
@@ -200,4 +187,29 @@ public static class AttributesClass
 
         return current ?? startingForm;
     }
+
+    public static void TextboxPlaceholder(TextBox textBox, string placeholder) //act as textbox hint
+    {
+        // Initial setup
+        textBox.Text = placeholder;
+
+        // Handle Enter (focus)
+        textBox.Enter += (s, e) =>
+        {
+            if (textBox.Text == placeholder)
+            {
+                textBox.Text = "";
+            }
+        };
+
+        // Handle Leave (focus lost)
+        textBox.Leave += (s, e) =>
+        {
+            if (string.IsNullOrWhiteSpace(textBox.Text))
+            {
+                textBox.Text = placeholder;
+            }
+        };
+    }
+
 }

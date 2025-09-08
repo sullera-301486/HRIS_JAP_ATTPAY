@@ -24,13 +24,13 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                labelProfile.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelNameInput.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
-                labelID.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
-                labelDepartment.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
-                labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
-                labelContact.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
-                labelEmail.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
+                labelProfile.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
+                labelNameInput.Font = AttributesClass.GetFont("Roboto-Light", 16f);
+                labelID.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
+                labelDepartment.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
+                labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
+                labelContact.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
+                labelEmail.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
                 labelIDInput.Font = AttributesClass.GetFont("Roboto-Light", 11f);
                 labelDepartmentInput.Font = AttributesClass.GetFont("Roboto-Light", 11f);
                 labelPositionInput.Font = AttributesClass.GetFont("Roboto-Light", 11f);
@@ -46,6 +46,7 @@ namespace HRIS_JAP_ATTPAY
         public UserProfile(string adminTag)
         {
             InitializeComponent();
+            SetFont();
             labelIDInput.Text = adminTag; //for admin version via constructor overloading
         }
 
@@ -54,13 +55,5 @@ namespace HRIS_JAP_ATTPAY
             this.Close();
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            //temporary method; rework if necessary
-            //code below shows how to call a new form even when layered, blocking all background forms until foreground form is closed
-            UserProfile dialog = new UserProfile();
-            Form trueOwner = AttributesClass.GetRealOwnerForm(this.FindForm());
-            AttributesClass.ShowWithOverlay(trueOwner, dialog);
-        }
     }
 }

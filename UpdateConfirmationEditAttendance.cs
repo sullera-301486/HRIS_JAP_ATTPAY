@@ -15,6 +15,25 @@ namespace HRIS_JAP_ATTPAY
         public UpdateConfirmationEditAttendance()
         {
             InitializeComponent();
+            setFont();
+        }
+
+        private void XpictureBox_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void buttonCancel_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void setFont()
+        {
+            buttonCancel.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+            buttonConfirm.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+            labelMessage.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+            labelRequestConfirm.Font = AttributesClass.GetFont("Roboto-Regular", 18f);
         }
     }
 }

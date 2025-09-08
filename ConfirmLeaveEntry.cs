@@ -15,6 +15,7 @@ namespace HRIS_JAP_ATTPAY
         public ConfirmLeaveEntry()
         {
             InitializeComponent();
+            setFont();
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
@@ -25,6 +26,26 @@ namespace HRIS_JAP_ATTPAY
         private void buttonConfirm_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void setFont()
+        {
+            try
+            {
+                labelRequestConfirm.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
+                labelMessage.Font = AttributesClass.GetFont("Roboto-Light", 11f);
+                buttonConfirm.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                buttonCancel.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Font load failed: " + ex.Message);
+            }
+        }
+
+        private void buttonCancel_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

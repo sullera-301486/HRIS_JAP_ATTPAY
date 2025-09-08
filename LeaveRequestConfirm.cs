@@ -15,17 +15,16 @@ namespace HRIS_JAP_ATTPAY
         public LeaveRequestConfirm()
         {
             InitializeComponent();
-            SetFont();
+            setFont();
         }
-        private void SetFont()
+        private void setFont()
         {
             try
             {
                 labelRequestConfirm.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
-                labelMessage.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
+                labelMessage.Font = AttributesClass.GetFont("Roboto-Light", 11f);
                 buttonConfirm.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                buttonCancel.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-
+                buttonCancel.Font = AttributesClass.GetFont("Roboto-Light", 12f);
             }
             catch (Exception ex)
             {
@@ -45,17 +44,7 @@ namespace HRIS_JAP_ATTPAY
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void labelMessage_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void labelRequestConfirm_Click(object sender, EventArgs e)
-        {
-
+            this.Close();
         }
     }
 }

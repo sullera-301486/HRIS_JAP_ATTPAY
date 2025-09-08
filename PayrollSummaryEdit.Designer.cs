@@ -29,121 +29,121 @@
         private void InitializeComponent()
         {
             this.buttonCancel = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.label91 = new System.Windows.Forms.Label();
-            this.label92 = new System.Windows.Forms.Label();
-            this.label89 = new System.Windows.Forms.Label();
-            this.label90 = new System.Windows.Forms.Label();
-            this.label86 = new System.Windows.Forms.Label();
-            this.label85 = new System.Windows.Forms.Label();
-            this.label84 = new System.Windows.Forms.Label();
+            this.buttonUpdate = new System.Windows.Forms.Button();
+            this.labelVacationLeaveBalance = new System.Windows.Forms.Label();
+            this.labelSickLeaveBalance = new System.Windows.Forms.Label();
+            this.labelVacationLeaveDebit = new System.Windows.Forms.Label();
+            this.labelSickLeaveDebit = new System.Windows.Forms.Label();
+            this.labelLeaveDebit = new System.Windows.Forms.Label();
+            this.labelLeaveBalance = new System.Windows.Forms.Label();
+            this.labelLeave = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.label82 = new System.Windows.Forms.Label();
-            this.label79 = new System.Windows.Forms.Label();
-            this.label78 = new System.Windows.Forms.Label();
-            this.label77 = new System.Windows.Forms.Label();
+            this.labelOverallTotalInput = new System.Windows.Forms.Label();
+            this.labelSickLeave = new System.Windows.Forms.Label();
+            this.labelVacationLeave = new System.Windows.Forms.Label();
+            this.labelLeaveCredit = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.label80 = new System.Windows.Forms.Label();
+            this.labelGrossPayInput = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.label83 = new System.Windows.Forms.Label();
-            this.label81 = new System.Windows.Forms.Label();
-            this.label42 = new System.Windows.Forms.Label();
-            this.label65 = new System.Windows.Forms.Label();
-            this.label66 = new System.Windows.Forms.Label();
-            this.label67 = new System.Windows.Forms.Label();
-            this.label68 = new System.Windows.Forms.Label();
-            this.label57 = new System.Windows.Forms.Label();
-            this.label58 = new System.Windows.Forms.Label();
-            this.label59 = new System.Windows.Forms.Label();
-            this.label60 = new System.Windows.Forms.Label();
-            this.label32 = new System.Windows.Forms.Label();
-            this.label43 = new System.Windows.Forms.Label();
-            this.label44 = new System.Windows.Forms.Label();
-            this.label45 = new System.Windows.Forms.Label();
-            this.label46 = new System.Windows.Forms.Label();
-            this.label47 = new System.Windows.Forms.Label();
-            this.label48 = new System.Windows.Forms.Label();
-            this.label56 = new System.Windows.Forms.Label();
-            this.label30 = new System.Windows.Forms.Label();
-            this.label41 = new System.Windows.Forms.Label();
-            this.label49 = new System.Windows.Forms.Label();
-            this.label50 = new System.Windows.Forms.Label();
-            this.label51 = new System.Windows.Forms.Label();
-            this.label52 = new System.Windows.Forms.Label();
-            this.label53 = new System.Windows.Forms.Label();
-            this.label54 = new System.Windows.Forms.Label();
-            this.label55 = new System.Windows.Forms.Label();
-            this.label40 = new System.Windows.Forms.Label();
-            this.label39 = new System.Windows.Forms.Label();
-            this.label33 = new System.Windows.Forms.Label();
-            this.label31 = new System.Windows.Forms.Label();
-            this.label29 = new System.Windows.Forms.Label();
-            this.label28 = new System.Windows.Forms.Label();
-            this.label27 = new System.Windows.Forms.Label();
-            this.label26 = new System.Windows.Forms.Label();
-            this.label25 = new System.Windows.Forms.Label();
-            this.label24 = new System.Windows.Forms.Label();
-            this.label23 = new System.Windows.Forms.Label();
-            this.label19 = new System.Windows.Forms.Label();
-            this.label22 = new System.Windows.Forms.Label();
-            this.label21 = new System.Windows.Forms.Label();
-            this.label20 = new System.Windows.Forms.Label();
-            this.label17 = new System.Windows.Forms.Label();
-            this.label18 = new System.Windows.Forms.Label();
-            this.label15 = new System.Windows.Forms.Label();
-            this.label16 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label11 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.labelDateInput = new System.Windows.Forms.Label();
+            this.labelDeductions = new System.Windows.Forms.Label();
+            this.labelDeductionsInput = new System.Windows.Forms.Label();
+            this.labelGrossPay = new System.Windows.Forms.Label();
+            this.labelOthers = new System.Windows.Forms.Label();
+            this.labelCoopLoan = new System.Windows.Forms.Label();
+            this.labelCoopContri = new System.Windows.Forms.Label();
+            this.labelCashAdvance = new System.Windows.Forms.Label();
+            this.labelWithTaxAmountDebitInput = new System.Windows.Forms.Label();
+            this.labelSSSAmountDebitInput = new System.Windows.Forms.Label();
+            this.labelPagIbigAmountDebitInput = new System.Windows.Forms.Label();
+            this.labelPhilhealthAmountDebitInput = new System.Windows.Forms.Label();
+            this.labelBasicPayAmountCreditInput = new System.Windows.Forms.Label();
+            this.labelOvertimePerHourAmountCreditInput = new System.Windows.Forms.Label();
+            this.labelOvertimePerMinuteAmountCreditInput = new System.Windows.Forms.Label();
+            this.labelIncentivesAmountCreditInput = new System.Windows.Forms.Label();
+            this.labelCommissionAmountCreditInput = new System.Windows.Forms.Label();
+            this.labelGasAllowanceAmountCreditInput = new System.Windows.Forms.Label();
+            this.labelFoodAllowanceAmountCreditInput = new System.Windows.Forms.Label();
+            this.labelCommunicationAmountCreditInput = new System.Windows.Forms.Label();
+            this.labelBasicPayAmountBaseInput = new System.Windows.Forms.Label();
+            this.labelWithTax = new System.Windows.Forms.Label();
+            this.labelSSS = new System.Windows.Forms.Label();
+            this.labelPagIbig = new System.Windows.Forms.Label();
+            this.labelHousingLoan = new System.Windows.Forms.Label();
+            this.labelPagIbigLoan = new System.Windows.Forms.Label();
+            this.labelPhilhealth = new System.Windows.Forms.Label();
+            this.labelCarLoan = new System.Windows.Forms.Label();
+            this.labelSSSLoan = new System.Windows.Forms.Label();
+            this.labelOvertimePerHourAmountBaseInput = new System.Windows.Forms.Label();
+            this.labelOvertimePerMinuteAmountBaseInput = new System.Windows.Forms.Label();
+            this.labelBasicPayCredit = new System.Windows.Forms.Label();
+            this.labelOvertimeCredit = new System.Windows.Forms.Label();
+            this.labelBasicPay = new System.Windows.Forms.Label();
+            this.labelOvertimePerHour = new System.Windows.Forms.Label();
+            this.labelOvertimePerMinute = new System.Windows.Forms.Label();
+            this.labelCommunication = new System.Windows.Forms.Label();
+            this.labelGasAllowance = new System.Windows.Forms.Label();
+            this.labelIncentives = new System.Windows.Forms.Label();
+            this.labelFoodAllowance = new System.Windows.Forms.Label();
+            this.labelCommission = new System.Windows.Forms.Label();
+            this.labelAmountDebit = new System.Windows.Forms.Label();
+            this.labelAmountCredit = new System.Windows.Forms.Label();
+            this.labelDetails = new System.Windows.Forms.Label();
+            this.labelDebit = new System.Windows.Forms.Label();
+            this.labelCredit = new System.Windows.Forms.Label();
+            this.labelAmountBase = new System.Windows.Forms.Label();
+            this.labelPayAndAllowances = new System.Windows.Forms.Label();
+            this.labelDateCoveredInput = new System.Windows.Forms.Label();
+            this.labelDaysInput = new System.Windows.Forms.Label();
+            this.labelDaysPresentInput = new System.Windows.Forms.Label();
+            this.labelOvertimeInput = new System.Windows.Forms.Label();
+            this.labelOvertime = new System.Windows.Forms.Label();
+            this.labelDaysPresent = new System.Windows.Forms.Label();
+            this.labelDays = new System.Windows.Forms.Label();
+            this.labelSalaryInput = new System.Windows.Forms.Label();
             this.labelNameInput = new System.Windows.Forms.Label();
+            this.labelSalary = new System.Windows.Forms.Label();
+            this.labelDailyRate = new System.Windows.Forms.Label();
+            this.labelDepartment = new System.Windows.Forms.Label();
+            this.labelPosition = new System.Windows.Forms.Label();
+            this.labelDepartmentInput = new System.Windows.Forms.Label();
+            this.labelPositionInput = new System.Windows.Forms.Label();
             this.labelIDInput = new System.Windows.Forms.Label();
-            this.labelDate = new System.Windows.Forms.Label();
+            this.labelDateCovered = new System.Windows.Forms.Label();
             this.labelName = new System.Windows.Forms.Label();
             this.labelID = new System.Windows.Forms.Label();
             this.XpictureBox = new System.Windows.Forms.PictureBox();
-            this.labelRequestConfirm = new System.Windows.Forms.Label();
-            this.textBoxOverTimeIn = new System.Windows.Forms.TextBox();
-            this.label93 = new System.Windows.Forms.Label();
-            this.label94 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.textBox4 = new System.Windows.Forms.TextBox();
-            this.textBox5 = new System.Windows.Forms.TextBox();
-            this.textBox6 = new System.Windows.Forms.TextBox();
-            this.textBox7 = new System.Windows.Forms.TextBox();
-            this.textBox8 = new System.Windows.Forms.TextBox();
-            this.textBox9 = new System.Windows.Forms.TextBox();
-            this.textBox10 = new System.Windows.Forms.TextBox();
-            this.textBox11 = new System.Windows.Forms.TextBox();
-            this.textBox12 = new System.Windows.Forms.TextBox();
-            this.textBox13 = new System.Windows.Forms.TextBox();
-            this.textBox14 = new System.Windows.Forms.TextBox();
-            this.textBox15 = new System.Windows.Forms.TextBox();
-            this.textBox16 = new System.Windows.Forms.TextBox();
-            this.textBox17 = new System.Windows.Forms.TextBox();
-            this.textBox18 = new System.Windows.Forms.TextBox();
-            this.textBox19 = new System.Windows.Forms.TextBox();
-            this.textBox20 = new System.Windows.Forms.TextBox();
-            this.textBox21 = new System.Windows.Forms.TextBox();
-            this.textBox22 = new System.Windows.Forms.TextBox();
-            this.textBox23 = new System.Windows.Forms.TextBox();
-            this.textBox24 = new System.Windows.Forms.TextBox();
-            this.textBox25 = new System.Windows.Forms.TextBox();
-            this.textBox26 = new System.Windows.Forms.TextBox();
-            this.textBox27 = new System.Windows.Forms.TextBox();
-            this.textBox28 = new System.Windows.Forms.TextBox();
+            this.labelPayrollSummary = new System.Windows.Forms.Label();
+            this.textBoxIncentivesAmountBaseInput = new System.Windows.Forms.TextBox();
+            this.labelGondolaAmountCreditInput = new System.Windows.Forms.Label();
+            this.labelGondola = new System.Windows.Forms.Label();
+            this.textBoxCommissionAmountBaseInput = new System.Windows.Forms.TextBox();
+            this.textBoxGasAllowanceAmountBaseInput = new System.Windows.Forms.TextBox();
+            this.textBoxFoodAllowanceAmountBaseInput = new System.Windows.Forms.TextBox();
+            this.textBoxCommunicationAmountBaseInput = new System.Windows.Forms.TextBox();
+            this.textBoxGondolaAmountBaseInput = new System.Windows.Forms.TextBox();
+            this.textBoxCashAdvanceAmountDebitInput = new System.Windows.Forms.TextBox();
+            this.textBoxHousingLoanAmountDebitInput = new System.Windows.Forms.TextBox();
+            this.textBoxCarLoanAmountDebitInput = new System.Windows.Forms.TextBox();
+            this.textBoxPagIbigLoanAmountDebitInput = new System.Windows.Forms.TextBox();
+            this.textBoxSSSLoanAmountDebitInput = new System.Windows.Forms.TextBox();
+            this.textBoxOthersAmountDebitInput = new System.Windows.Forms.TextBox();
+            this.textBoxCoopContriAmountDebitInput = new System.Windows.Forms.TextBox();
+            this.textBoxCoopLoanAmountDebitInput = new System.Windows.Forms.TextBox();
+            this.textBoxHousingLoanDetails = new System.Windows.Forms.TextBox();
+            this.textBoxCarLoanDetails = new System.Windows.Forms.TextBox();
+            this.textBoxPagIbigLoanDetails = new System.Windows.Forms.TextBox();
+            this.textBoxSSSLoanDetails = new System.Windows.Forms.TextBox();
+            this.textBoxPhilhealthDetails = new System.Windows.Forms.TextBox();
+            this.textBoxPagIbigDetails = new System.Windows.Forms.TextBox();
+            this.textBoxSSSDetails = new System.Windows.Forms.TextBox();
+            this.textBoxWithTaxDetails = new System.Windows.Forms.TextBox();
+            this.textBoxOthersDetails = new System.Windows.Forms.TextBox();
+            this.textBoxCoopContriDetails = new System.Windows.Forms.TextBox();
+            this.textBoxCoopLoanDetails = new System.Windows.Forms.TextBox();
+            this.textBoxCashAdvanceDetails = new System.Windows.Forms.TextBox();
+            this.textBoxVacationLeaveCredit = new System.Windows.Forms.TextBox();
+            this.textBoxSickLeaveCredit = new System.Windows.Forms.TextBox();
+            this.textBoxDailyRateInput = new System.Windows.Forms.TextBox();
             this.panel3.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -153,901 +153,986 @@
             // buttonCancel
             // 
             this.buttonCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(154)))), ((int)(((byte)(154)))));
+            this.buttonCancel.Cursor = System.Windows.Forms.Cursors.Hand;
             this.buttonCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonCancel.ForeColor = System.Drawing.Color.White;
-            this.buttonCancel.Location = new System.Drawing.Point(731, 633);
+            this.buttonCancel.Location = new System.Drawing.Point(975, 779);
+            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(135, 30);
+            this.buttonCancel.Size = new System.Drawing.Size(180, 41);
             this.buttonCancel.TabIndex = 248;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = false;
+            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
             // 
-            // button1
+            // buttonUpdate
             // 
-            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(81)))), ((int)(((byte)(148)))));
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.ForeColor = System.Drawing.Color.White;
-            this.button1.Location = new System.Drawing.Point(574, 633);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(135, 30);
-            this.button1.TabIndex = 247;
-            this.button1.Text = "Update";
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.buttonUpdate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(81)))), ((int)(((byte)(148)))));
+            this.buttonUpdate.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.buttonUpdate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonUpdate.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonUpdate.ForeColor = System.Drawing.Color.White;
+            this.buttonUpdate.Location = new System.Drawing.Point(765, 779);
+            this.buttonUpdate.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonUpdate.Name = "buttonUpdate";
+            this.buttonUpdate.Size = new System.Drawing.Size(180, 41);
+            this.buttonUpdate.TabIndex = 247;
+            this.buttonUpdate.Text = "Update";
+            this.buttonUpdate.UseVisualStyleBackColor = false;
+            this.buttonUpdate.Click += new System.EventHandler(this.buttonUpdate_Click);
             // 
-            // label91
+            // labelVacationLeaveBalance
             // 
-            this.label91.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label91.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label91.Location = new System.Drawing.Point(424, 627);
-            this.label91.Name = "label91";
-            this.label91.Size = new System.Drawing.Size(97, 25);
-            this.label91.TabIndex = 246;
-            this.label91.Text = "N/A";
-            this.label91.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelVacationLeaveBalance.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelVacationLeaveBalance.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelVacationLeaveBalance.Location = new System.Drawing.Point(565, 772);
+            this.labelVacationLeaveBalance.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelVacationLeaveBalance.Name = "labelVacationLeaveBalance";
+            this.labelVacationLeaveBalance.Size = new System.Drawing.Size(129, 31);
+            this.labelVacationLeaveBalance.TabIndex = 246;
+            this.labelVacationLeaveBalance.Text = "N/A";
+            this.labelVacationLeaveBalance.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label92
+            // labelSickLeaveBalance
             // 
-            this.label92.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label92.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label92.Location = new System.Drawing.Point(424, 655);
-            this.label92.Name = "label92";
-            this.label92.Size = new System.Drawing.Size(97, 25);
-            this.label92.TabIndex = 245;
-            this.label92.Text = "N/A";
-            this.label92.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelSickLeaveBalance.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelSickLeaveBalance.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSickLeaveBalance.Location = new System.Drawing.Point(565, 806);
+            this.labelSickLeaveBalance.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSickLeaveBalance.Name = "labelSickLeaveBalance";
+            this.labelSickLeaveBalance.Size = new System.Drawing.Size(129, 31);
+            this.labelSickLeaveBalance.TabIndex = 245;
+            this.labelSickLeaveBalance.Text = "N/A";
+            this.labelSickLeaveBalance.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label89
+            // labelVacationLeaveDebit
             // 
-            this.label89.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label89.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label89.Location = new System.Drawing.Point(307, 627);
-            this.label89.Name = "label89";
-            this.label89.Size = new System.Drawing.Size(97, 25);
-            this.label89.TabIndex = 244;
-            this.label89.Text = "N/A";
-            this.label89.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelVacationLeaveDebit.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelVacationLeaveDebit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelVacationLeaveDebit.Location = new System.Drawing.Point(409, 772);
+            this.labelVacationLeaveDebit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelVacationLeaveDebit.Name = "labelVacationLeaveDebit";
+            this.labelVacationLeaveDebit.Size = new System.Drawing.Size(129, 31);
+            this.labelVacationLeaveDebit.TabIndex = 244;
+            this.labelVacationLeaveDebit.Text = "N/A";
+            this.labelVacationLeaveDebit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label90
+            // labelSickLeaveDebit
             // 
-            this.label90.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label90.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label90.Location = new System.Drawing.Point(307, 655);
-            this.label90.Name = "label90";
-            this.label90.Size = new System.Drawing.Size(97, 25);
-            this.label90.TabIndex = 243;
-            this.label90.Text = "N/A";
-            this.label90.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelSickLeaveDebit.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelSickLeaveDebit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSickLeaveDebit.Location = new System.Drawing.Point(409, 806);
+            this.labelSickLeaveDebit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSickLeaveDebit.Name = "labelSickLeaveDebit";
+            this.labelSickLeaveDebit.Size = new System.Drawing.Size(129, 31);
+            this.labelSickLeaveDebit.TabIndex = 243;
+            this.labelSickLeaveDebit.Text = "N/A";
+            this.labelSickLeaveDebit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label86
+            // labelLeaveDebit
             // 
-            this.label86.AutoSize = true;
-            this.label86.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label86.Location = new System.Drawing.Point(335, 609);
-            this.label86.Name = "label86";
-            this.label86.Size = new System.Drawing.Size(44, 16);
-            this.label86.TabIndex = 240;
-            this.label86.Text = "Debit";
-            this.label86.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelLeaveDebit.AutoSize = true;
+            this.labelLeaveDebit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelLeaveDebit.Location = new System.Drawing.Point(447, 750);
+            this.labelLeaveDebit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelLeaveDebit.Name = "labelLeaveDebit";
+            this.labelLeaveDebit.Size = new System.Drawing.Size(54, 20);
+            this.labelLeaveDebit.TabIndex = 240;
+            this.labelLeaveDebit.Text = "Debit";
+            this.labelLeaveDebit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label85
+            // labelLeaveBalance
             // 
-            this.label85.AutoSize = true;
-            this.label85.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label85.Location = new System.Drawing.Point(446, 609);
-            this.label85.Name = "label85";
-            this.label85.Size = new System.Drawing.Size(64, 16);
-            this.label85.TabIndex = 239;
-            this.label85.Text = "Balance";
-            this.label85.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelLeaveBalance.AutoSize = true;
+            this.labelLeaveBalance.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelLeaveBalance.Location = new System.Drawing.Point(595, 750);
+            this.labelLeaveBalance.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelLeaveBalance.Name = "labelLeaveBalance";
+            this.labelLeaveBalance.Size = new System.Drawing.Size(77, 20);
+            this.labelLeaveBalance.TabIndex = 239;
+            this.labelLeaveBalance.Text = "Balance";
+            this.labelLeaveBalance.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label84
+            // labelLeave
             // 
-            this.label84.AutoSize = true;
-            this.label84.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label84.Location = new System.Drawing.Point(49, 609);
-            this.label84.Name = "label84";
-            this.label84.Size = new System.Drawing.Size(50, 16);
-            this.label84.TabIndex = 238;
-            this.label84.Text = "Leave";
-            this.label84.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelLeave.AutoSize = true;
+            this.labelLeave.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelLeave.Location = new System.Drawing.Point(65, 750);
+            this.labelLeave.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelLeave.Name = "labelLeave";
+            this.labelLeave.Size = new System.Drawing.Size(59, 20);
+            this.labelLeave.TabIndex = 238;
+            this.labelLeave.Text = "Leave";
+            this.labelLeave.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // panel3
             // 
             this.panel3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(95)))), ((int)(((byte)(218)))), ((int)(((byte)(71)))));
-            this.panel3.Controls.Add(this.label82);
-            this.panel3.Location = new System.Drawing.Point(791, 582);
+            this.panel3.Controls.Add(this.labelOverallTotalInput);
+            this.panel3.Location = new System.Drawing.Point(1055, 716);
+            this.panel3.Margin = new System.Windows.Forms.Padding(4);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(94, 24);
+            this.panel3.Size = new System.Drawing.Size(125, 30);
             this.panel3.TabIndex = 237;
             // 
-            // label82
+            // labelOverallTotalInput
             // 
-            this.label82.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label82.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label82.Location = new System.Drawing.Point(-2, 4);
-            this.label82.Name = "label82";
-            this.label82.Size = new System.Drawing.Size(97, 16);
-            this.label82.TabIndex = 141;
-            this.label82.Text = "₱0.00";
-            this.label82.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelOverallTotalInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelOverallTotalInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelOverallTotalInput.Location = new System.Drawing.Point(-3, 5);
+            this.labelOverallTotalInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelOverallTotalInput.Name = "labelOverallTotalInput";
+            this.labelOverallTotalInput.Size = new System.Drawing.Size(129, 20);
+            this.labelOverallTotalInput.TabIndex = 141;
+            this.labelOverallTotalInput.Text = "₱0.00";
+            this.labelOverallTotalInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label79
+            // labelSickLeave
             // 
-            this.label79.AutoSize = true;
-            this.label79.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label79.Location = new System.Drawing.Point(25, 659);
-            this.label79.Name = "label79";
-            this.label79.Size = new System.Drawing.Size(84, 16);
-            this.label79.TabIndex = 236;
-            this.label79.Text = "Sick Leave";
-            this.label79.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelSickLeave.AutoSize = true;
+            this.labelSickLeave.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSickLeave.Location = new System.Drawing.Point(33, 811);
+            this.labelSickLeave.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSickLeave.Name = "labelSickLeave";
+            this.labelSickLeave.Size = new System.Drawing.Size(101, 20);
+            this.labelSickLeave.TabIndex = 236;
+            this.labelSickLeave.Text = "Sick Leave";
+            this.labelSickLeave.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label78
+            // labelVacationLeave
             // 
-            this.label78.AutoSize = true;
-            this.label78.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label78.Location = new System.Drawing.Point(25, 633);
-            this.label78.Name = "label78";
-            this.label78.Size = new System.Drawing.Size(115, 16);
-            this.label78.TabIndex = 235;
-            this.label78.Text = "Vacation Leave";
-            this.label78.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelVacationLeave.AutoSize = true;
+            this.labelVacationLeave.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelVacationLeave.Location = new System.Drawing.Point(33, 779);
+            this.labelVacationLeave.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelVacationLeave.Name = "labelVacationLeave";
+            this.labelVacationLeave.Size = new System.Drawing.Size(138, 20);
+            this.labelVacationLeave.TabIndex = 235;
+            this.labelVacationLeave.Text = "Vacation Leave";
+            this.labelVacationLeave.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label77
+            // labelLeaveCredit
             // 
-            this.label77.AutoSize = true;
-            this.label77.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label77.Location = new System.Drawing.Point(196, 609);
-            this.label77.Name = "label77";
-            this.label77.Size = new System.Drawing.Size(48, 16);
-            this.label77.TabIndex = 234;
-            this.label77.Text = "Credit";
-            this.label77.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelLeaveCredit.AutoSize = true;
+            this.labelLeaveCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelLeaveCredit.Location = new System.Drawing.Point(261, 750);
+            this.labelLeaveCredit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelLeaveCredit.Name = "labelLeaveCredit";
+            this.labelLeaveCredit.Size = new System.Drawing.Size(60, 20);
+            this.labelLeaveCredit.TabIndex = 234;
+            this.labelLeaveCredit.Text = "Credit";
+            this.labelLeaveCredit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(233)))), ((int)(((byte)(64)))));
-            this.panel1.Controls.Add(this.label80);
+            this.panel1.Controls.Add(this.labelGrossPayInput);
             this.panel1.Controls.Add(this.panel2);
-            this.panel1.Controls.Add(this.label42);
-            this.panel1.Location = new System.Drawing.Point(29, 582);
+            this.panel1.Controls.Add(this.labelGrossPay);
+            this.panel1.Location = new System.Drawing.Point(39, 716);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(856, 24);
+            this.panel1.Size = new System.Drawing.Size(1141, 30);
             this.panel1.TabIndex = 233;
             // 
-            // label80
+            // labelGrossPayInput
             // 
-            this.label80.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label80.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label80.Location = new System.Drawing.Point(397, 4);
-            this.label80.Name = "label80";
-            this.label80.Size = new System.Drawing.Size(97, 16);
-            this.label80.TabIndex = 139;
-            this.label80.Text = "₱0.00";
-            this.label80.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelGrossPayInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelGrossPayInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelGrossPayInput.Location = new System.Drawing.Point(529, 5);
+            this.labelGrossPayInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelGrossPayInput.Name = "labelGrossPayInput";
+            this.labelGrossPayInput.Size = new System.Drawing.Size(129, 20);
+            this.labelGrossPayInput.TabIndex = 139;
+            this.labelGrossPayInput.Text = "₱0.00";
+            this.labelGrossPayInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(163)))), ((int)(((byte)(64)))));
-            this.panel2.Controls.Add(this.label83);
-            this.panel2.Controls.Add(this.label81);
-            this.panel2.Location = new System.Drawing.Point(532, 0);
+            this.panel2.Controls.Add(this.labelDeductions);
+            this.panel2.Controls.Add(this.labelDeductionsInput);
+            this.panel2.Location = new System.Drawing.Point(709, 0);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(231, 24);
+            this.panel2.Size = new System.Drawing.Size(308, 30);
             this.panel2.TabIndex = 137;
             // 
-            // label83
-            // 
-            this.label83.AutoSize = true;
-            this.label83.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label83.Location = new System.Drawing.Point(12, 3);
-            this.label83.Name = "label83";
-            this.label83.Size = new System.Drawing.Size(85, 16);
-            this.label83.TabIndex = 140;
-            this.label83.Text = "Deductions";
-            this.label83.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label81
-            // 
-            this.label81.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label81.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label81.Location = new System.Drawing.Point(108, 4);
-            this.label81.Name = "label81";
-            this.label81.Size = new System.Drawing.Size(97, 16);
-            this.label81.TabIndex = 140;
-            this.label81.Text = "₱0.00";
-            this.label81.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label42
-            // 
-            this.label42.AutoSize = true;
-            this.label42.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label42.Location = new System.Drawing.Point(136, 4);
-            this.label42.Name = "label42";
-            this.label42.Size = new System.Drawing.Size(79, 16);
-            this.label42.TabIndex = 134;
-            this.label42.Text = "Gross Pay";
-            this.label42.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label65
-            // 
-            this.label65.AutoSize = true;
-            this.label65.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label65.Location = new System.Drawing.Point(551, 552);
-            this.label65.Name = "label65";
-            this.label65.Size = new System.Drawing.Size(52, 16);
-            this.label65.TabIndex = 224;
-            this.label65.Text = "Others";
-            this.label65.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label66
-            // 
-            this.label66.AutoSize = true;
-            this.label66.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label66.Location = new System.Drawing.Point(551, 498);
-            this.label66.Name = "label66";
-            this.label66.Size = new System.Drawing.Size(87, 16);
-            this.label66.TabIndex = 223;
-            this.label66.Text = "COOP Loan";
-            this.label66.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label67
-            // 
-            this.label67.AutoSize = true;
-            this.label67.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label67.Location = new System.Drawing.Point(551, 525);
-            this.label67.Name = "label67";
-            this.label67.Size = new System.Drawing.Size(93, 16);
-            this.label67.TabIndex = 222;
-            this.label67.Text = "COOP Contri";
-            this.label67.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label68
-            // 
-            this.label68.AutoSize = true;
-            this.label68.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label68.Location = new System.Drawing.Point(551, 471);
-            this.label68.Name = "label68";
-            this.label68.Size = new System.Drawing.Size(107, 16);
-            this.label68.TabIndex = 221;
-            this.label68.Text = "Cash Advance";
-            this.label68.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label57
-            // 
-            this.label57.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label57.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label57.Location = new System.Drawing.Point(669, 253);
-            this.label57.Name = "label57";
-            this.label57.Size = new System.Drawing.Size(97, 25);
-            this.label57.TabIndex = 220;
-            this.label57.Text = "₱0.00";
-            this.label57.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label58
-            // 
-            this.label58.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label58.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label58.Location = new System.Drawing.Point(669, 278);
-            this.label58.Name = "label58";
-            this.label58.Size = new System.Drawing.Size(97, 25);
-            this.label58.TabIndex = 219;
-            this.label58.Text = "₱0.00";
-            this.label58.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label59
-            // 
-            this.label59.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label59.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label59.Location = new System.Drawing.Point(669, 305);
-            this.label59.Name = "label59";
-            this.label59.Size = new System.Drawing.Size(97, 25);
-            this.label59.TabIndex = 218;
-            this.label59.Text = "₱0.00";
-            this.label59.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label60
-            // 
-            this.label60.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label60.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label60.Location = new System.Drawing.Point(669, 332);
-            this.label60.Name = "label60";
-            this.label60.Size = new System.Drawing.Size(97, 25);
-            this.label60.TabIndex = 217;
-            this.label60.Text = "₱0.00";
-            this.label60.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label32
-            // 
-            this.label32.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label32.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label32.Location = new System.Drawing.Point(430, 251);
-            this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(97, 25);
-            this.label32.TabIndex = 212;
-            this.label32.Text = "₱0.00";
-            this.label32.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label43
-            // 
-            this.label43.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label43.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label43.Location = new System.Drawing.Point(430, 281);
-            this.label43.Name = "label43";
-            this.label43.Size = new System.Drawing.Size(97, 25);
-            this.label43.TabIndex = 211;
-            this.label43.Text = "₱0.00";
-            this.label43.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label44
-            // 
-            this.label44.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label44.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label44.Location = new System.Drawing.Point(430, 309);
-            this.label44.Name = "label44";
-            this.label44.Size = new System.Drawing.Size(97, 25);
-            this.label44.TabIndex = 210;
-            this.label44.Text = "₱0.00";
-            this.label44.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label45
-            // 
-            this.label45.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label45.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label45.Location = new System.Drawing.Point(430, 337);
-            this.label45.Name = "label45";
-            this.label45.Size = new System.Drawing.Size(97, 25);
-            this.label45.TabIndex = 209;
-            this.label45.Text = "₱0.00";
-            this.label45.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label46
-            // 
-            this.label46.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label46.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label46.Location = new System.Drawing.Point(430, 365);
-            this.label46.Name = "label46";
-            this.label46.Size = new System.Drawing.Size(97, 25);
-            this.label46.TabIndex = 208;
-            this.label46.Text = "₱0.00";
-            this.label46.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label47
-            // 
-            this.label47.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label47.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label47.Location = new System.Drawing.Point(430, 393);
-            this.label47.Name = "label47";
-            this.label47.Size = new System.Drawing.Size(97, 25);
-            this.label47.TabIndex = 207;
-            this.label47.Text = "₱0.00";
-            this.label47.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label48
-            // 
-            this.label48.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label48.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label48.Location = new System.Drawing.Point(430, 421);
-            this.label48.Name = "label48";
-            this.label48.Size = new System.Drawing.Size(97, 25);
-            this.label48.TabIndex = 206;
-            this.label48.Text = "₱0.00";
-            this.label48.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label56
-            // 
-            this.label56.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label56.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label56.Location = new System.Drawing.Point(430, 449);
-            this.label56.Name = "label56";
-            this.label56.Size = new System.Drawing.Size(97, 25);
-            this.label56.TabIndex = 205;
-            this.label56.Text = "₱0.00";
-            this.label56.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label30
-            // 
-            this.label30.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label30.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label30.Location = new System.Drawing.Point(175, 251);
-            this.label30.Name = "label30";
-            this.label30.Size = new System.Drawing.Size(97, 25);
-            this.label30.TabIndex = 204;
-            this.label30.Text = "₱0.00";
-            this.label30.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label41
-            // 
-            this.label41.AutoSize = true;
-            this.label41.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label41.Location = new System.Drawing.Point(551, 255);
-            this.label41.Name = "label41";
-            this.label41.Size = new System.Drawing.Size(52, 16);
-            this.label41.TabIndex = 203;
-            this.label41.Text = "W/Tax";
-            this.label41.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label49
-            // 
-            this.label49.AutoSize = true;
-            this.label49.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label49.Location = new System.Drawing.Point(551, 282);
-            this.label49.Name = "label49";
-            this.label49.Size = new System.Drawing.Size(37, 16);
-            this.label49.TabIndex = 202;
-            this.label49.Text = "SSS";
-            this.label49.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label50
-            // 
-            this.label50.AutoSize = true;
-            this.label50.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label50.Location = new System.Drawing.Point(551, 309);
-            this.label50.Name = "label50";
-            this.label50.Size = new System.Drawing.Size(72, 16);
-            this.label50.TabIndex = 201;
-            this.label50.Text = "PAG-IBIG";
-            this.label50.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label51
-            // 
-            this.label51.AutoSize = true;
-            this.label51.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label51.Location = new System.Drawing.Point(551, 444);
-            this.label51.Name = "label51";
-            this.label51.Size = new System.Drawing.Size(114, 16);
-            this.label51.TabIndex = 200;
-            this.label51.Text = "HOUSING Loan";
-            this.label51.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label52
-            // 
-            this.label52.AutoSize = true;
-            this.label52.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label52.Location = new System.Drawing.Point(551, 390);
-            this.label52.Name = "label52";
-            this.label52.Size = new System.Drawing.Size(110, 16);
-            this.label52.TabIndex = 199;
-            this.label52.Text = "PAG-IBIG Loan";
-            this.label52.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label53
-            // 
-            this.label53.AutoSize = true;
-            this.label53.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label53.Location = new System.Drawing.Point(551, 336);
-            this.label53.Name = "label53";
-            this.label53.Size = new System.Drawing.Size(100, 16);
-            this.label53.TabIndex = 198;
-            this.label53.Text = "PHILHEALTH";
-            this.label53.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label54
-            // 
-            this.label54.AutoSize = true;
-            this.label54.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label54.Location = new System.Drawing.Point(551, 417);
-            this.label54.Name = "label54";
-            this.label54.Size = new System.Drawing.Size(76, 16);
-            this.label54.TabIndex = 197;
-            this.label54.Text = "CAR Loan";
-            this.label54.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label55
-            // 
-            this.label55.AutoSize = true;
-            this.label55.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label55.Location = new System.Drawing.Point(551, 363);
-            this.label55.Name = "label55";
-            this.label55.Size = new System.Drawing.Size(75, 16);
-            this.label55.TabIndex = 196;
-            this.label55.Text = "SSS Loan";
-            this.label55.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label40
-            // 
-            this.label40.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label40.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label40.Location = new System.Drawing.Point(175, 279);
-            this.label40.Name = "label40";
-            this.label40.Size = new System.Drawing.Size(97, 25);
-            this.label40.TabIndex = 195;
-            this.label40.Text = "₱0.00";
-            this.label40.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label39
-            // 
-            this.label39.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label39.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label39.Location = new System.Drawing.Point(175, 309);
-            this.label39.Name = "label39";
-            this.label39.Size = new System.Drawing.Size(97, 25);
-            this.label39.TabIndex = 194;
-            this.label39.Text = "₱0.00";
-            this.label39.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label33
-            // 
-            this.label33.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label33.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label33.Location = new System.Drawing.Point(308, 253);
-            this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(100, 25);
-            this.label33.TabIndex = 188;
-            this.label33.Text = "₱0.00";
-            this.label33.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label31
-            // 
-            this.label31.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label31.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label31.Location = new System.Drawing.Point(308, 281);
-            this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(100, 25);
-            this.label31.TabIndex = 187;
-            this.label31.Text = "₱0.00";
-            this.label31.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label29
-            // 
-            this.label29.AutoSize = true;
-            this.label29.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label29.Location = new System.Drawing.Point(26, 255);
-            this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(77, 16);
-            this.label29.TabIndex = 186;
-            this.label29.Text = "Basic Pay";
-            this.label29.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label28
-            // 
-            this.label28.AutoSize = true;
-            this.label28.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label28.Location = new System.Drawing.Point(26, 283);
-            this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(90, 16);
-            this.label28.TabIndex = 185;
-            this.label28.Text = "Overtime/Hr";
-            this.label28.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label27
-            // 
-            this.label27.AutoSize = true;
-            this.label27.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label27.Location = new System.Drawing.Point(26, 311);
-            this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(98, 16);
-            this.label27.TabIndex = 184;
-            this.label27.Text = "Overtime/Min";
-            this.label27.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label26
-            // 
-            this.label26.AutoSize = true;
-            this.label26.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label26.Location = new System.Drawing.Point(26, 451);
-            this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(112, 16);
-            this.label26.TabIndex = 183;
-            this.label26.Text = "Communication";
-            this.label26.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label25
-            // 
-            this.label25.AutoSize = true;
-            this.label25.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label25.Location = new System.Drawing.Point(26, 395);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(110, 16);
-            this.label25.TabIndex = 182;
-            this.label25.Text = "Gas Allowance";
-            this.label25.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label24
-            // 
-            this.label24.AutoSize = true;
-            this.label24.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label24.Location = new System.Drawing.Point(26, 339);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(77, 16);
-            this.label24.TabIndex = 181;
-            this.label24.Text = "Incentives";
-            this.label24.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label23
-            // 
-            this.label23.AutoSize = true;
-            this.label23.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label23.Location = new System.Drawing.Point(26, 423);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(118, 16);
-            this.label23.TabIndex = 180;
-            this.label23.Text = "Food Allowance";
-            this.label23.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label19.Location = new System.Drawing.Point(26, 367);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(83, 16);
-            this.label19.TabIndex = 179;
-            this.label19.Text = "Commision";
-            this.label19.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label22
-            // 
-            this.label22.AutoSize = true;
-            this.label22.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label22.Location = new System.Drawing.Point(687, 213);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(58, 16);
-            this.label22.TabIndex = 178;
-            this.label22.Text = "Amount";
-            this.label22.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label21
-            // 
-            this.label21.AutoSize = true;
-            this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label21.Location = new System.Drawing.Point(448, 213);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(66, 16);
-            this.label21.TabIndex = 177;
-            this.label21.Text = "Amounts";
-            this.label21.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label20.Location = new System.Drawing.Point(810, 213);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(56, 16);
-            this.label20.TabIndex = 176;
-            this.label20.Text = "Details";
-            this.label20.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label17
-            // 
-            this.label17.AutoSize = true;
-            this.label17.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label17.Location = new System.Drawing.Point(579, 213);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(44, 16);
-            this.label17.TabIndex = 175;
-            this.label17.Text = "Debit";
-            this.label17.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label18.Location = new System.Drawing.Point(336, 213);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(48, 16);
-            this.label18.TabIndex = 174;
-            this.label18.Text = "Credit";
-            this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label15.Location = new System.Drawing.Point(193, 213);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(66, 16);
-            this.label15.TabIndex = 173;
-            this.label15.Text = "Amounts";
-            this.label15.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label16.Location = new System.Drawing.Point(37, 204);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(86, 32);
-            this.label16.TabIndex = 172;
-            this.label16.Text = "Pay and \r\nAllowances\r\n";
-            this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label14
-            // 
-            this.label14.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label14.Location = new System.Drawing.Point(147, 140);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(166, 25);
-            this.label14.TabIndex = 171;
-            this.label14.Text = "N/A";
-            this.label14.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label13
-            // 
-            this.label13.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label13.Location = new System.Drawing.Point(117, 167);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(166, 25);
-            this.label13.TabIndex = 170;
-            this.label13.Text = "N/A";
-            this.label13.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label12
-            // 
-            this.label12.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(434, 167);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(166, 25);
-            this.label12.TabIndex = 169;
-            this.label12.Text = "N/A";
-            this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label11
-            // 
-            this.label11.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label11.Location = new System.Drawing.Point(700, 167);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(166, 25);
-            this.label11.TabIndex = 168;
-            this.label11.Text = "N/A";
-            this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.Location = new System.Drawing.Point(628, 171);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(43, 16);
-            this.label9.TabIndex = 167;
-            this.label9.Text = "Days";
-            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(314, 171);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(103, 16);
-            this.label10.TabIndex = 166;
-            this.label10.Text = "Date Covered";
-            this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(26, 171);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(43, 16);
-            this.label8.TabIndex = 165;
-            this.label8.Text = "Days";
-            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label6
-            // 
-            this.label6.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(724, 65);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(166, 25);
-            this.label6.TabIndex = 164;
-            this.label6.Text = "N/A";
-            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label5
-            // 
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(117, 67);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(166, 25);
-            this.label5.TabIndex = 162;
-            this.label5.Text = "Charles Andrei Macaraig";
-            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(628, 69);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(52, 16);
-            this.label3.TabIndex = 161;
-            this.label3.Text = "Salary";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(628, 107);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(80, 16);
-            this.label4.TabIndex = 160;
-            this.label4.Text = "Daily Rate";
-            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(314, 69);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(87, 16);
-            this.label1.TabIndex = 159;
-            this.label1.Text = "Department";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(314, 107);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(63, 16);
-            this.label2.TabIndex = 158;
-            this.label2.Text = "Position";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // labelDateInput
-            // 
-            this.labelDateInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.labelDateInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelDateInput.Location = new System.Drawing.Point(431, 65);
-            this.labelDateInput.Name = "labelDateInput";
-            this.labelDateInput.Size = new System.Drawing.Size(166, 25);
-            this.labelDateInput.TabIndex = 157;
-            this.labelDateInput.Text = "Human Resource";
-            this.labelDateInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // labelDeductions
+            // 
+            this.labelDeductions.AutoSize = true;
+            this.labelDeductions.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDeductions.Location = new System.Drawing.Point(16, 4);
+            this.labelDeductions.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDeductions.Name = "labelDeductions";
+            this.labelDeductions.Size = new System.Drawing.Size(104, 20);
+            this.labelDeductions.TabIndex = 140;
+            this.labelDeductions.Text = "Deductions";
+            this.labelDeductions.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelDeductionsInput
+            // 
+            this.labelDeductionsInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelDeductionsInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDeductionsInput.Location = new System.Drawing.Point(144, 5);
+            this.labelDeductionsInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDeductionsInput.Name = "labelDeductionsInput";
+            this.labelDeductionsInput.Size = new System.Drawing.Size(129, 20);
+            this.labelDeductionsInput.TabIndex = 140;
+            this.labelDeductionsInput.Text = "₱0.00";
+            this.labelDeductionsInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelGrossPay
+            // 
+            this.labelGrossPay.AutoSize = true;
+            this.labelGrossPay.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelGrossPay.Location = new System.Drawing.Point(181, 5);
+            this.labelGrossPay.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelGrossPay.Name = "labelGrossPay";
+            this.labelGrossPay.Size = new System.Drawing.Size(97, 20);
+            this.labelGrossPay.TabIndex = 134;
+            this.labelGrossPay.Text = "Gross Pay";
+            this.labelGrossPay.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelOthers
+            // 
+            this.labelOthers.AutoSize = true;
+            this.labelOthers.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelOthers.Location = new System.Drawing.Point(735, 679);
+            this.labelOthers.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelOthers.Name = "labelOthers";
+            this.labelOthers.Size = new System.Drawing.Size(66, 20);
+            this.labelOthers.TabIndex = 224;
+            this.labelOthers.Text = "Others";
+            this.labelOthers.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelCoopLoan
+            // 
+            this.labelCoopLoan.AutoSize = true;
+            this.labelCoopLoan.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCoopLoan.Location = new System.Drawing.Point(735, 613);
+            this.labelCoopLoan.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCoopLoan.Name = "labelCoopLoan";
+            this.labelCoopLoan.Size = new System.Drawing.Size(109, 20);
+            this.labelCoopLoan.TabIndex = 223;
+            this.labelCoopLoan.Text = "COOP Loan";
+            this.labelCoopLoan.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelCoopContri
+            // 
+            this.labelCoopContri.AutoSize = true;
+            this.labelCoopContri.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCoopContri.Location = new System.Drawing.Point(735, 646);
+            this.labelCoopContri.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCoopContri.Name = "labelCoopContri";
+            this.labelCoopContri.Size = new System.Drawing.Size(119, 20);
+            this.labelCoopContri.TabIndex = 222;
+            this.labelCoopContri.Text = "COOP Contri";
+            this.labelCoopContri.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelCashAdvance
+            // 
+            this.labelCashAdvance.AutoSize = true;
+            this.labelCashAdvance.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCashAdvance.Location = new System.Drawing.Point(735, 580);
+            this.labelCashAdvance.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCashAdvance.Name = "labelCashAdvance";
+            this.labelCashAdvance.Size = new System.Drawing.Size(129, 20);
+            this.labelCashAdvance.TabIndex = 221;
+            this.labelCashAdvance.Text = "Cash Advance";
+            this.labelCashAdvance.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelWithTaxAmountDebitInput
+            // 
+            this.labelWithTaxAmountDebitInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelWithTaxAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelWithTaxAmountDebitInput.Location = new System.Drawing.Point(892, 311);
+            this.labelWithTaxAmountDebitInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelWithTaxAmountDebitInput.Name = "labelWithTaxAmountDebitInput";
+            this.labelWithTaxAmountDebitInput.Size = new System.Drawing.Size(129, 31);
+            this.labelWithTaxAmountDebitInput.TabIndex = 220;
+            this.labelWithTaxAmountDebitInput.Text = "₱0.00";
+            this.labelWithTaxAmountDebitInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelSSSAmountDebitInput
+            // 
+            this.labelSSSAmountDebitInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelSSSAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSSSAmountDebitInput.Location = new System.Drawing.Point(892, 342);
+            this.labelSSSAmountDebitInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSSSAmountDebitInput.Name = "labelSSSAmountDebitInput";
+            this.labelSSSAmountDebitInput.Size = new System.Drawing.Size(129, 31);
+            this.labelSSSAmountDebitInput.TabIndex = 219;
+            this.labelSSSAmountDebitInput.Text = "₱0.00";
+            this.labelSSSAmountDebitInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelPagIbigAmountDebitInput
+            // 
+            this.labelPagIbigAmountDebitInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelPagIbigAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPagIbigAmountDebitInput.Location = new System.Drawing.Point(892, 375);
+            this.labelPagIbigAmountDebitInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPagIbigAmountDebitInput.Name = "labelPagIbigAmountDebitInput";
+            this.labelPagIbigAmountDebitInput.Size = new System.Drawing.Size(129, 31);
+            this.labelPagIbigAmountDebitInput.TabIndex = 218;
+            this.labelPagIbigAmountDebitInput.Text = "₱0.00";
+            this.labelPagIbigAmountDebitInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelPhilhealthAmountDebitInput
+            // 
+            this.labelPhilhealthAmountDebitInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelPhilhealthAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPhilhealthAmountDebitInput.Location = new System.Drawing.Point(892, 409);
+            this.labelPhilhealthAmountDebitInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPhilhealthAmountDebitInput.Name = "labelPhilhealthAmountDebitInput";
+            this.labelPhilhealthAmountDebitInput.Size = new System.Drawing.Size(129, 31);
+            this.labelPhilhealthAmountDebitInput.TabIndex = 217;
+            this.labelPhilhealthAmountDebitInput.Text = "₱0.00";
+            this.labelPhilhealthAmountDebitInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelBasicPayAmountCreditInput
+            // 
+            this.labelBasicPayAmountCreditInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelBasicPayAmountCreditInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelBasicPayAmountCreditInput.Location = new System.Drawing.Point(573, 309);
+            this.labelBasicPayAmountCreditInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelBasicPayAmountCreditInput.Name = "labelBasicPayAmountCreditInput";
+            this.labelBasicPayAmountCreditInput.Size = new System.Drawing.Size(129, 31);
+            this.labelBasicPayAmountCreditInput.TabIndex = 212;
+            this.labelBasicPayAmountCreditInput.Text = "₱0.00";
+            this.labelBasicPayAmountCreditInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelOvertimePerHourAmountCreditInput
+            // 
+            this.labelOvertimePerHourAmountCreditInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelOvertimePerHourAmountCreditInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelOvertimePerHourAmountCreditInput.Location = new System.Drawing.Point(573, 346);
+            this.labelOvertimePerHourAmountCreditInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelOvertimePerHourAmountCreditInput.Name = "labelOvertimePerHourAmountCreditInput";
+            this.labelOvertimePerHourAmountCreditInput.Size = new System.Drawing.Size(129, 31);
+            this.labelOvertimePerHourAmountCreditInput.TabIndex = 211;
+            this.labelOvertimePerHourAmountCreditInput.Text = "₱0.00";
+            this.labelOvertimePerHourAmountCreditInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelOvertimePerMinuteAmountCreditInput
+            // 
+            this.labelOvertimePerMinuteAmountCreditInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelOvertimePerMinuteAmountCreditInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelOvertimePerMinuteAmountCreditInput.Location = new System.Drawing.Point(573, 380);
+            this.labelOvertimePerMinuteAmountCreditInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelOvertimePerMinuteAmountCreditInput.Name = "labelOvertimePerMinuteAmountCreditInput";
+            this.labelOvertimePerMinuteAmountCreditInput.Size = new System.Drawing.Size(129, 31);
+            this.labelOvertimePerMinuteAmountCreditInput.TabIndex = 210;
+            this.labelOvertimePerMinuteAmountCreditInput.Text = "₱0.00";
+            this.labelOvertimePerMinuteAmountCreditInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelIncentivesAmountCreditInput
+            // 
+            this.labelIncentivesAmountCreditInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelIncentivesAmountCreditInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelIncentivesAmountCreditInput.Location = new System.Drawing.Point(573, 415);
+            this.labelIncentivesAmountCreditInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelIncentivesAmountCreditInput.Name = "labelIncentivesAmountCreditInput";
+            this.labelIncentivesAmountCreditInput.Size = new System.Drawing.Size(129, 31);
+            this.labelIncentivesAmountCreditInput.TabIndex = 209;
+            this.labelIncentivesAmountCreditInput.Text = "₱0.00";
+            this.labelIncentivesAmountCreditInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelCommissionAmountCreditInput
+            // 
+            this.labelCommissionAmountCreditInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelCommissionAmountCreditInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCommissionAmountCreditInput.Location = new System.Drawing.Point(573, 449);
+            this.labelCommissionAmountCreditInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCommissionAmountCreditInput.Name = "labelCommissionAmountCreditInput";
+            this.labelCommissionAmountCreditInput.Size = new System.Drawing.Size(129, 31);
+            this.labelCommissionAmountCreditInput.TabIndex = 208;
+            this.labelCommissionAmountCreditInput.Text = "₱0.00";
+            this.labelCommissionAmountCreditInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelGasAllowanceAmountCreditInput
+            // 
+            this.labelGasAllowanceAmountCreditInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelGasAllowanceAmountCreditInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelGasAllowanceAmountCreditInput.Location = new System.Drawing.Point(573, 484);
+            this.labelGasAllowanceAmountCreditInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelGasAllowanceAmountCreditInput.Name = "labelGasAllowanceAmountCreditInput";
+            this.labelGasAllowanceAmountCreditInput.Size = new System.Drawing.Size(129, 31);
+            this.labelGasAllowanceAmountCreditInput.TabIndex = 207;
+            this.labelGasAllowanceAmountCreditInput.Text = "₱0.00";
+            this.labelGasAllowanceAmountCreditInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelFoodAllowanceAmountCreditInput
+            // 
+            this.labelFoodAllowanceAmountCreditInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelFoodAllowanceAmountCreditInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelFoodAllowanceAmountCreditInput.Location = new System.Drawing.Point(573, 518);
+            this.labelFoodAllowanceAmountCreditInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelFoodAllowanceAmountCreditInput.Name = "labelFoodAllowanceAmountCreditInput";
+            this.labelFoodAllowanceAmountCreditInput.Size = new System.Drawing.Size(129, 31);
+            this.labelFoodAllowanceAmountCreditInput.TabIndex = 206;
+            this.labelFoodAllowanceAmountCreditInput.Text = "₱0.00";
+            this.labelFoodAllowanceAmountCreditInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelCommunicationAmountCreditInput
+            // 
+            this.labelCommunicationAmountCreditInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelCommunicationAmountCreditInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCommunicationAmountCreditInput.Location = new System.Drawing.Point(573, 553);
+            this.labelCommunicationAmountCreditInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCommunicationAmountCreditInput.Name = "labelCommunicationAmountCreditInput";
+            this.labelCommunicationAmountCreditInput.Size = new System.Drawing.Size(129, 31);
+            this.labelCommunicationAmountCreditInput.TabIndex = 205;
+            this.labelCommunicationAmountCreditInput.Text = "₱0.00";
+            this.labelCommunicationAmountCreditInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelBasicPayAmountBaseInput
+            // 
+            this.labelBasicPayAmountBaseInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelBasicPayAmountBaseInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelBasicPayAmountBaseInput.Location = new System.Drawing.Point(233, 309);
+            this.labelBasicPayAmountBaseInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelBasicPayAmountBaseInput.Name = "labelBasicPayAmountBaseInput";
+            this.labelBasicPayAmountBaseInput.Size = new System.Drawing.Size(129, 31);
+            this.labelBasicPayAmountBaseInput.TabIndex = 204;
+            this.labelBasicPayAmountBaseInput.Text = "₱0.00";
+            this.labelBasicPayAmountBaseInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelWithTax
+            // 
+            this.labelWithTax.AutoSize = true;
+            this.labelWithTax.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelWithTax.Location = new System.Drawing.Point(735, 314);
+            this.labelWithTax.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelWithTax.Name = "labelWithTax";
+            this.labelWithTax.Size = new System.Drawing.Size(62, 20);
+            this.labelWithTax.TabIndex = 203;
+            this.labelWithTax.Text = "W/Tax";
+            this.labelWithTax.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelSSS
+            // 
+            this.labelSSS.AutoSize = true;
+            this.labelSSS.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSSS.Location = new System.Drawing.Point(735, 347);
+            this.labelSSS.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSSS.Name = "labelSSS";
+            this.labelSSS.Size = new System.Drawing.Size(45, 20);
+            this.labelSSS.TabIndex = 202;
+            this.labelSSS.Text = "SSS";
+            this.labelSSS.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelPagIbig
+            // 
+            this.labelPagIbig.AutoSize = true;
+            this.labelPagIbig.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPagIbig.Location = new System.Drawing.Point(735, 380);
+            this.labelPagIbig.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPagIbig.Name = "labelPagIbig";
+            this.labelPagIbig.Size = new System.Drawing.Size(91, 20);
+            this.labelPagIbig.TabIndex = 201;
+            this.labelPagIbig.Text = "PAG-IBIG";
+            this.labelPagIbig.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelHousingLoan
+            // 
+            this.labelHousingLoan.AutoSize = true;
+            this.labelHousingLoan.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelHousingLoan.Location = new System.Drawing.Point(735, 546);
+            this.labelHousingLoan.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelHousingLoan.Name = "labelHousingLoan";
+            this.labelHousingLoan.Size = new System.Drawing.Size(141, 20);
+            this.labelHousingLoan.TabIndex = 200;
+            this.labelHousingLoan.Text = "HOUSING Loan";
+            this.labelHousingLoan.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelPagIbigLoan
+            // 
+            this.labelPagIbigLoan.AutoSize = true;
+            this.labelPagIbigLoan.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPagIbigLoan.Location = new System.Drawing.Point(735, 480);
+            this.labelPagIbigLoan.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPagIbigLoan.Name = "labelPagIbigLoan";
+            this.labelPagIbigLoan.Size = new System.Drawing.Size(138, 20);
+            this.labelPagIbigLoan.TabIndex = 199;
+            this.labelPagIbigLoan.Text = "PAG-IBIG Loan";
+            this.labelPagIbigLoan.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelPhilhealth
+            // 
+            this.labelPhilhealth.AutoSize = true;
+            this.labelPhilhealth.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPhilhealth.Location = new System.Drawing.Point(735, 414);
+            this.labelPhilhealth.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPhilhealth.Name = "labelPhilhealth";
+            this.labelPhilhealth.Size = new System.Drawing.Size(125, 20);
+            this.labelPhilhealth.TabIndex = 198;
+            this.labelPhilhealth.Text = "PHILHEALTH";
+            this.labelPhilhealth.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelCarLoan
+            // 
+            this.labelCarLoan.AutoSize = true;
+            this.labelCarLoan.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCarLoan.Location = new System.Drawing.Point(735, 513);
+            this.labelCarLoan.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCarLoan.Name = "labelCarLoan";
+            this.labelCarLoan.Size = new System.Drawing.Size(94, 20);
+            this.labelCarLoan.TabIndex = 197;
+            this.labelCarLoan.Text = "CAR Loan";
+            this.labelCarLoan.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelSSSLoan
+            // 
+            this.labelSSSLoan.AutoSize = true;
+            this.labelSSSLoan.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSSSLoan.Location = new System.Drawing.Point(735, 447);
+            this.labelSSSLoan.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSSSLoan.Name = "labelSSSLoan";
+            this.labelSSSLoan.Size = new System.Drawing.Size(92, 20);
+            this.labelSSSLoan.TabIndex = 196;
+            this.labelSSSLoan.Text = "SSS Loan";
+            this.labelSSSLoan.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelOvertimePerHourAmountBaseInput
+            // 
+            this.labelOvertimePerHourAmountBaseInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelOvertimePerHourAmountBaseInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelOvertimePerHourAmountBaseInput.Location = new System.Drawing.Point(233, 343);
+            this.labelOvertimePerHourAmountBaseInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelOvertimePerHourAmountBaseInput.Name = "labelOvertimePerHourAmountBaseInput";
+            this.labelOvertimePerHourAmountBaseInput.Size = new System.Drawing.Size(129, 31);
+            this.labelOvertimePerHourAmountBaseInput.TabIndex = 195;
+            this.labelOvertimePerHourAmountBaseInput.Text = "₱0.00";
+            this.labelOvertimePerHourAmountBaseInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelOvertimePerMinuteAmountBaseInput
+            // 
+            this.labelOvertimePerMinuteAmountBaseInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelOvertimePerMinuteAmountBaseInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelOvertimePerMinuteAmountBaseInput.Location = new System.Drawing.Point(233, 380);
+            this.labelOvertimePerMinuteAmountBaseInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelOvertimePerMinuteAmountBaseInput.Name = "labelOvertimePerMinuteAmountBaseInput";
+            this.labelOvertimePerMinuteAmountBaseInput.Size = new System.Drawing.Size(129, 31);
+            this.labelOvertimePerMinuteAmountBaseInput.TabIndex = 194;
+            this.labelOvertimePerMinuteAmountBaseInput.Text = "₱0.00";
+            this.labelOvertimePerMinuteAmountBaseInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelBasicPayCredit
+            // 
+            this.labelBasicPayCredit.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelBasicPayCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelBasicPayCredit.Location = new System.Drawing.Point(411, 311);
+            this.labelBasicPayCredit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelBasicPayCredit.Name = "labelBasicPayCredit";
+            this.labelBasicPayCredit.Size = new System.Drawing.Size(133, 31);
+            this.labelBasicPayCredit.TabIndex = 188;
+            this.labelBasicPayCredit.Text = "12.50";
+            this.labelBasicPayCredit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelOvertimeCredit
+            // 
+            this.labelOvertimeCredit.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelOvertimeCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelOvertimeCredit.Location = new System.Drawing.Point(411, 346);
+            this.labelOvertimeCredit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelOvertimeCredit.Name = "labelOvertimeCredit";
+            this.labelOvertimeCredit.Size = new System.Drawing.Size(133, 31);
+            this.labelOvertimeCredit.TabIndex = 187;
+            this.labelOvertimeCredit.Text = "0";
+            this.labelOvertimeCredit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelBasicPay
+            // 
+            this.labelBasicPay.AutoSize = true;
+            this.labelBasicPay.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelBasicPay.Location = new System.Drawing.Point(35, 314);
+            this.labelBasicPay.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelBasicPay.Name = "labelBasicPay";
+            this.labelBasicPay.Size = new System.Drawing.Size(94, 20);
+            this.labelBasicPay.TabIndex = 186;
+            this.labelBasicPay.Text = "Basic Pay";
+            this.labelBasicPay.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelOvertimePerHour
+            // 
+            this.labelOvertimePerHour.AutoSize = true;
+            this.labelOvertimePerHour.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelOvertimePerHour.Location = new System.Drawing.Point(35, 348);
+            this.labelOvertimePerHour.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelOvertimePerHour.Name = "labelOvertimePerHour";
+            this.labelOvertimePerHour.Size = new System.Drawing.Size(112, 20);
+            this.labelOvertimePerHour.TabIndex = 185;
+            this.labelOvertimePerHour.Text = "Overtime/Hr";
+            this.labelOvertimePerHour.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelOvertimePerMinute
+            // 
+            this.labelOvertimePerMinute.AutoSize = true;
+            this.labelOvertimePerMinute.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelOvertimePerMinute.Location = new System.Drawing.Point(35, 383);
+            this.labelOvertimePerMinute.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelOvertimePerMinute.Name = "labelOvertimePerMinute";
+            this.labelOvertimePerMinute.Size = new System.Drawing.Size(121, 20);
+            this.labelOvertimePerMinute.TabIndex = 184;
+            this.labelOvertimePerMinute.Text = "Overtime/Min";
+            this.labelOvertimePerMinute.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelCommunication
+            // 
+            this.labelCommunication.AutoSize = true;
+            this.labelCommunication.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCommunication.Location = new System.Drawing.Point(35, 555);
+            this.labelCommunication.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCommunication.Name = "labelCommunication";
+            this.labelCommunication.Size = new System.Drawing.Size(138, 20);
+            this.labelCommunication.TabIndex = 183;
+            this.labelCommunication.Text = "Communication";
+            this.labelCommunication.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelGasAllowance
+            // 
+            this.labelGasAllowance.AutoSize = true;
+            this.labelGasAllowance.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelGasAllowance.Location = new System.Drawing.Point(35, 486);
+            this.labelGasAllowance.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelGasAllowance.Name = "labelGasAllowance";
+            this.labelGasAllowance.Size = new System.Drawing.Size(134, 20);
+            this.labelGasAllowance.TabIndex = 182;
+            this.labelGasAllowance.Text = "Gas Allowance";
+            this.labelGasAllowance.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelIncentives
+            // 
+            this.labelIncentives.AutoSize = true;
+            this.labelIncentives.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelIncentives.Location = new System.Drawing.Point(35, 417);
+            this.labelIncentives.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelIncentives.Name = "labelIncentives";
+            this.labelIncentives.Size = new System.Drawing.Size(94, 20);
+            this.labelIncentives.TabIndex = 181;
+            this.labelIncentives.Text = "Incentives";
+            this.labelIncentives.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelFoodAllowance
+            // 
+            this.labelFoodAllowance.AutoSize = true;
+            this.labelFoodAllowance.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelFoodAllowance.Location = new System.Drawing.Point(35, 521);
+            this.labelFoodAllowance.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelFoodAllowance.Name = "labelFoodAllowance";
+            this.labelFoodAllowance.Size = new System.Drawing.Size(141, 20);
+            this.labelFoodAllowance.TabIndex = 180;
+            this.labelFoodAllowance.Text = "Food Allowance";
+            this.labelFoodAllowance.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelCommission
+            // 
+            this.labelCommission.AutoSize = true;
+            this.labelCommission.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCommission.Location = new System.Drawing.Point(35, 452);
+            this.labelCommission.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCommission.Name = "labelCommission";
+            this.labelCommission.Size = new System.Drawing.Size(112, 20);
+            this.labelCommission.TabIndex = 179;
+            this.labelCommission.Text = "Commission";
+            this.labelCommission.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelAmountDebit
+            // 
+            this.labelAmountDebit.AutoSize = true;
+            this.labelAmountDebit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelAmountDebit.Location = new System.Drawing.Point(916, 262);
+            this.labelAmountDebit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelAmountDebit.Name = "labelAmountDebit";
+            this.labelAmountDebit.Size = new System.Drawing.Size(72, 20);
+            this.labelAmountDebit.TabIndex = 178;
+            this.labelAmountDebit.Text = "Amount";
+            this.labelAmountDebit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelAmountCredit
+            // 
+            this.labelAmountCredit.AutoSize = true;
+            this.labelAmountCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelAmountCredit.Location = new System.Drawing.Point(597, 262);
+            this.labelAmountCredit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelAmountCredit.Name = "labelAmountCredit";
+            this.labelAmountCredit.Size = new System.Drawing.Size(72, 20);
+            this.labelAmountCredit.TabIndex = 177;
+            this.labelAmountCredit.Text = "Amount";
+            this.labelAmountCredit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelDetails
+            // 
+            this.labelDetails.AutoSize = true;
+            this.labelDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDetails.Location = new System.Drawing.Point(1080, 262);
+            this.labelDetails.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDetails.Name = "labelDetails";
+            this.labelDetails.Size = new System.Drawing.Size(69, 20);
+            this.labelDetails.TabIndex = 176;
+            this.labelDetails.Text = "Details";
+            this.labelDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelDebit
+            // 
+            this.labelDebit.AutoSize = true;
+            this.labelDebit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDebit.Location = new System.Drawing.Point(772, 262);
+            this.labelDebit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDebit.Name = "labelDebit";
+            this.labelDebit.Size = new System.Drawing.Size(54, 20);
+            this.labelDebit.TabIndex = 175;
+            this.labelDebit.Text = "Debit";
+            this.labelDebit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelCredit
+            // 
+            this.labelCredit.AutoSize = true;
+            this.labelCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCredit.Location = new System.Drawing.Point(448, 262);
+            this.labelCredit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCredit.Name = "labelCredit";
+            this.labelCredit.Size = new System.Drawing.Size(60, 20);
+            this.labelCredit.TabIndex = 174;
+            this.labelCredit.Text = "Credit";
+            this.labelCredit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelAmountBase
+            // 
+            this.labelAmountBase.AutoSize = true;
+            this.labelAmountBase.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelAmountBase.Location = new System.Drawing.Point(257, 262);
+            this.labelAmountBase.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelAmountBase.Name = "labelAmountBase";
+            this.labelAmountBase.Size = new System.Drawing.Size(72, 20);
+            this.labelAmountBase.TabIndex = 173;
+            this.labelAmountBase.Text = "Amount";
+            this.labelAmountBase.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelPayAndAllowances
+            // 
+            this.labelPayAndAllowances.AutoSize = true;
+            this.labelPayAndAllowances.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPayAndAllowances.Location = new System.Drawing.Point(49, 251);
+            this.labelPayAndAllowances.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPayAndAllowances.Name = "labelPayAndAllowances";
+            this.labelPayAndAllowances.Size = new System.Drawing.Size(104, 40);
+            this.labelPayAndAllowances.TabIndex = 172;
+            this.labelPayAndAllowances.Text = "Pay and \r\nAllowances\r\n";
+            this.labelPayAndAllowances.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelDateCoveredInput
+            // 
+            this.labelDateCoveredInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelDateCoveredInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDateCoveredInput.Location = new System.Drawing.Point(196, 172);
+            this.labelDateCoveredInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDateCoveredInput.Name = "labelDateCoveredInput";
+            this.labelDateCoveredInput.Size = new System.Drawing.Size(221, 31);
+            this.labelDateCoveredInput.TabIndex = 171;
+            this.labelDateCoveredInput.Text = "N/A";
+            this.labelDateCoveredInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelDaysInput
+            // 
+            this.labelDaysInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelDaysInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDaysInput.Location = new System.Drawing.Point(156, 206);
+            this.labelDaysInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDaysInput.Name = "labelDaysInput";
+            this.labelDaysInput.Size = new System.Drawing.Size(221, 31);
+            this.labelDaysInput.TabIndex = 170;
+            this.labelDaysInput.Text = "N/A";
+            this.labelDaysInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelDaysPresentInput
+            // 
+            this.labelDaysPresentInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelDaysPresentInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDaysPresentInput.Location = new System.Drawing.Point(579, 206);
+            this.labelDaysPresentInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDaysPresentInput.Name = "labelDaysPresentInput";
+            this.labelDaysPresentInput.Size = new System.Drawing.Size(221, 31);
+            this.labelDaysPresentInput.TabIndex = 169;
+            this.labelDaysPresentInput.Text = "N/A";
+            this.labelDaysPresentInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelOvertimeInput
+            // 
+            this.labelOvertimeInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelOvertimeInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelOvertimeInput.Location = new System.Drawing.Point(933, 206);
+            this.labelOvertimeInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelOvertimeInput.Name = "labelOvertimeInput";
+            this.labelOvertimeInput.Size = new System.Drawing.Size(221, 31);
+            this.labelOvertimeInput.TabIndex = 168;
+            this.labelOvertimeInput.Text = "N/A";
+            this.labelOvertimeInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelOvertime
+            // 
+            this.labelOvertime.AutoSize = true;
+            this.labelOvertime.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelOvertime.Location = new System.Drawing.Point(837, 210);
+            this.labelOvertime.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelOvertime.Name = "labelOvertime";
+            this.labelOvertime.Size = new System.Drawing.Size(85, 20);
+            this.labelOvertime.TabIndex = 167;
+            this.labelOvertime.Text = "Overtime";
+            this.labelOvertime.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelDaysPresent
+            // 
+            this.labelDaysPresent.AutoSize = true;
+            this.labelDaysPresent.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDaysPresent.Location = new System.Drawing.Point(419, 210);
+            this.labelDaysPresent.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDaysPresent.Name = "labelDaysPresent";
+            this.labelDaysPresent.Size = new System.Drawing.Size(123, 20);
+            this.labelDaysPresent.TabIndex = 166;
+            this.labelDaysPresent.Text = "Days Present";
+            this.labelDaysPresent.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelDays
+            // 
+            this.labelDays.AutoSize = true;
+            this.labelDays.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDays.Location = new System.Drawing.Point(35, 210);
+            this.labelDays.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDays.Name = "labelDays";
+            this.labelDays.Size = new System.Drawing.Size(52, 20);
+            this.labelDays.TabIndex = 165;
+            this.labelDays.Text = "Days";
+            this.labelDays.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelSalaryInput
+            // 
+            this.labelSalaryInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelSalaryInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSalaryInput.Location = new System.Drawing.Point(965, 80);
+            this.labelSalaryInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSalaryInput.Name = "labelSalaryInput";
+            this.labelSalaryInput.Size = new System.Drawing.Size(221, 31);
+            this.labelSalaryInput.TabIndex = 164;
+            this.labelSalaryInput.Text = "N/A";
+            this.labelSalaryInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelNameInput
             // 
-            this.labelNameInput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.labelNameInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelNameInput.Location = new System.Drawing.Point(431, 103);
+            this.labelNameInput.Location = new System.Drawing.Point(156, 82);
+            this.labelNameInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelNameInput.Name = "labelNameInput";
-            this.labelNameInput.Size = new System.Drawing.Size(166, 25);
-            this.labelNameInput.TabIndex = 156;
-            this.labelNameInput.Text = "Manager";
+            this.labelNameInput.Size = new System.Drawing.Size(221, 31);
+            this.labelNameInput.TabIndex = 162;
+            this.labelNameInput.Text = "Charles Andrei Macaraig";
             this.labelNameInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelSalary
+            // 
+            this.labelSalary.AutoSize = true;
+            this.labelSalary.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSalary.Location = new System.Drawing.Point(837, 85);
+            this.labelSalary.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSalary.Name = "labelSalary";
+            this.labelSalary.Size = new System.Drawing.Size(62, 20);
+            this.labelSalary.TabIndex = 161;
+            this.labelSalary.Text = "Salary";
+            this.labelSalary.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelDailyRate
+            // 
+            this.labelDailyRate.AutoSize = true;
+            this.labelDailyRate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDailyRate.Location = new System.Drawing.Point(837, 132);
+            this.labelDailyRate.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDailyRate.Name = "labelDailyRate";
+            this.labelDailyRate.Size = new System.Drawing.Size(97, 20);
+            this.labelDailyRate.TabIndex = 160;
+            this.labelDailyRate.Text = "Daily Rate";
+            this.labelDailyRate.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelDepartment
+            // 
+            this.labelDepartment.AutoSize = true;
+            this.labelDepartment.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDepartment.Location = new System.Drawing.Point(419, 85);
+            this.labelDepartment.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDepartment.Name = "labelDepartment";
+            this.labelDepartment.Size = new System.Drawing.Size(107, 20);
+            this.labelDepartment.TabIndex = 159;
+            this.labelDepartment.Text = "Department";
+            this.labelDepartment.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelPosition
+            // 
+            this.labelPosition.AutoSize = true;
+            this.labelPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPosition.Location = new System.Drawing.Point(419, 132);
+            this.labelPosition.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPosition.Name = "labelPosition";
+            this.labelPosition.Size = new System.Drawing.Size(77, 20);
+            this.labelPosition.TabIndex = 158;
+            this.labelPosition.Text = "Position";
+            this.labelPosition.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelDepartmentInput
+            // 
+            this.labelDepartmentInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelDepartmentInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDepartmentInput.Location = new System.Drawing.Point(575, 80);
+            this.labelDepartmentInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDepartmentInput.Name = "labelDepartmentInput";
+            this.labelDepartmentInput.Size = new System.Drawing.Size(221, 31);
+            this.labelDepartmentInput.TabIndex = 157;
+            this.labelDepartmentInput.Text = "Human Resource";
+            this.labelDepartmentInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelPositionInput
+            // 
+            this.labelPositionInput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelPositionInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPositionInput.Location = new System.Drawing.Point(575, 127);
+            this.labelPositionInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPositionInput.Name = "labelPositionInput";
+            this.labelPositionInput.Size = new System.Drawing.Size(221, 31);
+            this.labelPositionInput.TabIndex = 156;
+            this.labelPositionInput.Text = "Manager";
+            this.labelPositionInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelIDInput
             // 
             this.labelIDInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelIDInput.Location = new System.Drawing.Point(117, 105);
+            this.labelIDInput.Location = new System.Drawing.Point(156, 129);
+            this.labelIDInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelIDInput.Name = "labelIDInput";
-            this.labelIDInput.Size = new System.Drawing.Size(166, 25);
+            this.labelIDInput.Size = new System.Drawing.Size(221, 31);
             this.labelIDInput.TabIndex = 155;
             this.labelIDInput.Text = "N/A";
             this.labelIDInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // labelDate
+            // labelDateCovered
             // 
-            this.labelDate.AutoSize = true;
-            this.labelDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelDate.Location = new System.Drawing.Point(26, 144);
-            this.labelDate.Name = "labelDate";
-            this.labelDate.Size = new System.Drawing.Size(103, 16);
-            this.labelDate.TabIndex = 154;
-            this.labelDate.Text = "Date Covered";
-            this.labelDate.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelDateCovered.AutoSize = true;
+            this.labelDateCovered.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDateCovered.Location = new System.Drawing.Point(35, 177);
+            this.labelDateCovered.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDateCovered.Name = "labelDateCovered";
+            this.labelDateCovered.Size = new System.Drawing.Size(124, 20);
+            this.labelDateCovered.TabIndex = 154;
+            this.labelDateCovered.Text = "Date Covered";
+            this.labelDateCovered.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelName
             // 
             this.labelName.AutoSize = true;
             this.labelName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelName.Location = new System.Drawing.Point(26, 69);
+            this.labelName.Location = new System.Drawing.Point(35, 85);
+            this.labelName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelName.Name = "labelName";
-            this.labelName.Size = new System.Drawing.Size(48, 16);
+            this.labelName.Size = new System.Drawing.Size(57, 20);
             this.labelName.TabIndex = 153;
             this.labelName.Text = "Name";
             this.labelName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -1056,522 +1141,557 @@
             // 
             this.labelID.AutoSize = true;
             this.labelID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelID.Location = new System.Drawing.Point(26, 107);
+            this.labelID.Location = new System.Drawing.Point(35, 132);
+            this.labelID.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelID.Name = "labelID";
-            this.labelID.Size = new System.Drawing.Size(22, 16);
+            this.labelID.Size = new System.Drawing.Size(28, 20);
             this.labelID.TabIndex = 152;
             this.labelID.Text = "ID";
             this.labelID.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // XpictureBox
             // 
+            this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
-            this.XpictureBox.Location = new System.Drawing.Point(870, 1);
-            this.XpictureBox.Margin = new System.Windows.Forms.Padding(2);
+            this.XpictureBox.Location = new System.Drawing.Point(1160, 1);
+            this.XpictureBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.XpictureBox.Name = "XpictureBox";
-            this.XpictureBox.Size = new System.Drawing.Size(38, 41);
+            this.XpictureBox.Size = new System.Drawing.Size(51, 50);
             this.XpictureBox.TabIndex = 151;
             this.XpictureBox.TabStop = false;
             this.XpictureBox.Click += new System.EventHandler(this.XpictureBox_Click);
             // 
-            // labelRequestConfirm
+            // labelPayrollSummary
             // 
-            this.labelRequestConfirm.AutoSize = true;
-            this.labelRequestConfirm.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelRequestConfirm.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(34)))), ((int)(((byte)(31)))));
-            this.labelRequestConfirm.Location = new System.Drawing.Point(24, 22);
-            this.labelRequestConfirm.Name = "labelRequestConfirm";
-            this.labelRequestConfirm.Size = new System.Drawing.Size(194, 29);
-            this.labelRequestConfirm.TabIndex = 150;
-            this.labelRequestConfirm.Text = "Payroll Summary";
+            this.labelPayrollSummary.AutoSize = true;
+            this.labelPayrollSummary.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPayrollSummary.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(34)))), ((int)(((byte)(31)))));
+            this.labelPayrollSummary.Location = new System.Drawing.Point(32, 27);
+            this.labelPayrollSummary.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPayrollSummary.Name = "labelPayrollSummary";
+            this.labelPayrollSummary.Size = new System.Drawing.Size(239, 36);
+            this.labelPayrollSummary.TabIndex = 150;
+            this.labelPayrollSummary.Text = "Payroll Summary";
             // 
-            // textBoxOverTimeIn
+            // textBoxIncentivesAmountBaseInput
             // 
-            this.textBoxOverTimeIn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxOverTimeIn.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxOverTimeIn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxOverTimeIn.ForeColor = System.Drawing.Color.White;
-            this.textBoxOverTimeIn.Location = new System.Drawing.Point(178, 337);
-            this.textBoxOverTimeIn.Name = "textBoxOverTimeIn";
-            this.textBoxOverTimeIn.Size = new System.Drawing.Size(94, 22);
-            this.textBoxOverTimeIn.TabIndex = 249;
-            this.textBoxOverTimeIn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxIncentivesAmountBaseInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxIncentivesAmountBaseInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxIncentivesAmountBaseInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxIncentivesAmountBaseInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxIncentivesAmountBaseInput.Location = new System.Drawing.Point(237, 415);
+            this.textBoxIncentivesAmountBaseInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxIncentivesAmountBaseInput.Name = "textBoxIncentivesAmountBaseInput";
+            this.textBoxIncentivesAmountBaseInput.Size = new System.Drawing.Size(125, 26);
+            this.textBoxIncentivesAmountBaseInput.TabIndex = 249;
+            this.textBoxIncentivesAmountBaseInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // label93
+            // labelGondolaAmountCreditInput
             // 
-            this.label93.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label93.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label93.Location = new System.Drawing.Point(430, 499);
-            this.label93.Name = "label93";
-            this.label93.Size = new System.Drawing.Size(97, 25);
-            this.label93.TabIndex = 250;
-            this.label93.Text = "₱0.00";
-            this.label93.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelGondolaAmountCreditInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelGondolaAmountCreditInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelGondolaAmountCreditInput.Location = new System.Drawing.Point(573, 614);
+            this.labelGondolaAmountCreditInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelGondolaAmountCreditInput.Name = "labelGondolaAmountCreditInput";
+            this.labelGondolaAmountCreditInput.Size = new System.Drawing.Size(129, 31);
+            this.labelGondolaAmountCreditInput.TabIndex = 250;
+            this.labelGondolaAmountCreditInput.Text = "₱0.00";
+            this.labelGondolaAmountCreditInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label94
+            // labelGondola
             // 
-            this.label94.AutoSize = true;
-            this.label94.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label94.Location = new System.Drawing.Point(26, 503);
-            this.label94.Name = "label94";
-            this.label94.Size = new System.Drawing.Size(66, 16);
-            this.label94.TabIndex = 251;
-            this.label94.Text = "Gondola";
-            this.label94.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelGondola.AutoSize = true;
+            this.labelGondola.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelGondola.Location = new System.Drawing.Point(35, 619);
+            this.labelGondola.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelGondola.Name = "labelGondola";
+            this.labelGondola.Size = new System.Drawing.Size(78, 20);
+            this.labelGondola.TabIndex = 251;
+            this.labelGondola.Text = "Gondola";
+            this.labelGondola.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // textBox1
+            // textBoxCommissionAmountBaseInput
             // 
-            this.textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.ForeColor = System.Drawing.Color.White;
-            this.textBox1.Location = new System.Drawing.Point(178, 365);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(94, 22);
-            this.textBox1.TabIndex = 252;
-            this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxCommissionAmountBaseInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxCommissionAmountBaseInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxCommissionAmountBaseInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxCommissionAmountBaseInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxCommissionAmountBaseInput.Location = new System.Drawing.Point(237, 449);
+            this.textBoxCommissionAmountBaseInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxCommissionAmountBaseInput.Name = "textBoxCommissionAmountBaseInput";
+            this.textBoxCommissionAmountBaseInput.Size = new System.Drawing.Size(125, 26);
+            this.textBoxCommissionAmountBaseInput.TabIndex = 252;
+            this.textBoxCommissionAmountBaseInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox2
+            // textBoxGasAllowanceAmountBaseInput
             // 
-            this.textBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox2.ForeColor = System.Drawing.Color.White;
-            this.textBox2.Location = new System.Drawing.Point(178, 393);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(94, 22);
-            this.textBox2.TabIndex = 253;
-            this.textBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxGasAllowanceAmountBaseInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxGasAllowanceAmountBaseInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxGasAllowanceAmountBaseInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxGasAllowanceAmountBaseInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxGasAllowanceAmountBaseInput.Location = new System.Drawing.Point(237, 484);
+            this.textBoxGasAllowanceAmountBaseInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxGasAllowanceAmountBaseInput.Name = "textBoxGasAllowanceAmountBaseInput";
+            this.textBoxGasAllowanceAmountBaseInput.Size = new System.Drawing.Size(125, 26);
+            this.textBoxGasAllowanceAmountBaseInput.TabIndex = 253;
+            this.textBoxGasAllowanceAmountBaseInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox3
+            // textBoxFoodAllowanceAmountBaseInput
             // 
-            this.textBox3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox3.ForeColor = System.Drawing.Color.White;
-            this.textBox3.Location = new System.Drawing.Point(178, 421);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(94, 22);
-            this.textBox3.TabIndex = 254;
-            this.textBox3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxFoodAllowanceAmountBaseInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxFoodAllowanceAmountBaseInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxFoodAllowanceAmountBaseInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxFoodAllowanceAmountBaseInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxFoodAllowanceAmountBaseInput.Location = new System.Drawing.Point(237, 518);
+            this.textBoxFoodAllowanceAmountBaseInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxFoodAllowanceAmountBaseInput.Name = "textBoxFoodAllowanceAmountBaseInput";
+            this.textBoxFoodAllowanceAmountBaseInput.Size = new System.Drawing.Size(125, 26);
+            this.textBoxFoodAllowanceAmountBaseInput.TabIndex = 254;
+            this.textBoxFoodAllowanceAmountBaseInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox4
+            // textBoxCommunicationAmountBaseInput
             // 
-            this.textBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox4.ForeColor = System.Drawing.Color.White;
-            this.textBox4.Location = new System.Drawing.Point(178, 449);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(94, 22);
-            this.textBox4.TabIndex = 255;
-            this.textBox4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxCommunicationAmountBaseInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxCommunicationAmountBaseInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxCommunicationAmountBaseInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxCommunicationAmountBaseInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxCommunicationAmountBaseInput.Location = new System.Drawing.Point(237, 553);
+            this.textBoxCommunicationAmountBaseInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxCommunicationAmountBaseInput.Name = "textBoxCommunicationAmountBaseInput";
+            this.textBoxCommunicationAmountBaseInput.Size = new System.Drawing.Size(125, 26);
+            this.textBoxCommunicationAmountBaseInput.TabIndex = 255;
+            this.textBoxCommunicationAmountBaseInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox5
+            // textBoxGondolaAmountBaseInput
             // 
-            this.textBox5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox5.ForeColor = System.Drawing.Color.White;
-            this.textBox5.Location = new System.Drawing.Point(178, 501);
-            this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(94, 22);
-            this.textBox5.TabIndex = 256;
-            this.textBox5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxGondolaAmountBaseInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxGondolaAmountBaseInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxGondolaAmountBaseInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxGondolaAmountBaseInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxGondolaAmountBaseInput.Location = new System.Drawing.Point(237, 617);
+            this.textBoxGondolaAmountBaseInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxGondolaAmountBaseInput.Name = "textBoxGondolaAmountBaseInput";
+            this.textBoxGondolaAmountBaseInput.Size = new System.Drawing.Size(125, 26);
+            this.textBoxGondolaAmountBaseInput.TabIndex = 256;
+            this.textBoxGondolaAmountBaseInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox6
+            // textBoxCashAdvanceAmountDebitInput
             // 
-            this.textBox6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox6.ForeColor = System.Drawing.Color.White;
-            this.textBox6.Location = new System.Drawing.Point(672, 469);
-            this.textBox6.Name = "textBox6";
-            this.textBox6.Size = new System.Drawing.Size(94, 22);
-            this.textBox6.TabIndex = 261;
-            this.textBox6.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxCashAdvanceAmountDebitInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxCashAdvanceAmountDebitInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxCashAdvanceAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxCashAdvanceAmountDebitInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxCashAdvanceAmountDebitInput.Location = new System.Drawing.Point(896, 577);
+            this.textBoxCashAdvanceAmountDebitInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxCashAdvanceAmountDebitInput.Name = "textBoxCashAdvanceAmountDebitInput";
+            this.textBoxCashAdvanceAmountDebitInput.Size = new System.Drawing.Size(125, 26);
+            this.textBoxCashAdvanceAmountDebitInput.TabIndex = 261;
+            this.textBoxCashAdvanceAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox7
+            // textBoxHousingLoanAmountDebitInput
             // 
-            this.textBox7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox7.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox7.ForeColor = System.Drawing.Color.White;
-            this.textBox7.Location = new System.Drawing.Point(672, 442);
-            this.textBox7.Name = "textBox7";
-            this.textBox7.Size = new System.Drawing.Size(94, 22);
-            this.textBox7.TabIndex = 260;
-            this.textBox7.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxHousingLoanAmountDebitInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxHousingLoanAmountDebitInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxHousingLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxHousingLoanAmountDebitInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxHousingLoanAmountDebitInput.Location = new System.Drawing.Point(896, 544);
+            this.textBoxHousingLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxHousingLoanAmountDebitInput.Name = "textBoxHousingLoanAmountDebitInput";
+            this.textBoxHousingLoanAmountDebitInput.Size = new System.Drawing.Size(125, 26);
+            this.textBoxHousingLoanAmountDebitInput.TabIndex = 260;
+            this.textBoxHousingLoanAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox8
+            // textBoxCarLoanAmountDebitInput
             // 
-            this.textBox8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox8.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox8.ForeColor = System.Drawing.Color.White;
-            this.textBox8.Location = new System.Drawing.Point(672, 415);
-            this.textBox8.Name = "textBox8";
-            this.textBox8.Size = new System.Drawing.Size(94, 22);
-            this.textBox8.TabIndex = 259;
-            this.textBox8.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxCarLoanAmountDebitInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxCarLoanAmountDebitInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxCarLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxCarLoanAmountDebitInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxCarLoanAmountDebitInput.Location = new System.Drawing.Point(896, 511);
+            this.textBoxCarLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxCarLoanAmountDebitInput.Name = "textBoxCarLoanAmountDebitInput";
+            this.textBoxCarLoanAmountDebitInput.Size = new System.Drawing.Size(125, 26);
+            this.textBoxCarLoanAmountDebitInput.TabIndex = 259;
+            this.textBoxCarLoanAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox9
+            // textBoxPagIbigLoanAmountDebitInput
             // 
-            this.textBox9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox9.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox9.ForeColor = System.Drawing.Color.White;
-            this.textBox9.Location = new System.Drawing.Point(672, 388);
-            this.textBox9.Name = "textBox9";
-            this.textBox9.Size = new System.Drawing.Size(94, 22);
-            this.textBox9.TabIndex = 258;
-            this.textBox9.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxPagIbigLoanAmountDebitInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxPagIbigLoanAmountDebitInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxPagIbigLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxPagIbigLoanAmountDebitInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxPagIbigLoanAmountDebitInput.Location = new System.Drawing.Point(896, 478);
+            this.textBoxPagIbigLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxPagIbigLoanAmountDebitInput.Name = "textBoxPagIbigLoanAmountDebitInput";
+            this.textBoxPagIbigLoanAmountDebitInput.Size = new System.Drawing.Size(125, 26);
+            this.textBoxPagIbigLoanAmountDebitInput.TabIndex = 258;
+            this.textBoxPagIbigLoanAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox10
+            // textBoxSSSLoanAmountDebitInput
             // 
-            this.textBox10.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox10.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox10.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox10.ForeColor = System.Drawing.Color.White;
-            this.textBox10.Location = new System.Drawing.Point(672, 361);
-            this.textBox10.Name = "textBox10";
-            this.textBox10.Size = new System.Drawing.Size(94, 22);
-            this.textBox10.TabIndex = 257;
-            this.textBox10.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxSSSLoanAmountDebitInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxSSSLoanAmountDebitInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxSSSLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxSSSLoanAmountDebitInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxSSSLoanAmountDebitInput.Location = new System.Drawing.Point(896, 444);
+            this.textBoxSSSLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxSSSLoanAmountDebitInput.Name = "textBoxSSSLoanAmountDebitInput";
+            this.textBoxSSSLoanAmountDebitInput.Size = new System.Drawing.Size(125, 26);
+            this.textBoxSSSLoanAmountDebitInput.TabIndex = 257;
+            this.textBoxSSSLoanAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox11
+            // textBoxOthersAmountDebitInput
             // 
-            this.textBox11.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox11.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox11.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox11.ForeColor = System.Drawing.Color.White;
-            this.textBox11.Location = new System.Drawing.Point(672, 550);
-            this.textBox11.Name = "textBox11";
-            this.textBox11.Size = new System.Drawing.Size(94, 22);
-            this.textBox11.TabIndex = 264;
-            this.textBox11.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxOthersAmountDebitInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxOthersAmountDebitInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxOthersAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxOthersAmountDebitInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxOthersAmountDebitInput.Location = new System.Drawing.Point(896, 677);
+            this.textBoxOthersAmountDebitInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxOthersAmountDebitInput.Name = "textBoxOthersAmountDebitInput";
+            this.textBoxOthersAmountDebitInput.Size = new System.Drawing.Size(125, 26);
+            this.textBoxOthersAmountDebitInput.TabIndex = 264;
+            this.textBoxOthersAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox12
+            // textBoxCoopContriAmountDebitInput
             // 
-            this.textBox12.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox12.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox12.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox12.ForeColor = System.Drawing.Color.White;
-            this.textBox12.Location = new System.Drawing.Point(672, 523);
-            this.textBox12.Name = "textBox12";
-            this.textBox12.Size = new System.Drawing.Size(94, 22);
-            this.textBox12.TabIndex = 263;
-            this.textBox12.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxCoopContriAmountDebitInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxCoopContriAmountDebitInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxCoopContriAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxCoopContriAmountDebitInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxCoopContriAmountDebitInput.Location = new System.Drawing.Point(896, 644);
+            this.textBoxCoopContriAmountDebitInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxCoopContriAmountDebitInput.Name = "textBoxCoopContriAmountDebitInput";
+            this.textBoxCoopContriAmountDebitInput.Size = new System.Drawing.Size(125, 26);
+            this.textBoxCoopContriAmountDebitInput.TabIndex = 263;
+            this.textBoxCoopContriAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox13
+            // textBoxCoopLoanAmountDebitInput
             // 
-            this.textBox13.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox13.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox13.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox13.ForeColor = System.Drawing.Color.White;
-            this.textBox13.Location = new System.Drawing.Point(672, 496);
-            this.textBox13.Name = "textBox13";
-            this.textBox13.Size = new System.Drawing.Size(94, 22);
-            this.textBox13.TabIndex = 262;
-            this.textBox13.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxCoopLoanAmountDebitInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxCoopLoanAmountDebitInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxCoopLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxCoopLoanAmountDebitInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxCoopLoanAmountDebitInput.Location = new System.Drawing.Point(896, 610);
+            this.textBoxCoopLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxCoopLoanAmountDebitInput.Name = "textBoxCoopLoanAmountDebitInput";
+            this.textBoxCoopLoanAmountDebitInput.Size = new System.Drawing.Size(125, 26);
+            this.textBoxCoopLoanAmountDebitInput.TabIndex = 262;
+            this.textBoxCoopLoanAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox14
+            // textBoxHousingLoanDetails
             // 
-            this.textBox14.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox14.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox14.ForeColor = System.Drawing.Color.White;
-            this.textBox14.Location = new System.Drawing.Point(791, 442);
-            this.textBox14.Name = "textBox14";
-            this.textBox14.Size = new System.Drawing.Size(94, 22);
-            this.textBox14.TabIndex = 272;
-            this.textBox14.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxHousingLoanDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxHousingLoanDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxHousingLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxHousingLoanDetails.ForeColor = System.Drawing.Color.White;
+            this.textBoxHousingLoanDetails.Location = new System.Drawing.Point(1055, 544);
+            this.textBoxHousingLoanDetails.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxHousingLoanDetails.Name = "textBoxHousingLoanDetails";
+            this.textBoxHousingLoanDetails.Size = new System.Drawing.Size(125, 26);
+            this.textBoxHousingLoanDetails.TabIndex = 272;
+            this.textBoxHousingLoanDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox15
+            // textBoxCarLoanDetails
             // 
-            this.textBox15.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox15.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox15.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox15.ForeColor = System.Drawing.Color.White;
-            this.textBox15.Location = new System.Drawing.Point(791, 415);
-            this.textBox15.Name = "textBox15";
-            this.textBox15.Size = new System.Drawing.Size(94, 22);
-            this.textBox15.TabIndex = 271;
-            this.textBox15.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxCarLoanDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxCarLoanDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxCarLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxCarLoanDetails.ForeColor = System.Drawing.Color.White;
+            this.textBoxCarLoanDetails.Location = new System.Drawing.Point(1055, 511);
+            this.textBoxCarLoanDetails.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxCarLoanDetails.Name = "textBoxCarLoanDetails";
+            this.textBoxCarLoanDetails.Size = new System.Drawing.Size(125, 26);
+            this.textBoxCarLoanDetails.TabIndex = 271;
+            this.textBoxCarLoanDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox16
+            // textBoxPagIbigLoanDetails
             // 
-            this.textBox16.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox16.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox16.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox16.ForeColor = System.Drawing.Color.White;
-            this.textBox16.Location = new System.Drawing.Point(791, 388);
-            this.textBox16.Name = "textBox16";
-            this.textBox16.Size = new System.Drawing.Size(94, 22);
-            this.textBox16.TabIndex = 270;
-            this.textBox16.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxPagIbigLoanDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxPagIbigLoanDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxPagIbigLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxPagIbigLoanDetails.ForeColor = System.Drawing.Color.White;
+            this.textBoxPagIbigLoanDetails.Location = new System.Drawing.Point(1055, 478);
+            this.textBoxPagIbigLoanDetails.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxPagIbigLoanDetails.Name = "textBoxPagIbigLoanDetails";
+            this.textBoxPagIbigLoanDetails.Size = new System.Drawing.Size(125, 26);
+            this.textBoxPagIbigLoanDetails.TabIndex = 270;
+            this.textBoxPagIbigLoanDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox17
+            // textBoxSSSLoanDetails
             // 
-            this.textBox17.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox17.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox17.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox17.ForeColor = System.Drawing.Color.White;
-            this.textBox17.Location = new System.Drawing.Point(791, 361);
-            this.textBox17.Name = "textBox17";
-            this.textBox17.Size = new System.Drawing.Size(94, 22);
-            this.textBox17.TabIndex = 269;
-            this.textBox17.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxSSSLoanDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxSSSLoanDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxSSSLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxSSSLoanDetails.ForeColor = System.Drawing.Color.White;
+            this.textBoxSSSLoanDetails.Location = new System.Drawing.Point(1055, 444);
+            this.textBoxSSSLoanDetails.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxSSSLoanDetails.Name = "textBoxSSSLoanDetails";
+            this.textBoxSSSLoanDetails.Size = new System.Drawing.Size(125, 26);
+            this.textBoxSSSLoanDetails.TabIndex = 269;
+            this.textBoxSSSLoanDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox18
+            // textBoxPhilhealthDetails
             // 
-            this.textBox18.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox18.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox18.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox18.ForeColor = System.Drawing.Color.White;
-            this.textBox18.Location = new System.Drawing.Point(791, 334);
-            this.textBox18.Name = "textBox18";
-            this.textBox18.Size = new System.Drawing.Size(94, 22);
-            this.textBox18.TabIndex = 268;
-            this.textBox18.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxPhilhealthDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxPhilhealthDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxPhilhealthDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxPhilhealthDetails.ForeColor = System.Drawing.Color.White;
+            this.textBoxPhilhealthDetails.Location = new System.Drawing.Point(1055, 411);
+            this.textBoxPhilhealthDetails.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxPhilhealthDetails.Name = "textBoxPhilhealthDetails";
+            this.textBoxPhilhealthDetails.Size = new System.Drawing.Size(125, 26);
+            this.textBoxPhilhealthDetails.TabIndex = 268;
+            this.textBoxPhilhealthDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox19
+            // textBoxPagIbigDetails
             // 
-            this.textBox19.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox19.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox19.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox19.ForeColor = System.Drawing.Color.White;
-            this.textBox19.Location = new System.Drawing.Point(791, 307);
-            this.textBox19.Name = "textBox19";
-            this.textBox19.Size = new System.Drawing.Size(94, 22);
-            this.textBox19.TabIndex = 267;
-            this.textBox19.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxPagIbigDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxPagIbigDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxPagIbigDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxPagIbigDetails.ForeColor = System.Drawing.Color.White;
+            this.textBoxPagIbigDetails.Location = new System.Drawing.Point(1055, 378);
+            this.textBoxPagIbigDetails.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxPagIbigDetails.Name = "textBoxPagIbigDetails";
+            this.textBoxPagIbigDetails.Size = new System.Drawing.Size(125, 26);
+            this.textBoxPagIbigDetails.TabIndex = 267;
+            this.textBoxPagIbigDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox20
+            // textBoxSSSDetails
             // 
-            this.textBox20.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox20.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox20.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox20.ForeColor = System.Drawing.Color.White;
-            this.textBox20.Location = new System.Drawing.Point(791, 280);
-            this.textBox20.Name = "textBox20";
-            this.textBox20.Size = new System.Drawing.Size(94, 22);
-            this.textBox20.TabIndex = 266;
-            this.textBox20.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxSSSDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxSSSDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxSSSDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxSSSDetails.ForeColor = System.Drawing.Color.White;
+            this.textBoxSSSDetails.Location = new System.Drawing.Point(1055, 345);
+            this.textBoxSSSDetails.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxSSSDetails.Name = "textBoxSSSDetails";
+            this.textBoxSSSDetails.Size = new System.Drawing.Size(125, 26);
+            this.textBoxSSSDetails.TabIndex = 266;
+            this.textBoxSSSDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox21
+            // textBoxWithTaxDetails
             // 
-            this.textBox21.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox21.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox21.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox21.ForeColor = System.Drawing.Color.White;
-            this.textBox21.Location = new System.Drawing.Point(791, 253);
-            this.textBox21.Name = "textBox21";
-            this.textBox21.Size = new System.Drawing.Size(94, 22);
-            this.textBox21.TabIndex = 265;
-            this.textBox21.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxWithTaxDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxWithTaxDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxWithTaxDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxWithTaxDetails.ForeColor = System.Drawing.Color.White;
+            this.textBoxWithTaxDetails.Location = new System.Drawing.Point(1055, 311);
+            this.textBoxWithTaxDetails.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxWithTaxDetails.Name = "textBoxWithTaxDetails";
+            this.textBoxWithTaxDetails.Size = new System.Drawing.Size(125, 26);
+            this.textBoxWithTaxDetails.TabIndex = 265;
+            this.textBoxWithTaxDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox22
+            // textBoxOthersDetails
             // 
-            this.textBox22.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox22.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox22.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox22.ForeColor = System.Drawing.Color.White;
-            this.textBox22.Location = new System.Drawing.Point(791, 551);
-            this.textBox22.Name = "textBox22";
-            this.textBox22.Size = new System.Drawing.Size(94, 22);
-            this.textBox22.TabIndex = 276;
-            this.textBox22.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxOthersDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxOthersDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxOthersDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxOthersDetails.ForeColor = System.Drawing.Color.White;
+            this.textBoxOthersDetails.Location = new System.Drawing.Point(1055, 678);
+            this.textBoxOthersDetails.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxOthersDetails.Name = "textBoxOthersDetails";
+            this.textBoxOthersDetails.Size = new System.Drawing.Size(125, 26);
+            this.textBoxOthersDetails.TabIndex = 276;
+            this.textBoxOthersDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox23
+            // textBoxCoopContriDetails
             // 
-            this.textBox23.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox23.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox23.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox23.ForeColor = System.Drawing.Color.White;
-            this.textBox23.Location = new System.Drawing.Point(791, 524);
-            this.textBox23.Name = "textBox23";
-            this.textBox23.Size = new System.Drawing.Size(94, 22);
-            this.textBox23.TabIndex = 275;
-            this.textBox23.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxCoopContriDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxCoopContriDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxCoopContriDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxCoopContriDetails.ForeColor = System.Drawing.Color.White;
+            this.textBoxCoopContriDetails.Location = new System.Drawing.Point(1055, 645);
+            this.textBoxCoopContriDetails.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxCoopContriDetails.Name = "textBoxCoopContriDetails";
+            this.textBoxCoopContriDetails.Size = new System.Drawing.Size(125, 26);
+            this.textBoxCoopContriDetails.TabIndex = 275;
+            this.textBoxCoopContriDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox24
+            // textBoxCoopLoanDetails
             // 
-            this.textBox24.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox24.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox24.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox24.ForeColor = System.Drawing.Color.White;
-            this.textBox24.Location = new System.Drawing.Point(791, 497);
-            this.textBox24.Name = "textBox24";
-            this.textBox24.Size = new System.Drawing.Size(94, 22);
-            this.textBox24.TabIndex = 274;
-            this.textBox24.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxCoopLoanDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxCoopLoanDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxCoopLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxCoopLoanDetails.ForeColor = System.Drawing.Color.White;
+            this.textBoxCoopLoanDetails.Location = new System.Drawing.Point(1055, 612);
+            this.textBoxCoopLoanDetails.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxCoopLoanDetails.Name = "textBoxCoopLoanDetails";
+            this.textBoxCoopLoanDetails.Size = new System.Drawing.Size(125, 26);
+            this.textBoxCoopLoanDetails.TabIndex = 274;
+            this.textBoxCoopLoanDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox25
+            // textBoxCashAdvanceDetails
             // 
-            this.textBox25.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox25.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox25.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox25.ForeColor = System.Drawing.Color.White;
-            this.textBox25.Location = new System.Drawing.Point(791, 470);
-            this.textBox25.Name = "textBox25";
-            this.textBox25.Size = new System.Drawing.Size(94, 22);
-            this.textBox25.TabIndex = 273;
-            this.textBox25.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxCashAdvanceDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxCashAdvanceDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxCashAdvanceDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxCashAdvanceDetails.ForeColor = System.Drawing.Color.White;
+            this.textBoxCashAdvanceDetails.Location = new System.Drawing.Point(1055, 578);
+            this.textBoxCashAdvanceDetails.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxCashAdvanceDetails.Name = "textBoxCashAdvanceDetails";
+            this.textBoxCashAdvanceDetails.Size = new System.Drawing.Size(125, 26);
+            this.textBoxCashAdvanceDetails.TabIndex = 273;
+            this.textBoxCashAdvanceDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox26
+            // textBoxVacationLeaveCredit
             // 
-            this.textBox26.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox26.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox26.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox26.ForeColor = System.Drawing.Color.White;
-            this.textBox26.Location = new System.Drawing.Point(172, 631);
-            this.textBox26.Name = "textBox26";
-            this.textBox26.Size = new System.Drawing.Size(94, 22);
-            this.textBox26.TabIndex = 277;
-            this.textBox26.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxVacationLeaveCredit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxVacationLeaveCredit.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxVacationLeaveCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxVacationLeaveCredit.ForeColor = System.Drawing.Color.White;
+            this.textBoxVacationLeaveCredit.Location = new System.Drawing.Point(229, 777);
+            this.textBoxVacationLeaveCredit.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxVacationLeaveCredit.Name = "textBoxVacationLeaveCredit";
+            this.textBoxVacationLeaveCredit.Size = new System.Drawing.Size(125, 26);
+            this.textBoxVacationLeaveCredit.TabIndex = 277;
+            this.textBoxVacationLeaveCredit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox27
+            // textBoxSickLeaveCredit
             // 
-            this.textBox27.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox27.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox27.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox27.ForeColor = System.Drawing.Color.White;
-            this.textBox27.Location = new System.Drawing.Point(172, 657);
-            this.textBox27.Name = "textBox27";
-            this.textBox27.Size = new System.Drawing.Size(94, 22);
-            this.textBox27.TabIndex = 278;
-            this.textBox27.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxSickLeaveCredit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxSickLeaveCredit.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxSickLeaveCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxSickLeaveCredit.ForeColor = System.Drawing.Color.White;
+            this.textBoxSickLeaveCredit.Location = new System.Drawing.Point(229, 809);
+            this.textBoxSickLeaveCredit.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxSickLeaveCredit.Name = "textBoxSickLeaveCredit";
+            this.textBoxSickLeaveCredit.Size = new System.Drawing.Size(125, 26);
+            this.textBoxSickLeaveCredit.TabIndex = 278;
+            this.textBoxSickLeaveCredit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBox28
+            // textBoxDailyRateInput
             // 
-            this.textBox28.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox28.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox28.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox28.ForeColor = System.Drawing.Color.White;
-            this.textBox28.Location = new System.Drawing.Point(727, 105);
-            this.textBox28.Name = "textBox28";
-            this.textBox28.Size = new System.Drawing.Size(163, 22);
-            this.textBox28.TabIndex = 279;
-            this.textBox28.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBoxDailyRateInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxDailyRateInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxDailyRateInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxDailyRateInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxDailyRateInput.Location = new System.Drawing.Point(969, 129);
+            this.textBoxDailyRateInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxDailyRateInput.Name = "textBoxDailyRateInput";
+            this.textBoxDailyRateInput.Size = new System.Drawing.Size(217, 26);
+            this.textBoxDailyRateInput.TabIndex = 279;
+            this.textBoxDailyRateInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // PayrollSummaryEdit
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(914, 686);
-            this.Controls.Add(this.textBox28);
-            this.Controls.Add(this.textBox27);
-            this.Controls.Add(this.textBox26);
-            this.Controls.Add(this.textBox22);
-            this.Controls.Add(this.textBox23);
-            this.Controls.Add(this.textBox24);
-            this.Controls.Add(this.textBox25);
-            this.Controls.Add(this.textBox14);
-            this.Controls.Add(this.textBox15);
-            this.Controls.Add(this.textBox16);
-            this.Controls.Add(this.textBox17);
-            this.Controls.Add(this.textBox18);
-            this.Controls.Add(this.textBox19);
-            this.Controls.Add(this.textBox20);
-            this.Controls.Add(this.textBox21);
-            this.Controls.Add(this.textBox11);
-            this.Controls.Add(this.textBox12);
-            this.Controls.Add(this.textBox13);
-            this.Controls.Add(this.textBox6);
-            this.Controls.Add(this.textBox7);
-            this.Controls.Add(this.textBox8);
-            this.Controls.Add(this.textBox9);
-            this.Controls.Add(this.textBox10);
-            this.Controls.Add(this.textBox5);
-            this.Controls.Add(this.textBox4);
-            this.Controls.Add(this.textBox3);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.label94);
-            this.Controls.Add(this.label93);
-            this.Controls.Add(this.textBoxOverTimeIn);
+            this.ClientSize = new System.Drawing.Size(1219, 844);
+            this.Controls.Add(this.textBoxDailyRateInput);
+            this.Controls.Add(this.textBoxSickLeaveCredit);
+            this.Controls.Add(this.textBoxVacationLeaveCredit);
+            this.Controls.Add(this.textBoxOthersDetails);
+            this.Controls.Add(this.textBoxCoopContriDetails);
+            this.Controls.Add(this.textBoxCoopLoanDetails);
+            this.Controls.Add(this.textBoxCashAdvanceDetails);
+            this.Controls.Add(this.textBoxHousingLoanDetails);
+            this.Controls.Add(this.textBoxCarLoanDetails);
+            this.Controls.Add(this.textBoxPagIbigLoanDetails);
+            this.Controls.Add(this.textBoxSSSLoanDetails);
+            this.Controls.Add(this.textBoxPhilhealthDetails);
+            this.Controls.Add(this.textBoxPagIbigDetails);
+            this.Controls.Add(this.textBoxSSSDetails);
+            this.Controls.Add(this.textBoxWithTaxDetails);
+            this.Controls.Add(this.textBoxOthersAmountDebitInput);
+            this.Controls.Add(this.textBoxCoopContriAmountDebitInput);
+            this.Controls.Add(this.textBoxCoopLoanAmountDebitInput);
+            this.Controls.Add(this.textBoxCashAdvanceAmountDebitInput);
+            this.Controls.Add(this.textBoxHousingLoanAmountDebitInput);
+            this.Controls.Add(this.textBoxCarLoanAmountDebitInput);
+            this.Controls.Add(this.textBoxPagIbigLoanAmountDebitInput);
+            this.Controls.Add(this.textBoxSSSLoanAmountDebitInput);
+            this.Controls.Add(this.textBoxGondolaAmountBaseInput);
+            this.Controls.Add(this.textBoxCommunicationAmountBaseInput);
+            this.Controls.Add(this.textBoxFoodAllowanceAmountBaseInput);
+            this.Controls.Add(this.textBoxGasAllowanceAmountBaseInput);
+            this.Controls.Add(this.textBoxCommissionAmountBaseInput);
+            this.Controls.Add(this.labelGondola);
+            this.Controls.Add(this.labelGondolaAmountCreditInput);
+            this.Controls.Add(this.textBoxIncentivesAmountBaseInput);
             this.Controls.Add(this.buttonCancel);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.label91);
-            this.Controls.Add(this.label92);
-            this.Controls.Add(this.label89);
-            this.Controls.Add(this.label90);
-            this.Controls.Add(this.label86);
-            this.Controls.Add(this.label85);
-            this.Controls.Add(this.label84);
+            this.Controls.Add(this.buttonUpdate);
+            this.Controls.Add(this.labelVacationLeaveBalance);
+            this.Controls.Add(this.labelSickLeaveBalance);
+            this.Controls.Add(this.labelVacationLeaveDebit);
+            this.Controls.Add(this.labelSickLeaveDebit);
+            this.Controls.Add(this.labelLeaveDebit);
+            this.Controls.Add(this.labelLeaveBalance);
+            this.Controls.Add(this.labelLeave);
             this.Controls.Add(this.panel3);
-            this.Controls.Add(this.label79);
-            this.Controls.Add(this.label78);
-            this.Controls.Add(this.label77);
+            this.Controls.Add(this.labelSickLeave);
+            this.Controls.Add(this.labelVacationLeave);
+            this.Controls.Add(this.labelLeaveCredit);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.label65);
-            this.Controls.Add(this.label66);
-            this.Controls.Add(this.label67);
-            this.Controls.Add(this.label68);
-            this.Controls.Add(this.label57);
-            this.Controls.Add(this.label58);
-            this.Controls.Add(this.label59);
-            this.Controls.Add(this.label60);
-            this.Controls.Add(this.label32);
-            this.Controls.Add(this.label43);
-            this.Controls.Add(this.label44);
-            this.Controls.Add(this.label45);
-            this.Controls.Add(this.label46);
-            this.Controls.Add(this.label47);
-            this.Controls.Add(this.label48);
-            this.Controls.Add(this.label56);
-            this.Controls.Add(this.label30);
-            this.Controls.Add(this.label41);
-            this.Controls.Add(this.label49);
-            this.Controls.Add(this.label50);
-            this.Controls.Add(this.label51);
-            this.Controls.Add(this.label52);
-            this.Controls.Add(this.label53);
-            this.Controls.Add(this.label54);
-            this.Controls.Add(this.label55);
-            this.Controls.Add(this.label40);
-            this.Controls.Add(this.label39);
-            this.Controls.Add(this.label33);
-            this.Controls.Add(this.label31);
-            this.Controls.Add(this.label29);
-            this.Controls.Add(this.label28);
-            this.Controls.Add(this.label27);
-            this.Controls.Add(this.label26);
-            this.Controls.Add(this.label25);
-            this.Controls.Add(this.label24);
-            this.Controls.Add(this.label23);
-            this.Controls.Add(this.label19);
-            this.Controls.Add(this.label22);
-            this.Controls.Add(this.label21);
-            this.Controls.Add(this.label20);
-            this.Controls.Add(this.label17);
-            this.Controls.Add(this.label18);
-            this.Controls.Add(this.label15);
-            this.Controls.Add(this.label16);
-            this.Controls.Add(this.label14);
-            this.Controls.Add(this.label13);
-            this.Controls.Add(this.label12);
-            this.Controls.Add(this.label11);
-            this.Controls.Add(this.label9);
-            this.Controls.Add(this.label10);
-            this.Controls.Add(this.label8);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.labelDateInput);
+            this.Controls.Add(this.labelOthers);
+            this.Controls.Add(this.labelCoopLoan);
+            this.Controls.Add(this.labelCoopContri);
+            this.Controls.Add(this.labelCashAdvance);
+            this.Controls.Add(this.labelWithTaxAmountDebitInput);
+            this.Controls.Add(this.labelSSSAmountDebitInput);
+            this.Controls.Add(this.labelPagIbigAmountDebitInput);
+            this.Controls.Add(this.labelPhilhealthAmountDebitInput);
+            this.Controls.Add(this.labelBasicPayAmountCreditInput);
+            this.Controls.Add(this.labelOvertimePerHourAmountCreditInput);
+            this.Controls.Add(this.labelOvertimePerMinuteAmountCreditInput);
+            this.Controls.Add(this.labelIncentivesAmountCreditInput);
+            this.Controls.Add(this.labelCommissionAmountCreditInput);
+            this.Controls.Add(this.labelGasAllowanceAmountCreditInput);
+            this.Controls.Add(this.labelFoodAllowanceAmountCreditInput);
+            this.Controls.Add(this.labelCommunicationAmountCreditInput);
+            this.Controls.Add(this.labelBasicPayAmountBaseInput);
+            this.Controls.Add(this.labelWithTax);
+            this.Controls.Add(this.labelSSS);
+            this.Controls.Add(this.labelPagIbig);
+            this.Controls.Add(this.labelHousingLoan);
+            this.Controls.Add(this.labelPagIbigLoan);
+            this.Controls.Add(this.labelPhilhealth);
+            this.Controls.Add(this.labelCarLoan);
+            this.Controls.Add(this.labelSSSLoan);
+            this.Controls.Add(this.labelOvertimePerHourAmountBaseInput);
+            this.Controls.Add(this.labelOvertimePerMinuteAmountBaseInput);
+            this.Controls.Add(this.labelBasicPayCredit);
+            this.Controls.Add(this.labelOvertimeCredit);
+            this.Controls.Add(this.labelBasicPay);
+            this.Controls.Add(this.labelOvertimePerHour);
+            this.Controls.Add(this.labelOvertimePerMinute);
+            this.Controls.Add(this.labelCommunication);
+            this.Controls.Add(this.labelGasAllowance);
+            this.Controls.Add(this.labelIncentives);
+            this.Controls.Add(this.labelFoodAllowance);
+            this.Controls.Add(this.labelCommission);
+            this.Controls.Add(this.labelAmountDebit);
+            this.Controls.Add(this.labelAmountCredit);
+            this.Controls.Add(this.labelDetails);
+            this.Controls.Add(this.labelDebit);
+            this.Controls.Add(this.labelCredit);
+            this.Controls.Add(this.labelAmountBase);
+            this.Controls.Add(this.labelPayAndAllowances);
+            this.Controls.Add(this.labelDateCoveredInput);
+            this.Controls.Add(this.labelDaysInput);
+            this.Controls.Add(this.labelDaysPresentInput);
+            this.Controls.Add(this.labelOvertimeInput);
+            this.Controls.Add(this.labelOvertime);
+            this.Controls.Add(this.labelDaysPresent);
+            this.Controls.Add(this.labelDays);
+            this.Controls.Add(this.labelSalaryInput);
             this.Controls.Add(this.labelNameInput);
+            this.Controls.Add(this.labelSalary);
+            this.Controls.Add(this.labelDailyRate);
+            this.Controls.Add(this.labelDepartment);
+            this.Controls.Add(this.labelPosition);
+            this.Controls.Add(this.labelDepartmentInput);
+            this.Controls.Add(this.labelPositionInput);
             this.Controls.Add(this.labelIDInput);
-            this.Controls.Add(this.labelDate);
+            this.Controls.Add(this.labelDateCovered);
             this.Controls.Add(this.labelName);
             this.Controls.Add(this.labelID);
             this.Controls.Add(this.XpictureBox);
-            this.Controls.Add(this.labelRequestConfirm);
+            this.Controls.Add(this.labelPayrollSummary);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "PayrollSummaryEdit";
             this.ShowInTaskbar = false;
             this.Text = "PayrollSummaryEdit";
@@ -1589,120 +1709,120 @@
         #endregion
 
         private System.Windows.Forms.Button buttonCancel;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label label91;
-        private System.Windows.Forms.Label label92;
-        private System.Windows.Forms.Label label89;
-        private System.Windows.Forms.Label label90;
-        private System.Windows.Forms.Label label86;
-        private System.Windows.Forms.Label label85;
-        private System.Windows.Forms.Label label84;
+        private System.Windows.Forms.Button buttonUpdate;
+        private System.Windows.Forms.Label labelVacationLeaveBalance;
+        private System.Windows.Forms.Label labelSickLeaveBalance;
+        private System.Windows.Forms.Label labelVacationLeaveDebit;
+        private System.Windows.Forms.Label labelSickLeaveDebit;
+        private System.Windows.Forms.Label labelLeaveDebit;
+        private System.Windows.Forms.Label labelLeaveBalance;
+        private System.Windows.Forms.Label labelLeave;
         private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.Label label82;
-        private System.Windows.Forms.Label label79;
-        private System.Windows.Forms.Label label78;
-        private System.Windows.Forms.Label label77;
+        private System.Windows.Forms.Label labelOverallTotalInput;
+        private System.Windows.Forms.Label labelSickLeave;
+        private System.Windows.Forms.Label labelVacationLeave;
+        private System.Windows.Forms.Label labelLeaveCredit;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label label80;
+        private System.Windows.Forms.Label labelGrossPayInput;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Label label83;
-        private System.Windows.Forms.Label label81;
-        private System.Windows.Forms.Label label42;
-        private System.Windows.Forms.Label label65;
-        private System.Windows.Forms.Label label66;
-        private System.Windows.Forms.Label label67;
-        private System.Windows.Forms.Label label68;
-        private System.Windows.Forms.Label label57;
-        private System.Windows.Forms.Label label58;
-        private System.Windows.Forms.Label label59;
-        private System.Windows.Forms.Label label60;
-        private System.Windows.Forms.Label label32;
-        private System.Windows.Forms.Label label43;
-        private System.Windows.Forms.Label label44;
-        private System.Windows.Forms.Label label45;
-        private System.Windows.Forms.Label label46;
-        private System.Windows.Forms.Label label47;
-        private System.Windows.Forms.Label label48;
-        private System.Windows.Forms.Label label56;
-        private System.Windows.Forms.Label label30;
-        private System.Windows.Forms.Label label41;
-        private System.Windows.Forms.Label label49;
-        private System.Windows.Forms.Label label50;
-        private System.Windows.Forms.Label label51;
-        private System.Windows.Forms.Label label52;
-        private System.Windows.Forms.Label label53;
-        private System.Windows.Forms.Label label54;
-        private System.Windows.Forms.Label label55;
-        private System.Windows.Forms.Label label40;
-        private System.Windows.Forms.Label label39;
-        private System.Windows.Forms.Label label33;
-        private System.Windows.Forms.Label label31;
-        private System.Windows.Forms.Label label29;
-        private System.Windows.Forms.Label label28;
-        private System.Windows.Forms.Label label27;
-        private System.Windows.Forms.Label label26;
-        private System.Windows.Forms.Label label25;
-        private System.Windows.Forms.Label label24;
-        private System.Windows.Forms.Label label23;
-        private System.Windows.Forms.Label label19;
-        private System.Windows.Forms.Label label22;
-        private System.Windows.Forms.Label label21;
-        private System.Windows.Forms.Label label20;
-        private System.Windows.Forms.Label label17;
-        private System.Windows.Forms.Label label18;
-        private System.Windows.Forms.Label label15;
-        private System.Windows.Forms.Label label16;
-        private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label labelDateInput;
+        private System.Windows.Forms.Label labelDeductions;
+        private System.Windows.Forms.Label labelDeductionsInput;
+        private System.Windows.Forms.Label labelGrossPay;
+        private System.Windows.Forms.Label labelOthers;
+        private System.Windows.Forms.Label labelCoopLoan;
+        private System.Windows.Forms.Label labelCoopContri;
+        private System.Windows.Forms.Label labelCashAdvance;
+        private System.Windows.Forms.Label labelWithTaxAmountDebitInput;
+        private System.Windows.Forms.Label labelSSSAmountDebitInput;
+        private System.Windows.Forms.Label labelPagIbigAmountDebitInput;
+        private System.Windows.Forms.Label labelPhilhealthAmountDebitInput;
+        private System.Windows.Forms.Label labelBasicPayAmountCreditInput;
+        private System.Windows.Forms.Label labelOvertimePerHourAmountCreditInput;
+        private System.Windows.Forms.Label labelOvertimePerMinuteAmountCreditInput;
+        private System.Windows.Forms.Label labelIncentivesAmountCreditInput;
+        private System.Windows.Forms.Label labelCommissionAmountCreditInput;
+        private System.Windows.Forms.Label labelGasAllowanceAmountCreditInput;
+        private System.Windows.Forms.Label labelFoodAllowanceAmountCreditInput;
+        private System.Windows.Forms.Label labelCommunicationAmountCreditInput;
+        private System.Windows.Forms.Label labelBasicPayAmountBaseInput;
+        private System.Windows.Forms.Label labelWithTax;
+        private System.Windows.Forms.Label labelSSS;
+        private System.Windows.Forms.Label labelPagIbig;
+        private System.Windows.Forms.Label labelHousingLoan;
+        private System.Windows.Forms.Label labelPagIbigLoan;
+        private System.Windows.Forms.Label labelPhilhealth;
+        private System.Windows.Forms.Label labelCarLoan;
+        private System.Windows.Forms.Label labelSSSLoan;
+        private System.Windows.Forms.Label labelOvertimePerHourAmountBaseInput;
+        private System.Windows.Forms.Label labelOvertimePerMinuteAmountBaseInput;
+        private System.Windows.Forms.Label labelBasicPayCredit;
+        private System.Windows.Forms.Label labelOvertimeCredit;
+        private System.Windows.Forms.Label labelBasicPay;
+        private System.Windows.Forms.Label labelOvertimePerHour;
+        private System.Windows.Forms.Label labelOvertimePerMinute;
+        private System.Windows.Forms.Label labelCommunication;
+        private System.Windows.Forms.Label labelGasAllowance;
+        private System.Windows.Forms.Label labelIncentives;
+        private System.Windows.Forms.Label labelFoodAllowance;
+        private System.Windows.Forms.Label labelCommission;
+        private System.Windows.Forms.Label labelAmountDebit;
+        private System.Windows.Forms.Label labelAmountCredit;
+        private System.Windows.Forms.Label labelDetails;
+        private System.Windows.Forms.Label labelDebit;
+        private System.Windows.Forms.Label labelCredit;
+        private System.Windows.Forms.Label labelAmountBase;
+        private System.Windows.Forms.Label labelPayAndAllowances;
+        private System.Windows.Forms.Label labelDateCoveredInput;
+        private System.Windows.Forms.Label labelDaysInput;
+        private System.Windows.Forms.Label labelDaysPresentInput;
+        private System.Windows.Forms.Label labelOvertimeInput;
+        private System.Windows.Forms.Label labelOvertime;
+        private System.Windows.Forms.Label labelDaysPresent;
+        private System.Windows.Forms.Label labelDays;
+        private System.Windows.Forms.Label labelSalaryInput;
         private System.Windows.Forms.Label labelNameInput;
+        private System.Windows.Forms.Label labelSalary;
+        private System.Windows.Forms.Label labelDailyRate;
+        private System.Windows.Forms.Label labelDepartment;
+        private System.Windows.Forms.Label labelPosition;
+        private System.Windows.Forms.Label labelDepartmentInput;
+        private System.Windows.Forms.Label labelPositionInput;
         private System.Windows.Forms.Label labelIDInput;
-        private System.Windows.Forms.Label labelDate;
+        private System.Windows.Forms.Label labelDateCovered;
         private System.Windows.Forms.Label labelName;
         private System.Windows.Forms.Label labelID;
         private System.Windows.Forms.PictureBox XpictureBox;
-        private System.Windows.Forms.Label labelRequestConfirm;
-        private System.Windows.Forms.TextBox textBoxOverTimeIn;
-        private System.Windows.Forms.Label label93;
-        private System.Windows.Forms.Label label94;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.TextBox textBox4;
-        private System.Windows.Forms.TextBox textBox5;
-        private System.Windows.Forms.TextBox textBox6;
-        private System.Windows.Forms.TextBox textBox7;
-        private System.Windows.Forms.TextBox textBox8;
-        private System.Windows.Forms.TextBox textBox9;
-        private System.Windows.Forms.TextBox textBox10;
-        private System.Windows.Forms.TextBox textBox11;
-        private System.Windows.Forms.TextBox textBox12;
-        private System.Windows.Forms.TextBox textBox13;
-        private System.Windows.Forms.TextBox textBox14;
-        private System.Windows.Forms.TextBox textBox15;
-        private System.Windows.Forms.TextBox textBox16;
-        private System.Windows.Forms.TextBox textBox17;
-        private System.Windows.Forms.TextBox textBox18;
-        private System.Windows.Forms.TextBox textBox19;
-        private System.Windows.Forms.TextBox textBox20;
-        private System.Windows.Forms.TextBox textBox21;
-        private System.Windows.Forms.TextBox textBox22;
-        private System.Windows.Forms.TextBox textBox23;
-        private System.Windows.Forms.TextBox textBox24;
-        private System.Windows.Forms.TextBox textBox25;
-        private System.Windows.Forms.TextBox textBox26;
-        private System.Windows.Forms.TextBox textBox27;
-        private System.Windows.Forms.TextBox textBox28;
+        private System.Windows.Forms.Label labelPayrollSummary;
+        private System.Windows.Forms.TextBox textBoxIncentivesAmountBaseInput;
+        private System.Windows.Forms.Label labelGondolaAmountCreditInput;
+        private System.Windows.Forms.Label labelGondola;
+        private System.Windows.Forms.TextBox textBoxCommissionAmountBaseInput;
+        private System.Windows.Forms.TextBox textBoxGasAllowanceAmountBaseInput;
+        private System.Windows.Forms.TextBox textBoxFoodAllowanceAmountBaseInput;
+        private System.Windows.Forms.TextBox textBoxCommunicationAmountBaseInput;
+        private System.Windows.Forms.TextBox textBoxGondolaAmountBaseInput;
+        private System.Windows.Forms.TextBox textBoxCashAdvanceAmountDebitInput;
+        private System.Windows.Forms.TextBox textBoxHousingLoanAmountDebitInput;
+        private System.Windows.Forms.TextBox textBoxCarLoanAmountDebitInput;
+        private System.Windows.Forms.TextBox textBoxPagIbigLoanAmountDebitInput;
+        private System.Windows.Forms.TextBox textBoxSSSLoanAmountDebitInput;
+        private System.Windows.Forms.TextBox textBoxOthersAmountDebitInput;
+        private System.Windows.Forms.TextBox textBoxCoopContriAmountDebitInput;
+        private System.Windows.Forms.TextBox textBoxCoopLoanAmountDebitInput;
+        private System.Windows.Forms.TextBox textBoxHousingLoanDetails;
+        private System.Windows.Forms.TextBox textBoxCarLoanDetails;
+        private System.Windows.Forms.TextBox textBoxPagIbigLoanDetails;
+        private System.Windows.Forms.TextBox textBoxSSSLoanDetails;
+        private System.Windows.Forms.TextBox textBoxPhilhealthDetails;
+        private System.Windows.Forms.TextBox textBoxPagIbigDetails;
+        private System.Windows.Forms.TextBox textBoxSSSDetails;
+        private System.Windows.Forms.TextBox textBoxWithTaxDetails;
+        private System.Windows.Forms.TextBox textBoxOthersDetails;
+        private System.Windows.Forms.TextBox textBoxCoopContriDetails;
+        private System.Windows.Forms.TextBox textBoxCoopLoanDetails;
+        private System.Windows.Forms.TextBox textBoxCashAdvanceDetails;
+        private System.Windows.Forms.TextBox textBoxVacationLeaveCredit;
+        private System.Windows.Forms.TextBox textBoxSickLeaveCredit;
+        private System.Windows.Forms.TextBox textBoxDailyRateInput;
     }
 }

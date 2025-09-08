@@ -66,6 +66,7 @@
             // buttonOverview
             // 
             this.buttonOverview.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(126)))), ((int)(((byte)(112)))), ((int)(((byte)(175)))));
+            this.buttonOverview.Cursor = System.Windows.Forms.Cursors.Hand;
             this.buttonOverview.Dock = System.Windows.Forms.DockStyle.Fill;
             this.buttonOverview.FlatAppearance.BorderSize = 0;
             this.buttonOverview.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -82,9 +83,11 @@
             // buttonEmployee
             // 
             this.buttonEmployee.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(153)))), ((int)(((byte)(137)))), ((int)(((byte)(207)))));
+            this.buttonEmployee.Cursor = System.Windows.Forms.Cursors.Hand;
             this.buttonEmployee.Dock = System.Windows.Forms.DockStyle.Fill;
             this.buttonEmployee.FlatAppearance.BorderSize = 0;
             this.buttonEmployee.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonEmployee.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(23)))), ((int)(((byte)(112)))));
             this.buttonEmployee.Location = new System.Drawing.Point(360, 0);
             this.buttonEmployee.Margin = new System.Windows.Forms.Padding(0);
             this.buttonEmployee.Name = "buttonEmployee";
@@ -97,9 +100,11 @@
             // buttonAttendance
             // 
             this.buttonAttendance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(153)))), ((int)(((byte)(137)))), ((int)(((byte)(207)))));
+            this.buttonAttendance.Cursor = System.Windows.Forms.Cursors.Hand;
             this.buttonAttendance.Dock = System.Windows.Forms.DockStyle.Fill;
             this.buttonAttendance.FlatAppearance.BorderSize = 0;
             this.buttonAttendance.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonAttendance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(23)))), ((int)(((byte)(112)))));
             this.buttonAttendance.Location = new System.Drawing.Point(720, 0);
             this.buttonAttendance.Margin = new System.Windows.Forms.Padding(0);
             this.buttonAttendance.Name = "buttonAttendance";
@@ -112,9 +117,11 @@
             // buttonPayroll
             // 
             this.buttonPayroll.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(153)))), ((int)(((byte)(137)))), ((int)(((byte)(207)))));
+            this.buttonPayroll.Cursor = System.Windows.Forms.Cursors.Hand;
             this.buttonPayroll.Dock = System.Windows.Forms.DockStyle.Fill;
             this.buttonPayroll.FlatAppearance.BorderSize = 0;
             this.buttonPayroll.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonPayroll.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(23)))), ((int)(((byte)(112)))));
             this.buttonPayroll.Location = new System.Drawing.Point(1080, 0);
             this.buttonPayroll.Margin = new System.Windows.Forms.Padding(0);
             this.buttonPayroll.Name = "buttonPayroll";
@@ -128,6 +135,7 @@
             // 
             this.labelLogOut.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.labelLogOut.AutoSize = true;
+            this.labelLogOut.Cursor = System.Windows.Forms.Cursors.Hand;
             this.labelLogOut.ForeColor = System.Drawing.Color.White;
             this.labelLogOut.Location = new System.Drawing.Point(1325, 37);
             this.labelLogOut.Name = "labelLogOut";
@@ -160,6 +168,7 @@
             // 
             // pictureBoxNotification
             // 
+            this.pictureBoxNotification.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxNotification.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pictureBoxNotification.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.Notification;
             this.pictureBoxNotification.Location = new System.Drawing.Point(1197, 24);
@@ -171,6 +180,7 @@
             // 
             // pictureBoxUserProfile
             // 
+            this.pictureBoxUserProfile.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxUserProfile.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pictureBoxUserProfile.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.UserProfile;
             this.pictureBoxUserProfile.Location = new System.Drawing.Point(1261, 24);

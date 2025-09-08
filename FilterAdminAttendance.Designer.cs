@@ -28,452 +28,499 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxSortLogo = new System.Windows.Forms.PictureBox();
             this.XpictureBox = new System.Windows.Forms.PictureBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.comboBox3 = new System.Windows.Forms.ComboBox();
-            this.comboBox4 = new System.Windows.Forms.ComboBox();
-            this.label8 = new System.Windows.Forms.Label();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.checkBox2 = new System.Windows.Forms.CheckBox();
-            this.checkBox3 = new System.Windows.Forms.CheckBox();
-            this.checkBox4 = new System.Windows.Forms.CheckBox();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.textBox4 = new System.Windows.Forms.TextBox();
-            this.label11 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.checkBox5 = new System.Windows.Forms.CheckBox();
-            this.checkBox6 = new System.Windows.Forms.CheckBox();
-            this.checkBox7 = new System.Windows.Forms.CheckBox();
-            this.checkBox8 = new System.Windows.Forms.CheckBox();
-            this.buttonCancel = new System.Windows.Forms.Button();
-            this.buttonConfirm = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.labelSearchFilters = new System.Windows.Forms.Label();
+            this.labelDate = new System.Windows.Forms.Label();
+            this.labelSort = new System.Windows.Forms.Label();
+            this.labelName = new System.Windows.Forms.Label();
+            this.labelID = new System.Windows.Forms.Label();
+            this.labelDepartment = new System.Windows.Forms.Label();
+            this.labelPosition = new System.Windows.Forms.Label();
+            this.comboBoxSort = new System.Windows.Forms.ComboBox();
+            this.comboBoxDate = new System.Windows.Forms.ComboBox();
+            this.textBoxName = new System.Windows.Forms.TextBox();
+            this.textBoxID = new System.Windows.Forms.TextBox();
+            this.comboBoxDepartment = new System.Windows.Forms.ComboBox();
+            this.comboBoxPosition = new System.Windows.Forms.ComboBox();
+            this.labelStatus = new System.Windows.Forms.Label();
+            this.checkBoxPresent = new System.Windows.Forms.CheckBox();
+            this.checkBoxLate = new System.Windows.Forms.CheckBox();
+            this.checkBoxAbsent = new System.Windows.Forms.CheckBox();
+            this.checkBoxEarlyOut = new System.Windows.Forms.CheckBox();
+            this.labelTimeIn = new System.Windows.Forms.Label();
+            this.labelTimeOut = new System.Windows.Forms.Label();
+            this.textBoxTimeIn = new System.Windows.Forms.TextBox();
+            this.textBoxTimeOut = new System.Windows.Forms.TextBox();
+            this.labelHoursWorked = new System.Windows.Forms.Label();
+            this.labelOvertime = new System.Windows.Forms.Label();
+            this.checkBoxEightHours = new System.Windows.Forms.CheckBox();
+            this.checkBoxBelowEightHours = new System.Windows.Forms.CheckBox();
+            this.checkBoxOneHour = new System.Windows.Forms.CheckBox();
+            this.checkBoxAboveTwoHours = new System.Windows.Forms.CheckBox();
+            this.buttonReset = new System.Windows.Forms.Button();
+            this.buttonApply = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSortLogo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
             this.SuspendLayout();
             // 
-            // pictureBox1
+            // pictureBoxSortLogo
             // 
-            this.pictureBox1.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.Filter;
-            this.pictureBox1.Location = new System.Drawing.Point(238, 56);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(24, 27);
-            this.pictureBox1.TabIndex = 20;
-            this.pictureBox1.TabStop = false;
+            this.pictureBoxSortLogo.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.Filter;
+            this.pictureBoxSortLogo.Location = new System.Drawing.Point(317, 69);
+            this.pictureBoxSortLogo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pictureBoxSortLogo.Name = "pictureBoxSortLogo";
+            this.pictureBoxSortLogo.Size = new System.Drawing.Size(32, 33);
+            this.pictureBoxSortLogo.TabIndex = 20;
+            this.pictureBoxSortLogo.TabStop = false;
             // 
             // XpictureBox
             // 
+            this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
-            this.XpictureBox.Location = new System.Drawing.Point(345, 1);
-            this.XpictureBox.Margin = new System.Windows.Forms.Padding(2);
+            this.XpictureBox.Location = new System.Drawing.Point(460, 1);
+            this.XpictureBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.XpictureBox.Name = "XpictureBox";
-            this.XpictureBox.Size = new System.Drawing.Size(38, 41);
+            this.XpictureBox.Size = new System.Drawing.Size(51, 50);
             this.XpictureBox.TabIndex = 19;
             this.XpictureBox.TabStop = false;
             this.XpictureBox.Click += new System.EventHandler(this.XpictureBox_Click);
             // 
-            // label1
+            // labelSearchFilters
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(34)))), ((int)(((byte)(31)))));
-            this.label1.Location = new System.Drawing.Point(16, 15);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(162, 29);
-            this.label1.TabIndex = 21;
-            this.label1.Text = "Search Filters";
+            this.labelSearchFilters.AutoSize = true;
+            this.labelSearchFilters.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSearchFilters.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(34)))), ((int)(((byte)(31)))));
+            this.labelSearchFilters.Location = new System.Drawing.Point(21, 18);
+            this.labelSearchFilters.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSearchFilters.Name = "labelSearchFilters";
+            this.labelSearchFilters.Size = new System.Drawing.Size(198, 36);
+            this.labelSearchFilters.TabIndex = 21;
+            this.labelSearchFilters.Text = "Search Filters";
             // 
-            // label2
+            // labelDate
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(26, 60);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(48, 20);
-            this.label2.TabIndex = 22;
-            this.label2.Text = "Date";
+            this.labelDate.AutoSize = true;
+            this.labelDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDate.Location = new System.Drawing.Point(35, 74);
+            this.labelDate.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDate.Name = "labelDate";
+            this.labelDate.Size = new System.Drawing.Size(70, 25);
+            this.labelDate.TabIndex = 22;
+            this.labelDate.Text = "DATE";
             // 
-            // label3
+            // labelSort
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(195, 60);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(43, 20);
-            this.label3.TabIndex = 23;
-            this.label3.Text = "Sort";
+            this.labelSort.AutoSize = true;
+            this.labelSort.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSort.Location = new System.Drawing.Point(260, 74);
+            this.labelSort.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSort.Name = "labelSort";
+            this.labelSort.Size = new System.Drawing.Size(52, 25);
+            this.labelSort.TabIndex = 23;
+            this.labelSort.Text = "Sort";
             // 
-            // label4
+            // labelName
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(26, 122);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(55, 20);
-            this.label4.TabIndex = 24;
-            this.label4.Text = "Name";
+            this.labelName.AutoSize = true;
+            this.labelName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelName.Location = new System.Drawing.Point(35, 150);
+            this.labelName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelName.Name = "labelName";
+            this.labelName.Size = new System.Drawing.Size(74, 25);
+            this.labelName.TabIndex = 24;
+            this.labelName.Text = "NAME";
             // 
-            // label5
+            // labelID
             // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(195, 122);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(28, 20);
-            this.label5.TabIndex = 25;
-            this.label5.Text = "ID";
+            this.labelID.AutoSize = true;
+            this.labelID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelID.Location = new System.Drawing.Point(260, 150);
+            this.labelID.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelID.Name = "labelID";
+            this.labelID.Size = new System.Drawing.Size(33, 25);
+            this.labelID.TabIndex = 25;
+            this.labelID.Text = "ID";
             // 
-            // label6
+            // labelDepartment
             // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(26, 180);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(104, 20);
-            this.label6.TabIndex = 26;
-            this.label6.Text = "Department";
+            this.labelDepartment.AutoSize = true;
+            this.labelDepartment.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDepartment.Location = new System.Drawing.Point(35, 222);
+            this.labelDepartment.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDepartment.Name = "labelDepartment";
+            this.labelDepartment.Size = new System.Drawing.Size(159, 25);
+            this.labelDepartment.TabIndex = 26;
+            this.labelDepartment.Text = "DEPARTMENT";
             // 
-            // label7
+            // labelPosition
             // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(195, 180);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(73, 20);
-            this.label7.TabIndex = 27;
-            this.label7.Text = "Position";
+            this.labelPosition.AutoSize = true;
+            this.labelPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPosition.Location = new System.Drawing.Point(260, 222);
+            this.labelPosition.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPosition.Name = "labelPosition";
+            this.labelPosition.Size = new System.Drawing.Size(116, 25);
+            this.labelPosition.TabIndex = 27;
+            this.labelPosition.Text = "POSITION";
             // 
-            // comboBox1
+            // comboBoxSort
             // 
-            this.comboBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.comboBox1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBox1.ForeColor = System.Drawing.Color.White;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(268, 56);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(77, 24);
-            this.comboBox1.TabIndex = 28;
-            this.comboBox1.Text = "A-Z";
+            this.comboBoxSort.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.comboBoxSort.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxSort.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBoxSort.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.comboBoxSort.ForeColor = System.Drawing.Color.White;
+            this.comboBoxSort.FormattingEnabled = true;
+            this.comboBoxSort.Location = new System.Drawing.Point(357, 69);
+            this.comboBoxSort.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxSort.Name = "comboBoxSort";
+            this.comboBoxSort.Size = new System.Drawing.Size(101, 28);
+            this.comboBoxSort.TabIndex = 28;
+            this.comboBoxSort.Text = "A-Z";
             // 
-            // comboBox2
+            // comboBoxDate
             // 
-            this.comboBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.comboBox2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBox2.ForeColor = System.Drawing.Color.White;
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(30, 86);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(315, 24);
-            this.comboBox2.TabIndex = 29;
-            this.comboBox2.Text = "Select date";
+            this.comboBoxDate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.comboBoxDate.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxDate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBoxDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.comboBoxDate.ForeColor = System.Drawing.Color.White;
+            this.comboBoxDate.FormattingEnabled = true;
+            this.comboBoxDate.Location = new System.Drawing.Point(40, 106);
+            this.comboBoxDate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxDate.Name = "comboBoxDate";
+            this.comboBoxDate.Size = new System.Drawing.Size(419, 28);
+            this.comboBoxDate.TabIndex = 29;
+            this.comboBoxDate.Text = "Select date";
             // 
-            // textBox1
+            // textBoxName
             // 
-            this.textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.ForeColor = System.Drawing.Color.White;
-            this.textBox1.Location = new System.Drawing.Point(30, 145);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(148, 22);
-            this.textBox1.TabIndex = 30;
-            this.textBox1.Text = "Search name";
+            this.textBoxName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxName.ForeColor = System.Drawing.Color.White;
+            this.textBoxName.Location = new System.Drawing.Point(40, 178);
+            this.textBoxName.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxName.Name = "textBoxName";
+            this.textBoxName.Size = new System.Drawing.Size(197, 26);
+            this.textBoxName.TabIndex = 30;
+            this.textBoxName.Text = "Search name";
             // 
-            // textBox2
+            // textBoxID
             // 
-            this.textBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox2.ForeColor = System.Drawing.Color.White;
-            this.textBox2.Location = new System.Drawing.Point(199, 145);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(146, 22);
-            this.textBox2.TabIndex = 31;
-            this.textBox2.Text = "Search ID";
+            this.textBoxID.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxID.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxID.ForeColor = System.Drawing.Color.White;
+            this.textBoxID.Location = new System.Drawing.Point(265, 178);
+            this.textBoxID.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxID.Name = "textBoxID";
+            this.textBoxID.Size = new System.Drawing.Size(194, 26);
+            this.textBoxID.TabIndex = 31;
+            this.textBoxID.Text = "Search ID";
             // 
-            // comboBox3
+            // comboBoxDepartment
             // 
-            this.comboBox3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.comboBox3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBox3.ForeColor = System.Drawing.Color.White;
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Location = new System.Drawing.Point(30, 203);
-            this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(148, 24);
-            this.comboBox3.TabIndex = 32;
-            this.comboBox3.Text = "Select department";
+            this.comboBoxDepartment.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.comboBoxDepartment.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxDepartment.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBoxDepartment.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.comboBoxDepartment.ForeColor = System.Drawing.Color.White;
+            this.comboBoxDepartment.FormattingEnabled = true;
+            this.comboBoxDepartment.Location = new System.Drawing.Point(40, 250);
+            this.comboBoxDepartment.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxDepartment.Name = "comboBoxDepartment";
+            this.comboBoxDepartment.Size = new System.Drawing.Size(196, 28);
+            this.comboBoxDepartment.TabIndex = 32;
+            this.comboBoxDepartment.Text = "Select department";
             // 
-            // comboBox4
+            // comboBoxPosition
             // 
-            this.comboBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.comboBox4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBox4.ForeColor = System.Drawing.Color.White;
-            this.comboBox4.FormattingEnabled = true;
-            this.comboBox4.Location = new System.Drawing.Point(199, 203);
-            this.comboBox4.Name = "comboBox4";
-            this.comboBox4.Size = new System.Drawing.Size(146, 24);
-            this.comboBox4.TabIndex = 33;
-            this.comboBox4.Text = "Select position";
+            this.comboBoxPosition.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.comboBoxPosition.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxPosition.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBoxPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.comboBoxPosition.ForeColor = System.Drawing.Color.White;
+            this.comboBoxPosition.FormattingEnabled = true;
+            this.comboBoxPosition.Location = new System.Drawing.Point(265, 250);
+            this.comboBoxPosition.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxPosition.Name = "comboBoxPosition";
+            this.comboBoxPosition.Size = new System.Drawing.Size(193, 28);
+            this.comboBoxPosition.TabIndex = 33;
+            this.comboBoxPosition.Text = "Select position";
             // 
-            // label8
+            // labelStatus
             // 
-            this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(26, 242);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(62, 20);
-            this.label8.TabIndex = 34;
-            this.label8.Text = "Status";
+            this.labelStatus.AutoSize = true;
+            this.labelStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelStatus.Location = new System.Drawing.Point(35, 298);
+            this.labelStatus.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelStatus.Name = "labelStatus";
+            this.labelStatus.Size = new System.Drawing.Size(100, 25);
+            this.labelStatus.TabIndex = 34;
+            this.labelStatus.Text = "STATUS";
             // 
-            // checkBox1
+            // checkBoxPresent
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.checkBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBox1.Location = new System.Drawing.Point(30, 276);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(80, 24);
-            this.checkBox1.TabIndex = 35;
-            this.checkBox1.Text = "Present";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBoxPresent.AutoSize = true;
+            this.checkBoxPresent.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.checkBoxPresent.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.checkBoxPresent.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxPresent.Location = new System.Drawing.Point(40, 340);
+            this.checkBoxPresent.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkBoxPresent.Name = "checkBoxPresent";
+            this.checkBoxPresent.Size = new System.Drawing.Size(97, 29);
+            this.checkBoxPresent.TabIndex = 35;
+            this.checkBoxPresent.Text = "Present";
+            this.checkBoxPresent.UseVisualStyleBackColor = true;
             // 
-            // checkBox2
+            // checkBoxLate
             // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.checkBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBox2.Location = new System.Drawing.Point(30, 316);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(57, 24);
-            this.checkBox2.TabIndex = 36;
-            this.checkBox2.Text = "Late";
-            this.checkBox2.UseVisualStyleBackColor = true;
+            this.checkBoxLate.AutoSize = true;
+            this.checkBoxLate.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.checkBoxLate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.checkBoxLate.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxLate.Location = new System.Drawing.Point(40, 389);
+            this.checkBoxLate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkBoxLate.Name = "checkBoxLate";
+            this.checkBoxLate.Size = new System.Drawing.Size(68, 29);
+            this.checkBoxLate.TabIndex = 36;
+            this.checkBoxLate.Text = "Late";
+            this.checkBoxLate.UseVisualStyleBackColor = true;
             // 
-            // checkBox3
+            // checkBoxAbsent
             // 
-            this.checkBox3.AutoSize = true;
-            this.checkBox3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.checkBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBox3.Location = new System.Drawing.Point(199, 276);
-            this.checkBox3.Name = "checkBox3";
-            this.checkBox3.Size = new System.Drawing.Size(76, 24);
-            this.checkBox3.TabIndex = 37;
-            this.checkBox3.Text = "Absent";
-            this.checkBox3.UseVisualStyleBackColor = true;
+            this.checkBoxAbsent.AutoSize = true;
+            this.checkBoxAbsent.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.checkBoxAbsent.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.checkBoxAbsent.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxAbsent.Location = new System.Drawing.Point(265, 340);
+            this.checkBoxAbsent.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkBoxAbsent.Name = "checkBoxAbsent";
+            this.checkBoxAbsent.Size = new System.Drawing.Size(92, 29);
+            this.checkBoxAbsent.TabIndex = 37;
+            this.checkBoxAbsent.Text = "Absent";
+            this.checkBoxAbsent.UseVisualStyleBackColor = true;
             // 
-            // checkBox4
+            // checkBoxEarlyOut
             // 
-            this.checkBox4.AutoSize = true;
-            this.checkBox4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.checkBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBox4.Location = new System.Drawing.Point(199, 316);
-            this.checkBox4.Name = "checkBox4";
-            this.checkBox4.Size = new System.Drawing.Size(90, 24);
-            this.checkBox4.TabIndex = 38;
-            this.checkBox4.Text = "Early Out";
-            this.checkBox4.UseVisualStyleBackColor = true;
+            this.checkBoxEarlyOut.AutoSize = true;
+            this.checkBoxEarlyOut.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.checkBoxEarlyOut.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.checkBoxEarlyOut.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxEarlyOut.Location = new System.Drawing.Point(265, 389);
+            this.checkBoxEarlyOut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkBoxEarlyOut.Name = "checkBoxEarlyOut";
+            this.checkBoxEarlyOut.Size = new System.Drawing.Size(111, 29);
+            this.checkBoxEarlyOut.TabIndex = 38;
+            this.checkBoxEarlyOut.Text = "Early Out";
+            this.checkBoxEarlyOut.UseVisualStyleBackColor = true;
             // 
-            // label9
+            // labelTimeIn
             // 
-            this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.Location = new System.Drawing.Point(26, 357);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(74, 20);
-            this.label9.TabIndex = 39;
-            this.label9.Text = "TIME IN";
+            this.labelTimeIn.AutoSize = true;
+            this.labelTimeIn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelTimeIn.Location = new System.Drawing.Point(35, 439);
+            this.labelTimeIn.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelTimeIn.Name = "labelTimeIn";
+            this.labelTimeIn.Size = new System.Drawing.Size(91, 25);
+            this.labelTimeIn.TabIndex = 39;
+            this.labelTimeIn.Text = "TIME IN";
             // 
-            // label10
+            // labelTimeOut
             // 
-            this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(195, 357);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(92, 20);
-            this.label10.TabIndex = 40;
-            this.label10.Text = "TIME OUT";
+            this.labelTimeOut.AutoSize = true;
+            this.labelTimeOut.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelTimeOut.Location = new System.Drawing.Point(260, 439);
+            this.labelTimeOut.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelTimeOut.Name = "labelTimeOut";
+            this.labelTimeOut.Size = new System.Drawing.Size(116, 25);
+            this.labelTimeOut.TabIndex = 40;
+            this.labelTimeOut.Text = "TIME OUT";
             // 
-            // textBox3
+            // textBoxTimeIn
             // 
-            this.textBox3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox3.ForeColor = System.Drawing.Color.White;
-            this.textBox3.Location = new System.Drawing.Point(30, 380);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(148, 22);
-            this.textBox3.TabIndex = 41;
-            this.textBox3.Text = "Select time";
+            this.textBoxTimeIn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxTimeIn.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxTimeIn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxTimeIn.ForeColor = System.Drawing.Color.White;
+            this.textBoxTimeIn.Location = new System.Drawing.Point(40, 468);
+            this.textBoxTimeIn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxTimeIn.Name = "textBoxTimeIn";
+            this.textBoxTimeIn.Size = new System.Drawing.Size(197, 26);
+            this.textBoxTimeIn.TabIndex = 41;
+            this.textBoxTimeIn.Text = "Select time";
             // 
-            // textBox4
+            // textBoxTimeOut
             // 
-            this.textBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox4.ForeColor = System.Drawing.Color.White;
-            this.textBox4.Location = new System.Drawing.Point(199, 380);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(146, 22);
-            this.textBox4.TabIndex = 42;
-            this.textBox4.Text = "Select time";
+            this.textBoxTimeOut.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxTimeOut.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxTimeOut.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxTimeOut.ForeColor = System.Drawing.Color.White;
+            this.textBoxTimeOut.Location = new System.Drawing.Point(265, 468);
+            this.textBoxTimeOut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxTimeOut.Name = "textBoxTimeOut";
+            this.textBoxTimeOut.Size = new System.Drawing.Size(194, 26);
+            this.textBoxTimeOut.TabIndex = 42;
+            this.textBoxTimeOut.Text = "Select time";
             // 
-            // label11
+            // labelHoursWorked
             // 
-            this.label11.AutoSize = true;
-            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label11.Location = new System.Drawing.Point(26, 416);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(156, 20);
-            this.label11.TabIndex = 43;
-            this.label11.Text = "HOURS WORKED";
+            this.labelHoursWorked.AutoSize = true;
+            this.labelHoursWorked.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelHoursWorked.Location = new System.Drawing.Point(35, 512);
+            this.labelHoursWorked.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelHoursWorked.Name = "labelHoursWorked";
+            this.labelHoursWorked.Size = new System.Drawing.Size(190, 25);
+            this.labelHoursWorked.TabIndex = 43;
+            this.labelHoursWorked.Text = "HOURS WORKED";
             // 
-            // label12
+            // labelOvertime
             // 
-            this.label12.AutoSize = true;
-            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(195, 416);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(101, 20);
-            this.label12.TabIndex = 44;
-            this.label12.Text = "OVERTIME";
+            this.labelOvertime.AutoSize = true;
+            this.labelOvertime.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelOvertime.Location = new System.Drawing.Point(260, 512);
+            this.labelOvertime.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelOvertime.Name = "labelOvertime";
+            this.labelOvertime.Size = new System.Drawing.Size(124, 25);
+            this.labelOvertime.TabIndex = 44;
+            this.labelOvertime.Text = "OVERTIME";
             // 
-            // checkBox5
+            // checkBoxEightHours
             // 
-            this.checkBox5.AutoSize = true;
-            this.checkBox5.BackColor = System.Drawing.Color.White;
-            this.checkBox5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.checkBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBox5.Location = new System.Drawing.Point(30, 449);
-            this.checkBox5.Name = "checkBox5";
-            this.checkBox5.Size = new System.Drawing.Size(81, 24);
-            this.checkBox5.TabIndex = 45;
-            this.checkBox5.Text = "8 Hours";
-            this.checkBox5.UseVisualStyleBackColor = false;
+            this.checkBoxEightHours.AutoSize = true;
+            this.checkBoxEightHours.BackColor = System.Drawing.Color.White;
+            this.checkBoxEightHours.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.checkBoxEightHours.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.checkBoxEightHours.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxEightHours.Location = new System.Drawing.Point(40, 553);
+            this.checkBoxEightHours.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkBoxEightHours.Name = "checkBoxEightHours";
+            this.checkBoxEightHours.Size = new System.Drawing.Size(98, 29);
+            this.checkBoxEightHours.TabIndex = 45;
+            this.checkBoxEightHours.Text = "8 Hours";
+            this.checkBoxEightHours.UseVisualStyleBackColor = false;
             // 
-            // checkBox6
+            // checkBoxBelowEightHours
             // 
-            this.checkBox6.AutoSize = true;
-            this.checkBox6.BackColor = System.Drawing.Color.White;
-            this.checkBox6.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.checkBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBox6.Location = new System.Drawing.Point(30, 488);
-            this.checkBox6.Name = "checkBox6";
-            this.checkBox6.Size = new System.Drawing.Size(128, 24);
-            this.checkBox6.TabIndex = 46;
-            this.checkBox6.Text = "Below 8 Hours";
-            this.checkBox6.UseVisualStyleBackColor = false;
+            this.checkBoxBelowEightHours.AutoSize = true;
+            this.checkBoxBelowEightHours.BackColor = System.Drawing.Color.White;
+            this.checkBoxBelowEightHours.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.checkBoxBelowEightHours.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.checkBoxBelowEightHours.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxBelowEightHours.Location = new System.Drawing.Point(40, 601);
+            this.checkBoxBelowEightHours.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkBoxBelowEightHours.Name = "checkBoxBelowEightHours";
+            this.checkBoxBelowEightHours.Size = new System.Drawing.Size(156, 29);
+            this.checkBoxBelowEightHours.TabIndex = 46;
+            this.checkBoxBelowEightHours.Text = "Below 8 Hours";
+            this.checkBoxBelowEightHours.UseVisualStyleBackColor = false;
             // 
-            // checkBox7
+            // checkBoxOneHour
             // 
-            this.checkBox7.AutoSize = true;
-            this.checkBox7.BackColor = System.Drawing.Color.White;
-            this.checkBox7.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.checkBox7.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBox7.Location = new System.Drawing.Point(199, 449);
-            this.checkBox7.Name = "checkBox7";
-            this.checkBox7.Size = new System.Drawing.Size(73, 24);
-            this.checkBox7.TabIndex = 47;
-            this.checkBox7.Text = "1 Hour";
-            this.checkBox7.UseVisualStyleBackColor = false;
+            this.checkBoxOneHour.AutoSize = true;
+            this.checkBoxOneHour.BackColor = System.Drawing.Color.White;
+            this.checkBoxOneHour.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.checkBoxOneHour.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.checkBoxOneHour.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxOneHour.Location = new System.Drawing.Point(265, 553);
+            this.checkBoxOneHour.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkBoxOneHour.Name = "checkBoxOneHour";
+            this.checkBoxOneHour.Size = new System.Drawing.Size(88, 29);
+            this.checkBoxOneHour.TabIndex = 47;
+            this.checkBoxOneHour.Text = "1 Hour";
+            this.checkBoxOneHour.UseVisualStyleBackColor = false;
             // 
-            // checkBox8
+            // checkBoxAboveTwoHours
             // 
-            this.checkBox8.AutoSize = true;
-            this.checkBox8.BackColor = System.Drawing.Color.White;
-            this.checkBox8.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.checkBox8.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBox8.Location = new System.Drawing.Point(199, 488);
-            this.checkBox8.Name = "checkBox8";
-            this.checkBox8.Size = new System.Drawing.Size(94, 24);
-            this.checkBox8.TabIndex = 48;
-            this.checkBox8.Text = "2 Hours +";
-            this.checkBox8.UseVisualStyleBackColor = false;
+            this.checkBoxAboveTwoHours.AutoSize = true;
+            this.checkBoxAboveTwoHours.BackColor = System.Drawing.Color.White;
+            this.checkBoxAboveTwoHours.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.checkBoxAboveTwoHours.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.checkBoxAboveTwoHours.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxAboveTwoHours.Location = new System.Drawing.Point(265, 601);
+            this.checkBoxAboveTwoHours.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkBoxAboveTwoHours.Name = "checkBoxAboveTwoHours";
+            this.checkBoxAboveTwoHours.Size = new System.Drawing.Size(115, 29);
+            this.checkBoxAboveTwoHours.TabIndex = 48;
+            this.checkBoxAboveTwoHours.Text = "2 Hours +";
+            this.checkBoxAboveTwoHours.UseVisualStyleBackColor = false;
             // 
-            // buttonCancel
+            // buttonReset
             // 
-            this.buttonCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(154)))), ((int)(((byte)(154)))));
-            this.buttonCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonCancel.ForeColor = System.Drawing.Color.White;
-            this.buttonCancel.Location = new System.Drawing.Point(211, 530);
-            this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(132, 30);
-            this.buttonCancel.TabIndex = 50;
-            this.buttonCancel.Text = "Reset";
-            this.buttonCancel.UseVisualStyleBackColor = false;
+            this.buttonReset.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(154)))), ((int)(((byte)(154)))));
+            this.buttonReset.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.buttonReset.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonReset.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonReset.ForeColor = System.Drawing.Color.White;
+            this.buttonReset.Location = new System.Drawing.Point(281, 652);
+            this.buttonReset.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonReset.Name = "buttonReset";
+            this.buttonReset.Size = new System.Drawing.Size(176, 41);
+            this.buttonReset.TabIndex = 50;
+            this.buttonReset.Text = "Reset";
+            this.buttonReset.UseVisualStyleBackColor = false;
             // 
-            // buttonConfirm
+            // buttonApply
             // 
-            this.buttonConfirm.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(81)))), ((int)(((byte)(148)))));
-            this.buttonConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonConfirm.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonConfirm.ForeColor = System.Drawing.Color.White;
-            this.buttonConfirm.Location = new System.Drawing.Point(42, 530);
-            this.buttonConfirm.Name = "buttonConfirm";
-            this.buttonConfirm.Size = new System.Drawing.Size(132, 30);
-            this.buttonConfirm.TabIndex = 49;
-            this.buttonConfirm.Text = "Apply";
-            this.buttonConfirm.UseVisualStyleBackColor = false;
+            this.buttonApply.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(81)))), ((int)(((byte)(148)))));
+            this.buttonApply.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.buttonApply.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonApply.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonApply.ForeColor = System.Drawing.Color.White;
+            this.buttonApply.Location = new System.Drawing.Point(56, 652);
+            this.buttonApply.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonApply.Name = "buttonApply";
+            this.buttonApply.Size = new System.Drawing.Size(176, 41);
+            this.buttonApply.TabIndex = 49;
+            this.buttonApply.Text = "Apply";
+            this.buttonApply.UseVisualStyleBackColor = false;
             // 
             // FilterAdminAttendance
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(386, 582);
-            this.Controls.Add(this.buttonCancel);
-            this.Controls.Add(this.buttonConfirm);
-            this.Controls.Add(this.checkBox8);
-            this.Controls.Add(this.checkBox7);
-            this.Controls.Add(this.checkBox6);
-            this.Controls.Add(this.checkBox5);
-            this.Controls.Add(this.label12);
-            this.Controls.Add(this.label11);
-            this.Controls.Add(this.textBox4);
-            this.Controls.Add(this.textBox3);
-            this.Controls.Add(this.label10);
-            this.Controls.Add(this.label9);
-            this.Controls.Add(this.checkBox4);
-            this.Controls.Add(this.checkBox3);
-            this.Controls.Add(this.checkBox2);
-            this.Controls.Add(this.checkBox1);
-            this.Controls.Add(this.label8);
-            this.Controls.Add(this.comboBox4);
-            this.Controls.Add(this.comboBox3);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.comboBox2);
-            this.Controls.Add(this.comboBox1);
-            this.Controls.Add(this.label7);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.pictureBox1);
+            this.ClientSize = new System.Drawing.Size(515, 716);
+            this.Controls.Add(this.buttonReset);
+            this.Controls.Add(this.buttonApply);
+            this.Controls.Add(this.checkBoxAboveTwoHours);
+            this.Controls.Add(this.checkBoxOneHour);
+            this.Controls.Add(this.checkBoxBelowEightHours);
+            this.Controls.Add(this.checkBoxEightHours);
+            this.Controls.Add(this.labelOvertime);
+            this.Controls.Add(this.labelHoursWorked);
+            this.Controls.Add(this.textBoxTimeOut);
+            this.Controls.Add(this.textBoxTimeIn);
+            this.Controls.Add(this.labelTimeOut);
+            this.Controls.Add(this.labelTimeIn);
+            this.Controls.Add(this.checkBoxEarlyOut);
+            this.Controls.Add(this.checkBoxAbsent);
+            this.Controls.Add(this.checkBoxLate);
+            this.Controls.Add(this.checkBoxPresent);
+            this.Controls.Add(this.labelStatus);
+            this.Controls.Add(this.comboBoxPosition);
+            this.Controls.Add(this.comboBoxDepartment);
+            this.Controls.Add(this.textBoxID);
+            this.Controls.Add(this.textBoxName);
+            this.Controls.Add(this.comboBoxDate);
+            this.Controls.Add(this.comboBoxSort);
+            this.Controls.Add(this.labelPosition);
+            this.Controls.Add(this.labelDepartment);
+            this.Controls.Add(this.labelID);
+            this.Controls.Add(this.labelName);
+            this.Controls.Add(this.labelSort);
+            this.Controls.Add(this.labelDate);
+            this.Controls.Add(this.labelSearchFilters);
+            this.Controls.Add(this.pictureBoxSortLogo);
             this.Controls.Add(this.XpictureBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "FilterAdminAttendance";
             this.ShowInTaskbar = false;
             this.Text = "SearchFilters";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSortLogo)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -483,36 +530,36 @@
         #endregion
 
         private System.Windows.Forms.PictureBox XpictureBox;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.ComboBox comboBox2;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.ComboBox comboBox3;
-        private System.Windows.Forms.ComboBox comboBox4;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.CheckBox checkBox2;
-        private System.Windows.Forms.CheckBox checkBox3;
-        private System.Windows.Forms.CheckBox checkBox4;
-        private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.TextBox textBox4;
-        private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.CheckBox checkBox5;
-        private System.Windows.Forms.CheckBox checkBox6;
-        private System.Windows.Forms.CheckBox checkBox7;
-        private System.Windows.Forms.CheckBox checkBox8;
-        private System.Windows.Forms.Button buttonCancel;
-        private System.Windows.Forms.Button buttonConfirm;
+        private System.Windows.Forms.PictureBox pictureBoxSortLogo;
+        private System.Windows.Forms.Label labelSearchFilters;
+        private System.Windows.Forms.Label labelDate;
+        private System.Windows.Forms.Label labelSort;
+        private System.Windows.Forms.Label labelName;
+        private System.Windows.Forms.Label labelID;
+        private System.Windows.Forms.Label labelDepartment;
+        private System.Windows.Forms.Label labelPosition;
+        private System.Windows.Forms.ComboBox comboBoxSort;
+        private System.Windows.Forms.ComboBox comboBoxDate;
+        private System.Windows.Forms.TextBox textBoxName;
+        private System.Windows.Forms.TextBox textBoxID;
+        private System.Windows.Forms.ComboBox comboBoxDepartment;
+        private System.Windows.Forms.ComboBox comboBoxPosition;
+        private System.Windows.Forms.Label labelStatus;
+        private System.Windows.Forms.CheckBox checkBoxPresent;
+        private System.Windows.Forms.CheckBox checkBoxLate;
+        private System.Windows.Forms.CheckBox checkBoxAbsent;
+        private System.Windows.Forms.CheckBox checkBoxEarlyOut;
+        private System.Windows.Forms.Label labelTimeIn;
+        private System.Windows.Forms.Label labelTimeOut;
+        private System.Windows.Forms.TextBox textBoxTimeIn;
+        private System.Windows.Forms.TextBox textBoxTimeOut;
+        private System.Windows.Forms.Label labelHoursWorked;
+        private System.Windows.Forms.Label labelOvertime;
+        private System.Windows.Forms.CheckBox checkBoxEightHours;
+        private System.Windows.Forms.CheckBox checkBoxBelowEightHours;
+        private System.Windows.Forms.CheckBox checkBoxOneHour;
+        private System.Windows.Forms.CheckBox checkBoxAboveTwoHours;
+        private System.Windows.Forms.Button buttonReset;
+        private System.Windows.Forms.Button buttonApply;
     }
 }

@@ -29,33 +29,31 @@
         private void InitializeComponent()
         {
             this.buttonCancel = new System.Windows.Forms.Button();
-            this.buttonSendRequest = new System.Windows.Forms.Button();
-            this.labelReason = new System.Windows.Forms.Label();
-            this.labelPeriod = new System.Windows.Forms.Label();
+            this.buttonAdd = new System.Windows.Forms.Button();
             this.labelLeaveType = new System.Windows.Forms.Label();
+            this.labelPosition = new System.Windows.Forms.Label();
+            this.labelDepartment = new System.Windows.Forms.Label();
             this.labelName = new System.Windows.Forms.Label();
-            this.labelRequestLeaveEntry = new System.Windows.Forms.Label();
-            this.labelLeaveRequest = new System.Windows.Forms.Label();
+            this.labelAddLeaveRecord = new System.Windows.Forms.Label();
+            this.labelNewLeave = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.label15 = new System.Windows.Forms.Label();
-            this.textBox9 = new System.Windows.Forms.TextBox();
-            this.textBox7 = new System.Windows.Forms.TextBox();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label94 = new System.Windows.Forms.Label();
-            this.panel3 = new System.Windows.Forms.Panel();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.labelDash = new System.Windows.Forms.Label();
+            this.textBoxEndPeriod = new System.Windows.Forms.TextBox();
+            this.textBoxStartPeriod = new System.Windows.Forms.TextBox();
+            this.comboBoxLeaveType = new System.Windows.Forms.ComboBox();
+            this.labelVacationLeaveInput = new System.Windows.Forms.Label();
+            this.labelSickLeaveInput = new System.Windows.Forms.Label();
+            this.labelVacationLeave = new System.Windows.Forms.Label();
+            this.labelSickLeave = new System.Windows.Forms.Label();
+            this.labelPositionInput = new System.Windows.Forms.Label();
+            this.labelDepartmentInput = new System.Windows.Forms.Label();
+            this.panelSearch = new System.Windows.Forms.Panel();
+            this.textBoxNameInput = new System.Windows.Forms.TextBox();
+            this.labelPeriod = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.XpictureBox = new System.Windows.Forms.PictureBox();
             this.panel2.SuspendLayout();
-            this.panel3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
+            this.panelSearch.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
             this.SuspendLayout();
@@ -63,308 +61,326 @@
             // buttonCancel
             // 
             this.buttonCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(154)))), ((int)(((byte)(154)))));
+            this.buttonCancel.Cursor = System.Windows.Forms.Cursors.Hand;
             this.buttonCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonCancel.ForeColor = System.Drawing.Color.White;
-            this.buttonCancel.Location = new System.Drawing.Point(409, 238);
+            this.buttonCancel.Location = new System.Drawing.Point(545, 293);
+            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(112, 32);
+            this.buttonCancel.Size = new System.Drawing.Size(149, 41);
             this.buttonCancel.TabIndex = 12;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = false;
+            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
             // 
-            // buttonSendRequest
+            // buttonAdd
             // 
-            this.buttonSendRequest.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(81)))), ((int)(((byte)(148)))));
-            this.buttonSendRequest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonSendRequest.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonSendRequest.ForeColor = System.Drawing.Color.White;
-            this.buttonSendRequest.Location = new System.Drawing.Point(277, 238);
-            this.buttonSendRequest.Name = "buttonSendRequest";
-            this.buttonSendRequest.Size = new System.Drawing.Size(112, 32);
-            this.buttonSendRequest.TabIndex = 11;
-            this.buttonSendRequest.Text = "Add";
-            this.buttonSendRequest.UseVisualStyleBackColor = false;
-            this.buttonSendRequest.Click += new System.EventHandler(this.buttonSendRequest_Click_1);
-            // 
-            // labelReason
-            // 
-            this.labelReason.AutoSize = true;
-            this.labelReason.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelReason.Location = new System.Drawing.Point(30, 140);
-            this.labelReason.Name = "labelReason";
-            this.labelReason.Size = new System.Drawing.Size(100, 20);
-            this.labelReason.TabIndex = 3;
-            this.labelReason.Text = "Leave Type";
-            // 
-            // labelPeriod
-            // 
-            this.labelPeriod.AutoSize = true;
-            this.labelPeriod.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelPeriod.Location = new System.Drawing.Point(30, 109);
-            this.labelPeriod.Name = "labelPeriod";
-            this.labelPeriod.Size = new System.Drawing.Size(73, 20);
-            this.labelPeriod.TabIndex = 2;
-            this.labelPeriod.Text = "Position";
+            this.buttonAdd.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(81)))), ((int)(((byte)(148)))));
+            this.buttonAdd.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.buttonAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonAdd.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonAdd.ForeColor = System.Drawing.Color.White;
+            this.buttonAdd.Location = new System.Drawing.Point(369, 293);
+            this.buttonAdd.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonAdd.Name = "buttonAdd";
+            this.buttonAdd.Size = new System.Drawing.Size(149, 41);
+            this.buttonAdd.TabIndex = 11;
+            this.buttonAdd.Text = "Add";
+            this.buttonAdd.UseVisualStyleBackColor = false;
+            this.buttonAdd.Click += new System.EventHandler(this.buttonSendRequest_Click);
             // 
             // labelLeaveType
             // 
             this.labelLeaveType.AutoSize = true;
             this.labelLeaveType.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelLeaveType.Location = new System.Drawing.Point(30, 75);
+            this.labelLeaveType.Location = new System.Drawing.Point(40, 172);
+            this.labelLeaveType.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelLeaveType.Name = "labelLeaveType";
-            this.labelLeaveType.Size = new System.Drawing.Size(104, 20);
-            this.labelLeaveType.TabIndex = 1;
-            this.labelLeaveType.Text = "Department";
+            this.labelLeaveType.Size = new System.Drawing.Size(126, 25);
+            this.labelLeaveType.TabIndex = 3;
+            this.labelLeaveType.Text = "Leave Type";
+            // 
+            // labelPosition
+            // 
+            this.labelPosition.AutoSize = true;
+            this.labelPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPosition.Location = new System.Drawing.Point(40, 134);
+            this.labelPosition.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPosition.Name = "labelPosition";
+            this.labelPosition.Size = new System.Drawing.Size(89, 25);
+            this.labelPosition.TabIndex = 2;
+            this.labelPosition.Text = "Position";
+            // 
+            // labelDepartment
+            // 
+            this.labelDepartment.AutoSize = true;
+            this.labelDepartment.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDepartment.Location = new System.Drawing.Point(40, 92);
+            this.labelDepartment.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDepartment.Name = "labelDepartment";
+            this.labelDepartment.Size = new System.Drawing.Size(123, 25);
+            this.labelDepartment.TabIndex = 1;
+            this.labelDepartment.Text = "Department";
             // 
             // labelName
             // 
             this.labelName.AutoSize = true;
             this.labelName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelName.Location = new System.Drawing.Point(30, 24);
+            this.labelName.Location = new System.Drawing.Point(40, 30);
+            this.labelName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelName.Name = "labelName";
-            this.labelName.Size = new System.Drawing.Size(55, 20);
+            this.labelName.Size = new System.Drawing.Size(68, 25);
             this.labelName.TabIndex = 0;
             this.labelName.Text = "Name";
             // 
-            // labelRequestLeaveEntry
+            // labelAddLeaveRecord
             // 
-            this.labelRequestLeaveEntry.AutoSize = true;
-            this.labelRequestLeaveEntry.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelRequestLeaveEntry.ForeColor = System.Drawing.Color.Black;
-            this.labelRequestLeaveEntry.Location = new System.Drawing.Point(31, 57);
-            this.labelRequestLeaveEntry.Name = "labelRequestLeaveEntry";
-            this.labelRequestLeaveEntry.Size = new System.Drawing.Size(129, 18);
-            this.labelRequestLeaveEntry.TabIndex = 0;
-            this.labelRequestLeaveEntry.Text = "Add Leave Record";
+            this.labelAddLeaveRecord.AutoSize = true;
+            this.labelAddLeaveRecord.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelAddLeaveRecord.ForeColor = System.Drawing.Color.Black;
+            this.labelAddLeaveRecord.Location = new System.Drawing.Point(41, 70);
+            this.labelAddLeaveRecord.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelAddLeaveRecord.Name = "labelAddLeaveRecord";
+            this.labelAddLeaveRecord.Size = new System.Drawing.Size(168, 24);
+            this.labelAddLeaveRecord.TabIndex = 0;
+            this.labelAddLeaveRecord.Text = "Add Leave Record";
             // 
-            // labelLeaveRequest
+            // labelNewLeave
             // 
-            this.labelLeaveRequest.AutoSize = true;
-            this.labelLeaveRequest.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelLeaveRequest.ForeColor = System.Drawing.Color.Red;
-            this.labelLeaveRequest.Location = new System.Drawing.Point(29, 19);
-            this.labelLeaveRequest.Name = "labelLeaveRequest";
-            this.labelLeaveRequest.Size = new System.Drawing.Size(134, 29);
-            this.labelLeaveRequest.TabIndex = 0;
-            this.labelLeaveRequest.Text = "New Leave";
+            this.labelNewLeave.AutoSize = true;
+            this.labelNewLeave.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelNewLeave.ForeColor = System.Drawing.Color.Red;
+            this.labelNewLeave.Location = new System.Drawing.Point(39, 23);
+            this.labelNewLeave.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelNewLeave.Name = "labelNewLeave";
+            this.labelNewLeave.Size = new System.Drawing.Size(163, 36);
+            this.labelNewLeave.TabIndex = 0;
+            this.labelNewLeave.Text = "New Leave";
             // 
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.White;
-            this.panel2.Controls.Add(this.label15);
-            this.panel2.Controls.Add(this.textBox9);
-            this.panel2.Controls.Add(this.textBox7);
-            this.panel2.Controls.Add(this.comboBox2);
-            this.panel2.Controls.Add(this.label5);
-            this.panel2.Controls.Add(this.label6);
-            this.panel2.Controls.Add(this.label3);
-            this.panel2.Controls.Add(this.label4);
-            this.panel2.Controls.Add(this.label2);
-            this.panel2.Controls.Add(this.label94);
-            this.panel2.Controls.Add(this.panel3);
-            this.panel2.Controls.Add(this.label1);
-            this.panel2.Controls.Add(this.buttonCancel);
-            this.panel2.Controls.Add(this.buttonSendRequest);
-            this.panel2.Controls.Add(this.labelReason);
+            this.panel2.Controls.Add(this.labelDash);
+            this.panel2.Controls.Add(this.textBoxEndPeriod);
+            this.panel2.Controls.Add(this.textBoxStartPeriod);
+            this.panel2.Controls.Add(this.comboBoxLeaveType);
+            this.panel2.Controls.Add(this.labelVacationLeaveInput);
+            this.panel2.Controls.Add(this.labelSickLeaveInput);
+            this.panel2.Controls.Add(this.labelVacationLeave);
+            this.panel2.Controls.Add(this.labelSickLeave);
+            this.panel2.Controls.Add(this.labelPositionInput);
+            this.panel2.Controls.Add(this.labelDepartmentInput);
+            this.panel2.Controls.Add(this.panelSearch);
             this.panel2.Controls.Add(this.labelPeriod);
+            this.panel2.Controls.Add(this.buttonCancel);
+            this.panel2.Controls.Add(this.buttonAdd);
             this.panel2.Controls.Add(this.labelLeaveType);
+            this.panel2.Controls.Add(this.labelPosition);
+            this.panel2.Controls.Add(this.labelDepartment);
             this.panel2.Controls.Add(this.labelName);
-            this.panel2.Location = new System.Drawing.Point(-2, 85);
+            this.panel2.Location = new System.Drawing.Point(-3, 105);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(543, 283);
+            this.panel2.Size = new System.Drawing.Size(724, 348);
             this.panel2.TabIndex = 4;
             // 
-            // label15
+            // labelDash
             // 
-            this.label15.AutoSize = true;
-            this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label15.Location = new System.Drawing.Point(321, 181);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(15, 20);
-            this.label15.TabIndex = 162;
-            this.label15.Text = "-";
+            this.labelDash.AutoSize = true;
+            this.labelDash.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDash.Location = new System.Drawing.Point(428, 223);
+            this.labelDash.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDash.Name = "labelDash";
+            this.labelDash.Size = new System.Drawing.Size(20, 25);
+            this.labelDash.TabIndex = 162;
+            this.labelDash.Text = "-";
             // 
-            // textBox9
+            // textBoxEndPeriod
             // 
-            this.textBox9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox9.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox9.ForeColor = System.Drawing.Color.White;
-            this.textBox9.Location = new System.Drawing.Point(344, 178);
-            this.textBox9.Name = "textBox9";
-            this.textBox9.Size = new System.Drawing.Size(168, 24);
-            this.textBox9.TabIndex = 161;
-            this.textBox9.Text = "End of Leave";
+            this.textBoxEndPeriod.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxEndPeriod.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxEndPeriod.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxEndPeriod.ForeColor = System.Drawing.Color.White;
+            this.textBoxEndPeriod.Location = new System.Drawing.Point(459, 219);
+            this.textBoxEndPeriod.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxEndPeriod.Name = "textBoxEndPeriod";
+            this.textBoxEndPeriod.Size = new System.Drawing.Size(223, 29);
+            this.textBoxEndPeriod.TabIndex = 161;
+            this.textBoxEndPeriod.Text = "End of Leave";
             // 
-            // textBox7
+            // textBoxStartPeriod
             // 
-            this.textBox7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox7.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox7.ForeColor = System.Drawing.Color.White;
-            this.textBox7.Location = new System.Drawing.Point(146, 178);
-            this.textBox7.Name = "textBox7";
-            this.textBox7.Size = new System.Drawing.Size(168, 24);
-            this.textBox7.TabIndex = 160;
-            this.textBox7.Text = "Start of Leave";
+            this.textBoxStartPeriod.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxStartPeriod.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxStartPeriod.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxStartPeriod.ForeColor = System.Drawing.Color.White;
+            this.textBoxStartPeriod.Location = new System.Drawing.Point(195, 219);
+            this.textBoxStartPeriod.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxStartPeriod.Name = "textBoxStartPeriod";
+            this.textBoxStartPeriod.Size = new System.Drawing.Size(223, 29);
+            this.textBoxStartPeriod.TabIndex = 160;
+            this.textBoxStartPeriod.Text = "Start of Leave";
             // 
-            // comboBox2
+            // comboBoxLeaveType
             // 
-            this.comboBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.comboBox2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBox2.ForeColor = System.Drawing.Color.White;
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(146, 137);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(366, 28);
-            this.comboBox2.TabIndex = 159;
+            this.comboBoxLeaveType.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.comboBoxLeaveType.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxLeaveType.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBoxLeaveType.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.comboBoxLeaveType.ForeColor = System.Drawing.Color.White;
+            this.comboBoxLeaveType.FormattingEnabled = true;
+            this.comboBoxLeaveType.Location = new System.Drawing.Point(195, 169);
+            this.comboBoxLeaveType.Margin = new System.Windows.Forms.Padding(4);
+            this.comboBoxLeaveType.Name = "comboBoxLeaveType";
+            this.comboBoxLeaveType.Size = new System.Drawing.Size(487, 33);
+            this.comboBoxLeaveType.TabIndex = 159;
             // 
-            // label5
+            // labelVacationLeaveInput
             // 
-            this.label5.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(441, 107);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(97, 25);
-            this.label5.TabIndex = 158;
-            this.label5.Text = "N/A";
-            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelVacationLeaveInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelVacationLeaveInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelVacationLeaveInput.Location = new System.Drawing.Point(588, 132);
+            this.labelVacationLeaveInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelVacationLeaveInput.Name = "labelVacationLeaveInput";
+            this.labelVacationLeaveInput.Size = new System.Drawing.Size(129, 31);
+            this.labelVacationLeaveInput.TabIndex = 158;
+            this.labelVacationLeaveInput.Text = "N/A";
+            this.labelVacationLeaveInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label6
+            // labelSickLeaveInput
             // 
-            this.label6.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(441, 73);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(97, 25);
-            this.label6.TabIndex = 157;
-            this.label6.Text = "N/A";
-            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelSickLeaveInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelSickLeaveInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSickLeaveInput.Location = new System.Drawing.Point(588, 90);
+            this.labelSickLeaveInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSickLeaveInput.Name = "labelSickLeaveInput";
+            this.labelSickLeaveInput.Size = new System.Drawing.Size(129, 31);
+            this.labelSickLeaveInput.TabIndex = 157;
+            this.labelSickLeaveInput.Text = "N/A";
+            this.labelSickLeaveInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label3
+            // labelVacationLeave
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(265, 109);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(170, 20);
-            this.label3.TabIndex = 156;
-            this.label3.Text = "Vacation Leave Left";
+            this.labelVacationLeave.AutoSize = true;
+            this.labelVacationLeave.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelVacationLeave.Location = new System.Drawing.Point(353, 134);
+            this.labelVacationLeave.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelVacationLeave.Name = "labelVacationLeave";
+            this.labelVacationLeave.Size = new System.Drawing.Size(204, 25);
+            this.labelVacationLeave.TabIndex = 156;
+            this.labelVacationLeave.Text = "Vacation Leave Left";
             // 
-            // label4
+            // labelSickLeave
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(265, 75);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(133, 20);
-            this.label4.TabIndex = 155;
-            this.label4.Text = "Sick Leave Left";
+            this.labelSickLeave.AutoSize = true;
+            this.labelSickLeave.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSickLeave.Location = new System.Drawing.Point(353, 92);
+            this.labelSickLeave.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSickLeave.Name = "labelSickLeave";
+            this.labelSickLeave.Size = new System.Drawing.Size(161, 25);
+            this.labelSickLeave.TabIndex = 155;
+            this.labelSickLeave.Text = "Sick Leave Left";
             // 
-            // label2
+            // labelPositionInput
             // 
-            this.label2.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(162, 107);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(97, 25);
-            this.label2.TabIndex = 154;
-            this.label2.Text = "N/A";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelPositionInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelPositionInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPositionInput.Location = new System.Drawing.Point(216, 132);
+            this.labelPositionInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPositionInput.Name = "labelPositionInput";
+            this.labelPositionInput.Size = new System.Drawing.Size(129, 31);
+            this.labelPositionInput.TabIndex = 154;
+            this.labelPositionInput.Text = "N/A";
+            this.labelPositionInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label94
+            // labelDepartmentInput
             // 
-            this.label94.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label94.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label94.Location = new System.Drawing.Point(162, 73);
-            this.label94.Name = "label94";
-            this.label94.Size = new System.Drawing.Size(97, 25);
-            this.label94.TabIndex = 153;
-            this.label94.Text = "N/A";
-            this.label94.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelDepartmentInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelDepartmentInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDepartmentInput.Location = new System.Drawing.Point(216, 90);
+            this.labelDepartmentInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDepartmentInput.Name = "labelDepartmentInput";
+            this.labelDepartmentInput.Size = new System.Drawing.Size(129, 31);
+            this.labelDepartmentInput.TabIndex = 153;
+            this.labelDepartmentInput.Text = "N/A";
+            this.labelDepartmentInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // panel3
+            // panelSearch
             // 
-            this.panel3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.panel3.Controls.Add(this.textBox2);
-            this.panel3.Controls.Add(this.pictureBox3);
-            this.panel3.Location = new System.Drawing.Point(143, 12);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(369, 41);
-            this.panel3.TabIndex = 14;
+            this.panelSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.panelSearch.Controls.Add(this.textBoxNameInput);
+            this.panelSearch.Location = new System.Drawing.Point(191, 15);
+            this.panelSearch.Margin = new System.Windows.Forms.Padding(4);
+            this.panelSearch.Name = "panelSearch";
+            this.panelSearch.Size = new System.Drawing.Size(492, 50);
+            this.panelSearch.TabIndex = 14;
             // 
-            // textBox2
+            // textBoxNameInput
             // 
-            this.textBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox2.ForeColor = System.Drawing.Color.White;
-            this.textBox2.Location = new System.Drawing.Point(3, 9);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(316, 22);
-            this.textBox2.TabIndex = 2;
-            this.textBox2.Text = "Search";
+            this.textBoxNameInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxNameInput.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBoxNameInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxNameInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxNameInput.Location = new System.Drawing.Point(4, 10);
+            this.textBoxNameInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxNameInput.Name = "textBoxNameInput";
+            this.textBoxNameInput.Size = new System.Drawing.Size(484, 29);
+            this.textBoxNameInput.TabIndex = 2;
             // 
-            // pictureBox3
+            // labelPeriod
             // 
-            this.pictureBox3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.pictureBox3.BackgroundImage = global::HRIS_JAP_ATTPAY.Properties.Resources.search;
-            this.pictureBox3.Location = new System.Drawing.Point(325, 0);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(44, 41);
-            this.pictureBox3.TabIndex = 5;
-            this.pictureBox3.TabStop = false;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(30, 179);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(60, 20);
-            this.label1.TabIndex = 13;
-            this.label1.Text = "Period";
+            this.labelPeriod.AutoSize = true;
+            this.labelPeriod.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPeriod.Location = new System.Drawing.Point(40, 220);
+            this.labelPeriod.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPeriod.Name = "labelPeriod";
+            this.labelPeriod.Size = new System.Drawing.Size(74, 25);
+            this.labelPeriod.TabIndex = 13;
+            this.labelPeriod.Text = "Period";
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.White;
             this.panel1.Controls.Add(this.XpictureBox);
-            this.panel1.Controls.Add(this.labelRequestLeaveEntry);
-            this.panel1.Controls.Add(this.labelLeaveRequest);
-            this.panel1.Location = new System.Drawing.Point(-2, -5);
+            this.panel1.Controls.Add(this.labelAddLeaveRecord);
+            this.panel1.Controls.Add(this.labelNewLeave);
+            this.panel1.Location = new System.Drawing.Point(-3, -6);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(543, 88);
+            this.panel1.Size = new System.Drawing.Size(724, 108);
             this.panel1.TabIndex = 3;
             // 
             // XpictureBox
             // 
+            this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
-            this.XpictureBox.Location = new System.Drawing.Point(500, 3);
-            this.XpictureBox.Margin = new System.Windows.Forms.Padding(2);
+            this.XpictureBox.Location = new System.Drawing.Point(670, 9);
+            this.XpictureBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.XpictureBox.Name = "XpictureBox";
-            this.XpictureBox.Size = new System.Drawing.Size(38, 41);
+            this.XpictureBox.Size = new System.Drawing.Size(51, 50);
             this.XpictureBox.TabIndex = 1;
             this.XpictureBox.TabStop = false;
+            this.XpictureBox.Click += new System.EventHandler(this.XpictureBox_Click);
             // 
             // NewLeave
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(540, 370);
+            this.ClientSize = new System.Drawing.Size(720, 455);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "NewLeave";
+            this.ShowInTaskbar = false;
             this.Text = "NewLeave";
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
-            this.panel3.ResumeLayout(false);
-            this.panel3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
+            this.panelSearch.ResumeLayout(false);
+            this.panelSearch.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).EndInit();
@@ -374,29 +390,28 @@
 
         #endregion
         private System.Windows.Forms.Button buttonCancel;
-        private System.Windows.Forms.Button buttonSendRequest;
-        private System.Windows.Forms.Label labelReason;
-        private System.Windows.Forms.Label labelPeriod;
+        private System.Windows.Forms.Button buttonAdd;
         private System.Windows.Forms.Label labelLeaveType;
+        private System.Windows.Forms.Label labelPosition;
+        private System.Windows.Forms.Label labelDepartment;
         private System.Windows.Forms.Label labelName;
         private System.Windows.Forms.PictureBox XpictureBox;
-        private System.Windows.Forms.Label labelRequestLeaveEntry;
-        private System.Windows.Forms.Label labelLeaveRequest;
+        private System.Windows.Forms.Label labelAddLeaveRecord;
+        private System.Windows.Forms.Label labelNewLeave;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.PictureBox pictureBox3;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label94;
-        private System.Windows.Forms.ComboBox comboBox2;
-        private System.Windows.Forms.Label label15;
-        private System.Windows.Forms.TextBox textBox9;
-        private System.Windows.Forms.TextBox textBox7;
+        private System.Windows.Forms.Label labelPeriod;
+        private System.Windows.Forms.Panel panelSearch;
+        private System.Windows.Forms.TextBox textBoxNameInput;
+        private System.Windows.Forms.Label labelVacationLeaveInput;
+        private System.Windows.Forms.Label labelSickLeaveInput;
+        private System.Windows.Forms.Label labelVacationLeave;
+        private System.Windows.Forms.Label labelSickLeave;
+        private System.Windows.Forms.Label labelPositionInput;
+        private System.Windows.Forms.Label labelDepartmentInput;
+        private System.Windows.Forms.ComboBox comboBoxLeaveType;
+        private System.Windows.Forms.Label labelDash;
+        private System.Windows.Forms.TextBox textBoxEndPeriod;
+        private System.Windows.Forms.TextBox textBoxStartPeriod;
     }
 }

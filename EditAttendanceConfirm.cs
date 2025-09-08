@@ -22,9 +22,9 @@ namespace HRIS_JAP_ATTPAY
             try
             {
                 labelRequestConfirmation.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
-                labelMessage.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
+                labelMessage.Font = AttributesClass.GetFont("Roboto-Light", 11f);
                 buttonConfirm.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                buttonCancel.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                buttonCancel.Font = AttributesClass.GetFont("Roboto-Light", 12f);
 
             }
             catch (Exception ex)
@@ -34,6 +34,11 @@ namespace HRIS_JAP_ATTPAY
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void buttonCancel_Click(object sender, EventArgs e)
         {
             this.Close();
         }
