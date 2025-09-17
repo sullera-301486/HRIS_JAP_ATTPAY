@@ -7,17 +7,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Firebase.Database;
+using Firebase.Database.Query; // 🔹 Firebase references
 
 namespace HRIS_JAP_ATTPAY
 {
     public partial class HREmployee : UserControl
     {
+        // 🔹 Firebase client
+        private FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
+
         public HREmployee()
         {
             InitializeComponent();
             setFont();
             setTextBoxAttributes();
             setDataGridViewAttributes();
+
+            // 🔹 Add search filter (like AdminEmployee)
+            textBoxSearchEmployee.TextChanged += textBoxSearchEmployee_TextChanged;
+
+            // 🔹 Load data from Firebase
+            LoadFirebaseData();
         }
 
         private void HREmployee_Load(object sender, EventArgs e)
@@ -34,9 +45,8 @@ namespace HRIS_JAP_ATTPAY
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Form parentForm = this.FindForm();
-            EmployeeProfileHR employeeProfileHRForm = new EmployeeProfileHR();
-            AttributesClass.ShowWithOverlay(parentForm, employeeProfileHRForm);
+            MessageBox.Show("⚠ This table is for viewing only. Profiles cannot be opened from here.",
+                "View Only", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void setDataGridViewAttributes()
@@ -54,10 +64,30 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewEmployee.DefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Light", 10f);
             dataGridViewEmployee.ColumnHeadersDefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
 
-            for (int i = 1; i < 30; i++) //test code; will be replaced with actual data from database
+            // ❌ Disable row clickable behavior (view only)
+            dataGridViewEmployee.ClearSelection();
+            dataGridViewEmployee.Enabled = true;
+
+            // 🔹 Ensure columns exist
+            dataGridViewEmployee.Columns.Clear();
+
+            // 1️⃣ Counter column
+            var counterCol = new DataGridViewTextBoxColumn
             {
-                dataGridViewEmployee.Rows.Add(i + ".", "JAP-001", "Franz Louies Deloritos", "Human Resource", "Staff", "09151238765", "franz.deloritos@gmail.com");
-            }
+                Name = "RowNumber",
+                HeaderText = "",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                FillWeight = 25
+            };
+            dataGridViewEmployee.Columns.Add(counterCol);
+
+            // 🔹 Main Data Columns
+            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "EmployeeId", HeaderText = "ID", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 80 });
+            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "FullName", HeaderText = "Name", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 120 });
+            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "Department", HeaderText = "Department", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 100 });
+            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "Position", HeaderText = "Position", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 100 });
+            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "Contact", HeaderText = "Contact Number", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 100 });
+            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "Email", HeaderText = "Email", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 120 });
         }
 
         private void setFont()
@@ -92,6 +122,97 @@ namespace HRIS_JAP_ATTPAY
         private void setTextBoxAttributes()
         {
             AttributesClass.TextboxPlaceholder(textBoxSearchEmployee, "Find Employee");
+        }
+
+        // 🔹 Search filter (like AdminEmployee)
+        private void textBoxSearchEmployee_TextChanged(object sender, EventArgs e)
+        {
+            string searchText = textBoxSearchEmployee.Text.Trim().ToLower();
+
+            foreach (DataGridViewRow row in dataGridViewEmployee.Rows)
+            {
+                if (!row.IsNewRow)
+                {
+                    bool isVisible = string.IsNullOrEmpty(searchText) ||
+                        (row.Cells["FullName"].Value?.ToString().ToLower().Contains(searchText) ?? false) ||
+                        (row.Cells["EmployeeId"].Value?.ToString().ToLower().Contains(searchText) ?? false) ||
+                        (row.Cells["Department"].Value?.ToString().ToLower().Contains(searchText) ?? false);
+
+                    row.Visible = isVisible;
+                }
+            }
+        }
+
+        // 🔹 Load Firebase Data
+        private async void LoadFirebaseData()
+        {
+            try
+            {
+                dataGridViewEmployee.Rows.Clear();
+
+                // 🔹 Get EmployeeDetails
+                var firebaseEmployees = await firebase
+                    .Child("EmployeeDetails")
+                    .OnceAsync<dynamic>();
+
+                // 🔹 Get EmploymentInfo
+                var firebaseEmployment = await firebase
+                    .Child("EmploymentInfo")
+                    .OnceSingleAsync<List<dynamic>>();
+
+                // 🔹 Employment info lookup
+                var employmentDict = new Dictionary<string, (string Department, string Position)>();
+
+                if (firebaseEmployment != null)
+                {
+                    foreach (var emp in firebaseEmployment)
+                    {
+                        if (emp == null) continue;
+                        string empId = emp.employee_id ?? "";
+                        string dept = emp.department ?? "";
+                        string pos = emp.position ?? "";
+
+                        if (!string.IsNullOrEmpty(empId))
+                            employmentDict[empId] = (dept, pos);
+                    }
+                }
+
+                int counter = 1;
+                foreach (var fbEmp in firebaseEmployees)
+                {
+                    dynamic data = fbEmp.Object;
+
+                    string employeeId = data.employee_id ?? "";
+                    string fullName = $"{data.first_name ?? ""} {data.middle_name ?? ""} {data.last_name ?? ""}".Trim();
+                    string contact = data.contact ?? "";
+                    string email = data.email ?? "";
+
+                    string department = "";
+                    string position = "";
+                    if (!string.IsNullOrEmpty(employeeId) && employmentDict.ContainsKey(employeeId))
+                    {
+                        department = employmentDict[employeeId].Department;
+                        position = employmentDict[employeeId].Position;
+                    }
+
+                    // 🔹 Add row (no Action column, no click)
+                    dataGridViewEmployee.Rows.Add(
+                        counter,
+                        employeeId,
+                        fullName,
+                        department,
+                        position,
+                        contact,
+                        email
+                    );
+
+                    counter++;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to load Firebase data: " + ex.Message);
+            }
         }
     }
 }

@@ -180,7 +180,6 @@
             this.buttonEdit.TabIndex = 57;
             this.buttonEdit.Text = "Edit";
             this.buttonEdit.UseVisualStyleBackColor = false;
-            this.buttonEdit.Click += new System.EventHandler(this.button1_Click);
             // 
             // labelAltWorkHours
             // 

@@ -12,7 +12,7 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class EditEmployeeProfileHR : Form
     {
-        public EditEmployeeProfileHR()
+        public EditEmployeeProfileHR(string employeeId)
         {
             InitializeComponent();
             setFont();

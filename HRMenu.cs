@@ -80,7 +80,7 @@ namespace HRIS_JAP_ATTPAY
         {
             Form parentForm = this.FindForm();
             UserProfile userProfileForm = new UserProfile();
-            AttributesClass.ShowWithOverlay(parentForm, userProfileForm); 
+            AttributesClass.ShowWithOverlay(parentForm, userProfileForm);
         }
 
         private void labelLogOut_Click(object sender, EventArgs e)
