@@ -1,16 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;   // For List and Dictionary
-using System.Linq;                  // For Any()
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Firebase.Database;
 using Firebase.Database.Query;
-using Newtonsoft.Json.Linq;          // For JArray, JToken
+using Newtonsoft.Json.Linq;
+using System.Drawing;
 
 namespace HRIS_JAP_ATTPAY
 {
     public partial class EmployeeProfile : Form
     {
+        // 🔹 Store employeeId for reference
         private readonly string employeeId;
 
         // 🔹 Firebase client
@@ -27,23 +29,6 @@ namespace HRIS_JAP_ATTPAY
         {
             base.OnLoad(e);
             await LoadEmployeeDetails();
-            await LoadEmploymentInfo();     // ✅ corrected
-            await LoadWorkSchedule();       // ✅ corrected
-            await LoadUserPassword();
-        }
-
-        private void buttonCancel_Click(object sender, EventArgs e)
-        {
-            Form parentForm = this.FindForm();
-            ConfirmArchive confirmArchiveForm = new ConfirmArchive();
-            AttributesClass.ShowWithOverlay(parentForm, confirmArchiveForm);
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Form parentForm = this.FindForm();
-            EditEmployeeProfile editEmployeeProfileForm = new EditEmployeeProfile(employeeId);
-            AttributesClass.ShowWithOverlay(parentForm, editEmployeeProfileForm);
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
@@ -57,61 +42,59 @@ namespace HRIS_JAP_ATTPAY
             {
                 buttonArchive.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
                 buttonEdit.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
-
-                // Personal Info
-                labelEmployeeProfile.Font = AttributesClass.GetFont("Roboto-Regular", 18f);
-                labelPersonalInformation.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
-                labelEmployeeID.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelEmployeeIDInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelFirstName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelFirstNameInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelMiddleName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelMiddleNameInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelLastName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelLastNameInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelGender.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelGenderInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelDateOfBirth.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelDateOfBirthInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelEmail.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelEmailInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelAddress.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelAddressInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelAltWorkDays.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelAltWorkDaysInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelAltWorkHours.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelAltWorkHoursInputA.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelAltWorkHoursInputB.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelContact.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelContactInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelMaritalStatus.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelMaritalStatusInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelNationality.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelNationalityInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelRFIDTag.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelRFIDTagInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-
-                // Employment Info
-                labelEmploymentInformation.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
-                labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelPositionInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelDepartment.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelDepartmentInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelManager.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelManagerInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelContractType.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelContractTypeInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelDateOfJoining.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelDateOfJoiningInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelDashA.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
+                labelDashB.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
+                labelDateOfBirth.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelDateOfBirthInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelDateOfExit.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelDateOfExitInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-
-                // Work Schedule
+                labelDateOfJoining.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelDateOfJoiningInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelDepartment.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelDepartmentInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelEmail.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelEmailInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelEmployeeID.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelEmployeeIDInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelEmployeeProfile.Font = AttributesClass.GetFont("Roboto-Regular", 18f);
+                labelEmploymentInformation.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
+                labelFirstName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelFirstNameInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelGender.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelGenderInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelLastName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelLastNameInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelManager.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelManagerInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelMaritalStatus.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelMaritalStatusInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelMiddleName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelMiddleNameInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelNationality.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelNationalityInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelPersonalInformation.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
+                labelPersonalAndEmploymentRecord.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelPositionInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelRFIDTag.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelRFIDTagInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelShiftSchedule.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelWorkDays.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelWorkDaysInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelWorkHours.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelWorkHoursInputA.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelAltWorkHours.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelAltWorkHoursInputA.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelAltWorkHoursInputB.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelAltWorkDays.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelAltWorkDaysInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
             }
             catch (Exception ex)
             {
@@ -119,107 +102,167 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // Section 1: Employee Details
         private async Task LoadEmployeeDetails()
         {
             try
             {
-                var emp = await firebase
+                if (string.IsNullOrEmpty(employeeId))
+                {
+                    MessageBox.Show("Employee ID is missing.");
+                    return;
+                }
+
+                Console.WriteLine($"Loading details for employee: {employeeId}");
+
+                // 🔹 Test Firebase connectivity first
+                try
+                {
+                    var test = await firebase.Child("EmployeeDetails").OnceAsync<object>();
+                    Console.WriteLine($"Firebase connection successful. Found {test.Count} employee records.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Firebase connection failed: {ex.Message}");
+                    MessageBox.Show("Cannot connect to Firebase. Please check your internet connection.");
+                    return;
+                }
+
+                // 🔹 APPROACH 1: Use dynamic objects for more flexibility
+                await LoadEmployeeDetailsDynamic();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to load employee details: " + ex.Message);
+                Console.WriteLine($"Error details: {ex}");
+            }
+        }
+
+        private async Task LoadEmployeeDetailsDynamic()
+        {
+            try
+            {
+                // 🔹 Fetch personal info by employeeId using dynamic
+                var employeeResponse = await firebase
                     .Child("EmployeeDetails")
                     .Child(employeeId)
                     .OnceSingleAsync<dynamic>();
 
-                if (emp != null)
+                if (employeeResponse != null)
                 {
-                    labelEmployeeIDInput.Text = emp?.employee_id ?? "N/A";
-                    labelFirstNameInput.Text = emp?["first_name"]?.ToString() ?? "N/A";
-                    labelMiddleNameInput.Text = emp?["middle_name"]?.ToString() ?? "N/A";
-                    labelLastNameInput.Text = emp?["last_name"]?.ToString() ?? "N/A";
-                    labelGenderInput.Text = emp?["gender"]?.ToString() ?? "N/A";
-                    if (!string.IsNullOrEmpty(emp?.date_of_birth?.ToString()))
+                    dynamic employee = employeeResponse;
+                    labelEmployeeIDInput.Text = employee?.employee_id ?? "N/A";
+                    labelFirstNameInput.Text = employee["first_name"]?.ToString() ?? "N/A";
+                    labelMiddleNameInput.Text = employee["middle_name"]?.ToString() ?? "N/A";
+                    labelLastNameInput.Text = employee["last_name"]?.ToString() ?? "N/A";
+                    labelGenderInput.Text = employee["gender"]?.ToString() ?? "N/A";
+                    if (!string.IsNullOrEmpty(employee?.date_of_birth?.ToString()))
                     {
-                        if (DateTime.TryParse(emp.date_of_birth.ToString(), out DateTime dob))
+                        if (DateTime.TryParse(employee.date_of_birth.ToString(), out DateTime dob))
                             labelDateOfBirthInput.Text = dob.ToString("yyyy-MM-dd"); // Only date
                         else
-                            labelDateOfBirthInput.Text = emp.date_of_birth.ToString();
+                            labelDateOfBirthInput.Text = employee.date_of_birth.ToString();
                     }
                     else
                     {
                         labelDateOfBirthInput.Text = "N/A";
                     }
-                    labelEmailInput.Text = emp?["email"]?.ToString() ?? "N/A";
-                    labelAddressInput.Text = emp?["address"]?.ToString() ?? "N/A";
-                    labelContactInput.Text = emp?["contact"]?.ToString() ?? "N/A";
-                    labelMaritalStatusInput.Text = emp?.marital_status ?? "N/A";
-                    labelNationalityInput.Text = emp?.nationality ?? "N/A";
-                    labelRFIDTagInput.Text = emp?.rfid_tag ?? "No RFID assigned";  // ✅ custom fallback
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error loading employee details: " + ex.Message);
-            }
-        }
+                    labelEmailInput.Text = employee["email"]?.ToString() ?? "N/A";
+                    labelAddressInput.Text = employee["address"]?.ToString() ?? "N/A";
+                    labelContactInput.Text = employee["contact"]?.ToString() ?? "N/A";
 
-        private async Task LoadUserPassword()
-        {
-            try
-            {
-                var users = await firebase.Child("Users").OnceAsync<dynamic>();
+                    // 🔹 Add these
+                    labelMaritalStatusInput.Text = employee?.marital_status ?? "N/A";
+                    labelNationalityInput.Text = employee?.nationality ?? "N/A";
+                    labelRFIDTagInput.Text = employee?.rfid_tag ?? "N/A";
 
-                foreach (var u in users)
-                {
-                    // u.Key is the Firebase key, u.Object is the payload
-                    dynamic obj = u.Object;
-                    string empId = obj?.employee_id;
-                    if (empId == employeeId)
+                    // 🔹 NEW: Load profile image if available
+                    string imageUrl = employee?.image_url?.ToString();
+                    if (!string.IsNullOrEmpty(imageUrl))
                     {
-                        // 1) If plaintext password exists (insecure) show it:
-                        var plaintext = (string)obj?.password; // common insecure name
-
-                        // 2) Otherwise show the stored hash (likely)
-                        var hash = (string)obj?.password_hash ?? (string)obj?.passwordHash ?? (string)obj?.hash;
-
-                        if (!string.IsNullOrEmpty(plaintext))
-                        {
-                            // WARNING: displaying plaintext is insecure — do this only for trusted debug/admin
-                            labelPasswordInput.Text = plaintext;
-                        }
-                        else if (!string.IsNullOrEmpty(hash))
-                        {
-                            // Show the stored hash (this is not the plaintext)
-                            labelPasswordInput.Text = hash;
-                        }
-                        else
-                        {
-                            labelPasswordInput.Text = "No password record";
-                        }
-
-                        return;
+                        await LoadProfileImage(imageUrl);
+                    }
+                    else
+                    {
+                        // Set default image or clear existing
+                        pictureBoxEmployee.Image = null; // or set a default placeholder image
                     }
                 }
+                else
+                {
+                    MessageBox.Show("Employee not found.");
+                    return;
+                }
 
-                // no user record found
-                labelPasswordInput.Text = "No login";
+                // 🔹 APPROACH 2: Direct JSON parsing for EmploymentInfo array
+                await LoadEmploymentInfoDirect();
+
+                // 🔹 APPROACH 3: Manual iteration for Work_Schedule array
+                await LoadWorkScheduleManual();
             }
             catch (Exception ex)
             {
-                labelPasswordInput.Text = "Error";
-                Console.WriteLine("LoadUserPassword error: " + ex.Message);
+                MessageBox.Show("Error in dynamic loading: " + ex.Message);
             }
         }
 
-        // Section 2: Employment Information
-        private async Task LoadEmploymentInfo()   // ✅ corrected name
+        // 🔹 NEW: Method to load profile image
+        private async Task LoadProfileImage(string imageUrl)
         {
             try
             {
+                // Use Task.Run to avoid blocking the UI thread
+                await Task.Run(() =>
+                {
+                    // Invoke on UI thread to update the pictureBox
+                    if (pictureBoxEmployee.InvokeRequired)
+                    {
+                        pictureBoxEmployee.Invoke(new Action(() =>
+                        {
+                            try
+                            {
+                                pictureBoxEmployee.Load(imageUrl);
+                                pictureBoxEmployee.SizeMode = PictureBoxSizeMode.Zoom;
+                            }
+                            catch
+                            {
+                                // If image loading fails, set to null or default
+                                pictureBoxEmployee.Image = null;
+                            }
+                        }));
+                    }
+                    else
+                    {
+                        try
+                        {
+                            pictureBoxEmployee.Load(imageUrl);
+                            pictureBoxEmployee.SizeMode = PictureBoxSizeMode.Zoom;
+                        }
+                        catch
+                        {
+                            pictureBoxEmployee.Image = null;
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading profile image: {ex.Message}");
+                // Silently fail - don't show error for image loading
+            }
+        }
+
+        private async Task LoadEmploymentInfoDirect()
+        {
+            try
+            {
+                // 🔹 Get all EmploymentInfo as raw object
                 var employmentData = await firebase
                     .Child("EmploymentInfo")
                     .OnceSingleAsync<object>();
 
                 if (employmentData != null)
                 {
+                    // Convert to JArray
                     var employmentArray = JArray.FromObject(employmentData);
 
                     foreach (var item in employmentArray)
@@ -263,6 +306,7 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
+                // If no match found
                 Console.WriteLine("No employment info found for " + employeeId);
                 labelDepartmentInput.Text = "N/A";
                 labelPositionInput.Text = "N/A";
@@ -277,11 +321,11 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // Section 3: Work Schedule
-        private async Task LoadWorkSchedule()   // ✅ corrected name
+        private async Task LoadWorkScheduleManual()
         {
             try
             {
+                // 🔹 Get all Work_Schedule as JSON string
                 var scheduleData = await firebase
                     .Child("Work_Schedule")
                     .OnceSingleAsync<object>();
@@ -357,5 +401,58 @@ namespace HRIS_JAP_ATTPAY
                 Console.WriteLine($"Error loading work schedule: {ex.Message}");
             }
         }
+
+        private void buttonEdit_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            EditEmployeeProfile editEmployeeProfileForm = new EditEmployeeProfile(employeeId);
+            AttributesClass.ShowWithOverlay(parentForm, editEmployeeProfileForm);
+        }
+
+        private void buttonArchive_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            ConfirmArchive confirmArchiveForm = new ConfirmArchive();
+            AttributesClass.ShowWithOverlay(parentForm, confirmArchiveForm);
+        }
+    }
+
+    // 🔹 Keep your model classes as backup
+    public class EmployeeFields
+    {
+        public string employee_id { get; set; }
+        public string first_name { get; set; }
+        public string middle_name { get; set; }
+        public string last_name { get; set; }
+        public string email { get; set; }
+        public string contact { get; set; }
+        public string date_of_birth { get; set; }
+        public string address { get; set; }
+        public string gender { get; set; }
+        public string marital_status { get; set; }
+        public string nationality { get; set; }
+        public string rfid_tag { get; set; }
+        public string image_url { get; set; } // Added image_url field
+    }
+
+    public class EmploymentFields
+    {
+        public string employee_id { get; set; }
+        public string contract_type { get; set; }
+        public string date_of_joining { get; set; }
+        public string date_of_exit { get; set; }
+        public string department { get; set; }
+        public string position { get; set; }
+        public string manager_name { get; set; }
+    }
+
+    public class WorkScheduleFields
+    {
+        public string employee_id { get; set; }
+        public string day_of_week { get; set; }
+        public string start_time { get; set; }
+        public string end_time { get; set; }
+        public string schedule_type { get; set; }
+        public string schedule_id { get; set; }
     }
 }

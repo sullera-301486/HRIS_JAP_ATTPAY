@@ -292,7 +292,7 @@
             this.buttonUpdate.TabIndex = 57;
             this.buttonUpdate.Text = "Update";
             this.buttonUpdate.UseVisualStyleBackColor = false;
-            this.buttonUpdate.Click += new System.EventHandler(this.button1_Click);
+            this.buttonUpdate.Click += new System.EventHandler(this.buttonUpdate_Click);
             // 
             // labelAltWorkHours
             // 

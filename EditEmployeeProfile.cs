@@ -1,61 +1,56 @@
-﻿using System;
+﻿using Firebase.Database;
+using Firebase.Database.Query;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
-using System.Windows.Forms;
-using Firebase.Database;
-using Firebase.Database.Query;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace HRIS_JAP_ATTPAY
 {
     public partial class EditEmployeeProfile : Form
     {
-        private readonly string _employeeId; // store employee ID
-        private readonly FirebaseClient firebase = new FirebaseClient("https://thesis-2e8d2-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        private string selectedEmployeeId;
+        private string localImagePath; // Store the selected image path
 
-        // 🔹 Default constructor (no ID)
-        public EditEmployeeProfile()
-        {
-            InitializeComponent();
-            setFont();
-        }
+        // ---- Firebase Configuration for v7.3 ----
+        private readonly FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        private static readonly string FirebaseStorageBucket = "thesis151515.firebasestorage.app";
+        // ------------------------------------------
 
         // 🔹 Constructor with employee ID
         public EditEmployeeProfile(string employeeId)
         {
             InitializeComponent();
-            _employeeId = employeeId;
+            selectedEmployeeId = employeeId; // Store the employee ID
             setFont();
         }
 
         private async void EditEmployeeProfile_Load(object sender, EventArgs e)
         {
             // Setup checkboxes safely
-            var dayBoxes = new[]
-            {
-                checkBoxM, checkBoxT, checkBoxW, checkBoxTh,
-                checkBoxF, checkBoxS,
-                checkBoxAltM, checkBoxAltT, checkBoxAltW,
-                checkBoxAltTh, checkBoxAltF, checkBoxAltS
-            }
-            .Where(cb => cb != null)
-            .ToArray();
-
+            System.Windows.Forms.CheckBox[] dayBoxes = { checkBoxM, checkBoxT, checkBoxW, checkBoxTh, checkBoxF, checkBoxS, checkBoxAltM, checkBoxAltT, checkBoxAltW, checkBoxAltTh, checkBoxAltF, checkBoxAltS };
             foreach (var cb in dayBoxes)
             {
                 cb.Appearance = Appearance.Button;
                 cb.TextAlign = ContentAlignment.MiddleCenter;
                 cb.FlatStyle = FlatStyle.Flat;
-                cb.UseVisualStyleBackColor = false;
                 cb.Size = new Size(45, 45);
                 cb.Font = new Font("Roboto-Regular", 8f);
+                cb.UseVisualStyleBackColor = false;
                 cb.FlatAppearance.CheckedBackColor = Color.FromArgb(96, 81, 148);
                 cb.Cursor = Cursors.Hand;
 
                 cb.CheckedChanged += (s, ev) =>
                 {
-                    var box = s as CheckBox;
+                    var box = s as System.Windows.Forms.CheckBox;
                     if (box.Checked)
                     {
                         box.BackColor = Color.FromArgb(96, 81, 148);  // Selected
@@ -69,13 +64,12 @@ namespace HRIS_JAP_ATTPAY
                 };
 
                 cb.Checked = false;
-                cb.BackColor = Color.FromArgb(217, 217, 217);
             }
 
             // 🔹 Load employee data if an ID was passed
-            if (!string.IsNullOrEmpty(_employeeId))
+            if (!string.IsNullOrEmpty(selectedEmployeeId))
             {
-                await LoadEmployeeData(_employeeId);
+                await LoadEmployeeData(selectedEmployeeId);
             }
         }
 
@@ -103,6 +97,21 @@ namespace HRIS_JAP_ATTPAY
                     textBoxNationality.Text = empDetails.nationality;
                     labelEmployeeIDInput.Text = empDetails.employee_id;
                     labelRFIDTagInput.Text = empDetails.rfid_tag;
+
+                    // Load existing image if available
+                    if (!string.IsNullOrEmpty(empDetails.image_url))
+                    {
+                        try
+                        {
+                            pictureBoxEmployee.Load(empDetails.image_url);
+                            pictureBoxEmployee.SizeMode = PictureBoxSizeMode.Zoom;
+                        }
+                        catch
+                        {
+                            // If image loading fails, use default or leave empty
+                            pictureBoxEmployee.Image = null;
+                        }
+                    }
                 }
 
                 // ✅ Load EmploymentInfo from Firebase
@@ -128,18 +137,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private void XpictureBox_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Form parentForm = this.FindForm();
-            ConfirmProfileUpdate confirmProfileUpdateForm = new ConfirmProfileUpdate();
-            AttributesClass.ShowWithOverlay(parentForm, confirmProfileUpdateForm);
-        }
-
         private void buttonChangePhoto_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog ofd = new OpenFileDialog())
@@ -149,10 +146,16 @@ namespace HRIS_JAP_ATTPAY
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    pictureBoxEmployee.Image = Image.FromFile(ofd.FileName);
+                    localImagePath = ofd.FileName; // Store the file path
+                    pictureBoxEmployee.Image = Image.FromFile(localImagePath);
                     pictureBoxEmployee.SizeMode = PictureBoxSizeMode.Zoom;
                 }
             }
+        }
+
+        private void XpictureBox_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
 
         private void setFont()
@@ -187,8 +190,6 @@ namespace HRIS_JAP_ATTPAY
                 labelMaritalStatus.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelMiddleName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelNationality.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelPassword.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelPasswordInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelPersonalInformation.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
                 labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelPositionInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
@@ -226,6 +227,154 @@ namespace HRIS_JAP_ATTPAY
         {
             this.Close();
         }
+
+        private async void buttonUpdate_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(localImagePath))
+            {
+                try
+                {
+                    string downloadUrl = await UploadImageToFirebase(localImagePath, selectedEmployeeId);
+                    if (!string.IsNullOrEmpty(downloadUrl))
+                    {
+                        bool ok = await UpdateEmployeeImage(selectedEmployeeId, downloadUrl);
+                        if (ok)
+                        {
+                            MessageBox.Show("Profile image uploaded successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to update employee record with image URL.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Image upload failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            // Proceed with the existing confirmation dialog
+            Form parentForm = this.FindForm();
+            ConfirmProfileUpdate confirmProfileUpdateForm = new ConfirmProfileUpdate();
+            AttributesClass.ShowWithOverlay(parentForm, confirmProfileUpdateForm);
+        }
+
+        // CORRECTED for Firebase Storage v7.3
+        private async Task<string> UploadImageToFirebase(string localFilePath, string employeeId)
+        {
+            string fileNameOnly = Path.GetFileName(localFilePath);
+            string objectName = $"employee_images/{employeeId}_{fileNameOnly}";
+
+            // CORRECT URL FOR v7.3 - using the full bucket domain
+            string uploadUrl = $"https://firebasestorage.googleapis.com/v0/b/thesis151515.firebasestorage.app/o?uploadType=media&name={Uri.EscapeDataString(objectName)}";
+
+            using (var http = new HttpClient())
+            using (var stream = new FileStream(localFilePath, FileMode.Open, FileAccess.Read))
+            {
+                var content = new StreamContent(stream);
+
+                string ext = Path.GetExtension(localFilePath).ToLowerInvariant();
+                string mime;
+
+                switch (ext)
+                {
+                    case ".png":
+                        mime = "image/png";
+                        break;
+                    case ".jpg":
+                    case ".jpeg":
+                        mime = "image/jpeg";
+                        break;
+                    case ".gif":
+                        mime = "image/gif";
+                        break;
+                    default:
+                        mime = "application/octet-stream";
+                        break;
+                }
+
+                content.Headers.ContentType = new MediaTypeHeaderValue(mime);
+
+                try
+                {
+                    var resp = await http.PostAsync(uploadUrl, content);
+                    string respText = await resp.Content.ReadAsStringAsync();
+
+                    if (!resp.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show($"Upload failed ({(int)resp.StatusCode}): {respText}", "Upload error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return null;
+                    }
+
+                    // Parse response for v7.3
+                    var j = JObject.Parse(respText);
+                    string name = j["name"]?.ToString() ?? objectName;
+                    string bucket = j["bucket"]?.ToString() ?? FirebaseStorageBucket;
+                    string tokens = j["downloadTokens"]?.ToString();
+
+                    // CORRECT download URL for v7.3
+                    string downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/thesis151515.firebasestorage.app/o/{Uri.EscapeDataString(name)}?alt=media";
+                    if (!string.IsNullOrEmpty(tokens))
+                        downloadUrl += "&token=" + tokens;
+
+                    return downloadUrl;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Upload error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return null;
+                }
+            }
+        }
+
+        private async Task<bool> UpdateEmployeeImage(string employeeId, string imageUrl)
+        {
+            var updateData = new
+            {
+                image_url = imageUrl
+            };
+
+            string jsonBody = JsonConvert.SerializeObject(updateData);
+
+            using (var http = new HttpClient())
+            {
+                var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+                string[] pathsToTry = {
+            "EmployeeDetails/" + employeeId + ".json",
+            "employees/" + employeeId + ".json"
+        };
+
+                foreach (var path in pathsToTry)
+                {
+                    // Use the same URL as your FirebaseClient
+                    string fullUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/" + path;
+
+                    try
+                    {
+                        var response = await http.PatchAsync(fullUrl, content);
+                        string responseContent = await response.Content.ReadAsStringAsync();
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            MessageBox.Show($"Successfully updated at: {path}", "Success");
+                            return true;
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Failed at {path}: {response.StatusCode}\n{responseContent}", "Error");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error updating {path}: {ex.Message}", "Error");
+                    }
+                }
+
+                return false;
+            }
+        }
     }
 
     // 🔹 Firebase models
@@ -243,9 +392,10 @@ namespace HRIS_JAP_ATTPAY
         public string email { get; set; }
         public string address { get; set; }
         public string rfid_tag { get; set; }
+        public string image_url { get; set; } // Added image_url field
         public string created_at { get; set; }
     }
-
+    
     public class EmploymentInfoModel
     {
         public string employee_id { get; set; }
@@ -256,5 +406,15 @@ namespace HRIS_JAP_ATTPAY
         public string date_of_exit { get; set; }
         public string manager_name { get; set; }
         public string created_at { get; set; }
+    }
+}
+
+// PATCH extension for HttpClient
+public static class HttpClientExtensions
+{
+    public static Task<HttpResponseMessage> PatchAsync(this HttpClient client, string requestUri, HttpContent content)
+    {
+        var request = new HttpRequestMessage(new HttpMethod("PATCH"), requestUri) { Content = content };
+        return client.SendAsync(request);
     }
 }

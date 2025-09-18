@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Firebase.Database;
 using Firebase.Database.Query;
 using Newtonsoft.Json.Linq;
+using System.Drawing; // Added for Image handling
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -173,6 +174,18 @@ namespace HRIS_JAP_ATTPAY
                     labelMaritalStatusInput.Text = employee?.marital_status ?? "N/A";
                     labelNationalityInput.Text = employee?.nationality ?? "N/A";
                     labelRFIDTagInput.Text = employee?.rfid_tag ?? "N/A";
+
+                    // 🔹 NEW: Load profile image if available
+                    string imageUrl = employee?.image_url?.ToString();
+                    if (!string.IsNullOrEmpty(imageUrl))
+                    {
+                        await LoadProfileImage(imageUrl);
+                    }
+                    else
+                    {
+                        // Set default image or clear existing
+                        pictureBox1.Image = null; // or set a default placeholder image
+                    }
                 }
                 else
                 {
@@ -189,6 +202,52 @@ namespace HRIS_JAP_ATTPAY
             catch (Exception ex)
             {
                 MessageBox.Show("Error in dynamic loading: " + ex.Message);
+            }
+        }
+
+        // 🔹 NEW: Method to load profile image
+        private async Task LoadProfileImage(string imageUrl)
+        {
+            try
+            {
+                // Use Task.Run to avoid blocking the UI thread
+                await Task.Run(() =>
+                {
+                    // Invoke on UI thread to update the pictureBox
+                    if (pictureBox1.InvokeRequired)
+                    {
+                        pictureBox1.Invoke(new Action(() =>
+                        {
+                            try
+                            {
+                                pictureBox1.Load(imageUrl);
+                                pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+                            }
+                            catch
+                            {
+                                // If image loading fails, set to null or default
+                                pictureBox1.Image = null;
+                            }
+                        }));
+                    }
+                    else
+                    {
+                        try
+                        {
+                            pictureBox1.Load(imageUrl);
+                            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+                        }
+                        catch
+                        {
+                            pictureBox1.Image = null;
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading profile image: {ex.Message}");
+                // Silently fail - don't show error for image loading
             }
         }
 
@@ -268,8 +327,8 @@ namespace HRIS_JAP_ATTPAY
             {
                 // 🔹 Get all Work_Schedule as JSON string
                 var scheduleData = await firebase
-    .Child("Work_Schedule")
-    .OnceSingleAsync<object>();
+                    .Child("Work_Schedule")
+                    .OnceSingleAsync<object>();
 
                 if (scheduleData != null)
                 {
@@ -279,10 +338,10 @@ namespace HRIS_JAP_ATTPAY
                     string regularStart = "", regularEnd = "", alternateStart = "", alternateEnd = "";
 
                     var dayMap = new Dictionary<string, string>
-    {
-        {"Monday", "M"}, {"Tuesday", "T"}, {"Wednesday", "W"},
-        {"Thursday", "Th"}, {"Friday", "F"}, {"Saturday", "S"}, {"Sunday", "Su"}
-    };
+                    {
+                        {"Monday", "M"}, {"Tuesday", "T"}, {"Wednesday", "W"},
+                        {"Thursday", "Th"}, {"Friday", "F"}, {"Saturday", "S"}, {"Sunday", "Su"}
+                    };
 
                     foreach (var item in scheduleArray)
                     {
@@ -343,7 +402,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-
         private void buttonEdit_Click(object sender, EventArgs e)
         {
             Form parentForm = this.FindForm();
@@ -357,10 +415,12 @@ namespace HRIS_JAP_ATTPAY
             ConfirmArchive confirmArchiveForm = new ConfirmArchive();
             AttributesClass.ShowWithOverlay(parentForm, confirmArchiveForm);
         }
+
+
     }
 
     // 🔹 Keep your model classes as backup
-    public class EmployeeFields
+    public class EmployeeFieldsHR
     {
         public string employee_id { get; set; }
         public string first_name { get; set; }
@@ -374,9 +434,10 @@ namespace HRIS_JAP_ATTPAY
         public string marital_status { get; set; }
         public string nationality { get; set; }
         public string rfid_tag { get; set; }
+        public string image_url { get; set; } // Added image_url field
     }
 
-    public class EmploymentFields
+    public class EmploymentFieldsHR
     {
         public string employee_id { get; set; }
         public string contract_type { get; set; }
@@ -387,7 +448,7 @@ namespace HRIS_JAP_ATTPAY
         public string manager_name { get; set; }
     }
 
-    public class WorkScheduleFields
+    public class WorkScheduleFieldsHR
     {
         public string employee_id { get; set; }
         public string day_of_week { get; set; }

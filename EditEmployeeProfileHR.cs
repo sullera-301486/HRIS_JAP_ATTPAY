@@ -1,9 +1,15 @@
-﻿using System;
+﻿using Firebase.Database;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -12,13 +18,22 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class EditEmployeeProfileHR : Form
     {
+        private string selectedEmployeeId;
+        private string localImagePath; // Store the selected image path
+
+        // ---- Firebase Configuration for v7.3 ----
+        private readonly FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        private static readonly string FirebaseStorageBucket = "thesis151515.firebasestorage.app";
+        // ------------------------------------------
+
         public EditEmployeeProfileHR(string employeeId)
         {
             InitializeComponent();
+            selectedEmployeeId = employeeId; // Store the employee ID
             setFont();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void buttonChangePhoto_Click_1(object sender, EventArgs e)
         {
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
@@ -27,7 +42,8 @@ namespace HRIS_JAP_ATTPAY
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    pictureBoxEmployee.Image = Image.FromFile(ofd.FileName);
+                    localImagePath = ofd.FileName; // Store the file path
+                    pictureBoxEmployee.Image = Image.FromFile(localImagePath);
                     pictureBoxEmployee.SizeMode = PictureBoxSizeMode.Zoom;
                 }
             }
@@ -143,11 +159,164 @@ namespace HRIS_JAP_ATTPAY
             this.Close();
         }
 
-        private void buttonUpdate_Click(object sender, EventArgs e)
+        private async void buttonUpdate_Click(object sender, EventArgs e)
         {
+            if (!string.IsNullOrEmpty(localImagePath))
+            {
+                try
+                {
+                    string downloadUrl = await UploadImageToFirebase(localImagePath, selectedEmployeeId);
+                    if (!string.IsNullOrEmpty(downloadUrl))
+                    {
+                        bool ok = await UpdateEmployeeImage(selectedEmployeeId, downloadUrl);
+                        if (ok)
+                        {
+                            MessageBox.Show("Profile image uploaded successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to update employee record with image URL.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Image upload failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            // Proceed with the existing confirmation dialog
             Form parentForm = this.FindForm();
             ConfirmProfileUpdate confirmProfileUpdateForm = new ConfirmProfileUpdate();
             AttributesClass.ShowWithOverlay(parentForm, confirmProfileUpdateForm);
+        }
+
+        // CORRECTED for Firebase Storage v7.3
+        private async Task<string> UploadImageToFirebase(string localFilePath, string employeeId)
+        {
+            string fileNameOnly = Path.GetFileName(localFilePath);
+            string objectName = $"employee_images/{employeeId}_{fileNameOnly}";
+
+            // CORRECT URL FOR v7.3 - using the full bucket domain
+            string uploadUrl = $"https://firebasestorage.googleapis.com/v0/b/thesis151515.firebasestorage.app/o?uploadType=media&name={Uri.EscapeDataString(objectName)}";
+
+            using (var http = new HttpClient())
+            using (var stream = new FileStream(localFilePath, FileMode.Open, FileAccess.Read))
+            {
+                var content = new StreamContent(stream);
+
+                string ext = Path.GetExtension(localFilePath).ToLowerInvariant();
+                string mime;
+
+                switch (ext)
+                {
+                    case ".png":
+                        mime = "image/png";
+                        break;
+                    case ".jpg":
+                    case ".jpeg":
+                        mime = "image/jpeg";
+                        break;
+                    case ".gif":
+                        mime = "image/gif";
+                        break;
+                    default:
+                        mime = "application/octet-stream";
+                        break;
+                }
+
+                content.Headers.ContentType = new MediaTypeHeaderValue(mime);
+
+                try
+                {
+                    var resp = await http.PostAsync(uploadUrl, content);
+                    string respText = await resp.Content.ReadAsStringAsync();
+
+                    if (!resp.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show($"Upload failed ({(int)resp.StatusCode}): {respText}", "Upload error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return null;
+                    }
+
+                    // Parse response for v7.3
+                    var j = JObject.Parse(respText);
+                    string name = j["name"]?.ToString() ?? objectName;
+                    string bucket = j["bucket"]?.ToString() ?? FirebaseStorageBucket;
+                    string tokens = j["downloadTokens"]?.ToString();
+
+                    // CORRECT download URL for v7.3
+                    string downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/thesis151515.firebasestorage.app/o/{Uri.EscapeDataString(name)}?alt=media";
+                    if (!string.IsNullOrEmpty(tokens))
+                        downloadUrl += "&token=" + tokens;
+
+                    return downloadUrl;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Upload error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return null;
+                }
+            }
+        }
+
+        private async Task<bool> UpdateEmployeeImage(string employeeId, string imageUrl)
+        {
+            var updateData = new
+            {
+                image_url = imageUrl
+            };
+
+            string jsonBody = JsonConvert.SerializeObject(updateData);
+
+            using (var http = new HttpClient())
+            {
+                var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+                string[] pathsToTry = {
+            "EmployeeDetails/" + employeeId + ".json",
+            "employees/" + employeeId + ".json"
+        };
+
+                foreach (var path in pathsToTry)
+                {
+                    // Use the same URL as your FirebaseClient
+                    string fullUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/" + path;
+
+                    try
+                    {
+                        var response = await http.PatchAsync(fullUrl, content);
+                        string responseContent = await response.Content.ReadAsStringAsync();
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            MessageBox.Show($"Successfully updated at: {path}", "Success");
+                            return true;
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Failed at {path}: {response.StatusCode}\n{responseContent}", "Error");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error updating {path}: {ex.Message}", "Error");
+                    }
+                }
+
+                return false;
+            }
+        }
+
+
+    }
+
+    // PATCH extension for HttpClient
+    public static class HttpClientExtensions
+    {
+        public static Task<HttpResponseMessage> PatchAsync(this HttpClient client, string requestUri, HttpContent content)
+        {
+            var request = new HttpRequestMessage(new HttpMethod("PATCH"), requestUri) { Content = content };
+            return client.SendAsync(request);
         }
     }
 }

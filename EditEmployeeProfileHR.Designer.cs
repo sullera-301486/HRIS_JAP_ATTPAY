@@ -124,7 +124,7 @@
             this.buttonChangePhoto.TabIndex = 129;
             this.buttonChangePhoto.Text = "Change Photo";
             this.buttonChangePhoto.UseVisualStyleBackColor = false;
-            this.buttonChangePhoto.Click += new System.EventHandler(this.button2_Click);
+            this.buttonChangePhoto.Click += new System.EventHandler(this.buttonChangePhoto_Click_1);
             // 
             // labelDashB
             // 

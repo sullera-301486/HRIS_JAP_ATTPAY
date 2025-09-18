@@ -158,14 +158,12 @@
             this.buttonArchive.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonArchive.ForeColor = System.Drawing.Color.White;
             this.buttonArchive.Location = new System.Drawing.Point(973, 523);
-            this.buttonArchive.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonArchive.Margin = new System.Windows.Forms.Padding(4);
             this.buttonArchive.Name = "buttonArchive";
             this.buttonArchive.Size = new System.Drawing.Size(180, 41);
             this.buttonArchive.TabIndex = 58;
             this.buttonArchive.Text = "Archive";
-            this.buttonArchive.UseVisualStyleBackColor = false;
-            this.buttonArchive.Click += new System.EventHandler(this.buttonCancel_Click);
-            // 
+            this.buttonArchive.UseVisualStyleBackColor = false;            // 
             // buttonEdit
             // 
             this.buttonEdit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(81)))), ((int)(((byte)(148)))));
@@ -174,12 +172,13 @@
             this.buttonEdit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonEdit.ForeColor = System.Drawing.Color.White;
             this.buttonEdit.Location = new System.Drawing.Point(764, 523);
-            this.buttonEdit.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonEdit.Margin = new System.Windows.Forms.Padding(4);
             this.buttonEdit.Name = "buttonEdit";
             this.buttonEdit.Size = new System.Drawing.Size(180, 41);
             this.buttonEdit.TabIndex = 57;
             this.buttonEdit.Text = "Edit";
             this.buttonEdit.UseVisualStyleBackColor = false;
+            this.buttonEdit.Click += new System.EventHandler(this.buttonEdit_Click);
             // 
             // labelAltWorkHours
             // 
@@ -444,7 +443,7 @@
             this.panel1.Controls.Add(this.labelPersonalAndEmploymentRecord);
             this.panel1.Controls.Add(this.labelEmployeeProfile);
             this.panel1.Location = new System.Drawing.Point(-3, 0);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1209, 121);
             this.panel1.TabIndex = 2;
@@ -534,7 +533,7 @@
             this.panel2.Controls.Add(this.pictureBoxEmployee);
             this.panel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.panel2.Location = new System.Drawing.Point(-3, 123);
-            this.panel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1209, 581);
             this.panel2.TabIndex = 3;
@@ -854,7 +853,7 @@
             this.pictureBoxEmployee.BackColor = System.Drawing.Color.Silver;
             this.pictureBoxEmployee.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pictureBoxEmployee.Location = new System.Drawing.Point(37, 28);
-            this.pictureBoxEmployee.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pictureBoxEmployee.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBoxEmployee.Name = "pictureBoxEmployee";
             this.pictureBoxEmployee.Size = new System.Drawing.Size(218, 195);
             this.pictureBoxEmployee.TabIndex = 0;
@@ -869,7 +868,7 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panel2);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "EmployeeProfile";
             this.ShowInTaskbar = false;
             this.Text = "EmployeeProfile";
