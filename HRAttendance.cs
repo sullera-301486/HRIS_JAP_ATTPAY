@@ -59,7 +59,7 @@ namespace HRIS_JAP_ATTPAY
 
             foreach (DataGridViewRow row in dataGridViewAttendance.Rows)
             {
-                if (!row.IsNewRow)
+                if (!row.IsNewRow & searchText != "find employee")
                 {
                     string employeeId = row.Cells["EmployeeId"].Value?.ToString()?.ToLower() ?? "";
                     string fullName = row.Cells["FullName"].Value?.ToString()?.ToLower() ?? "";

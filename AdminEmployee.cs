@@ -47,7 +47,7 @@ namespace HRIS_JAP_ATTPAY
             foreach (DataGridViewRow row in dataGridViewEmployee.Rows)
             {
                 // Check if the row is not the new row and if the search text is not empty
-                if (!row.IsNewRow)
+                if (!row.IsNewRow & searchText != "find employee")
                 {
                     // Check various cells for a match (e.g., Name, ID, Department)
                     bool isVisible = string.IsNullOrEmpty(searchText) ||

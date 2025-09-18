@@ -48,7 +48,6 @@
             this.comboBoxSelectDate = new System.Windows.Forms.ComboBox();
             this.tableLayoutPanelAttendance = new System.Windows.Forms.TableLayoutPanel();
             this.dataGridViewAttendance = new System.Windows.Forms.DataGridView();
-            this.dataGridViewImageColumn1 = new System.Windows.Forms.DataGridViewImageColumn();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -60,6 +59,7 @@
             this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column11 = new System.Windows.Forms.DataGridViewImageColumn();
+            this.dataGridViewImageColumn1 = new System.Windows.Forms.DataGridViewImageColumn();
             this.tableLayoutPanel1.SuspendLayout();
             this.panelSearch.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).BeginInit();
@@ -225,6 +225,7 @@
             // comboBoxSelectDate
             // 
             this.comboBoxSelectDate.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxSelectDate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxSelectDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxSelectDate.FormattingEnabled = true;
             this.comboBoxSelectDate.Location = new System.Drawing.Point(0, 0);
@@ -232,7 +233,6 @@
             this.comboBoxSelectDate.Name = "comboBoxSelectDate";
             this.comboBoxSelectDate.Size = new System.Drawing.Size(226, 37);
             this.comboBoxSelectDate.TabIndex = 9;
-            this.comboBoxSelectDate.Text = "SELECT DATE";
             // 
             // tableLayoutPanelAttendance
             // 
@@ -316,17 +316,6 @@
             this.dataGridViewAttendance.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.dataGridViewAttendance.Size = new System.Drawing.Size(1440, 648);
             this.dataGridViewAttendance.TabIndex = 0;
-            // 
-            // dataGridViewImageColumn1
-            // 
-            this.dataGridViewImageColumn1.FillWeight = 17F;
-            this.dataGridViewImageColumn1.HeaderText = "";
-            this.dataGridViewImageColumn1.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.VerticalThreeDots;
-            this.dataGridViewImageColumn1.MinimumWidth = 6;
-            this.dataGridViewImageColumn1.Name = "dataGridViewImageColumn1";
-            this.dataGridViewImageColumn1.ReadOnly = true;
-            this.dataGridViewImageColumn1.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewImageColumn1.Width = 23;
             // 
             // Column1
             // 
@@ -433,6 +422,17 @@
             this.Column11.Name = "Column11";
             this.Column11.ReadOnly = true;
             this.Column11.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            // 
+            // dataGridViewImageColumn1
+            // 
+            this.dataGridViewImageColumn1.FillWeight = 17F;
+            this.dataGridViewImageColumn1.HeaderText = "";
+            this.dataGridViewImageColumn1.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.VerticalThreeDots;
+            this.dataGridViewImageColumn1.MinimumWidth = 6;
+            this.dataGridViewImageColumn1.Name = "dataGridViewImageColumn1";
+            this.dataGridViewImageColumn1.ReadOnly = true;
+            this.dataGridViewImageColumn1.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewImageColumn1.Width = 23;
             // 
             // AdminAttendance
             // 

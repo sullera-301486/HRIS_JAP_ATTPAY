@@ -51,7 +51,7 @@ namespace HRIS_JAP_ATTPAY
             // Filter rows based on search text
             foreach (DataGridViewRow row in dataGridViewAttendance.Rows)
             {
-                if (!row.IsNewRow)
+                if (!row.IsNewRow & searchText != "find employee")
                 {
                     // Get values from relevant columns
                     string employeeId = row.Cells["EmployeeId"].Value?.ToString()?.ToLower() ?? "";

@@ -98,6 +98,9 @@
             this.panelTodo = new System.Windows.Forms.Panel();
             this.labelTodoAdd = new System.Windows.Forms.Label();
             this.dataGridViewTodo = new System.Windows.Forms.DataGridView();
+            this.ColumnActivity = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColumnDueDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColumnTrash = new System.Windows.Forms.DataGridViewImageColumn();
             this.labelTodoDesc = new System.Windows.Forms.Label();
             this.panelAlert = new System.Windows.Forms.Panel();
             this.tableLayoutPanelAlert = new System.Windows.Forms.TableLayoutPanel();
@@ -115,10 +118,7 @@
             this.labelDailyEmployeeLog = new System.Windows.Forms.Label();
             this.dataGridViewDailyEmployeeLogs = new System.Windows.Forms.DataGridView();
             this.dataGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColumnActivity = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColumnDueDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewImageColumn1 = new System.Windows.Forms.DataGridViewImageColumn();
-            this.ColumnTrash = new System.Windows.Forms.DataGridViewImageColumn();
             this.tableLayoutPanelLeft.SuspendLayout();
             this.panelAttendanceSummary.SuspendLayout();
             this.tableLayoutPanelAttendanceSummary.SuspendLayout();
@@ -504,6 +504,7 @@
             // comboBoxSelectDate
             // 
             this.comboBoxSelectDate.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxSelectDate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxSelectDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxSelectDate.FormattingEnabled = true;
             this.comboBoxSelectDate.Location = new System.Drawing.Point(30, 61);
@@ -511,7 +512,6 @@
             this.comboBoxSelectDate.Name = "comboBoxSelectDate";
             this.comboBoxSelectDate.Size = new System.Drawing.Size(226, 37);
             this.comboBoxSelectDate.TabIndex = 19;
-            this.comboBoxSelectDate.Text = "SELECT DATE";
             // 
             // labelAttendanceSummary
             // 
@@ -900,6 +900,34 @@
             this.dataGridViewTodo.Size = new System.Drawing.Size(430, 167);
             this.dataGridViewTodo.TabIndex = 4;
             // 
+            // ColumnActivity
+            // 
+            this.ColumnActivity.FillWeight = 104F;
+            this.ColumnActivity.HeaderText = "Activity";
+            this.ColumnActivity.MinimumWidth = 6;
+            this.ColumnActivity.Name = "ColumnActivity";
+            this.ColumnActivity.ReadOnly = true;
+            this.ColumnActivity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // ColumnDueDate
+            // 
+            this.ColumnDueDate.FillWeight = 104F;
+            this.ColumnDueDate.HeaderText = "Due Date";
+            this.ColumnDueDate.MinimumWidth = 6;
+            this.ColumnDueDate.Name = "ColumnDueDate";
+            this.ColumnDueDate.ReadOnly = true;
+            // 
+            // ColumnTrash
+            // 
+            this.ColumnTrash.FillWeight = 20F;
+            this.ColumnTrash.HeaderText = "";
+            this.ColumnTrash.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.TrashBin;
+            this.ColumnTrash.MinimumWidth = 6;
+            this.ColumnTrash.Name = "ColumnTrash";
+            this.ColumnTrash.ReadOnly = true;
+            this.ColumnTrash.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.ColumnTrash.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
             // labelTodoDesc
             // 
             this.labelTodoDesc.AutoSize = true;
@@ -1249,23 +1277,6 @@
             this.dataGridViewTextBoxColumn5.ReadOnly = true;
             this.dataGridViewTextBoxColumn5.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
-            // ColumnActivity
-            // 
-            this.ColumnActivity.FillWeight = 104F;
-            this.ColumnActivity.HeaderText = "Activity";
-            this.ColumnActivity.MinimumWidth = 6;
-            this.ColumnActivity.Name = "ColumnActivity";
-            this.ColumnActivity.ReadOnly = true;
-            this.ColumnActivity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // ColumnDueDate
-            // 
-            this.ColumnDueDate.FillWeight = 104F;
-            this.ColumnDueDate.HeaderText = "Due Date";
-            this.ColumnDueDate.MinimumWidth = 6;
-            this.ColumnDueDate.Name = "ColumnDueDate";
-            this.ColumnDueDate.ReadOnly = true;
-            // 
             // dataGridViewImageColumn1
             // 
             this.dataGridViewImageColumn1.FillWeight = 20F;
@@ -1277,17 +1288,6 @@
             this.dataGridViewImageColumn1.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.dataGridViewImageColumn1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             this.dataGridViewImageColumn1.Width = 38;
-            // 
-            // ColumnTrash
-            // 
-            this.ColumnTrash.FillWeight = 20F;
-            this.ColumnTrash.HeaderText = "";
-            this.ColumnTrash.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.TrashBin;
-            this.ColumnTrash.MinimumWidth = 6;
-            this.ColumnTrash.Name = "ColumnTrash";
-            this.ColumnTrash.ReadOnly = true;
-            this.ColumnTrash.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.ColumnTrash.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             // 
             // AdminOverview
             // 

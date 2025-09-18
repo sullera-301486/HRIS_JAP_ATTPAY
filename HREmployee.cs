@@ -131,7 +131,7 @@ namespace HRIS_JAP_ATTPAY
 
             foreach (DataGridViewRow row in dataGridViewEmployee.Rows)
             {
-                if (!row.IsNewRow)
+                if (!row.IsNewRow & searchText != "find employee")
                 {
                     bool isVisible = string.IsNullOrEmpty(searchText) ||
                         (row.Cells["FullName"].Value?.ToString().ToLower().Contains(searchText) ?? false) ||

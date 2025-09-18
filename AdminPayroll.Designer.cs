@@ -32,27 +32,26 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AdminPayroll));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             this.comboBoxSelectPayDate = new System.Windows.Forms.ComboBox();
             this.buttonExportAll = new System.Windows.Forms.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panelFilter = new System.Windows.Forms.Panel();
             this.labelFiltersName = new System.Windows.Forms.Label();
+            this.pictureBoxFilters = new System.Windows.Forms.PictureBox();
             this.panelDate = new System.Windows.Forms.Panel();
             this.panelSearch = new System.Windows.Forms.Panel();
             this.textBoxSearchEmployee = new System.Windows.Forms.TextBox();
+            this.pictureBoxSearch = new System.Windows.Forms.PictureBox();
             this.labelAdminPayroll = new System.Windows.Forms.Label();
             this.labelPayrollDate = new System.Windows.Forms.Label();
             this.labelManageLeave = new System.Windows.Forms.Label();
             this.tableLayoutPanelEmployee = new System.Windows.Forms.TableLayoutPanel();
             this.dataGridViewEmployee = new System.Windows.Forms.DataGridView();
-            this.dataGridViewImageColumn1 = new System.Windows.Forms.DataGridViewImageColumn();
-            this.pictureBoxFilters = new System.Windows.Forms.PictureBox();
-            this.pictureBoxSearch = new System.Windows.Forms.PictureBox();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -61,19 +60,21 @@
             this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column8 = new System.Windows.Forms.DataGridViewImageColumn();
+            this.dataGridViewImageColumn1 = new System.Windows.Forms.DataGridViewImageColumn();
             this.tableLayoutPanel1.SuspendLayout();
             this.panelFilter.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFilters)).BeginInit();
             this.panelDate.SuspendLayout();
             this.panelSearch.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).BeginInit();
             this.tableLayoutPanelEmployee.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewEmployee)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFilters)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).BeginInit();
             this.SuspendLayout();
             // 
             // comboBoxSelectPayDate
             // 
             this.comboBoxSelectPayDate.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxSelectPayDate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxSelectPayDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxSelectPayDate.FormattingEnabled = true;
             this.comboBoxSelectPayDate.Location = new System.Drawing.Point(0, 1);
@@ -81,7 +82,6 @@
             this.comboBoxSelectPayDate.Name = "comboBoxSelectPayDate";
             this.comboBoxSelectPayDate.Size = new System.Drawing.Size(283, 37);
             this.comboBoxSelectPayDate.TabIndex = 9;
-            this.comboBoxSelectPayDate.Text = "SELECT PAY DATE";
             // 
             // buttonExportAll
             // 
@@ -155,6 +155,18 @@
             this.labelFiltersName.TabIndex = 10;
             this.labelFiltersName.Text = "Filters";
             // 
+            // pictureBoxFilters
+            // 
+            this.pictureBoxFilters.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pictureBoxFilters.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.filter__1__1;
+            this.pictureBoxFilters.Location = new System.Drawing.Point(97, 0);
+            this.pictureBoxFilters.Margin = new System.Windows.Forms.Padding(4);
+            this.pictureBoxFilters.Name = "pictureBoxFilters";
+            this.pictureBoxFilters.Size = new System.Drawing.Size(49, 46);
+            this.pictureBoxFilters.TabIndex = 7;
+            this.pictureBoxFilters.TabStop = false;
+            this.pictureBoxFilters.Click += new System.EventHandler(this.pictureBoxFilters_Click);
+            // 
             // panelDate
             // 
             this.panelDate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -191,6 +203,19 @@
             this.textBoxSearchEmployee.Size = new System.Drawing.Size(331, 42);
             this.textBoxSearchEmployee.TabIndex = 2;
             this.textBoxSearchEmployee.Text = "Find Employee";
+            // 
+            // pictureBoxSearch
+            // 
+            this.pictureBoxSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.pictureBoxSearch.BackgroundImage = global::HRIS_JAP_ATTPAY.Properties.Resources.search;
+            this.pictureBoxSearch.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pictureBoxSearch.Dock = System.Windows.Forms.DockStyle.Right;
+            this.pictureBoxSearch.Location = new System.Drawing.Point(331, 0);
+            this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxSearch.Name = "pictureBoxSearch";
+            this.pictureBoxSearch.Size = new System.Drawing.Size(57, 52);
+            this.pictureBoxSearch.TabIndex = 3;
+            this.pictureBoxSearch.TabStop = false;
             // 
             // labelAdminPayroll
             // 
@@ -311,49 +336,6 @@
             this.dataGridViewEmployee.Size = new System.Drawing.Size(1440, 648);
             this.dataGridViewEmployee.TabIndex = 0;
             // 
-            // dataGridViewImageColumn1
-            // 
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle8.NullValue = ((object)(resources.GetObject("dataGridViewCellStyle8.NullValue")));
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.Black;
-            this.dataGridViewImageColumn1.DefaultCellStyle = dataGridViewCellStyle8;
-            this.dataGridViewImageColumn1.FillWeight = 23F;
-            this.dataGridViewImageColumn1.HeaderText = "";
-            this.dataGridViewImageColumn1.Image = ((System.Drawing.Image)(resources.GetObject("dataGridViewImageColumn1.Image")));
-            this.dataGridViewImageColumn1.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Stretch;
-            this.dataGridViewImageColumn1.MinimumWidth = 6;
-            this.dataGridViewImageColumn1.Name = "dataGridViewImageColumn1";
-            this.dataGridViewImageColumn1.ReadOnly = true;
-            this.dataGridViewImageColumn1.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewImageColumn1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.dataGridViewImageColumn1.Width = 34;
-            // 
-            // pictureBoxFilters
-            // 
-            this.pictureBoxFilters.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pictureBoxFilters.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.filter__1__1;
-            this.pictureBoxFilters.Location = new System.Drawing.Point(97, 0);
-            this.pictureBoxFilters.Margin = new System.Windows.Forms.Padding(4);
-            this.pictureBoxFilters.Name = "pictureBoxFilters";
-            this.pictureBoxFilters.Size = new System.Drawing.Size(49, 46);
-            this.pictureBoxFilters.TabIndex = 7;
-            this.pictureBoxFilters.TabStop = false;
-            this.pictureBoxFilters.Click += new System.EventHandler(this.pictureBoxFilters_Click);
-            // 
-            // pictureBoxSearch
-            // 
-            this.pictureBoxSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.pictureBoxSearch.BackgroundImage = global::HRIS_JAP_ATTPAY.Properties.Resources.search;
-            this.pictureBoxSearch.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pictureBoxSearch.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pictureBoxSearch.Location = new System.Drawing.Point(331, 0);
-            this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(0);
-            this.pictureBoxSearch.Name = "pictureBoxSearch";
-            this.pictureBoxSearch.Size = new System.Drawing.Size(57, 52);
-            this.pictureBoxSearch.TabIndex = 3;
-            this.pictureBoxSearch.TabStop = false;
-            // 
             // Column1
             // 
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
@@ -439,6 +421,24 @@
             this.Column8.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.Column8.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             // 
+            // dataGridViewImageColumn1
+            // 
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle8.NullValue = ((object)(resources.GetObject("dataGridViewCellStyle8.NullValue")));
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.Black;
+            this.dataGridViewImageColumn1.DefaultCellStyle = dataGridViewCellStyle8;
+            this.dataGridViewImageColumn1.FillWeight = 23F;
+            this.dataGridViewImageColumn1.HeaderText = "";
+            this.dataGridViewImageColumn1.Image = ((System.Drawing.Image)(resources.GetObject("dataGridViewImageColumn1.Image")));
+            this.dataGridViewImageColumn1.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Stretch;
+            this.dataGridViewImageColumn1.MinimumWidth = 6;
+            this.dataGridViewImageColumn1.Name = "dataGridViewImageColumn1";
+            this.dataGridViewImageColumn1.ReadOnly = true;
+            this.dataGridViewImageColumn1.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewImageColumn1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.dataGridViewImageColumn1.Width = 34;
+            // 
             // AdminPayroll
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -453,13 +453,13 @@
             this.tableLayoutPanel1.PerformLayout();
             this.panelFilter.ResumeLayout(false);
             this.panelFilter.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFilters)).EndInit();
             this.panelDate.ResumeLayout(false);
             this.panelSearch.ResumeLayout(false);
             this.panelSearch.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).EndInit();
             this.tableLayoutPanelEmployee.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewEmployee)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFilters)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).EndInit();
             this.ResumeLayout(false);
 
         }
