@@ -30,17 +30,23 @@
         {
             this.labelNotification = new System.Windows.Forms.Label();
             this.XpictureBox = new System.Windows.Forms.PictureBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.flowSummary = new System.Windows.Forms.FlowLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
+            this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // labelNotification
             // 
             this.labelNotification.AutoSize = true;
+            this.labelNotification.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelNotification.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(34)))), ((int)(((byte)(31)))));
-            this.labelNotification.Location = new System.Drawing.Point(58, 62);
+            this.labelNotification.Location = new System.Drawing.Point(10, 21);
+            this.labelNotification.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.labelNotification.Name = "labelNotification";
-            this.labelNotification.Size = new System.Drawing.Size(80, 16);
+            this.labelNotification.Size = new System.Drawing.Size(145, 29);
             this.labelNotification.TabIndex = 0;
             this.labelNotification.Text = "Notifications";
             // 
@@ -48,38 +54,60 @@
             // 
             this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
-            this.XpictureBox.Location = new System.Drawing.Point(654, 28);
+            this.XpictureBox.Location = new System.Drawing.Point(497, -1);
+            this.XpictureBox.Margin = new System.Windows.Forms.Padding(2);
             this.XpictureBox.Name = "XpictureBox";
-            this.XpictureBox.Size = new System.Drawing.Size(50, 50);
+            this.XpictureBox.Size = new System.Drawing.Size(38, 41);
             this.XpictureBox.TabIndex = 1;
             this.XpictureBox.TabStop = false;
             this.XpictureBox.Click += new System.EventHandler(this.XpictureBox_Click);
             // 
-            // label1
+            // panel1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(290, 238);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(119, 16);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "temporary HR Tag";
+            this.panel1.BackColor = System.Drawing.Color.White;
+            this.panel1.Controls.Add(this.labelNotification);
+            this.panel1.Controls.Add(this.XpictureBox);
+            this.panel1.Location = new System.Drawing.Point(0, -2);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(541, 73);
+            this.panel1.TabIndex = 2;
+            // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.Color.White;
+            this.panel2.Controls.Add(this.flowSummary);
+            this.panel2.Location = new System.Drawing.Point(0, 73);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(541, 342);
+            this.panel2.TabIndex = 3;
+            // 
+            // flowSummary
+            // 
+            this.flowSummary.AutoScroll = true;
+            this.flowSummary.Location = new System.Drawing.Point(0, 0);
+            this.flowSummary.Name = "flowSummary";
+            this.flowSummary.Size = new System.Drawing.Size(541, 342);
+            this.flowSummary.TabIndex = 0;
             // 
             // HRNotification
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(720, 512);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.XpictureBox);
-            this.Controls.Add(this.labelNotification);
+            this.BackColor = System.Drawing.Color.Black;
+            this.ClientSize = new System.Drawing.Size(540, 416);
+            this.Controls.Add(this.panel2);
+            this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "HRNotification";
             this.ShowInTaskbar = false;
             this.Text = "HRNotification";
             this.Load += new System.EventHandler(this.HRNotification_Load);
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -87,6 +115,8 @@
 
         private System.Windows.Forms.Label labelNotification;
         private System.Windows.Forms.PictureBox XpictureBox;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.FlowLayoutPanel flowSummary;
     }
 }

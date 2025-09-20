@@ -101,7 +101,9 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
+    <Reference Include="System">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.dll</HintPath>
+    </Reference>
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
@@ -233,6 +235,12 @@
     <Compile Include="AdminPayroll.Designer.cs">
       <DependentUpon>AdminPayroll.cs</DependentUpon>
     </Compile>
+    <Compile Include="AttendanceNotificationItems.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AttendanceNotificationItems.Designer.cs">
+      <DependentUpon>AttendanceNotificationItems.cs</DependentUpon>
+    </Compile>
     <Compile Include="AttributesClassAlt.cs" />
     <Compile Include="Calendar.cs">
       <SubType>UserControl</SubType>
@@ -323,6 +331,18 @@
     </Compile>
     <Compile Include="FilterHREmployee.Designer.cs">
       <DependentUpon>FilterHREmployee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LeaveList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LeaveList.Designer.cs">
+      <DependentUpon>LeaveList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LeaveNotificationItems.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LeaveNotificationItems.Designer.cs">
+      <DependentUpon>LeaveNotificationItems.cs</DependentUpon>
     </Compile>
     <Compile Include="ManageLeave.cs">
       <SubType>Form</SubType>
@@ -458,6 +478,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SummaryNotificationItem.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SummaryNotificationItem.Designer.cs">
+      <DependentUpon>SummaryNotificationItem.cs</DependentUpon>
+    </Compile>
     <Compile Include="UpdateConfirmationEditAttendance.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -496,6 +522,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="AdminPayroll.resx">
       <DependentUpon>AdminPayroll.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AttendanceNotificationItems.resx">
+      <DependentUpon>AttendanceNotificationItems.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Calendar.resx">
       <DependentUpon>Calendar.cs</DependentUpon>
@@ -541,6 +570,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FilterHREmployee.resx">
       <DependentUpon>FilterHREmployee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LeaveList.resx">
+      <DependentUpon>LeaveList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LeaveNotificationItems.resx">
+      <DependentUpon>LeaveNotificationItems.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ManageLeave.resx">
       <DependentUpon>ManageLeave.cs</DependentUpon>
@@ -610,6 +645,9 @@
     <EmbeddedResource Include="FilterAdminAttendance.resx">
       <DependentUpon>FilterAdminAttendance.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="SummaryNotificationItem.resx">
+      <DependentUpon>SummaryNotificationItem.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UpdateConfirmationEditAttendance.resx">
       <DependentUpon>UpdateConfirmationEditAttendance.cs</DependentUpon>
     </EmbeddedResource>
@@ -674,7 +712,11 @@
     <None Include="Resources\SystemLogo.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\icon_check.png" />
+    <None Include="Resources\icon_cross.png" />
+    <None Include="Resources\icon_pending.png" />
     <Content Include="Resources\MenuLogoAlt.png" />
+    <None Include="Resources\User1.png" />
     <None Include="Resources\TrashBin.png" />
     <None Include="Resources\VerticalThreeDots.png" />
     <None Include="Resources\ExpandRight.png" />
