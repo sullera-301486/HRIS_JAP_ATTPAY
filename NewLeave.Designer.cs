@@ -65,7 +65,7 @@
             this.buttonCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonCancel.ForeColor = System.Drawing.Color.White;
-            this.buttonCancel.Location = new System.Drawing.Point(545, 293);
+            this.buttonCancel.Location = new System.Drawing.Point(533, 279);
             this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(149, 41);
@@ -81,7 +81,7 @@
             this.buttonAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonAdd.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonAdd.ForeColor = System.Drawing.Color.White;
-            this.buttonAdd.Location = new System.Drawing.Point(369, 293);
+            this.buttonAdd.Location = new System.Drawing.Point(362, 279);
             this.buttonAdd.Margin = new System.Windows.Forms.Padding(4);
             this.buttonAdd.Name = "buttonAdd";
             this.buttonAdd.Size = new System.Drawing.Size(149, 41);
@@ -105,7 +105,7 @@
             // 
             this.labelPosition.AutoSize = true;
             this.labelPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelPosition.Location = new System.Drawing.Point(40, 134);
+            this.labelPosition.Location = new System.Drawing.Point(40, 122);
             this.labelPosition.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelPosition.Name = "labelPosition";
             this.labelPosition.Size = new System.Drawing.Size(89, 25);
@@ -116,7 +116,7 @@
             // 
             this.labelDepartment.AutoSize = true;
             this.labelDepartment.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelDepartment.Location = new System.Drawing.Point(40, 92);
+            this.labelDepartment.Location = new System.Drawing.Point(40, 80);
             this.labelDepartment.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelDepartment.Name = "labelDepartment";
             this.labelDepartment.Size = new System.Drawing.Size(123, 25);
@@ -127,7 +127,7 @@
             // 
             this.labelName.AutoSize = true;
             this.labelName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelName.Location = new System.Drawing.Point(40, 30);
+            this.labelName.Location = new System.Drawing.Point(40, 36);
             this.labelName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelName.Name = "labelName";
             this.labelName.Size = new System.Drawing.Size(68, 25);
@@ -182,7 +182,7 @@
             this.panel2.Location = new System.Drawing.Point(-3, 105);
             this.panel2.Margin = new System.Windows.Forms.Padding(4);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(724, 348);
+            this.panel2.Size = new System.Drawing.Size(724, 355);
             this.panel2.TabIndex = 4;
             // 
             // labelDash
@@ -240,7 +240,7 @@
             // 
             this.labelVacationLeaveInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.labelVacationLeaveInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelVacationLeaveInput.Location = new System.Drawing.Point(588, 132);
+            this.labelVacationLeaveInput.Location = new System.Drawing.Point(581, 119);
             this.labelVacationLeaveInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelVacationLeaveInput.Name = "labelVacationLeaveInput";
             this.labelVacationLeaveInput.Size = new System.Drawing.Size(129, 31);
@@ -252,7 +252,7 @@
             // 
             this.labelSickLeaveInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.labelSickLeaveInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelSickLeaveInput.Location = new System.Drawing.Point(588, 90);
+            this.labelSickLeaveInput.Location = new System.Drawing.Point(581, 77);
             this.labelSickLeaveInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelSickLeaveInput.Name = "labelSickLeaveInput";
             this.labelSickLeaveInput.Size = new System.Drawing.Size(129, 31);
@@ -264,7 +264,7 @@
             // 
             this.labelVacationLeave.AutoSize = true;
             this.labelVacationLeave.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelVacationLeave.Location = new System.Drawing.Point(353, 134);
+            this.labelVacationLeave.Location = new System.Drawing.Point(357, 122);
             this.labelVacationLeave.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelVacationLeave.Name = "labelVacationLeave";
             this.labelVacationLeave.Size = new System.Drawing.Size(204, 25);
@@ -275,7 +275,7 @@
             // 
             this.labelSickLeave.AutoSize = true;
             this.labelSickLeave.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelSickLeave.Location = new System.Drawing.Point(353, 92);
+            this.labelSickLeave.Location = new System.Drawing.Point(357, 80);
             this.labelSickLeave.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelSickLeave.Name = "labelSickLeave";
             this.labelSickLeave.Size = new System.Drawing.Size(161, 25);
@@ -286,7 +286,7 @@
             // 
             this.labelPositionInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.labelPositionInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelPositionInput.Location = new System.Drawing.Point(216, 132);
+            this.labelPositionInput.Location = new System.Drawing.Point(203, 119);
             this.labelPositionInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelPositionInput.Name = "labelPositionInput";
             this.labelPositionInput.Size = new System.Drawing.Size(129, 31);
@@ -298,7 +298,7 @@
             // 
             this.labelDepartmentInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.labelDepartmentInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelDepartmentInput.Location = new System.Drawing.Point(216, 90);
+            this.labelDepartmentInput.Location = new System.Drawing.Point(203, 77);
             this.labelDepartmentInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelDepartmentInput.Name = "labelDepartmentInput";
             this.labelDepartmentInput.Size = new System.Drawing.Size(129, 31);
@@ -311,10 +311,10 @@
             this.panelSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.panelSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
             this.panelSearch.Controls.Add(this.textBoxNameInput);
-            this.panelSearch.Location = new System.Drawing.Point(191, 15);
+            this.panelSearch.Location = new System.Drawing.Point(191, 30);
             this.panelSearch.Margin = new System.Windows.Forms.Padding(4);
             this.panelSearch.Name = "panelSearch";
-            this.panelSearch.Size = new System.Drawing.Size(492, 50);
+            this.panelSearch.Size = new System.Drawing.Size(477, 35);
             this.panelSearch.TabIndex = 14;
             // 
             // textBoxNameInput
@@ -323,10 +323,10 @@
             this.textBoxNameInput.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxNameInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxNameInput.ForeColor = System.Drawing.Color.White;
-            this.textBoxNameInput.Location = new System.Drawing.Point(4, 10);
+            this.textBoxNameInput.Location = new System.Drawing.Point(4, 2);
             this.textBoxNameInput.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxNameInput.Name = "textBoxNameInput";
-            this.textBoxNameInput.Size = new System.Drawing.Size(484, 29);
+            this.textBoxNameInput.Size = new System.Drawing.Size(469, 29);
             this.textBoxNameInput.TabIndex = 2;
             // 
             // labelPeriod

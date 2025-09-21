@@ -66,7 +66,7 @@
             // 
             this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
-            this.XpictureBox.Location = new System.Drawing.Point(534, 2);
+            this.XpictureBox.Location = new System.Drawing.Point(530, 2);
             this.XpictureBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.XpictureBox.Name = "XpictureBox";
             this.XpictureBox.Size = new System.Drawing.Size(51, 50);
@@ -136,7 +136,7 @@
             this.buttonCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonCancel.ForeColor = System.Drawing.Color.White;
-            this.buttonCancel.Location = new System.Drawing.Point(413, 258);
+            this.buttonCancel.Location = new System.Drawing.Point(452, 264);
             this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(117, 37);
@@ -152,7 +152,7 @@
             this.buttonSendRequest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonSendRequest.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonSendRequest.ForeColor = System.Drawing.Color.White;
-            this.buttonSendRequest.Location = new System.Drawing.Point(221, 258);
+            this.buttonSendRequest.Location = new System.Drawing.Point(260, 264);
             this.buttonSendRequest.Margin = new System.Windows.Forms.Padding(4);
             this.buttonSendRequest.Name = "buttonSendRequest";
             this.buttonSendRequest.Size = new System.Drawing.Size(180, 37);

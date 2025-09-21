@@ -72,7 +72,7 @@
             this.labelSearchFilters.AutoSize = true;
             this.labelSearchFilters.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelSearchFilters.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(34)))), ((int)(((byte)(31)))));
-            this.labelSearchFilters.Location = new System.Drawing.Point(3, 17);
+            this.labelSearchFilters.Location = new System.Drawing.Point(9, 15);
             this.labelSearchFilters.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelSearchFilters.Name = "labelSearchFilters";
             this.labelSearchFilters.Size = new System.Drawing.Size(198, 36);
@@ -83,7 +83,7 @@
             // 
             this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
-            this.XpictureBox.Location = new System.Drawing.Point(437, 0);
+            this.XpictureBox.Location = new System.Drawing.Point(427, 6);
             this.XpictureBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.XpictureBox.Name = "XpictureBox";
             this.XpictureBox.Size = new System.Drawing.Size(51, 50);
@@ -175,7 +175,7 @@
             this.textBoxStartDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxStartDate.ForeColor = System.Drawing.Color.White;
             this.textBoxStartDate.Location = new System.Drawing.Point(39, 112);
-            this.textBoxStartDate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxStartDate.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxStartDate.Name = "textBoxStartDate";
             this.textBoxStartDate.Size = new System.Drawing.Size(183, 26);
             this.textBoxStartDate.TabIndex = 61;
@@ -188,7 +188,7 @@
             this.textBoxEndDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxEndDate.ForeColor = System.Drawing.Color.White;
             this.textBoxEndDate.Location = new System.Drawing.Point(259, 112);
-            this.textBoxEndDate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxEndDate.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxEndDate.Name = "textBoxEndDate";
             this.textBoxEndDate.Size = new System.Drawing.Size(183, 26);
             this.textBoxEndDate.TabIndex = 62;
@@ -201,7 +201,7 @@
             this.textBoxName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxName.ForeColor = System.Drawing.Color.White;
             this.textBoxName.Location = new System.Drawing.Point(39, 185);
-            this.textBoxName.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxName.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxName.Name = "textBoxName";
             this.textBoxName.Size = new System.Drawing.Size(183, 26);
             this.textBoxName.TabIndex = 63;
@@ -214,7 +214,7 @@
             this.textBoxID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxID.ForeColor = System.Drawing.Color.White;
             this.textBoxID.Location = new System.Drawing.Point(259, 185);
-            this.textBoxID.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxID.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxID.Name = "textBoxID";
             this.textBoxID.Size = new System.Drawing.Size(183, 26);
             this.textBoxID.TabIndex = 64;
@@ -251,7 +251,7 @@
             this.comboBoxDepartment.ForeColor = System.Drawing.Color.White;
             this.comboBoxDepartment.FormattingEnabled = true;
             this.comboBoxDepartment.Location = new System.Drawing.Point(39, 257);
-            this.comboBoxDepartment.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxDepartment.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxDepartment.Name = "comboBoxDepartment";
             this.comboBoxDepartment.Size = new System.Drawing.Size(183, 28);
             this.comboBoxDepartment.TabIndex = 67;
@@ -266,7 +266,7 @@
             this.comboBoxPosition.ForeColor = System.Drawing.Color.White;
             this.comboBoxPosition.FormattingEnabled = true;
             this.comboBoxPosition.Location = new System.Drawing.Point(259, 257);
-            this.comboBoxPosition.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxPosition.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxPosition.Name = "comboBoxPosition";
             this.comboBoxPosition.Size = new System.Drawing.Size(183, 28);
             this.comboBoxPosition.TabIndex = 68;
@@ -280,10 +280,10 @@
             this.comboBoxSort.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxSort.ForeColor = System.Drawing.Color.White;
             this.comboBoxSort.FormattingEnabled = true;
-            this.comboBoxSort.Location = new System.Drawing.Point(356, 75);
-            this.comboBoxSort.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxSort.Location = new System.Drawing.Point(354, 75);
+            this.comboBoxSort.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxSort.Name = "comboBoxSort";
-            this.comboBoxSort.Size = new System.Drawing.Size(85, 28);
+            this.comboBoxSort.Size = new System.Drawing.Size(87, 28);
             this.comboBoxSort.TabIndex = 71;
             this.comboBoxSort.Text = "A-Z";
             // 
@@ -301,8 +301,8 @@
             // pictureBoxSortLogo
             // 
             this.pictureBoxSortLogo.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.Filter;
-            this.pictureBoxSortLogo.Location = new System.Drawing.Point(316, 73);
-            this.pictureBoxSortLogo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pictureBoxSortLogo.Location = new System.Drawing.Point(314, 74);
+            this.pictureBoxSortLogo.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBoxSortLogo.Name = "pictureBoxSortLogo";
             this.pictureBoxSortLogo.Size = new System.Drawing.Size(32, 33);
             this.pictureBoxSortLogo.TabIndex = 69;
@@ -315,7 +315,7 @@
             this.textBoxSalaryMinimum.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxSalaryMinimum.ForeColor = System.Drawing.Color.White;
             this.textBoxSalaryMinimum.Location = new System.Drawing.Point(39, 332);
-            this.textBoxSalaryMinimum.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxSalaryMinimum.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxSalaryMinimum.Name = "textBoxSalaryMinimum";
             this.textBoxSalaryMinimum.Size = new System.Drawing.Size(183, 26);
             this.textBoxSalaryMinimum.TabIndex = 72;
@@ -328,7 +328,7 @@
             this.textBoxSalaryMaximum.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxSalaryMaximum.ForeColor = System.Drawing.Color.White;
             this.textBoxSalaryMaximum.Location = new System.Drawing.Point(259, 332);
-            this.textBoxSalaryMaximum.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxSalaryMaximum.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxSalaryMaximum.Name = "textBoxSalaryMaximum";
             this.textBoxSalaryMaximum.Size = new System.Drawing.Size(183, 26);
             this.textBoxSalaryMaximum.TabIndex = 73;
@@ -341,7 +341,7 @@
             this.textBoxGrossPayMinimum.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxGrossPayMinimum.ForeColor = System.Drawing.Color.White;
             this.textBoxGrossPayMinimum.Location = new System.Drawing.Point(39, 405);
-            this.textBoxGrossPayMinimum.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxGrossPayMinimum.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxGrossPayMinimum.Name = "textBoxGrossPayMinimum";
             this.textBoxGrossPayMinimum.Size = new System.Drawing.Size(183, 26);
             this.textBoxGrossPayMinimum.TabIndex = 74;
@@ -354,7 +354,7 @@
             this.textBoxNetPayMinimum.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxNetPayMinimum.ForeColor = System.Drawing.Color.White;
             this.textBoxNetPayMinimum.Location = new System.Drawing.Point(39, 478);
-            this.textBoxNetPayMinimum.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxNetPayMinimum.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxNetPayMinimum.Name = "textBoxNetPayMinimum";
             this.textBoxNetPayMinimum.Size = new System.Drawing.Size(183, 26);
             this.textBoxNetPayMinimum.TabIndex = 75;
@@ -367,7 +367,7 @@
             this.textBoxGrossPayMaximum.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxGrossPayMaximum.ForeColor = System.Drawing.Color.White;
             this.textBoxGrossPayMaximum.Location = new System.Drawing.Point(259, 405);
-            this.textBoxGrossPayMaximum.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxGrossPayMaximum.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxGrossPayMaximum.Name = "textBoxGrossPayMaximum";
             this.textBoxGrossPayMaximum.Size = new System.Drawing.Size(183, 26);
             this.textBoxGrossPayMaximum.TabIndex = 76;
@@ -380,7 +380,7 @@
             this.textBoxNetPayMaximum.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxNetPayMaximum.ForeColor = System.Drawing.Color.White;
             this.textBoxNetPayMaximum.Location = new System.Drawing.Point(259, 478);
-            this.textBoxNetPayMaximum.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxNetPayMaximum.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxNetPayMaximum.Name = "textBoxNetPayMaximum";
             this.textBoxNetPayMaximum.Size = new System.Drawing.Size(183, 26);
             this.textBoxNetPayMaximum.TabIndex = 77;
@@ -406,7 +406,7 @@
             this.comboBoxUnusedLeave.ForeColor = System.Drawing.Color.White;
             this.comboBoxUnusedLeave.FormattingEnabled = true;
             this.comboBoxUnusedLeave.Location = new System.Drawing.Point(39, 548);
-            this.comboBoxUnusedLeave.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxUnusedLeave.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxUnusedLeave.Name = "comboBoxUnusedLeave";
             this.comboBoxUnusedLeave.Size = new System.Drawing.Size(183, 28);
             this.comboBoxUnusedLeave.TabIndex = 81;
@@ -421,7 +421,7 @@
             this.comboBoxOvertimeHours.ForeColor = System.Drawing.Color.White;
             this.comboBoxOvertimeHours.FormattingEnabled = true;
             this.comboBoxOvertimeHours.Location = new System.Drawing.Point(259, 548);
-            this.comboBoxOvertimeHours.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxOvertimeHours.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxOvertimeHours.Name = "comboBoxOvertimeHours";
             this.comboBoxOvertimeHours.Size = new System.Drawing.Size(183, 28);
             this.comboBoxOvertimeHours.TabIndex = 82;
@@ -478,8 +478,8 @@
             this.buttonReset.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonReset.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonReset.ForeColor = System.Drawing.Color.White;
-            this.buttonReset.Location = new System.Drawing.Point(273, 617);
-            this.buttonReset.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonReset.Location = new System.Drawing.Point(258, 617);
+            this.buttonReset.Margin = new System.Windows.Forms.Padding(4);
             this.buttonReset.Name = "buttonReset";
             this.buttonReset.Size = new System.Drawing.Size(176, 41);
             this.buttonReset.TabIndex = 91;
@@ -494,7 +494,7 @@
             this.buttonApply.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonApply.ForeColor = System.Drawing.Color.White;
             this.buttonApply.Location = new System.Drawing.Point(48, 617);
-            this.buttonApply.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonApply.Margin = new System.Windows.Forms.Padding(4);
             this.buttonApply.Name = "buttonApply";
             this.buttonApply.Size = new System.Drawing.Size(176, 41);
             this.buttonApply.TabIndex = 90;
@@ -506,7 +506,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(493, 668);
+            this.ClientSize = new System.Drawing.Size(484, 668);
             this.Controls.Add(this.buttonReset);
             this.Controls.Add(this.buttonApply);
             this.Controls.Add(this.labelDashD);
@@ -543,7 +543,7 @@
             this.Controls.Add(this.labelSearchFilters);
             this.Controls.Add(this.XpictureBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "FilterAdminPayroll";
             this.ShowInTaskbar = false;
             this.Text = "FilterAdminPayroll";

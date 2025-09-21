@@ -15,6 +15,22 @@ namespace HRIS_JAP_ATTPAY
         public ManageLeave()
         {
             InitializeComponent();
+            SetFont();
+        }
+        private void SetFont()
+        {
+            try
+            {
+                labelLeaveManagement.Font = AttributesClass.GetFont("Roboto-Regular", 24f);
+                labelAddLeave.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                label1.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
+                label2.Font = AttributesClass.GetFont("Roboto-Regular", 18f);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Font load failed: " + ex.Message);
+            }
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)

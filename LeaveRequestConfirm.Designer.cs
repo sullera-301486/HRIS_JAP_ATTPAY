@@ -44,7 +44,7 @@
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonCancel.ForeColor = System.Drawing.Color.White;
             this.buttonCancel.Location = new System.Drawing.Point(219, 169);
-            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(135, 41);
             this.buttonCancel.TabIndex = 17;
@@ -60,7 +60,7 @@
             this.buttonConfirm.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonConfirm.ForeColor = System.Drawing.Color.White;
             this.buttonConfirm.Location = new System.Drawing.Point(60, 169);
-            this.buttonConfirm.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonConfirm.Margin = new System.Windows.Forms.Padding(4);
             this.buttonConfirm.Name = "buttonConfirm";
             this.buttonConfirm.Size = new System.Drawing.Size(135, 41);
             this.buttonConfirm.TabIndex = 16;
@@ -72,7 +72,7 @@
             // 
             this.labelMessage.AutoSize = true;
             this.labelMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelMessage.Location = new System.Drawing.Point(91, 91);
+            this.labelMessage.Location = new System.Drawing.Point(99, 93);
             this.labelMessage.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelMessage.Name = "labelMessage";
             this.labelMessage.Size = new System.Drawing.Size(218, 48);
@@ -85,7 +85,7 @@
             this.labelRequestConfirm.AutoSize = true;
             this.labelRequestConfirm.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelRequestConfirm.ForeColor = System.Drawing.Color.Red;
-            this.labelRequestConfirm.Location = new System.Drawing.Point(67, 42);
+            this.labelRequestConfirm.Location = new System.Drawing.Point(75, 44);
             this.labelRequestConfirm.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelRequestConfirm.Name = "labelRequestConfirm";
             this.labelRequestConfirm.Size = new System.Drawing.Size(277, 31);
@@ -116,7 +116,7 @@
             this.Controls.Add(this.labelMessage);
             this.Controls.Add(this.labelRequestConfirm);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "LeaveRequestConfirm";
             this.ShowInTaskbar = false;
             this.Text = "LeaveRequestConfirm";

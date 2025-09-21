@@ -36,6 +36,8 @@ namespace HRIS_JAP_ATTPAY
                 comboBoxSort.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxName.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxID.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelID.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelDate.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelDepartment.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 12f);

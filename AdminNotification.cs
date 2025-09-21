@@ -21,12 +21,13 @@ namespace HRIS_JAP_ATTPAY
 
         private void AdminNotification_Load(object sender, EventArgs e)
         {
+            
             // Attendance Notification 1
             var attendanceNotif1 = new AttendanceNotificationItems();
             attendanceNotif1.SetData(
                 "Manual Edit Request",
-                "Submitted by John Smith",
-                "Employee: Mark Reyes",
+                "John Smith",
+                "Mark Reyes",
                 DateTime.Now,
                 "8:05 AM",
                 "5:10 PM",
@@ -42,8 +43,8 @@ namespace HRIS_JAP_ATTPAY
             var leaveNotif1 = new LeaveNotificationItems();
             leaveNotif1.SetData(
                 "Leave Request - Vacation",
-                "Submitted by Marcus Verzo",
-                "Employee: Ej Sullera",
+                "Marcus Verzo",
+                "Ej Sullera",
                 "Vacation Leave",
                 "May 5 - May 8, 2025",
                 "Ej is requesting a vacation leave to attend a family event.",
@@ -56,8 +57,8 @@ namespace HRIS_JAP_ATTPAY
             var attendanceNotif2 = new AttendanceNotificationItems();
             attendanceNotif2.SetData(
                 "Manual Attendance Entry Request",
-                "Submitted by Maria Lopez",
-                "Employee: Carlo Mendoza",
+                "Maria Lopez",
+                "Carlo Mendoza",
                 DateTime.Now.AddDays(-1),
                 "7:50 AM",
                 "5:20 PM",
@@ -73,8 +74,8 @@ namespace HRIS_JAP_ATTPAY
             var leaveNotif2 = new LeaveNotificationItems();
             leaveNotif2.SetData(
                 "Leave Request - Sick Leave",
-                "Submitted by Anna Cruz",
-                "Employee: Paolo Santos",
+                "Anna Cruz",
+                "Paolo Santos",
                 "Sick Leave",
                 "June 10 - June 12, 2025",
                 "Paolo is requesting sick leave due to flu and has provided a medical certificate.",
@@ -88,8 +89,8 @@ namespace HRIS_JAP_ATTPAY
             var attendanceNotif3 = new AttendanceNotificationItems();
             attendanceNotif3.SetData(
                 "Overtime Approval Request",
-                "Submitted by Charles Dela Cruz",
-                "Employee: Lea Villanueva",
+                "Charles Dela Cruz",
+                "Lea Villanueva",
                 DateTime.Now.AddDays(-2),
                 "9:00 AM",
                 "6:00 PM",
@@ -105,8 +106,8 @@ namespace HRIS_JAP_ATTPAY
             var leaveNotif3 = new LeaveNotificationItems();
             leaveNotif3.SetData(
                 "Leave Request - Emergency",
-                "Submitted by Mark Javier",
-                "Employee: Sofia Cruz",
+                "Mark Javier",
+                "Sofia Cruz",
                 "Emergency Leave",
                 "June 15 - June 16, 2025",
                 "Sofia has a family emergency and is requesting 2 days of leave.",
@@ -120,8 +121,8 @@ namespace HRIS_JAP_ATTPAY
             var attendanceNotif4 = new AttendanceNotificationItems();
             attendanceNotif4.SetData(
                 "Attendance Correction Request",
-                "Submitted by Kevin Ramos",
-                "Employee: Diana Lim",
+                "Kevin Ramos",
+                "Diana Lim",
                 DateTime.Now.AddDays(-3),
                 "8:10 AM",
                 "5:05 PM",

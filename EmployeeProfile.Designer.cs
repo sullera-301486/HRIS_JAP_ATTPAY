@@ -110,7 +110,7 @@
             // 
             this.labelPassword.AutoSize = true;
             this.labelPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelPassword.Location = new System.Drawing.Point(87, 431);
+            this.labelPassword.Location = new System.Drawing.Point(93, 431);
             this.labelPassword.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelPassword.Name = "labelPassword";
             this.labelPassword.Size = new System.Drawing.Size(100, 24);
@@ -163,7 +163,8 @@
             this.buttonArchive.Size = new System.Drawing.Size(180, 41);
             this.buttonArchive.TabIndex = 58;
             this.buttonArchive.Text = "Archive";
-            this.buttonArchive.UseVisualStyleBackColor = false;            // 
+            this.buttonArchive.UseVisualStyleBackColor = false;
+            // 
             // buttonEdit
             // 
             this.buttonEdit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(81)))), ((int)(((byte)(148)))));
