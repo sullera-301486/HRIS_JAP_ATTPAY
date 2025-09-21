@@ -75,7 +75,12 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private async void buttonLogin_Click(object sender, EventArgs e)
+        private void buttonLogin_Click(object sender, EventArgs e)
+        {
+            doLogin();
+        }
+
+        private async void doLogin()
         {
             string enteredID = textBoxID.Text.Trim();
             string enteredPassword = textBoxPassword.Text.Trim();
@@ -125,6 +130,24 @@ namespace HRIS_JAP_ATTPAY
             public string salt { get; set; }
             public bool isAdmin { get; set; }
             public string created_at { get; set; }
+        }
+
+        private void textBoxID_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                doLogin();
+                e.SuppressKeyPress = true; 
+            }
+        }
+
+        private void textBoxPassword_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                doLogin();
+                e.SuppressKeyPress = true;
+            }
         }
     }
 }

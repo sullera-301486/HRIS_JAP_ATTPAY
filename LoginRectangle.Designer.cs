@@ -81,6 +81,7 @@
             this.textBoxID.Name = "textBoxID";
             this.textBoxID.Size = new System.Drawing.Size(485, 45);
             this.textBoxID.TabIndex = 4;
+            this.textBoxID.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxID_KeyDown);
             // 
             // labelPassword
             // 
@@ -104,6 +105,7 @@
             this.textBoxPassword.PasswordChar = '*';
             this.textBoxPassword.Size = new System.Drawing.Size(485, 45);
             this.textBoxPassword.TabIndex = 6;
+            this.textBoxPassword.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxPassword_KeyDown);
             // 
             // labelFailed
             // 
