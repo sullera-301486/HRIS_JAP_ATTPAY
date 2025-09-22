@@ -62,7 +62,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // SHA-256 hash
+        // 🔐 SHA-256 hash
         private string ComputeHash(string input)
         {
             using (SHA256 sha = SHA256.Create())
@@ -87,6 +87,7 @@ namespace HRIS_JAP_ATTPAY
 
             try
             {
+                // 🔹 Pull user from Firebase
                 var users = await firebase
                     .Child("Users")
                     .OnceAsync<UserFirebase>();
@@ -105,6 +106,7 @@ namespace HRIS_JAP_ATTPAY
                 {
                     labelFailed.Visible = false;
 
+                    // ✅ Move to correct form based on role
                     if (user.isAdmin)
                         MoveToAdmin();
                     else
@@ -137,7 +139,7 @@ namespace HRIS_JAP_ATTPAY
             if (e.KeyCode == Keys.Enter)
             {
                 doLogin();
-                e.SuppressKeyPress = true; 
+                e.SuppressKeyPress = true;
             }
         }
 
