@@ -12,10 +12,12 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class HRForm : Form
     {
+        private string currentUserId;
         private AttributesClassAlt panelLoaderView;
         private AttributesClassAlt panelLoaderMenu;
-        public HRForm()
+        public HRForm(string userId)
         {
+            currentUserId = userId;
             InitializeComponent();
 
             AttributesClass.SetMinSize(this, 1440, 1024);
@@ -26,8 +28,8 @@ namespace HRIS_JAP_ATTPAY
         }
         private void HRPage_Load(object sender, EventArgs e)
         {
-            panelLoaderMenu.LoadUserControl(new HRMenu(HRViewPanel));
-            panelLoaderView.LoadUserControl(new HROverview());
+            panelLoaderMenu.LoadUserControl(new HRMenu(HRViewPanel, currentUserId));
+            panelLoaderView.LoadUserControl(new HROverview(currentUserId));
         }
 
     }

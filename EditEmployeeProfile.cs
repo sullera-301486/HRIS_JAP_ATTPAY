@@ -395,7 +395,7 @@ namespace HRIS_JAP_ATTPAY
         public string image_url { get; set; } // Added image_url field
         public string created_at { get; set; }
     }
-    
+
     public class EmploymentInfoModel
     {
         public string employee_id { get; set; }

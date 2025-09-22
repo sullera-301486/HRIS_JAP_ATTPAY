@@ -1,13 +1,23 @@
-﻿using System;
+﻿using Firebase.Database;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+
 
 namespace HRIS_JAP_ATTPAY
 {
     public partial class HROverview : UserControl
     {
-        public HROverview()
+        private FirebaseClient firebase = new FirebaseClient(
+        "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        private string currentUserId;
+        public HROverview(string userId)
         {
+            currentUserId = userId;
             InitializeComponent();
             setFont();
             setActivityLogsDataGridViewAttributes();
@@ -16,7 +26,9 @@ namespace HRIS_JAP_ATTPAY
             setAlertLateDataGridViewAttributes();
             setPanelAttributes();
             setCalendar();
-
+            LoadAttendanceSummary(DateTime.Today);
+            PopulateDateComboBox();
+            LoadTodoList();
         }
         private void setFont()
         {
@@ -41,6 +53,238 @@ namespace HRIS_JAP_ATTPAY
             labelAbsentDescA.Font = AttributesClass.GetFont("Roboto-Light", 10f);
             labelAbsentDescB.Font = AttributesClass.GetFont("Roboto-Light", 10f);
         }
+        private async void PopulateDateComboBox()
+        {
+            try
+            {
+                comboBoxSelectDate.Items.Clear();
+
+                // Add special options
+                comboBoxSelectDate.Items.Add("Today");
+                comboBoxSelectDate.Items.Add("Yesterday");
+
+                // Get ALL unique dates from Firebase attendance data
+                var allDates = await GetAllAttendanceDatesAsync();
+
+                if (allDates.Count > 0)
+                {
+                    // Add all unique dates to the combo box
+                    foreach (var date in allDates)
+                    {
+                        comboBoxSelectDate.Items.Add(date);
+                    }
+                }
+                else
+                {
+                    // Fallback: Add dates for the last 30 days if no data in Firebase
+                    for (int i = 2; i < 30; i++)
+                    {
+                        comboBoxSelectDate.Items.Add(DateTime.Today.AddDays(-i).ToString("yyyy-MM-dd"));
+                    }
+                }
+
+                // Set default selection
+                comboBoxSelectDate.SelectedItem = "Today";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error populating date combo box: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private async Task<List<string>> GetAllAttendanceDatesAsync()
+        {
+            var uniqueDates = new HashSet<string>();
+
+            try
+            {
+                // Load ALL attendance data from Firebase
+                var allAttendanceData = await firebase.Child("Attendance").OnceSingleAsync<JArray>();
+
+                if (allAttendanceData != null)
+                {
+                    foreach (var attendanceItem in allAttendanceData)
+                    {
+                        if (attendanceItem != null && attendanceItem.Type != JTokenType.Null)
+                        {
+                            // Extract date from both possible fields
+                            string attendanceDateStr = attendanceItem["attendance_date"]?.ToString() ?? "";
+                            string timeInStr = attendanceItem["time_in"]?.ToString() ?? "";
+
+                            DateTime? recordDate = null;
+
+                            // Try to get date from attendance_date field first
+                            if (!string.IsNullOrEmpty(attendanceDateStr) &&
+                                DateTime.TryParse(attendanceDateStr, out DateTime parsedDate))
+                            {
+                                recordDate = parsedDate;
+                            }
+                            // If not available, try to extract from time_in field
+                            else if (!string.IsNullOrEmpty(timeInStr) &&
+                                     DateTime.TryParse(timeInStr, out DateTime timeInDate))
+                            {
+                                recordDate = timeInDate.Date;
+                            }
+
+                            if (recordDate.HasValue)
+                            {
+                                // Add date in consistent format
+                                uniqueDates.Add(recordDate.Value.ToString("yyyy-MM-dd"));
+                            }
+                        }
+                    }
+                }
+
+                // Sort dates in descending order (most recent first)
+                return uniqueDates.OrderByDescending(d => DateTime.Parse(d)).ToList();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error retrieving attendance dates: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return new List<string>();
+            }
+        }
+        private void comboBoxSelectDate_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBoxSelectDate.SelectedItem == null)
+                return;
+
+            string selectedText = comboBoxSelectDate.SelectedItem.ToString();
+            DateTime selectedDate;
+
+            if (selectedText == "Today")
+            {
+                selectedDate = DateTime.Today;
+            }
+            else if (selectedText == "Yesterday")
+            {
+                selectedDate = DateTime.Today.AddDays(-1);
+            }
+            else if (DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None,
+                out DateTime parsedDate))
+            {
+                selectedDate = parsedDate;
+            }
+            else
+            {
+                selectedDate = DateTime.Today;
+
+            }
+        }
+        private async void LoadAttendanceSummary(DateTime date)
+        {
+            try
+            {
+                // Show loading state
+                labelTotalNumber.Text = "";
+                labelOnTimeNumber.Text = "0";
+                labelLateNumber.Text = "0";
+                labelAbsentNumber.Text = "0";
+
+                // Load employee data
+                var employees = await GetAllAttendanceDatesAsync();
+                int totalEmployees = employees.Count;
+
+                // If no employees found, show zeros
+                if (totalEmployees == 0)
+                {
+                    labelTotalNumber.Text = "0";
+                    labelOnTimeNumber.Text = "0";
+                    labelLateNumber.Text = "0";
+                    labelAbsentNumber.Text = "0";
+                    labelAlertDateRange.Text = $"Date: {date.ToString("yyyy-MM-dd")}";
+                    return;
+                }
+
+                // Initialize counters
+                int onTimeCount = 0;
+                int lateCount = 0;
+                int absentCount = 0;
+
+                // Load ALL attendance data and filter locally (no index required)
+                var allAttendanceData = await firebase.Child("Attendance").OnceSingleAsync<JArray>();
+
+                // Create a set of employees who attended on the selected date
+                var attendedEmployees = new HashSet<string>();
+                string targetDate = date.ToString("yyyy-MM-dd");
+
+                if (allAttendanceData != null)
+                {
+                    foreach (var attendanceItem in allAttendanceData)
+                    {
+                        if (attendanceItem != null && attendanceItem.Type != JTokenType.Null)
+                        {
+                            // Extract values from JToken
+                            string attendanceDateStr = attendanceItem["attendance_date"]?.ToString() ?? "";
+                            string timeInStr = attendanceItem["time_in"]?.ToString() ?? "";
+                            string status = attendanceItem["status"]?.ToString() ?? "Absent";
+                            string employeeId = attendanceItem["employee_id"]?.ToString() ?? "";
+
+                            // Check if this record matches the selected date
+                            bool matchesDate = false;
+
+                            // Check attendance_date first
+                            if (!string.IsNullOrEmpty(attendanceDateStr) && attendanceDateStr == targetDate)
+                            {
+                                matchesDate = true;
+                            }
+
+                            // Check time_in date if not already matched
+                            if (!matchesDate && !string.IsNullOrEmpty(timeInStr) &&
+                                DateTime.TryParse(timeInStr, out DateTime timeInDate))
+                            {
+                                matchesDate = timeInDate.ToString("yyyy-MM-dd") == targetDate;
+                            }
+
+                            if (matchesDate && !string.IsNullOrEmpty(employeeId))
+                            {
+                                attendedEmployees.Add(employeeId);
+
+                                switch (status.ToLower())
+                                {
+                                    case "on time":
+                                        onTimeCount++;
+                                        break;
+                                    case "late":
+                                    case "early out":
+                                        lateCount++;
+                                        break;
+                                    default:
+                                        // Employee attended but with different status
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                absentCount = totalEmployees - attendedEmployees.Count;
+
+                // Update UI with counts
+                labelTotalNumber.Text = totalEmployees.ToString();
+                labelOnTimeNumber.Text = onTimeCount.ToString();
+                labelLateNumber.Text = lateCount.ToString();
+                labelAbsentNumber.Text = absentCount.ToString();
+
+                // Update the date range label
+                labelAlertDateRange.Text = $"Date: {targetDate}";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading attendance summary: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                // Reset UI on error
+                labelTotalNumber.Text = "0";
+                labelOnTimeNumber.Text = "0";
+                labelLateNumber.Text = "0";
+                labelAbsentNumber.Text = "0";
+            }
+        }
+
 
         private void setPanelAttributes()
         {
@@ -142,10 +386,26 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewTodo.CellMouseEnter += dataGridViewTodo_CellMouseEnter;
             dataGridViewTodo.CellMouseLeave += dataGridViewTodo_CellMouseLeave;
             dataGridViewTodo.CellClick += dataGridViewTodo_CellClick;
-            for (int i = 1; i < 10; i++) //test code; will be replaced with actual data from database
-            {
-                dataGridViewTodo.Rows.Add("Sample task " + i + ".", "10-24-2025");
-            }
+
+            // Clear existing columns and add the correct ones
+            dataGridViewTodo.Columns.Clear();
+
+            // Task column
+            dataGridViewTodo.Columns.Add("ColumnTask", "Task");
+            dataGridViewTodo.Columns["ColumnTask"].Width = 250;
+            dataGridViewTodo.Columns["ColumnTask"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            // Due Date column
+            dataGridViewTodo.Columns.Add("ColumnDueDate", "Due Date");
+            dataGridViewTodo.Columns["ColumnDueDate"].Width = 150;
+
+            // Delete button column (make sure you have a trash icon resource)
+            DataGridViewImageColumn deleteColumn = new DataGridViewImageColumn();
+            deleteColumn.Name = "ColumnTrash";
+            deleteColumn.HeaderText = "";
+            deleteColumn.Width = 40;
+            deleteColumn.Image = Properties.Resources.TrashBin;
+            dataGridViewTodo.Columns.Add(deleteColumn);
         }
 
         private void setAlertAbsentDataGridViewAttributes()
@@ -173,6 +433,7 @@ namespace HRIS_JAP_ATTPAY
                 dataGridViewAlertLate.Rows.Add("Franz Louies Deloritos", i);
             }
         }
+
 
         private void panelTodo_Paint(object sender, PaintEventArgs e)
         {
@@ -227,17 +488,121 @@ namespace HRIS_JAP_ATTPAY
         {
             if (e.RowIndex >= 0 && dataGridViewTodo.Columns[e.ColumnIndex].Name == "ColumnTrash")
             {
-                Form parentForm = this.FindForm();
-                ConfirmDeleteTask confirmDeleteTaskForm = new ConfirmDeleteTask();
-                AttributesClass.ShowWithOverlay(parentForm, confirmDeleteTaskForm); //should depend on database in the future
+                if (todoItemKeys.ContainsKey(e.RowIndex))
+                {
+                    // Debug: Check what columns you actually have
+                    string columnNames = "";
+                    foreach (DataGridViewColumn col in dataGridViewTodo.Columns)
+                    {
+                        columnNames += col.Name + ", ";
+                    }
+                    MessageBox.Show($"Available columns: {columnNames}");
+
+                    string taskKey = todoItemKeys[e.RowIndex];
+
+                    // Try different possible column names
+                    string taskText = "";
+                    if (dataGridViewTodo.Columns.Contains("ColumnTask"))
+                    {
+                        taskText = dataGridViewTodo.Rows[e.RowIndex].Cells["ColumnTask"].Value?.ToString() ?? "";
+                    }
+                    else if (dataGridViewTodo.Columns.Contains("Task"))
+                    {
+                        taskText = dataGridViewTodo.Rows[e.RowIndex].Cells["Task"].Value?.ToString() ?? "";
+                    }
+                    else if (dataGridViewTodo.Columns.Count > 0)
+                    {
+                        taskText = dataGridViewTodo.Rows[e.RowIndex].Cells[0].Value?.ToString() ?? ""; // First column
+                    }
+
+                    Form parentForm = this.FindForm();
+                    ConfirmDeleteTask confirmDeleteTaskForm = new ConfirmDeleteTask(taskKey, taskText, LoadTodoList);
+                    AttributesClass.ShowWithOverlay(parentForm, confirmDeleteTaskForm);
+                }
             }
         }
+
 
         private void labelTodoAdd_Click(object sender, EventArgs e)
         {
             Form parentForm = this.FindForm();
-            AddNewTask addNewTaskForm = new AddNewTask();
+            AddNewTask addNewTaskForm = new AddNewTask(currentUserId);
+            addNewTaskForm.TaskAdded += (s, args) =>
+            {
+                LoadTodoList();
+            };
             AttributesClass.ShowWithOverlay(parentForm, addNewTaskForm);
+        }
+
+        public void RefreshTodoList()
+        {
+            LoadTodoList();
+        }
+
+        private Dictionary<int, string> todoItemKeys = new Dictionary<int, string>(); // Add this at class level
+
+        private async void LoadTodoList()
+        {
+            try
+            {
+                dataGridViewTodo.Rows.Clear();
+                todoItemKeys.Clear(); // Clear previous mappings
+
+                // Load todo items from Firebase
+                var todoItems = await firebase
+                    .Child("Todos")
+                    .OnceAsync<Dictionary<string, object>>();
+
+                if (todoItems != null && todoItems.Any())
+                {
+                    int rowIndex = 0; // Track row index for mapping
+                    foreach (var todoItem in todoItems)
+                    {
+                        var todoData = todoItem.Object;
+
+                        if (todoData != null && todoData.ContainsKey("task"))
+                        {
+                            string task = todoData["task"]?.ToString() ?? "";
+                            string dueDate = todoData.ContainsKey("dueDate") ? todoData["dueDate"].ToString() : "";
+                            string assignedTo = todoData.ContainsKey("assignedTo") ? todoData["assignedTo"].ToString() : "";
+
+                            // Only show tasks assigned to current user or general tasks
+                            if (string.IsNullOrEmpty(assignedTo) || assignedTo == currentUserId || assignedTo == "all")
+                            {
+                                // Format date if possible
+                                string formattedDate = dueDate;
+                                if (DateTime.TryParse(dueDate, out DateTime parsedDate))
+                                {
+                                    formattedDate = parsedDate.ToString("MM-dd-yyyy");
+                                }
+                                else if (string.IsNullOrEmpty(dueDate))
+                                {
+                                    formattedDate = "No due date";
+                                }
+
+                                // Add to DataGridView
+                                dataGridViewTodo.Rows.Add(task, formattedDate);
+
+                                // Store the Firebase key for this row
+                                todoItemKeys[rowIndex] = todoItem.Key;
+                                rowIndex++;
+                            }
+                        }
+                    }
+                }
+
+                // If no tasks found, show a message
+                if (dataGridViewTodo.Rows.Count == 0)
+                {
+                    dataGridViewTodo.Rows.Add("No tasks found", "");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading todo list: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                dataGridViewTodo.Rows.Add("Error loading tasks", "");
+            }
         }
     }
 }

@@ -14,10 +14,12 @@ namespace HRIS_JAP_ATTPAY
     {
         private AttributesClassAlt panelLoaderView;
         private AttributesClassAlt panelLoaderMenu;
+        private string currentUserId;
 
-        public AdminForm()
+        public AdminForm(string userId)
         {
             InitializeComponent();
+            currentUserId = userId;
             AttributesClass.SetMinSize(this, 1440, 1024);
             this.Size = new Size(1240, 824);
 
@@ -27,8 +29,8 @@ namespace HRIS_JAP_ATTPAY
 
         private void AdminPage_Load(object sender, EventArgs e)
         {
-            panelLoaderMenu.LoadUserControl(new AdminMenu(AdminViewPanel));
-            panelLoaderView.LoadUserControl(new AdminOverview());
+            panelLoaderMenu.LoadUserControl(new AdminMenu(AdminViewPanel, currentUserId));
+            panelLoaderView.LoadUserControl(new AdminOverview(currentUserId));
         }
     }
 }

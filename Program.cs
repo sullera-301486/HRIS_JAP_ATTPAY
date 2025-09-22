@@ -9,6 +9,7 @@ namespace HRIS_JAP_ATTPAY
     internal static class Program
     {
         private static Form currentForm;
+        private static string currentUserId;
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -22,8 +23,12 @@ namespace HRIS_JAP_ATTPAY
             Application.Run(hostForm); // Run app using persistent host
         }
 
-        public static void OpenNextForm(string formName)
+        public static void OpenNextForm(string formName, string userId = null)
         {
+            if (!string.IsNullOrEmpty(userId))
+            {
+                currentUserId = userId;
+            }
             Application.OpenForms
                   .OfType<Form>()
                   .Where(f => f != null && !f.IsDisposed && f != currentForm)
@@ -38,10 +43,10 @@ namespace HRIS_JAP_ATTPAY
                     nextForm = new LoginForm();
                     break;
                 case "OpenNewForm1":
-                    nextForm = new AdminForm();
+                    nextForm = new AdminForm(currentUserId);
                     break;
                 case "OpenNewForm2":
-                    nextForm = new HRForm();
+                    nextForm = new HRForm(currentUserId);
                     break;
                 default:
                     MessageBox.Show("Invalid form requested, exiting.");

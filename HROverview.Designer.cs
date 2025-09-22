@@ -496,6 +496,7 @@
             this.comboBoxSelectDate.Name = "comboBoxSelectDate";
             this.comboBoxSelectDate.Size = new System.Drawing.Size(226, 37);
             this.comboBoxSelectDate.TabIndex = 19;
+            this.comboBoxSelectDate.SelectedIndexChanged += new System.EventHandler(this.comboBoxSelectDate_SelectedIndexChanged);
             // 
             // labelAttendanceSummary
             // 
