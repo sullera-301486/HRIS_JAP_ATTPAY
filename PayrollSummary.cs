@@ -12,12 +12,14 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class PayrollSummary : Form
     {
-        // 🔹 Firebase client
+        public PayrollExportData ExportData { get; private set; }
+
+        //  Firebase client
         private FirebaseClient firebase = new FirebaseClient(
             "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
         );
 
-        // 🔹 Data dictionaries
+        //  Data dictionaries
         private Dictionary<string, dynamic> employeeDetails = new Dictionary<string, dynamic>();
         private Dictionary<string, Dictionary<string, string>> workSchedules = new Dictionary<string, Dictionary<string, string>>();
         private Dictionary<string, Dictionary<string, string>> employmentInfo = new Dictionary<string, Dictionary<string, string>>();
@@ -28,7 +30,7 @@ namespace HRIS_JAP_ATTPAY
         private Dictionary<string, Dictionary<string, string>> payrollEarnings = new Dictionary<string, Dictionary<string, string>>();
         private List<Dictionary<string, string>> attendanceRecords = new List<Dictionary<string, string>>();
 
-        // 🔹 Store current employee ID to track selection
+        //  Store current employee ID to track selection
         private string currentEmployeeId = "";
 
         public PayrollSummary()
@@ -110,7 +112,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🔹 New: Calculate work days based on real calendar (2 weeks: Mon-Fri full day, Sat half day)
+        //  New: Calculate work days based on real calendar (2 weeks: Mon-Fri full day, Sat half day)
         private (int fullDays, int halfDays) CalculateWorkDaysInPeriod(DateTime startDate, DateTime endDate)
         {
             int fullDays = 0;
@@ -131,7 +133,7 @@ namespace HRIS_JAP_ATTPAY
             return (fullDays, halfDays);
         }
 
-        // 🔹 New: Government contributions & tax calculations (BI-MONTHLY)
+        // New: Government contributions & tax calculations (BI-MONTHLY)
         #region Government Contributions & Tax Calculations
 
         private decimal CalculateSSSContribution(decimal monthlySalary)
@@ -415,6 +417,51 @@ namespace HRIS_JAP_ATTPAY
                         // NET PAY (for this period)
                         decimal netPay = grossPay - totalDeductions;
                         labelOverallTotalInput.Text = netPay.ToString("0.00");
+
+                        ExportData = new PayrollExportData
+                        {
+                            EmployeeId = currentEmployeeId,
+                            EmployeeName = $"{emp["last_name"]}, {emp["first_name"]} {emp["middle_name"]}",
+                            Department = employment != null && employment.ContainsKey("department") ? employment["department"] : "",
+                            Position = employment != null && employment.ContainsKey("position") ? employment["position"] : "",
+                            DateCovered = $"{payroll["cutoff_start"]} to {payroll["cutoff_end"]}",
+                            Days = requiredDays.ToString(),
+                            DaysPresent = daysWorked.ToString(),
+                            DailyRate = dailyRate.ToString("0.00"),
+                            Salary = totalSalary.ToString("0.00"),
+                            Overtime = totalOvertime.ToString("0.00"),
+                            BasicPay = basicPay.ToString("0.00"),
+                            OvertimePerHour = overtimePay.ToString("0.00"),
+                            OvertimePerMinute = CalculateOvertimeMinutesPay(dailyRate, 1).ToString("0.00"), // Rate per minute
+                            Incentives = earnings != null && earnings.ContainsKey("incentives") ? decimal.Parse(earnings["incentives"]).ToString("0.00") : "0.00",
+                            Commission = earnings != null && earnings.ContainsKey("commission") ? decimal.Parse(earnings["commission"]).ToString("0.00") : "0.00",
+                            FoodAllowance = earnings != null && earnings.ContainsKey("food_allowance") ? decimal.Parse(earnings["food_allowance"]).ToString("0.00") : "0.00",
+                            Communication = earnings != null && earnings.ContainsKey("communication") ? decimal.Parse(earnings["communication"]).ToString("0.00") : "0.00",
+                            GasAllowance = earnings != null && earnings.ContainsKey("gas_allowance") ? decimal.Parse(earnings["gas_allowance"]).ToString("0.00") : "0.00",
+                            Gondola = earnings != null && earnings.ContainsKey("gondola") ? decimal.Parse(earnings["gondola"]).ToString("0.00") : "0.00",
+                            GrossPay = grossPay.ToString("0.00"),
+                            WithholdingTax = withholdingTax.ToString("0.00"),
+                            SSS = sss.ToString("0.00"),
+                            PagIbig = pagibig.ToString("0.00"),
+                            Philhealth = philhealth.ToString("0.00"),
+                            SSSLoan = loan != null && loan.ContainsKey("sss_loan") ? (decimal.Parse(loan["sss_loan"]) / 2).ToString("0.00") : "0.00",
+                            PagIbigLoan = loan != null && loan.ContainsKey("pagibig_loan") ? (decimal.Parse(loan["pagibig_loan"]) / 2).ToString("0.00") : "0.00",
+                            CarLoan = loan != null && loan.ContainsKey("car_loan") ? (decimal.Parse(loan["car_loan"]) / 2).ToString("0.00") : "0.00",
+                            HousingLoan = loan != null && loan.ContainsKey("housing_loan") ? (decimal.Parse(loan["housing_loan"]) / 2).ToString("0.00") : "0.00",
+                            CashAdvance = loan != null && loan.ContainsKey("cash_advance") ? (decimal.Parse(loan["cash_advance"]) / 2).ToString("0.00") : "0.00",
+                            CoopLoan = loan != null && loan.ContainsKey("coop_loan") ? (decimal.Parse(loan["coop_loan"]) / 2).ToString("0.00") : "0.00",
+                            CoopContribution = loan != null && loan.ContainsKey("coop_contribution") ? (decimal.Parse(loan["coop_contribution"]) / 2).ToString("0.00") : "0.00",
+                            Others = loan != null && loan.ContainsKey("other_deduction") ? (decimal.Parse(loan["other_deduction"]) / 2).ToString("0.00") : "0.00",
+                            TotalDeductions = totalDeductions.ToString("0.00"),
+                            NetPay = netPay.ToString("0.00"),
+                            // Leave balances - you'll need to implement these based on your leave tracking
+                            VacationLeaveCredit = "6.00",
+                            VacationLeaveDebit = "2.00",
+                            VacationLeaveBalance = "4.00",
+                            SickLeaveCredit = "6.00",
+                            SickLeaveDebit = "6.00",
+                            SickLeaveBalance = "0.00"
+                        };
                     }
                 }
             }
@@ -498,9 +545,15 @@ namespace HRIS_JAP_ATTPAY
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
+            if (ExportData == null)
+            {
+                MessageBox.Show("No payroll data to export. Please load employee data first.");
+                return;
+            }
+
             Form parentForm = this.FindForm();
-            ConfirmPayrollExportIndividual confirmPayrollExportIndividualForm = new ConfirmPayrollExportIndividual();
-            AttributesClass.ShowWithOverlay(parentForm, confirmPayrollExportIndividualForm);
+            ConfirmPayrollExportIndividual confirmForm = new ConfirmPayrollExportIndividual(ExportData);
+            AttributesClass.ShowWithOverlay(parentForm, confirmForm);
         }
 
         private void button1_Click(object sender, EventArgs e)
