@@ -12,6 +12,7 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class EditAttendanceConfirm : Form
     {
+        public bool UserConfirmed { get; private set; } = false;
         public EditAttendanceConfirm()
         {
             InitializeComponent();
@@ -35,12 +36,25 @@ namespace HRIS_JAP_ATTPAY
 
         private void XpictureBox_Click(object sender, EventArgs e)
         {
+            UserConfirmed = false;
+            this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
+            UserConfirmed = false;
+            this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
+
+
+        private void buttonConfirm_Click_1(object sender, EventArgs e)
+        {
+            UserConfirmed = true;
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+
     }
 }

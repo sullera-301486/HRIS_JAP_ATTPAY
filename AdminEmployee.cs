@@ -176,7 +176,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🔹 Load Firebase data into DataGridView
+        // 🔹 Load Firebase data into DataGridView - FIXED VERSION
         private async void LoadFirebaseData()
         {
             try
@@ -188,65 +188,152 @@ namespace HRIS_JAP_ATTPAY
                     .Child("EmployeeDetails")
                     .OnceAsync<dynamic>();
 
-                // 🔹 Get EmploymentInfo
+                // 🔹 Get EmploymentInfo - handle mixed structure
                 var firebaseEmployment = await firebase
                     .Child("EmploymentInfo")
-                    .OnceSingleAsync<List<dynamic>>();
+                    .OnceAsync<dynamic>();
 
-                // 🔹 Employment info lookup
+                // 🔹 Employment info lookup - dynamic handling
                 var employmentDict = new Dictionary<string, (string Department, string Position)>();
 
                 if (firebaseEmployment != null)
                 {
                     foreach (var emp in firebaseEmployment)
                     {
-                        if (emp == null) continue;
-                        string empId = emp.employee_id ?? "";
-                        string dept = emp.department ?? "";
-                        string pos = emp.position ?? "";
+                        if (emp?.Object == null) continue;
 
-                        if (!string.IsNullOrEmpty(empId))
-                            employmentDict[empId] = (dept, pos);
+                        try
+                        {
+                            dynamic empData = emp.Object;
+
+                            // 🔹 Dynamic employee_id extraction
+                            string empId = ExtractEmployeeId(empData, emp.Key);
+
+                            if (string.IsNullOrEmpty(empId)) continue;
+
+                            // 🔹 Dynamic department extraction
+                            string dept = empData.department ?? empData.Department ?? "";
+                            string pos = empData.position ?? empData.Position ?? "";
+
+                            // 🔹 Only add if we have valid data
+                            if (!string.IsNullOrEmpty(empId) && (!string.IsNullOrEmpty(dept) || !string.IsNullOrEmpty(pos)))
+                            {
+                                // 🔹 Handle duplicates - prefer the most complete record
+                                if (!employmentDict.ContainsKey(empId) ||
+                                    (string.IsNullOrEmpty(employmentDict[empId].Department) && !string.IsNullOrEmpty(dept)))
+                                {
+                                    employmentDict[empId] = (dept, pos);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // 🔹 Skip problematic records but continue processing others
+                            System.Diagnostics.Debug.WriteLine($"Skipped employment record: {ex.Message}");
+                            continue;
+                        }
                     }
                 }
 
                 int counter = 1;
                 foreach (var fbEmp in firebaseEmployees)
                 {
-                    dynamic data = fbEmp.Object;
-
-                    string employeeId = data.employee_id ?? "";
-                    string fullName = $"{data.first_name ?? ""} {data.middle_name ?? ""} {data.last_name ?? ""}".Trim();
-                    string contact = data.contact ?? "";
-                    string email = data.email ?? "";
-
-                    string department = "";
-                    string position = "";
-                    if (!string.IsNullOrEmpty(employeeId) && employmentDict.ContainsKey(employeeId))
+                    try
                     {
-                        department = employmentDict[employeeId].Department;
-                        position = employmentDict[employeeId].Position;
+                        dynamic data = fbEmp.Object;
+
+                        // 🔹 Dynamic employee ID extraction
+                        string employeeId = data.employee_id ?? data.Key ?? "";
+                        string fullName = FormatFullName(data.first_name, data.middle_name, data.last_name);
+                        string contact = data.contact ?? "";
+                        string email = data.email ?? "";
+
+                        // 🔹 Get employment info with fallback
+                        string department = "";
+                        string position = "";
+                        if (!string.IsNullOrEmpty(employeeId) && employmentDict.ContainsKey(employeeId))
+                        {
+                            var employmentInfo = employmentDict[employeeId];
+                            department = employmentInfo.Department;
+                            position = employmentInfo.Position;
+                        }
+
+                        // 🔹 Add row with counter + image
+                        dataGridViewEmployee.Rows.Add(
+                            counter,
+                            employeeId,
+                            fullName,
+                            department,
+                            position,
+                            contact,
+                            email,
+                            Properties.Resources.ExpandRight
+                        );
+
+                        counter++;
                     }
+                    catch (Exception ex)
+                    {
+                        // 🔹 Skip problematic employee records but continue
+                        System.Diagnostics.Debug.WriteLine($"Skipped employee record: {ex.Message}");
+                        continue;
+                    }
+                }
 
-                    // 🔹 Add row with counter + image
-                    dataGridViewEmployee.Rows.Add(
-                        counter,
-                        employeeId,
-                        fullName,
-                        department,
-                        position,
-                        contact,
-                        email,
-                        Properties.Resources.ExpandRight // same icon as Action column
-                    );
-
-                    counter++;
+                // 🔹 Show summary
+                if (dataGridViewEmployee.Rows.Count > 0)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Successfully loaded {dataGridViewEmployee.Rows.Count} employees");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to load Firebase data: " + ex.Message);
+                MessageBox.Show("Failed to load Firebase data: " + ex.Message +
+                               "\n\nPlease check your internet connection and try again.",
+                               "Data Load Error",
+                               MessageBoxButtons.OK,
+                               MessageBoxIcon.Error);
             }
+        }
+
+        // 🔹 Helper method to extract employee ID dynamically
+        private string ExtractEmployeeId(dynamic empData, string firebaseKey)
+        {
+            // 🔹 Priority 1: Check for employee_id in the data
+            string empId = empData.employee_id ?? empData.EmployeeId ?? "";
+
+            // 🔹 Priority 2: If no employee_id in data, check if key is an employee ID format
+            if (string.IsNullOrEmpty(empId))
+            {
+                // 🔹 Check if the Firebase key matches employee ID pattern (like "JAP-001")
+                if (!string.IsNullOrEmpty(firebaseKey) && firebaseKey.StartsWith("JAP-"))
+                {
+                    empId = firebaseKey;
+                }
+                // 🔹 If key is numeric, this might be an array index, so we need to rely on data
+                else if (int.TryParse(firebaseKey, out _))
+                {
+                    // This is likely an array index record, we'll use the employee_id from data
+                    // If empId is still empty, this record will be skipped
+                }
+            }
+
+            return empId?.Trim() ?? "";
+        }
+
+        // 🔹 Helper method to format full name safely
+        private string FormatFullName(object firstName, object middleName, object lastName)
+        {
+            string first = firstName?.ToString() ?? "";
+            string middle = middleName?.ToString() ?? "";
+            string last = lastName?.ToString() ?? "";
+
+            // 🔹 Clean up extra spaces
+            string fullName = $"{first} {middle} {last}".Trim();
+            while (fullName.Contains("  "))
+                fullName = fullName.Replace("  ", " ");
+
+            return fullName;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace HRIS_JAP_ATTPAY
+﻿using System.Windows.Forms;
+
+namespace HRIS_JAP_ATTPAY
 {
     partial class EditAttendanceConfirm
     {
@@ -68,7 +70,7 @@
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonCancel.ForeColor = System.Drawing.Color.White;
             this.buttonCancel.Location = new System.Drawing.Point(219, 169);
-            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(135, 37);
             this.buttonCancel.TabIndex = 12;
@@ -84,12 +86,13 @@
             this.buttonConfirm.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonConfirm.ForeColor = System.Drawing.Color.White;
             this.buttonConfirm.Location = new System.Drawing.Point(60, 169);
-            this.buttonConfirm.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonConfirm.Margin = new System.Windows.Forms.Padding(4);
             this.buttonConfirm.Name = "buttonConfirm";
             this.buttonConfirm.Size = new System.Drawing.Size(135, 37);
             this.buttonConfirm.TabIndex = 11;
             this.buttonConfirm.Text = "Confirm";
             this.buttonConfirm.UseVisualStyleBackColor = false;
+            this.buttonConfirm.Click += new System.EventHandler(this.buttonConfirm_Click_1);
             // 
             // XpictureBox
             // 
@@ -115,7 +118,7 @@
             this.Controls.Add(this.labelMessage);
             this.Controls.Add(this.labelRequestConfirmation);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "EditAttendanceConfirm";
             this.ShowInTaskbar = false;
             this.Text = "EditAttendanceConfirm";

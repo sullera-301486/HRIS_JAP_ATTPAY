@@ -230,34 +230,101 @@ namespace HRIS_JAP_ATTPAY
 
         private async void buttonUpdate_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(localImagePath))
+            using (EditAttendanceConfirm confirmForm = new EditAttendanceConfirm())
             {
-                try
+                confirmForm.StartPosition = FormStartPosition.CenterParent;
+                confirmForm.ShowDialog(this); // Just show the dialog, don't check result
+
+                // Only check the UserConfirmed property
+                if (confirmForm.UserConfirmed)
                 {
-                    string downloadUrl = await UploadImageToFirebase(localImagePath, selectedEmployeeId);
-                    if (!string.IsNullOrEmpty(downloadUrl))
-                    {
-                        bool ok = await UpdateEmployeeImage(selectedEmployeeId, downloadUrl);
-                        if (ok)
-                        {
-                            MessageBox.Show("Profile image uploaded successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Failed to update employee record with image URL.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        }
-                    }
+                    await ExecuteFinalUpdate();
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show($"Image upload failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Update cancelled.", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+        }
 
-            // Proceed with the existing confirmation dialog
-            Form parentForm = this.FindForm();
-            ConfirmProfileUpdate confirmProfileUpdateForm = new ConfirmProfileUpdate();
-            AttributesClass.ShowWithOverlay(parentForm, confirmProfileUpdateForm);
+        private async Task ExecuteFinalUpdate()
+        {
+            try
+            {
+                // 1. Handle image upload first (if new image was selected)
+                string imageUrl = null;
+                if (!string.IsNullOrEmpty(localImagePath))
+                {
+                    imageUrl = await UploadImageToFirebase(localImagePath, selectedEmployeeId);
+                    if (!string.IsNullOrEmpty(imageUrl))
+                    {
+                        await UpdateEmployeeImage(selectedEmployeeId, imageUrl);
+                    }
+                }
+
+                // 2. Update EmployeeDetails - PASS THE imageUrl PARAMETER
+                await UpdateEmployeeDetails(imageUrl);
+
+                // 3. Update EmploymentInfo
+                await UpdateEmploymentInfo();
+
+                MessageBox.Show("Employee profile updated successfully!", "Success",
+                               MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                this.Close(); // Close the form after successful update
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating profile: {ex.Message}", "Error",
+                               MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        private async Task UpdateEmployeeDetails(string imageUrl = null)
+        {
+            var employeeDetails = new EmployeeDetailsModel
+            {
+                employee_id = selectedEmployeeId,
+                first_name = textBoxFirstName.Text,
+                middle_name = textBoxMiddleName.Text,
+                last_name = textBoxLastName.Text,
+                date_of_birth = textBoxDateOfBirth.Text,
+                gender = textBoxGender.Text,
+                marital_status = textBoxMaritalStatus.Text,
+                nationality = textBoxNationality.Text,
+                contact = textBoxContact.Text,
+                email = textBoxEmail.Text,
+                address = textBoxAddress.Text,
+                rfid_tag = labelRFIDTagInput.Text,
+                image_url = imageUrl, // Use the provided imageUrl
+                created_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            };
+
+            await firebase
+                .Child("EmployeeDetails")
+                .Child(selectedEmployeeId)
+                .PutAsync(employeeDetails);
+        }
+
+        private async Task UpdateEmploymentInfo()
+        {
+            var employmentInfo = new EmploymentInfoModel
+            {
+                employee_id = selectedEmployeeId,
+                position = labelPositionInput.Text,
+                department = comboBoxDepartment.Text,
+                contract_type = textBoxContractType.Text,
+                date_of_joining = textBoxDateOfJoining.Text,
+                date_of_exit = textBoxDateOfExit.Text,
+                manager_name = textBoxManager.Text,
+                created_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            };
+
+            await firebase
+                .Child("EmploymentInfo")
+                .Child(selectedEmployeeId)
+                .PutAsync(employmentInfo);
         }
 
         // CORRECTED for Firebase Storage v7.3
@@ -358,7 +425,6 @@ namespace HRIS_JAP_ATTPAY
 
                         if (response.IsSuccessStatusCode)
                         {
-                            MessageBox.Show($"Successfully updated at: {path}", "Success");
                             return true;
                         }
                         else
@@ -409,12 +475,3 @@ namespace HRIS_JAP_ATTPAY
     }
 }
 
-// PATCH extension for HttpClient
-public static class HttpClientExtensions
-{
-    public static Task<HttpResponseMessage> PatchAsync(this HttpClient client, string requestUri, HttpContent content)
-    {
-        var request = new HttpRequestMessage(new HttpMethod("PATCH"), requestUri) { Content = content };
-        return client.SendAsync(request);
-    }
-}
