@@ -15,8 +15,12 @@ namespace HRIS_JAP_ATTPAY
         private AttributesClassAlt panelLoaderAdmin;
         public Panel AdminViewPanel;
         private string currentUserId;
-        public AdminMenu(Panel targetPanel, string userId)
+        private string currentEmployeeId;
+        private string payrollPeriod;
+        public AdminMenu(Panel targetPanel, string userId, string employeeId, string period = null)
         {
+            currentEmployeeId = employeeId;
+            payrollPeriod = period;
             InitializeComponent();
             SetFont();
             currentUserId = userId;
@@ -78,7 +82,7 @@ namespace HRIS_JAP_ATTPAY
             buttonAttendance.ForeColor = Color.FromArgb(43, 23, 112);
             buttonPayroll.BackColor = Color.FromArgb(126, 112, 175);
             buttonPayroll.ForeColor = Color.FromArgb(255, 255, 255);
-            panelLoaderAdmin.LoadUserControl(new AdminPayroll());
+            panelLoaderAdmin.LoadUserControl(new AdminPayroll(currentEmployeeId));
         }
 
         private void SetFont()

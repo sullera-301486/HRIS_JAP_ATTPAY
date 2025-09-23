@@ -1,27 +1,30 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using Firebase.Database;
+using Firebase.Database.Query;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Firebase.Database;
-using Firebase.Database.Query;
 
 namespace HRIS_JAP_ATTPAY
 {
     public partial class AdminPayroll : UserControl
     {
         // 🔹 Firebase client
-        private FirebaseClient firebase = new FirebaseClient(
-            "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
-        );
+        private FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        private string currentEmployeeId;
+        private string payrollPeriod;
 
         // 🔹 Search timer for delayed filtering
         private System.Threading.Timer searchTimer;
 
-        public AdminPayroll()
+        public AdminPayroll(string employeeId, string period = null)
         {
+            currentEmployeeId = employeeId;
+            payrollPeriod = period;
             InitializeComponent();
             setFont();
             setDataGridViewAttributes();
@@ -206,7 +209,7 @@ namespace HRIS_JAP_ATTPAY
                 if (!string.IsNullOrEmpty(selectedEmployeeId))
                 {
                     Form parentForm = this.FindForm();
-                    PayrollSummary payrollSummaryForm = new PayrollSummary();
+                    PayrollSummary payrollSummaryForm = new PayrollSummary(currentEmployeeId);
 
                     // 🔹 Pass the selected employee ID to the form
                     payrollSummaryForm.SetEmployeeId(selectedEmployeeId);

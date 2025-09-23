@@ -16,8 +16,8 @@ namespace HRIS_JAP_ATTPAY
 
         //  Firebase client
         private FirebaseClient firebase = new FirebaseClient(
-            "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
-        );
+            "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        private string payrollPeriod;
 
         //  Data dictionaries
         private Dictionary<string, dynamic> employeeDetails = new Dictionary<string, dynamic>();
@@ -33,16 +33,21 @@ namespace HRIS_JAP_ATTPAY
         //  Store current employee ID to track selection
         private string currentEmployeeId = "";
 
-        public PayrollSummary()
-        {
-            InitializeComponent();
-            setFont();
-        }
-
-        public void SetEmployeeId(string employeeId)
+        public PayrollSummary(string employeeId, string period = null)
         {
             currentEmployeeId = employeeId;
-            LoadPayrollDataAsync();
+            payrollPeriod = period;
+            InitializeComponent();
+            setFont();
+
+            // ADD THIS LINE to load data when form loads
+            this.Load += async (sender, e) => await LoadPayrollDataAsync();
+        }
+
+        public async void SetEmployeeId(string employeeId)
+        {
+            currentEmployeeId = employeeId;
+            await LoadPayrollDataAsync();
         }
 
         private List<Dictionary<string, string>> ParseMalformedJson(string rawJson)
@@ -261,7 +266,17 @@ namespace HRIS_JAP_ATTPAY
                     var summary = payrollSummaryData.ContainsKey(payrollId) ? payrollSummaryData[payrollId] : null;
                     var loan = loanDeductions.ContainsKey(payrollId) ? loanDeductions[payrollId] : null;
                     var earnings = payrollEarnings.ContainsKey(payrollId) ? payrollEarnings[payrollId] : null;
-                    var employment = employmentInfo.ContainsKey(currentEmployeeId) ? employmentInfo[currentEmployeeId] : null;
+
+                    // FIX: Find employment info by searching for the employee ID in all records
+                    Dictionary<string, string> employment = null;
+                    foreach (var empInfo in employmentInfo.Values)
+                    {
+                        if (empInfo.ContainsKey("employee_id") && empInfo["employee_id"] == currentEmployeeId)
+                        {
+                            employment = empInfo;
+                            break;
+                        }
+                    }
 
                     if (emp != null)
                     {
@@ -274,9 +289,10 @@ namespace HRIS_JAP_ATTPAY
 
                         // Parse rates safely
                         decimal dailyRate = 0m;
-                        if (employment != null && employment.ContainsKey("daily_rate"))
+                        if (employment != null && employment.ContainsKey("daily_rate") && !string.IsNullOrEmpty(employment["daily_rate"]))
+                        {
                             decimal.TryParse(employment["daily_rate"], out dailyRate);
-
+                        }
                         labelDailyRateInput.Text = dailyRate.ToString("0.00");
 
                         // Determine required days (Mon-Fri full, Sat half)
@@ -559,7 +575,7 @@ namespace HRIS_JAP_ATTPAY
         private void button1_Click(object sender, EventArgs e)
         {
             Form parentForm = this.FindForm();
-            PayrollSummaryEdit payrollSummaryEditForm = new PayrollSummaryEdit();
+            PayrollSummaryEdit payrollSummaryEditForm = new PayrollSummaryEdit(currentEmployeeId);
             AttributesClass.ShowWithOverlay(parentForm, payrollSummaryEditForm);
         }
 

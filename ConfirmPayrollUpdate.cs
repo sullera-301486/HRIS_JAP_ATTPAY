@@ -12,8 +12,8 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class ConfirmPayrollUpdate : Form
     {
+        public bool UserConfirmed { get; private set; } = false;
 
-      
         public ConfirmPayrollUpdate()
         {
             InitializeComponent();
@@ -22,16 +22,22 @@ namespace HRIS_JAP_ATTPAY
 
         private void buttonConfirm_Click(object sender, EventArgs e)
         {
-
+            UserConfirmed = true;
+            this.DialogResult = DialogResult.OK;
+            this.Close();
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
         {
+            UserConfirmed = false;
+            this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
+            UserConfirmed = false;
+            this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
 

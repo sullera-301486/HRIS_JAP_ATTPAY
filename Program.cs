@@ -10,6 +10,9 @@ namespace HRIS_JAP_ATTPAY
     {
         private static Form currentForm;
         private static string currentUserId;
+        private static string currentEmployeeId;
+        private static string payrollPeriod;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -25,6 +28,8 @@ namespace HRIS_JAP_ATTPAY
 
         public static void OpenNextForm(string formName, string userId = null)
         {
+           
+
             if (!string.IsNullOrEmpty(userId))
             {
                 currentUserId = userId;
@@ -43,7 +48,7 @@ namespace HRIS_JAP_ATTPAY
                     nextForm = new LoginForm();
                     break;
                 case "OpenNewForm1":
-                    nextForm = new AdminForm(currentUserId);
+                    nextForm = new AdminForm(currentUserId, currentEmployeeId, payrollPeriod);
                     break;
                 case "OpenNewForm2":
                     nextForm = new HRForm(currentUserId);
