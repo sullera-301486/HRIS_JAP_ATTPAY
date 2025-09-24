@@ -316,6 +316,7 @@
             this.dataGridViewAttendance.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.dataGridViewAttendance.Size = new System.Drawing.Size(1440, 648);
             this.dataGridViewAttendance.TabIndex = 0;
+            this.dataGridViewAttendance.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewAttendance_CellContentClick);
             // 
             // Column1
             // 

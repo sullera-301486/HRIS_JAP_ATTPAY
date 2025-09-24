@@ -12,6 +12,8 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class UpdateConfirmationEditAttendance : Form
     {
+        public bool UserConfirmed { get; private set; } = false;
+
         public UpdateConfirmationEditAttendance()
         {
             InitializeComponent();
@@ -20,11 +22,13 @@ namespace HRIS_JAP_ATTPAY
 
         private void XpictureBox_Click(object sender, EventArgs e)
         {
+            UserConfirmed = false;
             this.Close();
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
+            UserConfirmed = false;
             this.Close();
         }
 
@@ -34,6 +38,13 @@ namespace HRIS_JAP_ATTPAY
             buttonConfirm.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
             labelMessage.Font = AttributesClass.GetFont("Roboto-Light", 12f);
             labelRequestConfirm.Font = AttributesClass.GetFont("Roboto-Regular", 18f);
+        }
+
+        private void buttonConfirm_Click(object sender, EventArgs e)
+        {
+            UserConfirmed = true;
+            this.DialogResult = DialogResult.OK; // Add this line
+            this.Close();
         }
     }
 }

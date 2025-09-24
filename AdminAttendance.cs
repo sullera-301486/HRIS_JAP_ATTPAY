@@ -18,6 +18,9 @@ namespace HRIS_JAP_ATTPAY
             "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
         );
 
+        // 🔹 Store attendance records with their Firebase keys
+        private Dictionary<int, string> attendanceKeyMap = new Dictionary<int, string>();
+
         public AdminAttendance()
         {
             InitializeComponent();
@@ -118,7 +121,7 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewAttendance.ColumnHeadersDefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
             dataGridViewAttendance.CellMouseEnter += dataGridViewAttendance_CellMouseEnter;
             dataGridViewAttendance.CellMouseLeave += dataGridViewAttendance_CellMouseLeave;
-            dataGridViewAttendance.CellClick += dataGridViewAttendance_CellClick;
+            dataGridViewAttendance.CellClick += dataGridViewAttendance_CellContentClick;
             dataGridViewAttendance.CellFormatting += dataGridViewAttendance_CellFormatting;
 
             // 🔹 Define columns
@@ -175,14 +178,59 @@ namespace HRIS_JAP_ATTPAY
         {
             dataGridViewAttendance.Cursor = Cursors.Default;
         }
-
-        private void dataGridViewAttendance_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void dataGridViewAttendance_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
+
             if (e.RowIndex >= 0 && dataGridViewAttendance.Columns[e.ColumnIndex].Name == "Action")
             {
+                // Get the selected row data
+                DataGridViewRow selectedRow = dataGridViewAttendance.Rows[e.RowIndex];
+
+                // Get the Firebase key for this record
+                string firebaseKey = null;
+                if (attendanceKeyMap.ContainsKey(e.RowIndex))
+                {
+                    firebaseKey = attendanceKeyMap[e.RowIndex];
+                }
+
                 Form parentForm = this.FindForm();
                 EditAttendance editAttendanceForm = new EditAttendance();
+
+                // Pass the attendance data AND the Firebase key to the edit form
+                editAttendanceForm.SetAttendanceData(
+                    selectedRow.Cells["EmployeeId"].Value?.ToString(),
+                    selectedRow.Cells["FullName"].Value?.ToString(),
+                    selectedRow.Cells["TimeIn"].Value?.ToString(),
+                    selectedRow.Cells["TimeOut"].Value?.ToString(),
+                    selectedRow.Cells["HoursWorked"].Value?.ToString(),
+                    selectedRow.Cells["Status"].Value?.ToString(),
+                    selectedRow.Cells["OvertimeHours"].Value?.ToString(),
+                    selectedRow.Cells["VerificationMethod"].Value?.ToString(),
+                    firebaseKey  // Pass the Firebase key
+                );
+
                 AttributesClass.ShowWithOverlay(parentForm, editAttendanceForm);
+
+                // Refresh data after editing
+                editAttendanceForm.FormClosed += (s, args) => {
+                    if (editAttendanceForm.DataUpdated)
+                    {
+                        // Refresh with current filter
+                        string selectedText = comboBoxSelectDate.SelectedItem?.ToString();
+                        DateTime? selectedDate = null;
+
+                        if (!string.IsNullOrEmpty(selectedText) && selectedText != "All Dates")
+                        {
+                            DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
+                                System.Globalization.CultureInfo.InvariantCulture,
+                                System.Globalization.DateTimeStyles.None,
+                                out DateTime parsedDate);
+                            selectedDate = parsedDate;
+                        }
+
+                        LoadFirebaseAttendanceData(selectedDate);
+                    }
+                };
             }
         }
 
@@ -263,6 +311,53 @@ namespace HRIS_JAP_ATTPAY
             return Math.Round(overtime, 2).ToString("0.00");
         }
 
+        // 🔹 NEW METHOD: Calculate status based on business rules
+        private string CalculateStatus(string timeInStr, string timeOutStr, string existingStatus = "")
+        {
+            // If time in is N/A, then it's Absent
+            if (string.IsNullOrEmpty(timeInStr) || timeInStr == "N/A")
+                return "Absent";
+
+            try
+            {
+                // Parse the time in string
+                if (DateTime.TryParse(timeInStr, out DateTime timeIn))
+                {
+                    // Create a DateTime for 8:00 AM on the same day
+                    DateTime cutoffTime = new DateTime(timeIn.Year, timeIn.Month, timeIn.Day, 8, 0, 0);
+
+                    // Create a DateTime for 8:01 AM on the same day
+                    DateTime lateTime = new DateTime(timeIn.Year, timeIn.Month, timeIn.Day, 8, 1, 0);
+
+                    // Check if time in is before or equal to 8:00 AM
+                    if (timeIn <= cutoffTime)
+                    {
+                        return "On Time";
+                    }
+                    // Check if time in is 8:01 AM or later
+                    else if (timeIn >= lateTime)
+                    {
+                        return "Late";
+                    }
+                    else
+                    {
+                        // For any other case (between 8:00:01 and 8:00:59), consider as On Time
+                        return "On Time";
+                    }
+                }
+                else
+                {
+                    // If parsing fails, return the existing status or Absent
+                    return !string.IsNullOrEmpty(existingStatus) ? existingStatus : "Absent";
+                }
+            }
+            catch
+            {
+                // If any error occurs, return the existing status or Absent
+                return !string.IsNullOrEmpty(existingStatus) ? existingStatus : "Absent";
+            }
+        }
+
         private async void PopulateDateComboBox()
         {
             try
@@ -322,9 +417,9 @@ namespace HRIS_JAP_ATTPAY
             try
             {
                 dataGridViewAttendance.Rows.Clear();
+                attendanceKeyMap.Clear(); // Clear the key mapping
                 dataGridViewAttendance.Refresh();
 
-                // Rest of your loading code remains the same...
                 // Show loading indicator
                 Cursor.Current = Cursors.WaitCursor;
 
@@ -347,14 +442,20 @@ namespace HRIS_JAP_ATTPAY
                     }
 
                     int counter = 1;
+                    int rowIndex = 0;
+
                     foreach (var attendanceItem in attendanceData)
                     {
                         if (attendanceItem != null && attendanceItem.Type != JTokenType.Null)
                         {
-                            bool recordAdded = ProcessAttendanceRecord(attendanceItem, employeeDict, selectedDate, counter);
+                            // Get the Firebase key for this record (index-based since it's an array)
+                            string firebaseKey = (counter - 1).ToString(); // Use index as key
+
+                            bool recordAdded = ProcessAttendanceRecord(attendanceItem, employeeDict, selectedDate, counter, rowIndex, firebaseKey);
                             if (recordAdded)
                             {
                                 counter++;
+                                rowIndex++;
                             }
                         }
                     }
@@ -396,7 +497,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private bool ProcessAttendanceRecord(JToken attendance, Dictionary<string, dynamic> employeeDict, DateTime? selectedDate, int counter)
+        private bool ProcessAttendanceRecord(JToken attendance, Dictionary<string, dynamic> employeeDict, DateTime? selectedDate, int counter, int rowIndex, string firebaseKey)
         {
             try
             {
@@ -404,6 +505,7 @@ namespace HRIS_JAP_ATTPAY
                 string timeInStr = attendance["time_in"]?.ToString() ?? "";
                 string timeOutStr = attendance["time_out"]?.ToString() ?? "";
                 string attendanceDateStr = attendance["attendance_date"]?.ToString() ?? "";
+                string existingStatus = attendance["status"]?.ToString() ?? "";
 
                 // Debug: Check what dates we're working with
                 Console.WriteLine($"Attendance Date: {attendanceDateStr}, TimeIn: {timeInStr}, TimeOut: {timeOutStr}");
@@ -455,7 +557,10 @@ namespace HRIS_JAP_ATTPAY
                 string timeIn = FormatFirebaseTime(timeInStr);
                 string timeOut = FormatFirebaseTime(timeOutStr);
                 string hoursWorked = attendance["hours_worked"]?.ToString() ?? "0.00";
-                string status = attendance["status"]?.ToString() ?? "Absent";
+
+                // 🔹 USE THE NEW STATUS CALCULATION METHOD
+                string status = CalculateStatus(timeInStr, timeOutStr, existingStatus);
+
                 string verification = attendance["verification_method"]?.ToString() ?? "Manual";
                 string scheduleId = attendance["schedule_id"]?.ToString() ?? "";
                 string overtimeHoursStr = attendance["overtime_hours"]?.ToString() ?? "0.00"; // Get overtime_hours directly
@@ -493,6 +598,9 @@ namespace HRIS_JAP_ATTPAY
                             verification,
                             Properties.Resources.VerticalThreeDots
                         );
+
+                        // Store the Firebase key for this row
+                        attendanceKeyMap[rowIndex] = firebaseKey;
                     });
                 }
                 else
@@ -509,9 +617,13 @@ namespace HRIS_JAP_ATTPAY
                         verification,
                         Properties.Resources.VerticalThreeDots
                     );
+
+                    // Store the Firebase key for this row
+                    attendanceKeyMap[rowIndex] = firebaseKey;
                 }
 
-                Console.WriteLine($"Record added for employee {employeeId} on date {attendanceDateStr}");
+                Console.WriteLine($"Record added for employee {employeeId} on date {attendanceDateStr} with key {firebaseKey}");
+                Console.WriteLine($"Status calculated: TimeIn={timeInStr} -> Status={status}");
                 return true;
             }
             catch (Exception ex)
@@ -569,10 +681,15 @@ namespace HRIS_JAP_ATTPAY
                 string timeIn = FormatFirebaseTime(record.ContainsKey("time_in") ? record["time_in"] : "N/A");
                 string timeOut = FormatFirebaseTime(record.ContainsKey("time_out") ? record["time_out"] : "N/A");
                 string hoursWorked = record.ContainsKey("hours_worked") ? record["hours_worked"] : "0.00";
-                string status = record.ContainsKey("status") ? record["status"] : "Absent";
+                string existingStatus = record.ContainsKey("status") ? record["status"] : "Absent";
                 string verification = record.ContainsKey("verification_method") ? record["verification_method"] : "Manual";
                 string scheduleId = record.ContainsKey("schedule_id") ? record["schedule_id"] : "";
                 string overtimeHoursStr = record.ContainsKey("overtime_hours") ? record["overtime_hours"] : "0.00";
+
+                // 🔹 USE THE NEW STATUS CALCULATION METHOD
+                string status = CalculateStatus(record.ContainsKey("time_in") ? record["time_in"] : "N/A",
+                                              record.ContainsKey("time_out") ? record["time_out"] : "N/A",
+                                              existingStatus);
 
                 string overtime = CalculateOvertimeHours(overtimeHoursStr, hoursWorked, employeeId, scheduleId);
 
@@ -644,7 +761,9 @@ namespace HRIS_JAP_ATTPAY
                             string empId = item["employee_id"]?.ToString() ?? "null";
                             string date = item["attendance_date"]?.ToString() ?? "null";
                             string overtime = item["overtime_hours"]?.ToString() ?? "null";
-                            Console.WriteLine($"Employee: {empId}, Date: {date}, Overtime: {overtime}");
+                            string timeIn = item["time_in"]?.ToString() ?? "null";
+                            string status = CalculateStatus(timeIn, "", item["status"]?.ToString());
+                            Console.WriteLine($"Employee: {empId}, Date: {date}, TimeIn: {timeIn}, Status: {status}, Overtime: {overtime}");
                         }
                     }
                 }

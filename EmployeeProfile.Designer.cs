@@ -164,6 +164,7 @@
             this.buttonArchive.TabIndex = 58;
             this.buttonArchive.Text = "Archive";
             this.buttonArchive.UseVisualStyleBackColor = false;
+            this.buttonArchive.Click += new System.EventHandler(this.buttonArchive_Click_1);
             // 
             // buttonEdit
             // 

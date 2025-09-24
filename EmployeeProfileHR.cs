@@ -6,17 +6,17 @@ using System.Windows.Forms;
 using Firebase.Database;
 using Firebase.Database.Query;
 using Newtonsoft.Json.Linq;
-using System.Drawing; // Added for Image handling
+using System.Drawing;
+using System.Net.Http;
+using System.IO;
 
 namespace HRIS_JAP_ATTPAY
 {
     public partial class EmployeeProfileHR : Form
     {
-        // 🔹 Store employeeId for reference
         private readonly string employeeId;
-
-        // 🔹 Firebase client
         private readonly FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        public bool UserConfirmed { get; private set; }
 
         public EmployeeProfileHR(string employeeId)
         {
@@ -94,7 +94,8 @@ namespace HRIS_JAP_ATTPAY
                 labelWorkDaysInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelWorkHours.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelWorkHoursInputA.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelAltWorkHoursInputB.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                // Fixed: Changed labelAltWorkHoursInputB to labelWorkHoursInputB
+                labelWorkHoursInputB.Font = AttributesClass.GetFont("Roboto-Light", 12f);
             }
             catch (Exception ex)
             {
@@ -112,28 +113,22 @@ namespace HRIS_JAP_ATTPAY
                     return;
                 }
 
-                Console.WriteLine($"Loading details for employee: {employeeId}");
-
-                // 🔹 Test Firebase connectivity first
+                // Test Firebase connectivity
                 try
                 {
                     var test = await firebase.Child("EmployeeDetails").OnceAsync<object>();
-                    Console.WriteLine($"Firebase connection successful. Found {test.Count} employee records.");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Firebase connection failed: {ex.Message}");
                     MessageBox.Show("Cannot connect to Firebase. Please check your internet connection.");
                     return;
                 }
 
-                // 🔹 APPROACH 1: Use dynamic objects for more flexibility
                 await LoadEmployeeDetailsDynamic();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to load employee details: " + ex.Message);
-                Console.WriteLine($"Error details: {ex}");
             }
         }
 
@@ -141,7 +136,6 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // 🔹 Fetch personal info by employeeId using dynamic
                 var employeeResponse = await firebase
                     .Child("EmployeeDetails")
                     .Child(employeeId)
@@ -150,32 +144,34 @@ namespace HRIS_JAP_ATTPAY
                 if (employeeResponse != null)
                 {
                     dynamic employee = employeeResponse;
-                    labelEmployeeIDInput.Text = employee?.employee_id ?? "N/A";
-                    labelFirstNameInput.Text = employee["first_name"]?.ToString() ?? "N/A";
-                    labelMiddleNameInput.Text = employee["middle_name"]?.ToString() ?? "N/A";
-                    labelLastNameInput.Text = employee["last_name"]?.ToString() ?? "N/A";
-                    labelGenderInput.Text = employee["gender"]?.ToString() ?? "N/A";
+
+                    // Safe label updates with null checking
+                    SafeSetLabelText(labelEmployeeIDInput, employee?.employee_id?.ToString());
+                    SafeSetLabelText(labelFirstNameInput, employee?.first_name?.ToString());
+                    SafeSetLabelText(labelMiddleNameInput, employee?.middle_name?.ToString());
+                    SafeSetLabelText(labelLastNameInput, employee?.last_name?.ToString());
+                    SafeSetLabelText(labelGenderInput, employee?.gender?.ToString());
+                    SafeSetLabelText(labelEmailInput, employee?.email?.ToString());
+                    SafeSetLabelText(labelAddressInput, employee?.address?.ToString());
+                    SafeSetLabelText(labelContactInput, employee?.contact?.ToString());
+                    SafeSetLabelText(labelMaritalStatusInput, employee?.marital_status?.ToString());
+                    SafeSetLabelText(labelNationalityInput, employee?.nationality?.ToString());
+                    SafeSetLabelText(labelRFIDTagInput, employee?.rfid_tag?.ToString());
+
+                    // Date of birth handling
                     if (!string.IsNullOrEmpty(employee?.date_of_birth?.ToString()))
                     {
                         if (DateTime.TryParse(employee.date_of_birth.ToString(), out DateTime dob))
-                            labelDateOfBirthInput.Text = dob.ToString("yyyy-MM-dd"); // Only date
+                            SafeSetLabelText(labelDateOfBirthInput, dob.ToString("yyyy-MM-dd"));
                         else
-                            labelDateOfBirthInput.Text = employee.date_of_birth.ToString();
+                            SafeSetLabelText(labelDateOfBirthInput, employee.date_of_birth.ToString());
                     }
                     else
                     {
-                        labelDateOfBirthInput.Text = "N/A";
+                        SafeSetLabelText(labelDateOfBirthInput, "N/A");
                     }
-                    labelEmailInput.Text = employee["email"]?.ToString() ?? "N/A";
-                    labelAddressInput.Text = employee["address"]?.ToString() ?? "N/A";
-                    labelContactInput.Text = employee["contact"]?.ToString() ?? "N/A";
 
-                    // 🔹 Add these
-                    labelMaritalStatusInput.Text = employee?.marital_status ?? "N/A";
-                    labelNationalityInput.Text = employee?.nationality ?? "N/A";
-                    labelRFIDTagInput.Text = employee?.rfid_tag ?? "N/A";
-
-                    // 🔹 NEW: Load profile image if available
+                    // Load profile image
                     string imageUrl = employee?.image_url?.ToString();
                     if (!string.IsNullOrEmpty(imageUrl))
                     {
@@ -183,8 +179,7 @@ namespace HRIS_JAP_ATTPAY
                     }
                     else
                     {
-                        // Set default image or clear existing
-                        pictureBox1.Image = null; // or set a default placeholder image
+                        SafeSetPictureBoxImage(pictureBox1, null);
                     }
                 }
                 else
@@ -193,61 +188,63 @@ namespace HRIS_JAP_ATTPAY
                     return;
                 }
 
-                // 🔹 APPROACH 2: Direct JSON parsing for EmploymentInfo array
                 await LoadEmploymentInfoDirect();
-
-                // 🔹 APPROACH 3: Manual iteration for Work_Schedule array
                 await LoadWorkScheduleManual();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error in dynamic loading: " + ex.Message);
+                MessageBox.Show("Error loading employee data: " + ex.Message);
             }
         }
 
-        // 🔹 NEW: Method to load profile image
+        private void SafeSetLabelText(Label label, string text)
+        {
+            if (label.InvokeRequired)
+            {
+                label.Invoke(new Action(() => label.Text = text ?? "N/A"));
+            }
+            else
+            {
+                label.Text = text ?? "N/A";
+            }
+        }
+
+        private void SafeSetPictureBoxImage(PictureBox pictureBox, Image image)
+        {
+            if (pictureBox.InvokeRequired)
+            {
+                pictureBox.Invoke(new Action(() =>
+                {
+                    pictureBox.Image = image;
+                    pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
+                }));
+            }
+            else
+            {
+                pictureBox.Image = image;
+                pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
+            }
+        }
+
         private async Task LoadProfileImage(string imageUrl)
         {
             try
             {
-                // Use Task.Run to avoid blocking the UI thread
-                await Task.Run(() =>
+                using (HttpClient client = new HttpClient())
                 {
-                    // Invoke on UI thread to update the pictureBox
-                    if (pictureBox1.InvokeRequired)
+                    client.Timeout = TimeSpan.FromSeconds(30);
+                    var imageBytes = await client.GetByteArrayAsync(imageUrl);
+                    using (var ms = new MemoryStream(imageBytes))
                     {
-                        pictureBox1.Invoke(new Action(() =>
-                        {
-                            try
-                            {
-                                pictureBox1.Load(imageUrl);
-                                pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-                            }
-                            catch
-                            {
-                                // If image loading fails, set to null or default
-                                pictureBox1.Image = null;
-                            }
-                        }));
+                        var image = Image.FromStream(ms);
+                        SafeSetPictureBoxImage(pictureBox1, image);
                     }
-                    else
-                    {
-                        try
-                        {
-                            pictureBox1.Load(imageUrl);
-                            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-                        }
-                        catch
-                        {
-                            pictureBox1.Image = null;
-                        }
-                    }
-                });
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading profile image: {ex.Message}");
-                // Silently fail - don't show error for image loading
+                SafeSetPictureBoxImage(pictureBox1, null);
             }
         }
 
@@ -255,14 +252,12 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // 🔹 Get all EmploymentInfo as raw object
                 var employmentData = await firebase
                     .Child("EmploymentInfo")
                     .OnceSingleAsync<object>();
 
                 if (employmentData != null)
                 {
-                    // Convert to JArray
                     var employmentArray = JArray.FromObject(employmentData);
 
                     foreach (var item in employmentArray)
@@ -272,48 +267,49 @@ namespace HRIS_JAP_ATTPAY
                             var empId = item["employee_id"]?.ToString();
                             if (empId == employeeId)
                             {
-                                labelDepartmentInput.Text = item["department"]?.ToString() ?? "N/A";
-                                labelPositionInput.Text = item["position"]?.ToString() ?? "N/A";
-                                labelContractTypeInput.Text = item["contract_type"]?.ToString() ?? "N/A";
-                                labelManagerInput.Text = item["manager_name"]?.ToString() ?? "N/A";
+                                SafeSetLabelText(labelDepartmentInput, item["department"]?.ToString());
+                                SafeSetLabelText(labelPositionInput, item["position"]?.ToString());
+                                SafeSetLabelText(labelContractTypeInput, item["contract_type"]?.ToString());
+                                SafeSetLabelText(labelManagerInput, item["manager_name"]?.ToString());
+
+                                // Date of joining
                                 if (!string.IsNullOrEmpty(item["date_of_joining"]?.ToString()))
                                 {
                                     if (DateTime.TryParse(item["date_of_joining"].ToString(), out DateTime doj))
-                                        labelDateOfJoiningInput.Text = doj.ToString("yyyy-MM-dd"); // Only date
+                                        SafeSetLabelText(labelDateOfJoiningInput, doj.ToString("yyyy-MM-dd"));
                                     else
-                                        labelDateOfJoiningInput.Text = item["date_of_joining"].ToString();
+                                        SafeSetLabelText(labelDateOfJoiningInput, item["date_of_joining"].ToString());
                                 }
                                 else
                                 {
-                                    labelDateOfJoiningInput.Text = "N/A";
+                                    SafeSetLabelText(labelDateOfJoiningInput, "N/A");
                                 }
-                                // Date of Exit
+
+                                // Date of exit
                                 if (!string.IsNullOrEmpty(item["date_of_exit"]?.ToString()))
                                 {
                                     if (DateTime.TryParse(item["date_of_exit"].ToString(), out DateTime doe))
-                                        labelDateOfExitInput.Text = doe.ToString("yyyy-MM-dd"); // Only date
+                                        SafeSetLabelText(labelDateOfExitInput, doe.ToString("yyyy-MM-dd"));
                                     else
-                                        labelDateOfExitInput.Text = item["date_of_exit"].ToString();
+                                        SafeSetLabelText(labelDateOfExitInput, item["date_of_exit"].ToString());
                                 }
                                 else
                                 {
-                                    labelDateOfExitInput.Text = "N/A";
+                                    SafeSetLabelText(labelDateOfExitInput, "N/A");
                                 }
-                                Console.WriteLine("Found employment info for " + employeeId);
                                 return;
                             }
                         }
                     }
                 }
 
-                // If no match found
-                Console.WriteLine("No employment info found for " + employeeId);
-                labelDepartmentInput.Text = "N/A";
-                labelPositionInput.Text = "N/A";
-                labelContractTypeInput.Text = "N/A";
-                labelManagerInput.Text = "N/A";
-                labelDateOfJoiningInput.Text = "N/A";
-                labelDateOfExitInput.Text = "N/A";
+                // Set defaults if no data found
+                SafeSetLabelText(labelDepartmentInput, "N/A");
+                SafeSetLabelText(labelPositionInput, "N/A");
+                SafeSetLabelText(labelContractTypeInput, "N/A");
+                SafeSetLabelText(labelManagerInput, "N/A");
+                SafeSetLabelText(labelDateOfJoiningInput, "N/A");
+                SafeSetLabelText(labelDateOfExitInput, "N/A");
             }
             catch (Exception ex)
             {
@@ -325,7 +321,6 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // 🔹 Get all Work_Schedule as JSON string
                 var scheduleData = await firebase
                     .Child("Work_Schedule")
                     .OnceSingleAsync<object>();
@@ -383,17 +378,12 @@ namespace HRIS_JAP_ATTPAY
                         }
                     }
 
-                    labelWorkDaysInput.Text = regularDays.Any() ? string.Join(" - ", regularDays) : "N/A";
-                    labelWorkHoursInputA.Text = !string.IsNullOrEmpty(regularStart) ? regularStart : "N/A";
-                    labelWorkHoursInputB.Text = !string.IsNullOrEmpty(regularEnd) ? regularEnd : "N/A";
-
-                    labelAltWorkDaysInput.Text = alternateDays.Any() ? string.Join(" - ", alternateDays) : "N/A";
-                    labelAltWorkHoursInputA.Text = !string.IsNullOrEmpty(alternateStart) ? alternateStart : "N/A";
-                    labelAltWorkHoursInputB.Text = !string.IsNullOrEmpty(alternateEnd) ? alternateEnd : "N/A";
-                }
-                else
-                {
-                    Console.WriteLine("No schedule data found");
+                    SafeSetLabelText(labelWorkDaysInput, regularDays.Any() ? string.Join(" - ", regularDays) : "N/A");
+                    SafeSetLabelText(labelWorkHoursInputA, !string.IsNullOrEmpty(regularStart) ? regularStart : "N/A");
+                    SafeSetLabelText(labelWorkHoursInputB, !string.IsNullOrEmpty(regularEnd) ? regularEnd : "N/A");
+                    SafeSetLabelText(labelAltWorkDaysInput, alternateDays.Any() ? string.Join(" - ", alternateDays) : "N/A");
+                    SafeSetLabelText(labelAltWorkHoursInputA, !string.IsNullOrEmpty(alternateStart) ? alternateStart : "N/A");
+                    SafeSetLabelText(labelAltWorkHoursInputB, !string.IsNullOrEmpty(alternateEnd) ? alternateEnd : "N/A");
                 }
             }
             catch (Exception ex)
@@ -402,59 +392,71 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private void buttonEdit_Click(object sender, EventArgs e)
+        private async void buttonEdit_Click(object sender, EventArgs e)
         {
             Form parentForm = this.FindForm();
             EditEmployeeProfileHR editEmployeeProfileHRForm = new EditEmployeeProfileHR(employeeId);
             AttributesClass.ShowWithOverlay(parentForm, editEmployeeProfileHRForm);
         }
 
-        private void buttonArchive_Click(object sender, EventArgs e)
+        private async void buttonArchive_Click(object sender, EventArgs e)
         {
-            Form parentForm = this.FindForm();
-            ConfirmArchive confirmArchiveForm = new ConfirmArchive();
-            AttributesClass.ShowWithOverlay(parentForm, confirmArchiveForm);
+            using (ConfirmArchive confirmForm = new ConfirmArchive(employeeId))
+            {
+                confirmForm.StartPosition = FormStartPosition.CenterParent;
+                confirmForm.ShowDialog(this); // Just show the dialog, don't check result
+
+                // Only check the UserConfirmed property
+                if (confirmForm.UserConfirmed)
+                {
+                    await ExecuteArchiveAndRefresh();
+                }
+                else
+                {
+                    MessageBox.Show("Archive cancelled.", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
         }
 
+        private async Task ExecuteArchiveAndRefresh()
+        {
+            // Refresh the AdminEmployee data
+            RefreshAdminEmployee();
 
-    }
+            // Close the current form
+            this.Close();
 
-    // 🔹 Keep your model classes as backup
-    public class EmployeeFieldsHR
-    {
-        public string employee_id { get; set; }
-        public string first_name { get; set; }
-        public string middle_name { get; set; }
-        public string last_name { get; set; }
-        public string email { get; set; }
-        public string contact { get; set; }
-        public string date_of_birth { get; set; }
-        public string address { get; set; }
-        public string gender { get; set; }
-        public string marital_status { get; set; }
-        public string nationality { get; set; }
-        public string rfid_tag { get; set; }
-        public string image_url { get; set; } // Added image_url field
-    }
+            // Optional: Show success message
+            MessageBox.Show("Employee archived successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
 
-    public class EmploymentFieldsHR
-    {
-        public string employee_id { get; set; }
-        public string contract_type { get; set; }
-        public string date_of_joining { get; set; }
-        public string date_of_exit { get; set; }
-        public string department { get; set; }
-        public string position { get; set; }
-        public string manager_name { get; set; }
-    }
+        private void RefreshAdminEmployee()
+        {
+            // Find the AdminEmployee user control in the parent form hierarchy
+            Form parentForm = this.FindForm();
+            if (parentForm != null)
+            {
+                var adminEmployeeControl = FindControl<AdminEmployee>(parentForm);
+                if (adminEmployeeControl != null)
+                {
+                    // Call RefreshData on the found AdminEmployee control
+                    adminEmployeeControl.RefreshData();
+                }
+            }
+        }
 
-    public class WorkScheduleFieldsHR
-    {
-        public string employee_id { get; set; }
-        public string day_of_week { get; set; }
-        public string start_time { get; set; }
-        public string end_time { get; set; }
-        public string schedule_type { get; set; }
-        public string schedule_id { get; set; }
+        private T FindControl<T>(Control control) where T : Control
+        {
+            foreach (Control child in control.Controls)
+            {
+                if (child is T found)
+                    return found;
+
+                var deeper = FindControl<T>(child);
+                if (deeper != null)
+                    return deeper;
+            }
+            return null;
+        }
     }
 }

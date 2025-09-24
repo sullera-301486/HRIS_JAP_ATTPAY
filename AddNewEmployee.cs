@@ -4,6 +4,10 @@ using System.Windows.Forms;
 using System.Threading.Tasks;
 using Firebase.Database;
 using Firebase.Database.Query;
+using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json.Linq;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -11,6 +15,11 @@ namespace HRIS_JAP_ATTPAY
     {
         // Firebase client using your given URL
         private readonly FirebaseClient firebase;
+        private string localImagePath; // Store the selected image path
+
+        // ---- Firebase Configuration for v7.3 ----
+        private static readonly string FirebaseStorageBucket = "thesis151515.firebasestorage.app";
+        // ------------------------------------------
 
         public AddNewEmployee()
         {
@@ -46,7 +55,8 @@ namespace HRIS_JAP_ATTPAY
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    pictureBoxEmployee.Image = Image.FromFile(ofd.FileName);
+                    localImagePath = ofd.FileName; // Store the file path
+                    pictureBoxEmployee.Image = Image.FromFile(localImagePath);
                     pictureBoxEmployee.SizeMode = PictureBoxSizeMode.Zoom;
 
                     // remove the "Add Photo" text after image is loaded
@@ -99,12 +109,21 @@ namespace HRIS_JAP_ATTPAY
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            Form parentForm = this.FindForm();
-            ConfirmAddEmployee confirmAddEmployeeForm = new ConfirmAddEmployee();
-            AttributesClass.ShowWithOverlay(parentForm, confirmAddEmployeeForm);
+            // Show confirmation dialog first
+            using (ConfirmAddEmployee confirmForm = new ConfirmAddEmployee())
+            {
+                confirmForm.StartPosition = FormStartPosition.CenterParent;
+                var result = confirmForm.ShowDialog(this);
 
-            // After showing confirmation, add employee to Firebase
-            await AddEmployeeToFirebaseAsync();
+                if (result == DialogResult.OK || confirmForm.UserConfirmed) // Check both for safety
+                {
+                    await AddEmployeeToFirebaseAsync();
+                }
+                else
+                {
+                    MessageBox.Show("Employee addition cancelled.", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
         }
 
         private void setFont()
@@ -184,7 +203,14 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // Collect all UI values
+                // 1. Handle image upload first (if new image was selected)
+                string imageUrl = null;
+                if (!string.IsNullOrEmpty(localImagePath))
+                {
+                    imageUrl = await UploadImageToFirebase(localImagePath, textBoxEmployeeID.Text.Trim());
+                }
+
+                // 2. Collect all UI values
                 string employeeId = textBoxEmployeeID.Text.Trim();
                 string firstName = textBoxFirstName.Text.Trim();
                 string middleName = textBoxMiddleName.Text.Trim();
@@ -203,15 +229,13 @@ namespace HRIS_JAP_ATTPAY
                 string dateOfExit = textBoxDateOfExit.Text.Trim(); // can be blank
                 string managerName = textBoxManager.Text.Trim();
 
-                // For shift schedule & work days & alt schedule, you will likely want to gather the checked boxes & hours
-                // Assuming you have textBoxWorkHoursA and textBoxWorkHoursB, alt times etc.
-                string workHoursA = textBoxWorkHoursA.Text.Trim(); // e.g. "08:00 AM"
-                string workHoursB = textBoxWorkHoursB.Text.Trim(); // e.g. "05:00 PM"
-                string altWorkHoursA = textBoxAltWorkHoursA.Text.Trim(); // alternate hours
+                // For shift schedule & work days & alt schedule
+                string workHoursA = textBoxWorkHoursA.Text.Trim();
+                string workHoursB = textBoxWorkHoursB.Text.Trim();
+                string altWorkHoursA = textBoxAltWorkHoursA.Text.Trim();
                 string altWorkHoursB = textBoxAltWorkHoursB.Text.Trim();
 
                 // Collect which day boxes are checked
-                // e.g.
                 bool[] workDays = {
                     checkBoxM.Checked, checkBoxT.Checked, checkBoxW.Checked,
                     checkBoxTh.Checked, checkBoxF.Checked, checkBoxS.Checked
@@ -221,11 +245,10 @@ namespace HRIS_JAP_ATTPAY
                     checkBoxAltTh.Checked, checkBoxAltF.Checked, checkBoxAltS.Checked
                 };
 
-                // Generate a random RFID
-                var rnd = new Random();
-                string rfidTag = "RFID" + rnd.Next(100000, 999999).ToString();
+                // Set RFID tag to be the same as employee ID
+                string rfidTag = employeeId;
 
-                // Create object matching EmployeeDetails
+                // Create EmployeeDetails object matching your JSON structure
                 var employeeDetailsObj = new
                 {
                     employee_id = employeeId,
@@ -239,14 +262,19 @@ namespace HRIS_JAP_ATTPAY
                     contact = contact,
                     email = email,
                     address = address,
-                    rfid_tag = rfidTag,
+                    rfid_tag = rfidTag, // Now using employee ID as RFID tag
+                    image_url = imageUrl, // Add the image URL here
                     created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
                 };
 
-                // Create object matching EmploymentInfo
+                // Generate employment_id following your pattern (1, 2, 3, etc.)
+                string numericPart = employeeId.Split('-')[1]; // Extract "001" from "JAP-001"
+                string employmentId = numericPart; // This will be "001", "002", etc.
+
+                // Create EmploymentInfo object matching your JSON structure
                 var employmentInfoObj = new
                 {
-                    employment_id = Guid.NewGuid().ToString(), // or some unique id
+                    employment_id = employmentId,
                     employee_id = employeeId,
                     contract_type = contractType,
                     department = department,
@@ -261,25 +289,25 @@ namespace HRIS_JAP_ATTPAY
                 await firebase
                     .Child("EmployeeDetails")
                     .Child(employeeId)
-                    .PutAsync(employeeDetailsObj); // using Put so key = employeeId
+                    .PutAsync(employeeDetailsObj);
 
-                // Push to EmploymentInfo using generated employment_id
+                // Push to EmploymentInfo using the generated employment_id
                 await firebase
                     .Child("EmploymentInfo")
-                    .Child(employmentInfoObj.employment_id)
+                    .Child(employmentId)
                     .PutAsync(employmentInfoObj);
 
                 // Push schedules for regular work days
-                // For each day of week, if checked, create a Work_Schedule entry
-                // Example mapping: 0=M,1=T,2=W,3=Th,4=F,5=S
                 string[] days = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+
+                // Generate schedule IDs following your pattern (1, 2, 3, etc.)
+                int scheduleCounter = 1;
 
                 for (int i = 0; i < workDays.Length; i++)
                 {
                     if (workDays[i])
                     {
-                        // generate a schedule_id
-                        string scheduleId = Guid.NewGuid().ToString();
+                        string scheduleId = scheduleCounter.ToString();
                         var scheduleObj = new
                         {
                             schedule_id = scheduleId,
@@ -293,6 +321,7 @@ namespace HRIS_JAP_ATTPAY
                             .Child("Work_Schedule")
                             .Child(scheduleId)
                             .PutAsync(scheduleObj);
+                        scheduleCounter++;
                     }
                 }
 
@@ -301,10 +330,10 @@ namespace HRIS_JAP_ATTPAY
                 {
                     if (altWorkDays[i])
                     {
-                        string scheduleId2 = Guid.NewGuid().ToString();
-                        var scheduleObj2 = new
+                        string scheduleId = scheduleCounter.ToString();
+                        var scheduleObj = new
                         {
-                            schedule_id = scheduleId2,
+                            schedule_id = scheduleId,
                             employee_id = employeeId,
                             day_of_week = days[i],
                             start_time = altWorkHoursA,
@@ -313,10 +342,27 @@ namespace HRIS_JAP_ATTPAY
                         };
                         await firebase
                             .Child("Work_Schedule")
-                            .Child(scheduleId2)
-                            .PutAsync(scheduleObj2);
+                            .Child(scheduleId)
+                            .PutAsync(scheduleObj);
+                        scheduleCounter++;
                     }
                 }
+
+                // Create default user account
+                var userObj = new
+                {
+                    user_id = (100 + int.Parse(numericPart)).ToString(), // 101, 102, 103, etc.
+                    employee_id = employeeId,
+                    password_hash = "", // You can set a default or generate one
+                    salt = "",
+                    isAdmin = "False",
+                    created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
+                };
+
+                await firebase
+                    .Child("Users")
+                    .Child(userObj.user_id)
+                    .PutAsync(userObj);
 
                 MessageBox.Show("Employee successfully added to Firebase.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.Close();
@@ -324,6 +370,74 @@ namespace HRIS_JAP_ATTPAY
             catch (Exception ex)
             {
                 MessageBox.Show("Error adding employee to Firebase: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // CORRECTED for Firebase Storage v7.3 - Same as in EditEmployeeProfile
+        private async Task<string> UploadImageToFirebase(string localFilePath, string employeeId)
+        {
+            string fileNameOnly = Path.GetFileName(localFilePath);
+            string objectName = $"employee_images/{employeeId}_{fileNameOnly}";
+
+            // CORRECT URL FOR v7.3 - using the full bucket domain
+            string uploadUrl = $"https://firebasestorage.googleapis.com/v0/b/thesis151515.firebasestorage.app/o?uploadType=media&name={Uri.EscapeDataString(objectName)}";
+
+            using (var http = new HttpClient())
+            using (var stream = new FileStream(localFilePath, FileMode.Open, FileAccess.Read))
+            {
+                var content = new StreamContent(stream);
+
+                string ext = Path.GetExtension(localFilePath).ToLowerInvariant();
+                string mime;
+
+                switch (ext)
+                {
+                    case ".png":
+                        mime = "image/png";
+                        break;
+                    case ".jpg":
+                    case ".jpeg":
+                        mime = "image/jpeg";
+                        break;
+                    case ".gif":
+                        mime = "image/gif";
+                        break;
+                    default:
+                        mime = "application/octet-stream";
+                        break;
+                }
+
+                content.Headers.ContentType = new MediaTypeHeaderValue(mime);
+
+                try
+                {
+                    var resp = await http.PostAsync(uploadUrl, content);
+                    string respText = await resp.Content.ReadAsStringAsync();
+
+                    if (!resp.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show($"Upload failed ({(int)resp.StatusCode}): {respText}", "Upload error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return null;
+                    }
+
+                    // Parse response for v7.3
+                    var j = JObject.Parse(respText);
+                    string name = j["name"]?.ToString() ?? objectName;
+                    string bucket = j["bucket"]?.ToString() ?? FirebaseStorageBucket;
+                    string tokens = j["downloadTokens"]?.ToString();
+
+                    // CORRECT download URL for v7.3
+                    string downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/thesis151515.firebasestorage.app/o/{Uri.EscapeDataString(name)}?alt=media";
+                    if (!string.IsNullOrEmpty(tokens))
+                        downloadUrl += "&token=" + tokens;
+
+                    return downloadUrl;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Upload error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return null;
+                }
             }
         }
     }

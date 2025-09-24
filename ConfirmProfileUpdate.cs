@@ -48,12 +48,6 @@ namespace HRIS_JAP_ATTPAY
             this.Close();
         }
 
-        private void buttonConfirm_Click(object sender, EventArgs e)
-        {
-            this.UserConfirmed = true;
-            this.DialogResult = DialogResult.OK;
-            this.Close();
-        }
 
         private void setFont()
         {
@@ -68,6 +62,13 @@ namespace HRIS_JAP_ATTPAY
             {
                 MessageBox.Show("Font load failed: " + ex.Message);
             }
+        }
+
+        private void buttonConfirm_Click_1(object sender, EventArgs e)
+        {
+            this.UserConfirmed = true;
+            this.DialogResult = DialogResult.OK;
+            this.Close();
         }
     }
 }

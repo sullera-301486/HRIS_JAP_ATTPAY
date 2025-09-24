@@ -335,5 +335,10 @@ namespace HRIS_JAP_ATTPAY
 
             return fullName;
         }
+        public void RefreshData()
+        {
+            // Refresh the data grid view
+            LoadFirebaseData();
+        }
     }
 }
