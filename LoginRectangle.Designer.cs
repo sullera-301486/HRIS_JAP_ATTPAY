@@ -36,6 +36,7 @@
             this.textBoxPassword = new System.Windows.Forms.TextBox();
             this.labelFailed = new System.Windows.Forms.Label();
             this.buttonLogin = new System.Windows.Forms.Button();
+            this.labelTermsAndConditions = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // labelWelcome
@@ -43,7 +44,7 @@
             this.labelWelcome.AutoSize = true;
             this.labelWelcome.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelWelcome.ForeColor = System.Drawing.Color.Black;
-            this.labelWelcome.Location = new System.Drawing.Point(45, 40);
+            this.labelWelcome.Location = new System.Drawing.Point(45, 37);
             this.labelWelcome.Name = "labelWelcome";
             this.labelWelcome.Size = new System.Drawing.Size(313, 46);
             this.labelWelcome.TabIndex = 1;
@@ -54,7 +55,7 @@
             this.labelLogin.AutoSize = true;
             this.labelLogin.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelLogin.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(36)))), ((int)(((byte)(30)))));
-            this.labelLogin.Location = new System.Drawing.Point(40, 110);
+            this.labelLogin.Location = new System.Drawing.Point(40, 107);
             this.labelLogin.Name = "labelLogin";
             this.labelLogin.Size = new System.Drawing.Size(148, 46);
             this.labelLogin.TabIndex = 2;
@@ -65,7 +66,7 @@
             this.labelID.AutoSize = true;
             this.labelID.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelID.ForeColor = System.Drawing.Color.Black;
-            this.labelID.Location = new System.Drawing.Point(50, 200);
+            this.labelID.Location = new System.Drawing.Point(50, 195);
             this.labelID.Name = "labelID";
             this.labelID.Size = new System.Drawing.Size(61, 46);
             this.labelID.TabIndex = 3;
@@ -75,7 +76,7 @@
             // 
             this.textBoxID.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(217)))), ((int)(((byte)(217)))), ((int)(((byte)(217)))));
             this.textBoxID.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBoxID.Location = new System.Drawing.Point(55, 265);
+            this.textBoxID.Location = new System.Drawing.Point(55, 260);
             this.textBoxID.MaxLength = 12;
             this.textBoxID.Multiline = true;
             this.textBoxID.Name = "textBoxID";
@@ -88,7 +89,7 @@
             this.labelPassword.AutoSize = true;
             this.labelPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelPassword.ForeColor = System.Drawing.Color.Black;
-            this.labelPassword.Location = new System.Drawing.Point(50, 335);
+            this.labelPassword.Location = new System.Drawing.Point(50, 330);
             this.labelPassword.Name = "labelPassword";
             this.labelPassword.Size = new System.Drawing.Size(204, 46);
             this.labelPassword.TabIndex = 5;
@@ -98,7 +99,7 @@
             // 
             this.textBoxPassword.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(217)))), ((int)(((byte)(217)))), ((int)(((byte)(217)))));
             this.textBoxPassword.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBoxPassword.Location = new System.Drawing.Point(55, 405);
+            this.textBoxPassword.Location = new System.Drawing.Point(55, 400);
             this.textBoxPassword.MaxLength = 12;
             this.textBoxPassword.Multiline = true;
             this.textBoxPassword.Name = "textBoxPassword";
@@ -112,7 +113,7 @@
             this.labelFailed.AutoSize = true;
             this.labelFailed.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelFailed.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(34)))), ((int)(((byte)(31)))));
-            this.labelFailed.Location = new System.Drawing.Point(54, 465);
+            this.labelFailed.Location = new System.Drawing.Point(54, 460);
             this.labelFailed.Name = "labelFailed";
             this.labelFailed.Size = new System.Drawing.Size(228, 20);
             this.labelFailed.TabIndex = 8;
@@ -125,19 +126,33 @@
             this.buttonLogin.Cursor = System.Windows.Forms.Cursors.Hand;
             this.buttonLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonLogin.ForeColor = System.Drawing.Color.White;
-            this.buttonLogin.Location = new System.Drawing.Point(58, 495);
+            this.buttonLogin.Location = new System.Drawing.Point(55, 490);
             this.buttonLogin.Name = "buttonLogin";
-            this.buttonLogin.Size = new System.Drawing.Size(485, 70);
+            this.buttonLogin.Size = new System.Drawing.Size(488, 70);
             this.buttonLogin.TabIndex = 9;
             this.buttonLogin.Text = "LOGIN";
             this.buttonLogin.UseVisualStyleBackColor = false;
             this.buttonLogin.Click += new System.EventHandler(this.buttonLogin_Click);
+            // 
+            // labelTermsAndConditions
+            // 
+            this.labelTermsAndConditions.AutoSize = true;
+            this.labelTermsAndConditions.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.labelTermsAndConditions.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelTermsAndConditions.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(81)))), ((int)(((byte)(148)))));
+            this.labelTermsAndConditions.Location = new System.Drawing.Point(373, 569);
+            this.labelTermsAndConditions.Name = "labelTermsAndConditions";
+            this.labelTermsAndConditions.Size = new System.Drawing.Size(157, 20);
+            this.labelTermsAndConditions.TabIndex = 10;
+            this.labelTermsAndConditions.Text = "Terms && Conditions";
+            this.labelTermsAndConditions.Click += new System.EventHandler(this.labelTermsAndConditions_Click);
             // 
             // LoginRectangle
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
+            this.Controls.Add(this.labelTermsAndConditions);
             this.Controls.Add(this.buttonLogin);
             this.Controls.Add(this.labelFailed);
             this.Controls.Add(this.textBoxPassword);
@@ -164,5 +179,6 @@
         private System.Windows.Forms.TextBox textBoxPassword;
         private System.Windows.Forms.Label labelFailed;
         private System.Windows.Forms.Button buttonLogin;
+        private System.Windows.Forms.Label labelTermsAndConditions;
     }
 }

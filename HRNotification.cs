@@ -22,7 +22,7 @@ namespace HRIS_JAP_ATTPAY
 
         private void HRNotification_Load(object sender, EventArgs e)
         {
-            // ✅ Example 1 - Pending
+            // Example 1 - Pending
             var notif1 = new SummaryNotificationItem();
             notif1.SetData(
                 "Ej Sullera’s entry for 5-28-2025 pending admin review.",
@@ -30,7 +30,7 @@ namespace HRIS_JAP_ATTPAY
             );
             flowSummary.Controls.Add(notif1);
 
-            // ❌ Declined
+            // Declined
             var notif2 = new SummaryNotificationItem();
             notif2.SetData(
                 "Marcus Verzo’s attendance on 5-28-2025 declined by admin.",
@@ -38,7 +38,7 @@ namespace HRIS_JAP_ATTPAY
             );
             flowSummary.Controls.Add(notif2);
 
-            // ✅ Approved
+            // Approved
             var notif3 = new SummaryNotificationItem();
             notif3.SetData(
                 "Elijah Siena’s attendance on 5-22-2025 approved by admin.",

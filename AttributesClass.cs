@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.CustomProperties;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
@@ -159,6 +160,8 @@ public static class AttributesClass
             //nothing
         }
     }
+
+
     private static void UpdateOverlayPosition(Form owner, Form overlay)
     {
         if (owner == null || overlay == null) return;
@@ -186,6 +189,21 @@ public static class AttributesClass
         }
 
         return current ?? startingForm;
+    }
+
+    public static void ShowFullCover(Form owner, Form child)
+    {
+        if (owner == null || child == null) return;
+
+        // Configure child form to behave like a fullscreen overlay on the parent
+        child.TopLevel = false;
+        child.FormBorderStyle = FormBorderStyle.None;
+        child.Dock = DockStyle.Fill;
+
+        // Add child to parent and bring to front
+        owner.Controls.Add(child);
+        child.BringToFront();
+        child.Show();
     }
 
     public static void TextboxPlaceholder(TextBox textBox, string placeholder) //act as textbox hint

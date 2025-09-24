@@ -22,10 +22,5 @@ namespace HRIS_JAP_ATTPAY
             panelLoaderInfo.LoadUserControl(new LoginInfo());
             panelLoaderRectangle.LoadUserControl(new LoginRectangle());
         }
-
-        private void LoginBackground_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }

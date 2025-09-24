@@ -395,7 +395,7 @@
             this.labelDateCoveredInput.Location = new System.Drawing.Point(196, 172);
             this.labelDateCoveredInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelDateCoveredInput.Name = "labelDateCoveredInput";
-            this.labelDateCoveredInput.Size = new System.Drawing.Size(221, 31);
+            this.labelDateCoveredInput.Size = new System.Drawing.Size(360, 31);
             this.labelDateCoveredInput.TabIndex = 50;
             this.labelDateCoveredInput.Text = "N/A";
             this.labelDateCoveredInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -1139,7 +1139,7 @@
             this.panel1.Controls.Add(this.panel2);
             this.panel1.Controls.Add(this.labelGrossPay);
             this.panel1.Location = new System.Drawing.Point(39, 716);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1141, 30);
             this.panel1.TabIndex = 133;
@@ -1162,7 +1162,7 @@
             this.panel2.Controls.Add(this.labelDeductions);
             this.panel2.Controls.Add(this.labelDeductionsInput);
             this.panel2.Location = new System.Drawing.Point(708, 0);
-            this.panel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(308, 30);
             this.panel2.TabIndex = 137;
@@ -1244,7 +1244,7 @@
             this.panel3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(95)))), ((int)(((byte)(218)))), ((int)(((byte)(71)))));
             this.panel3.Controls.Add(this.labelOverallTotalInput);
             this.panel3.Location = new System.Drawing.Point(1055, 716);
-            this.panel3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel3.Margin = new System.Windows.Forms.Padding(4);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(125, 30);
             this.panel3.TabIndex = 138;
@@ -1377,7 +1377,7 @@
             this.buttonExport.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonExport.ForeColor = System.Drawing.Color.White;
             this.buttonExport.Location = new System.Drawing.Point(975, 779);
-            this.buttonExport.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonExport.Margin = new System.Windows.Forms.Padding(4);
             this.buttonExport.Name = "buttonExport";
             this.buttonExport.Size = new System.Drawing.Size(180, 41);
             this.buttonExport.TabIndex = 149;
@@ -1393,7 +1393,7 @@
             this.buttonEdit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonEdit.ForeColor = System.Drawing.Color.White;
             this.buttonEdit.Location = new System.Drawing.Point(765, 779);
-            this.buttonEdit.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonEdit.Margin = new System.Windows.Forms.Padding(4);
             this.buttonEdit.Name = "buttonEdit";
             this.buttonEdit.Size = new System.Drawing.Size(180, 41);
             this.buttonEdit.TabIndex = 148;
@@ -1662,7 +1662,7 @@
             this.Controls.Add(this.XpictureBox);
             this.Controls.Add(this.labelPayrollSummary);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "PayrollSummary";
             this.ShowInTaskbar = false;
             this.Text = "PayrollSummary";

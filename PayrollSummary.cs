@@ -40,7 +40,7 @@ namespace HRIS_JAP_ATTPAY
             InitializeComponent();
             setFont();
 
-            // ADD THIS LINE to load data when form loads
+            // Add this to load data when form loads
             this.Load += async (sender, e) => await LoadPayrollDataAsync();
         }
 
@@ -470,7 +470,7 @@ namespace HRIS_JAP_ATTPAY
                             Others = loan != null && loan.ContainsKey("other_deduction") ? (decimal.Parse(loan["other_deduction"]) / 2).ToString("0.00") : "0.00",
                             TotalDeductions = totalDeductions.ToString("0.00"),
                             NetPay = netPay.ToString("0.00"),
-                            // Leave balances - you'll need to implement these based on your leave tracking
+                            // Leave balances - test value; needs to be replaced with data from Firebase if available
                             VacationLeaveCredit = "6.00",
                             VacationLeaveDebit = "2.00",
                             VacationLeaveBalance = "4.00",
@@ -588,7 +588,6 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // 🔹 Full font initialization (unchanged)
                 labelAmountBase.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelAmountCredit.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelAmountDebit.Font = AttributesClass.GetFont("Roboto-Regular", 10f);

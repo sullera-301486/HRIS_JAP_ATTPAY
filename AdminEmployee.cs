@@ -11,7 +11,7 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class AdminEmployee : UserControl
     {
-        // 🔹 Firebase client
+        // Firebase client
         private FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
 
         public AdminEmployee()
@@ -22,7 +22,7 @@ namespace HRIS_JAP_ATTPAY
             setTextBoxAttributes();
             setDataGridViewAttributes();
 
-            // 🔹 Load Firebase data
+            // Load Firebase data
             LoadFirebaseData();
         }
 
@@ -78,35 +78,35 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewEmployee.CellMouseLeave += dataGridViewEmployee_CellMouseLeave;
             dataGridViewEmployee.CellClick += dataGridViewEmployee_CellClick;
 
-            // 🔹 Ensure columns exist
+            // Ensure columns exist
             dataGridViewEmployee.Columns.Clear();
 
-            // 1️⃣ Leftmost: Counter column (narrower)
+            // Leftmost: Counter column (narrower)
             var counterCol = new DataGridViewTextBoxColumn
             {
                 Name = "RowNumber",
                 HeaderText = "",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                FillWeight = 25 // 🔹 smaller width
+                FillWeight = 36 //  smaller width
             };
             dataGridViewEmployee.Columns.Add(counterCol);
 
-            // 🔹 Main Data Columns
-            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "EmployeeId", HeaderText = "ID", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 80 });
-            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "FullName", HeaderText = "Name", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 120 });
-            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "Department", HeaderText = "Department", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 100 });
-            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "Position", HeaderText = "Position", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 100 });
-            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "Contact", HeaderText = "Contact Number", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 100 });
-            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "Email", HeaderText = "Email", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 120 });
+            // Main Data Columns
+            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "EmployeeId", HeaderText = "ID", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 84 });
+            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "FullName", HeaderText = "Name", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 148 });
+            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "Department", HeaderText = "Department", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 148 });
+            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "Position", HeaderText = "Position", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 108 });
+            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "Contact", HeaderText = "Contact Number", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 110 });
+            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "Email", HeaderText = "Email", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 148 });
 
-            // 2️⃣ Rightmost: Image column (narrower)
+            // Rightmost: Image column (narrower)
             var actionCol = new DataGridViewImageColumn
             {
                 Name = "Action",
                 HeaderText = "",
                 ImageLayout = DataGridViewImageCellLayout.Zoom,
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                FillWeight = 25 // 🔹 smaller width
+                FillWeight = 23 // smaller width
             };
 
             actionCol.Image = Properties.Resources.ExpandRight;
@@ -149,7 +149,7 @@ namespace HRIS_JAP_ATTPAY
         {
             if (e.RowIndex >= 0 && dataGridViewEmployee.Columns[e.ColumnIndex].Name == "Action")
             {
-                // 🔹 Get values from the clicked row
+                //  Get values from the clicked row
                 string employeeId = dataGridViewEmployee.Rows[e.RowIndex].Cells["EmployeeId"].Value?.ToString();
                 string fullName = dataGridViewEmployee.Rows[e.RowIndex].Cells["FullName"].Value?.ToString();
                 string department = dataGridViewEmployee.Rows[e.RowIndex].Cells["Department"].Value?.ToString();
@@ -158,7 +158,7 @@ namespace HRIS_JAP_ATTPAY
                 Form parentForm = this.FindForm();
                 Form profileForm;
 
-                // 🔹 Check if HR
+                //  Check if HR
                 if (!string.IsNullOrEmpty(department) &&
                     department.Equals("Human Resources", StringComparison.OrdinalIgnoreCase))
                 {
@@ -171,29 +171,29 @@ namespace HRIS_JAP_ATTPAY
                     profileForm = new EmployeeProfileHR(employeeId);
                 }
 
-                // 🔹 Show with overlay (like your AddNewEmployee & Filter forms)
+                //  Show with overlay (like your AddNewEmployee & Filter forms)
                 AttributesClass.ShowWithOverlay(parentForm, profileForm);
             }
         }
 
-        // 🔹 Load Firebase data into DataGridView - FIXED VERSION
+        //  Load Firebase data into DataGridView - FIXED VERSION
         private async void LoadFirebaseData()
         {
             try
             {
                 dataGridViewEmployee.Rows.Clear();
 
-                // 🔹 Get EmployeeDetails
+                //  Get EmployeeDetails
                 var firebaseEmployees = await firebase
                     .Child("EmployeeDetails")
                     .OnceAsync<dynamic>();
 
-                // 🔹 Get EmploymentInfo - handle mixed structure
+                //  Get EmploymentInfo - handle mixed structure
                 var firebaseEmployment = await firebase
                     .Child("EmploymentInfo")
                     .OnceAsync<dynamic>();
 
-                // 🔹 Employment info lookup - dynamic handling
+                //  Employment info lookup - dynamic handling
                 var employmentDict = new Dictionary<string, (string Department, string Position)>();
 
                 if (firebaseEmployment != null)
@@ -206,19 +206,19 @@ namespace HRIS_JAP_ATTPAY
                         {
                             dynamic empData = emp.Object;
 
-                            // 🔹 Dynamic employee_id extraction
+                            //  Dynamic employee_id extraction
                             string empId = ExtractEmployeeId(empData, emp.Key);
 
                             if (string.IsNullOrEmpty(empId)) continue;
 
-                            // 🔹 Dynamic department extraction
+                            //  Dynamic department extraction
                             string dept = empData.department ?? empData.Department ?? "";
                             string pos = empData.position ?? empData.Position ?? "";
 
-                            // 🔹 Only add if we have valid data
+                            //  Only add if we have valid data
                             if (!string.IsNullOrEmpty(empId) && (!string.IsNullOrEmpty(dept) || !string.IsNullOrEmpty(pos)))
                             {
-                                // 🔹 Handle duplicates - prefer the most complete record
+                                //  Handle duplicates - prefer the most complete record
                                 if (!employmentDict.ContainsKey(empId) ||
                                     (string.IsNullOrEmpty(employmentDict[empId].Department) && !string.IsNullOrEmpty(dept)))
                                 {
@@ -228,7 +228,7 @@ namespace HRIS_JAP_ATTPAY
                         }
                         catch (Exception ex)
                         {
-                            // 🔹 Skip problematic records but continue processing others
+                            //  Skip problematic records but continue processing others
                             System.Diagnostics.Debug.WriteLine($"Skipped employment record: {ex.Message}");
                             continue;
                         }
@@ -242,13 +242,13 @@ namespace HRIS_JAP_ATTPAY
                     {
                         dynamic data = fbEmp.Object;
 
-                        // 🔹 Dynamic employee ID extraction
+                        //  Dynamic employee ID extraction
                         string employeeId = data.employee_id ?? data.Key ?? "";
                         string fullName = FormatFullName(data.first_name, data.middle_name, data.last_name);
                         string contact = data.contact ?? "";
                         string email = data.email ?? "";
 
-                        // 🔹 Get employment info with fallback
+                        //  Get employment info with fallback
                         string department = "";
                         string position = "";
                         if (!string.IsNullOrEmpty(employeeId) && employmentDict.ContainsKey(employeeId))
@@ -258,7 +258,7 @@ namespace HRIS_JAP_ATTPAY
                             position = employmentInfo.Position;
                         }
 
-                        // 🔹 Add row with counter + image
+                        //  Add row with counter + image
                         dataGridViewEmployee.Rows.Add(
                             counter,
                             employeeId,
@@ -274,13 +274,13 @@ namespace HRIS_JAP_ATTPAY
                     }
                     catch (Exception ex)
                     {
-                        // 🔹 Skip problematic employee records but continue
+                        //  Skip problematic employee records but continue
                         System.Diagnostics.Debug.WriteLine($"Skipped employee record: {ex.Message}");
                         continue;
                     }
                 }
 
-                // 🔹 Show summary
+                //  Show summary
                 if (dataGridViewEmployee.Rows.Count > 0)
                 {
                     System.Diagnostics.Debug.WriteLine($"Successfully loaded {dataGridViewEmployee.Rows.Count} employees");
@@ -296,21 +296,21 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🔹 Helper method to extract employee ID dynamically
+        //  Helper method to extract employee ID dynamically
         private string ExtractEmployeeId(dynamic empData, string firebaseKey)
         {
-            // 🔹 Priority 1: Check for employee_id in the data
+            //  Priority 1: Check for employee_id in the data
             string empId = empData.employee_id ?? empData.EmployeeId ?? "";
 
-            // 🔹 Priority 2: If no employee_id in data, check if key is an employee ID format
+            //  Priority 2: If no employee_id in data, check if key is an employee ID format
             if (string.IsNullOrEmpty(empId))
             {
-                // 🔹 Check if the Firebase key matches employee ID pattern (like "JAP-001")
+                //  Check if the Firebase key matches employee ID pattern (like "JAP-001")
                 if (!string.IsNullOrEmpty(firebaseKey) && firebaseKey.StartsWith("JAP-"))
                 {
                     empId = firebaseKey;
                 }
-                // 🔹 If key is numeric, this might be an array index, so we need to rely on data
+                //  If key is numeric, this might be an array index, so we need to rely on data
                 else if (int.TryParse(firebaseKey, out _))
                 {
                     // This is likely an array index record, we'll use the employee_id from data
@@ -321,14 +321,14 @@ namespace HRIS_JAP_ATTPAY
             return empId?.Trim() ?? "";
         }
 
-        // 🔹 Helper method to format full name safely
+        //  Helper method to format full name safely
         private string FormatFullName(object firstName, object middleName, object lastName)
         {
             string first = firstName?.ToString() ?? "";
             string middle = middleName?.ToString() ?? "";
             string last = lastName?.ToString() ?? "";
 
-            // 🔹 Clean up extra spaces
+            // Clean up extra spaces
             string fullName = $"{first} {middle} {last}".Trim();
             while (fullName.Contains("  "))
                 fullName = fullName.Replace("  ", " ");

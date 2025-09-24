@@ -930,7 +930,7 @@
             this.labelDateCoveredInput.Location = new System.Drawing.Point(196, 172);
             this.labelDateCoveredInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelDateCoveredInput.Name = "labelDateCoveredInput";
-            this.labelDateCoveredInput.Size = new System.Drawing.Size(221, 31);
+            this.labelDateCoveredInput.Size = new System.Drawing.Size(360, 31);
             this.labelDateCoveredInput.TabIndex = 171;
             this.labelDateCoveredInput.Text = "N/A";
             this.labelDateCoveredInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;

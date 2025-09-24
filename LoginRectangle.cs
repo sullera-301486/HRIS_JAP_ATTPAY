@@ -35,6 +35,7 @@ namespace HRIS_JAP_ATTPAY
                 textBoxPassword.Font = AttributesClass.GetFont("Roboto-Regular", 20f);
                 buttonLogin.Font = AttributesClass.GetFont("Roboto-Regular", 30f);
                 labelFailed.Font = AttributesClass.GetFont("Roboto-Light", 10f, FontStyle.Italic);
+                labelTermsAndConditions.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
             }
             catch (Exception ex)
             {
@@ -62,7 +63,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🔐 SHA-256 hash
+        // SHA-256 hash
         private string ComputeHash(string input)
         {
             using (SHA256 sha = SHA256.Create())
@@ -87,7 +88,7 @@ namespace HRIS_JAP_ATTPAY
 
             try
             {
-                // 🔹 Pull user from Firebase
+                // Pull user from Firebase
                 var users = await firebase
                     .Child("Users")
                     .OnceAsync<UserFirebase>();
@@ -106,7 +107,7 @@ namespace HRIS_JAP_ATTPAY
                 {
                     labelFailed.Visible = false;
 
-                    // ✅ Move to correct form based on role
+                    // Move to correct form based on role
                     if (user.isAdmin)
                         MoveToAdmin();
                     else
@@ -150,6 +151,13 @@ namespace HRIS_JAP_ATTPAY
                 doLogin();
                 e.SuppressKeyPress = true;
             }
+        }
+
+        private void labelTermsAndConditions_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            TermsAndConditions termsAndConditions = new TermsAndConditions();
+            AttributesClass.ShowFullCover(parentForm, termsAndConditions);
         }
     }
 }

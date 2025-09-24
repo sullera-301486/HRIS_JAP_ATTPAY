@@ -13,12 +13,12 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class AdminPayroll : UserControl
     {
-        // 🔹 Firebase client
+        // Firebase client
         private FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
         private string currentEmployeeId;
         private string payrollPeriod;
 
-        // 🔹 Search timer for delayed filtering
+        // Search timer for delayed filtering
         private System.Threading.Timer searchTimer;
 
         public AdminPayroll(string employeeId, string period = null)
@@ -30,14 +30,14 @@ namespace HRIS_JAP_ATTPAY
             setDataGridViewAttributes();
             setTextBoxAttributes();
 
-            // 🔹 Add event handler for search textbox
+            // Add event handler for search textbox
             textBoxSearchEmployee.TextChanged += textBoxSearchEmployee_TextChanged;
 
             // Load data from Firebase
             LoadFirebaseData();
         }
 
-        // 🔹 Search functionality implementation
+        // Search functionality implementation
         private void textBoxSearchEmployee_TextChanged(object sender, EventArgs e)
         {
             // Dispose of existing timer if any
@@ -100,16 +100,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🔹 Don't forget to dispose the timer when the form is closed
-        protected override void OnParentChanged(EventArgs e)
-        {
-            if (this.Parent == null)
-            {
-                searchTimer?.Dispose();
-            }
-            base.OnParentChanged(e);
-        }
-
         private void buttonExportAll_Click(object sender, EventArgs e)
         {
             Form parentForm = this.FindForm();
@@ -142,7 +132,7 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewEmployee.CellMouseLeave += dataGridViewEmployee_CellMouseLeave;
             dataGridViewEmployee.CellClick += dataGridViewEmployee_CellClick;
 
-            // 🔹 Setup columns
+            // Setup columns
             dataGridViewEmployee.Columns.Clear();
 
             // Numbering column (without header text)
@@ -151,8 +141,8 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "FullName", HeaderText = "Name", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 120 });
             dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "Department", HeaderText = "Department", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 100 });
             dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "Position", HeaderText = "Position", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 100 });
-            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "GrossPay", HeaderText = "Gross Pay", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 100 });
-            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "NetPay", HeaderText = "Net Pay", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 100 });
+            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "GrossPay", HeaderText = "Gross Pay", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 80 });
+            dataGridViewEmployee.Columns.Add(new DataGridViewTextBoxColumn { Name = "NetPay", HeaderText = "Net Pay", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 80 });
 
             var actionCol = new DataGridViewImageColumn
             {
@@ -263,7 +253,7 @@ namespace HRIS_JAP_ATTPAY
             return records;
         }
 
-        // 🔹 Government contributions & tax calculations (BI-MONTHLY)
+        //  Government contributions & tax calculations (BI-MONTHLY)
         #region Government Contributions & Tax Calculations
         private decimal CalculateSSSContribution(decimal monthlySalary)
         {
@@ -308,7 +298,7 @@ namespace HRIS_JAP_ATTPAY
         }
         #endregion
 
-        // 🔹 Load Firebase Data
+        //  Load Firebase Data
         private async void LoadFirebaseData()
         {
             try
@@ -391,7 +381,7 @@ namespace HRIS_JAP_ATTPAY
                         decimal.TryParse(empInfo.ContainsKey("monthly_salary") ? empInfo["monthly_salary"] : "0", out monthlySalary);
                     }
 
-                    // ✅ Calculate days worked and overtime
+                    //  Calculate days worked and overtime
                     int daysWorked = 0;
                     decimal totalOvertime = 0;
                     foreach (var attendance in attendanceRecords)
@@ -411,13 +401,13 @@ namespace HRIS_JAP_ATTPAY
                         }
                     }
 
-                    // ✅ Basic Pay (daily rate × days worked)
+                    //  Basic Pay (daily rate × days worked)
                     decimal basicPay = dailyRate * daysWorked;
 
-                    // ✅ Overtime Pay
+                    // Overtime Pay
                     decimal overtimePay = CalculateOvertimePay(dailyRate, totalOvertime);
 
-                    // ✅ Get payroll ID
+                    //  Get payroll ID
                     string payrollId = payrollData.ContainsKey(employeeId) ? payrollData[employeeId]["payroll_id"] : "";
 
                     // ✅ Compute Gross Pay (basic + overtime + allowances/earnings)
@@ -434,7 +424,7 @@ namespace HRIS_JAP_ATTPAY
                         grossPay += earnings.ContainsKey("incentives") ? decimal.Parse(earnings["incentives"]) : 0;
                     }
 
-                    // ✅ Compute deductions based on monthly salary
+                    //  Compute deductions based on monthly salary
                     // Note: deduction functions already return SEMI-MONTHLY share (/2)
                     decimal computedMonthlySalary = dailyRate * 26; // assumes 26 working days in a month
                     decimal sss = CalculateSSSContribution(computedMonthlySalary);

@@ -484,7 +484,6 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // Your existing font settings
                 labelAmountBase.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelAmountCredit.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelAmountDebit.Font = AttributesClass.GetFont("Roboto-Regular", 10f);

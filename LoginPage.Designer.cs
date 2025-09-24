@@ -58,13 +58,12 @@
             this.LoginBackground.Dock = System.Windows.Forms.DockStyle.Fill;
             this.LoginBackground.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.LoginBackground;
             this.LoginBackground.Location = new System.Drawing.Point(0, 0);
-            this.LoginBackground.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.LoginBackground.Margin = new System.Windows.Forms.Padding(4);
             this.LoginBackground.Name = "LoginBackground";
             this.LoginBackground.Size = new System.Drawing.Size(1371, 750);
             this.LoginBackground.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.LoginBackground.TabIndex = 0;
             this.LoginBackground.TabStop = false;
-            this.LoginBackground.Click += new System.EventHandler(this.LoginBackground_Click);
             // 
             // LoginForm
             // 
@@ -75,7 +74,7 @@
             this.Controls.Add(this.LoginRectanglePanel);
             this.Controls.Add(this.LoginBackground);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "LoginForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "JAP HRIS Login";
