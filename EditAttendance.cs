@@ -53,7 +53,7 @@ namespace HRIS_JAP_ATTPAY
             textBoxTimeOut.Text = timeOut ?? "";
             textBoxOverTimeIn.Text = "";
             textBoxOverTimeOut.Text = "";
-
+            statusColorCheck();
             // Set the date (you'll need to get this from the main form or Firebase)
             // Try to extract date from the original time in or use current date
             if (!string.IsNullOrEmpty(timeIn) && timeIn != "N/A")
@@ -338,6 +338,7 @@ namespace HRIS_JAP_ATTPAY
             labelHoursWorkedInput.Text = CalculateHoursWorked();
             labelOvertimeInput.Text = CalculateOvertime();
             labelStatusInput.Text = CalculateStatus();
+            statusColorCheck();
         }
 
         private void textBoxOverTimeIn_TextChanged(object sender, EventArgs e)
@@ -349,5 +350,34 @@ namespace HRIS_JAP_ATTPAY
         {
             // You can add overtime-specific calculations here if needed
         }
+
+        private void statusColorCheck()
+        {
+            switch (labelStatusInput.Text)
+            {
+                case "On Time":
+                    labelStatusInput.BackColor = Color.FromArgb(95, 218, 71);
+                    labelStatusInput.ForeColor = Color.White;
+                    break;
+                case "Late":
+                case "Early Out":
+                    labelStatusInput.BackColor = Color.FromArgb(255, 163, 74);
+                    labelStatusInput.ForeColor = Color.White;
+                    break;
+                case "Absent":
+                    labelStatusInput.BackColor = Color.FromArgb(221, 60, 60);
+                    labelStatusInput.ForeColor = Color.White;
+                    break;
+                case "Leave":
+                    labelStatusInput.BackColor = Color.FromArgb(71, 93, 218);
+                    labelStatusInput.ForeColor = Color.White;
+                    break;
+                case "Day Off":
+                    labelStatusInput.BackColor = Color.FromArgb(180, 174, 189);
+                    labelStatusInput.ForeColor = Color.White;
+                    break;
+            }
+        }
+
     }
 }

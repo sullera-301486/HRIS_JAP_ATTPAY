@@ -215,6 +215,12 @@
     <Compile Include="AdminEmployee.Designer.cs">
       <DependentUpon>AdminEmployee.cs</DependentUpon>
     </Compile>
+    <Compile Include="AdminLoan.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AdminLoan.Designer.cs">
+      <DependentUpon>AdminLoan.cs</DependentUpon>
+    </Compile>
     <Compile Include="AdminMenu.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -353,6 +359,18 @@
     </Compile>
     <Compile Include="LeaveNotificationItems.Designer.cs">
       <DependentUpon>LeaveNotificationItems.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LoanDetails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoanDetails.Designer.cs">
+      <DependentUpon>LoanDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LoanDetailsEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoanDetailsEdit.Designer.cs">
+      <DependentUpon>LoanDetailsEdit.cs</DependentUpon>
     </Compile>
     <Compile Include="ManageLeave.cs">
       <SubType>Form</SubType>
@@ -531,6 +549,9 @@
     <EmbeddedResource Include="AdminEmployee.resx">
       <DependentUpon>AdminEmployee.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="AdminLoan.resx">
+      <DependentUpon>AdminLoan.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AdminMenu.resx">
       <DependentUpon>AdminMenu.cs</DependentUpon>
     </EmbeddedResource>
@@ -599,6 +620,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="LeaveNotificationItems.resx">
       <DependentUpon>LeaveNotificationItems.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoanDetails.resx">
+      <DependentUpon>LoanDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoanDetailsEdit.resx">
+      <DependentUpon>LoanDetailsEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ManageLeave.resx">
       <DependentUpon>ManageLeave.cs</DependentUpon>

@@ -246,6 +246,7 @@
             // 
             this.comboBoxDepartment.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
             this.comboBoxDepartment.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxDepartment.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxDepartment.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxDepartment.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxDepartment.ForeColor = System.Drawing.Color.White;
@@ -255,12 +256,12 @@
             this.comboBoxDepartment.Name = "comboBoxDepartment";
             this.comboBoxDepartment.Size = new System.Drawing.Size(183, 28);
             this.comboBoxDepartment.TabIndex = 67;
-            this.comboBoxDepartment.Text = "Select department";
             // 
             // comboBoxPosition
             // 
             this.comboBoxPosition.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
             this.comboBoxPosition.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxPosition.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxPosition.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxPosition.ForeColor = System.Drawing.Color.White;
@@ -270,12 +271,12 @@
             this.comboBoxPosition.Name = "comboBoxPosition";
             this.comboBoxPosition.Size = new System.Drawing.Size(183, 28);
             this.comboBoxPosition.TabIndex = 68;
-            this.comboBoxPosition.Text = "Select position";
             // 
             // comboBoxSort
             // 
             this.comboBoxSort.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
             this.comboBoxSort.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxSort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxSort.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxSort.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxSort.ForeColor = System.Drawing.Color.White;
@@ -285,7 +286,6 @@
             this.comboBoxSort.Name = "comboBoxSort";
             this.comboBoxSort.Size = new System.Drawing.Size(87, 28);
             this.comboBoxSort.TabIndex = 71;
-            this.comboBoxSort.Text = "A-Z";
             // 
             // labelSort
             // 
@@ -401,6 +401,7 @@
             // 
             this.comboBoxUnusedLeave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
             this.comboBoxUnusedLeave.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxUnusedLeave.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxUnusedLeave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxUnusedLeave.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxUnusedLeave.ForeColor = System.Drawing.Color.White;
@@ -410,12 +411,12 @@
             this.comboBoxUnusedLeave.Name = "comboBoxUnusedLeave";
             this.comboBoxUnusedLeave.Size = new System.Drawing.Size(183, 28);
             this.comboBoxUnusedLeave.TabIndex = 81;
-            this.comboBoxUnusedLeave.Text = "Select no. of leaves";
             // 
             // comboBoxOvertimeHours
             // 
             this.comboBoxOvertimeHours.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
             this.comboBoxOvertimeHours.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxOvertimeHours.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxOvertimeHours.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxOvertimeHours.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxOvertimeHours.ForeColor = System.Drawing.Color.White;
@@ -425,7 +426,6 @@
             this.comboBoxOvertimeHours.Name = "comboBoxOvertimeHours";
             this.comboBoxOvertimeHours.Size = new System.Drawing.Size(183, 28);
             this.comboBoxOvertimeHours.TabIndex = 82;
-            this.comboBoxOvertimeHours.Text = "Select no. of hours";
             // 
             // labelDashA
             // 

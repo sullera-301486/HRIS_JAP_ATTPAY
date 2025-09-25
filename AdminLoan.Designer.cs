@@ -1,6 +1,6 @@
 ﻿namespace HRIS_JAP_ATTPAY
 {
-    partial class AdminPayroll
+    partial class AdminLoan
     {
         /// <summary> 
         /// Required designer variable.
@@ -28,26 +28,28 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AdminPayroll));
-            this.comboBoxSelectPayDate = new System.Windows.Forms.ComboBox();
-            this.buttonExportAll = new System.Windows.Forms.Button();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AdminLoan));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.panelPayrollAndLoan = new System.Windows.Forms.Panel();
+            this.labelMovePayroll = new System.Windows.Forms.Label();
             this.panelFilter = new System.Windows.Forms.Panel();
             this.labelFiltersName = new System.Windows.Forms.Label();
-            this.panelDate = new System.Windows.Forms.Panel();
+            this.pictureBoxFilters = new System.Windows.Forms.PictureBox();
             this.panelSearch = new System.Windows.Forms.Panel();
+            this.panelLoan = new System.Windows.Forms.Panel();
             this.textBoxSearchEmployee = new System.Windows.Forms.TextBox();
+            this.pictureBoxSearch = new System.Windows.Forms.PictureBox();
             this.labelAdminPayroll = new System.Windows.Forms.Label();
             this.labelPayrollDate = new System.Windows.Forms.Label();
             this.labelManageLeave = new System.Windows.Forms.Label();
+            this.labelAddLoan = new System.Windows.Forms.Label();
             this.tableLayoutPanelEmployee = new System.Windows.Forms.TableLayoutPanel();
             this.dataGridViewEmployee = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -57,55 +59,16 @@
             this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.labelMoveLoan = new System.Windows.Forms.Label();
-            this.panelLoan = new System.Windows.Forms.Panel();
-            this.panelLoanAndExport = new System.Windows.Forms.Panel();
-            this.dataGridViewImageColumn1 = new System.Windows.Forms.DataGridViewImageColumn();
             this.Column8 = new System.Windows.Forms.DataGridViewImageColumn();
-            this.pictureBoxFilters = new System.Windows.Forms.PictureBox();
-            this.pictureBoxSearch = new System.Windows.Forms.PictureBox();
             this.tableLayoutPanel1.SuspendLayout();
+            this.panelPayrollAndLoan.SuspendLayout();
             this.panelFilter.SuspendLayout();
-            this.panelDate.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFilters)).BeginInit();
             this.panelSearch.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).BeginInit();
             this.tableLayoutPanelEmployee.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewEmployee)).BeginInit();
-            this.panelLoanAndExport.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFilters)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).BeginInit();
             this.SuspendLayout();
-            // 
-            // comboBoxSelectPayDate
-            // 
-            this.comboBoxSelectPayDate.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.comboBoxSelectPayDate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxSelectPayDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBoxSelectPayDate.FormattingEnabled = true;
-            this.comboBoxSelectPayDate.Location = new System.Drawing.Point(0, 1);
-            this.comboBoxSelectPayDate.Margin = new System.Windows.Forms.Padding(0);
-            this.comboBoxSelectPayDate.Name = "comboBoxSelectPayDate";
-            this.comboBoxSelectPayDate.Size = new System.Drawing.Size(283, 37);
-            this.comboBoxSelectPayDate.TabIndex = 9;
-            // 
-            // buttonExportAll
-            // 
-            this.buttonExportAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonExportAll.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(135)))), ((int)(((byte)(57)))));
-            this.buttonExportAll.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.buttonExportAll.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.buttonExportAll.FlatAppearance.BorderSize = 0;
-            this.buttonExportAll.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonExportAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonExportAll.ForeColor = System.Drawing.Color.White;
-            this.buttonExportAll.Location = new System.Drawing.Point(232, 4);
-            this.buttonExportAll.Margin = new System.Windows.Forms.Padding(4);
-            this.buttonExportAll.Name = "buttonExportAll";
-            this.buttonExportAll.Size = new System.Drawing.Size(150, 33);
-            this.buttonExportAll.TabIndex = 10;
-            this.buttonExportAll.Text = "Export All";
-            this.buttonExportAll.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.buttonExportAll.UseVisualStyleBackColor = false;
-            this.buttonExportAll.Click += new System.EventHandler(this.buttonExportAll_Click);
             // 
             // tableLayoutPanel1
             // 
@@ -118,9 +81,8 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 1F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 27F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 1F));
-            this.tableLayoutPanel1.Controls.Add(this.panelLoanAndExport, 6, 1);
+            this.tableLayoutPanel1.Controls.Add(this.panelPayrollAndLoan, 6, 1);
             this.tableLayoutPanel1.Controls.Add(this.panelFilter, 4, 0);
-            this.tableLayoutPanel1.Controls.Add(this.panelDate, 2, 0);
             this.tableLayoutPanel1.Controls.Add(this.panelSearch, 6, 0);
             this.tableLayoutPanel1.Controls.Add(this.labelAdminPayroll, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.labelPayrollDate, 1, 1);
@@ -133,7 +95,30 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 61F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 39F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(1440, 114);
-            this.tableLayoutPanel1.TabIndex = 16;
+            this.tableLayoutPanel1.TabIndex = 17;
+            // 
+            // panelPayrollAndLoan
+            // 
+            this.panelPayrollAndLoan.Controls.Add(this.labelAddLoan);
+            this.panelPayrollAndLoan.Controls.Add(this.labelMovePayroll);
+            this.panelPayrollAndLoan.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelPayrollAndLoan.Location = new System.Drawing.Point(1038, 72);
+            this.panelPayrollAndLoan.Name = "panelPayrollAndLoan";
+            this.panelPayrollAndLoan.Size = new System.Drawing.Size(382, 39);
+            this.panelPayrollAndLoan.TabIndex = 21;
+            // 
+            // labelMovePayroll
+            // 
+            this.labelMovePayroll.AutoSize = true;
+            this.labelMovePayroll.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.labelMovePayroll.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelMovePayroll.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(23)))), ((int)(((byte)(112)))));
+            this.labelMovePayroll.Location = new System.Drawing.Point(4, 8);
+            this.labelMovePayroll.Name = "labelMovePayroll";
+            this.labelMovePayroll.Size = new System.Drawing.Size(208, 25);
+            this.labelMovePayroll.TabIndex = 18;
+            this.labelMovePayroll.Text = "Payroll Management <";
+            this.labelMovePayroll.Click += new System.EventHandler(this.labelMovePayroll_Click);
             // 
             // panelFilter
             // 
@@ -159,15 +144,16 @@
             this.labelFiltersName.TabIndex = 10;
             this.labelFiltersName.Text = "Filters";
             // 
-            // panelDate
+            // pictureBoxFilters
             // 
-            this.panelDate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelDate.Controls.Add(this.comboBoxSelectPayDate);
-            this.panelDate.Location = new System.Drawing.Point(539, 22);
-            this.panelDate.Margin = new System.Windows.Forms.Padding(0);
-            this.panelDate.Name = "panelDate";
-            this.panelDate.Size = new System.Drawing.Size(296, 47);
-            this.panelDate.TabIndex = 17;
+            this.pictureBoxFilters.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pictureBoxFilters.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.filter__1__1;
+            this.pictureBoxFilters.Location = new System.Drawing.Point(97, 0);
+            this.pictureBoxFilters.Margin = new System.Windows.Forms.Padding(4);
+            this.pictureBoxFilters.Name = "pictureBoxFilters";
+            this.pictureBoxFilters.Size = new System.Drawing.Size(49, 46);
+            this.pictureBoxFilters.TabIndex = 7;
+            this.pictureBoxFilters.TabStop = false;
             // 
             // panelSearch
             // 
@@ -181,6 +167,14 @@
             this.panelSearch.Name = "panelSearch";
             this.panelSearch.Size = new System.Drawing.Size(388, 52);
             this.panelSearch.TabIndex = 4;
+            // 
+            // panelLoan
+            // 
+            this.panelLoan.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.panelLoan.Location = new System.Drawing.Point(8, 60);
+            this.panelLoan.Name = "panelLoan";
+            this.panelLoan.Size = new System.Drawing.Size(200, 33);
+            this.panelLoan.TabIndex = 21;
             // 
             // textBoxSearchEmployee
             // 
@@ -197,6 +191,19 @@
             this.textBoxSearchEmployee.TabIndex = 2;
             this.textBoxSearchEmployee.Text = "Find Employee";
             // 
+            // pictureBoxSearch
+            // 
+            this.pictureBoxSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.pictureBoxSearch.BackgroundImage = global::HRIS_JAP_ATTPAY.Properties.Resources.search;
+            this.pictureBoxSearch.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pictureBoxSearch.Dock = System.Windows.Forms.DockStyle.Right;
+            this.pictureBoxSearch.Location = new System.Drawing.Point(331, 0);
+            this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxSearch.Name = "pictureBoxSearch";
+            this.pictureBoxSearch.Size = new System.Drawing.Size(57, 52);
+            this.pictureBoxSearch.TabIndex = 3;
+            this.pictureBoxSearch.TabStop = false;
+            // 
             // labelAdminPayroll
             // 
             this.labelAdminPayroll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -204,9 +211,9 @@
             this.labelAdminPayroll.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelAdminPayroll.Location = new System.Drawing.Point(46, 30);
             this.labelAdminPayroll.Name = "labelAdminPayroll";
-            this.labelAdminPayroll.Size = new System.Drawing.Size(417, 39);
+            this.labelAdminPayroll.Size = new System.Drawing.Size(390, 39);
             this.labelAdminPayroll.TabIndex = 11;
-            this.labelAdminPayroll.Text = "Payroll and Compensation";
+            this.labelAdminPayroll.Text = "Employee Loan Records";
             // 
             // labelPayrollDate
             // 
@@ -217,9 +224,9 @@
             this.labelPayrollDate.Location = new System.Drawing.Point(49, 89);
             this.labelPayrollDate.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.labelPayrollDate.Name = "labelPayrollDate";
-            this.labelPayrollDate.Size = new System.Drawing.Size(118, 25);
+            this.labelPayrollDate.Size = new System.Drawing.Size(346, 25);
             this.labelPayrollDate.TabIndex = 13;
-            this.labelPayrollDate.Text = "[Insert Date]\r\n";
+            this.labelPayrollDate.Text = "Track Employee Loans And Payments";
             // 
             // labelManageLeave
             // 
@@ -234,6 +241,20 @@
             this.labelManageLeave.Size = new System.Drawing.Size(0, 25);
             this.labelManageLeave.TabIndex = 7;
             // 
+            // labelAddLoan
+            // 
+            this.labelAddLoan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelAddLoan.AutoSize = true;
+            this.labelAddLoan.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.labelAddLoan.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelAddLoan.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(23)))), ((int)(((byte)(112)))));
+            this.labelAddLoan.Location = new System.Drawing.Point(266, 8);
+            this.labelAddLoan.Name = "labelAddLoan";
+            this.labelAddLoan.Size = new System.Drawing.Size(114, 25);
+            this.labelAddLoan.TabIndex = 19;
+            this.labelAddLoan.Text = "Add Loan +";
+            this.labelAddLoan.Click += new System.EventHandler(this.labelAddLoan_Click);
+            // 
             // tableLayoutPanelEmployee
             // 
             this.tableLayoutPanelEmployee.ColumnCount = 1;
@@ -247,7 +268,7 @@
             this.tableLayoutPanelEmployee.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanelEmployee.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 648F));
             this.tableLayoutPanelEmployee.Size = new System.Drawing.Size(1440, 648);
-            this.tableLayoutPanelEmployee.TabIndex = 20;
+            this.tableLayoutPanelEmployee.TabIndex = 21;
             // 
             // dataGridViewEmployee
             // 
@@ -260,14 +281,14 @@
             this.dataGridViewEmployee.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridViewEmployee.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dataGridViewEmployee.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle17.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle17.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle17.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewEmployee.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle17;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle15.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle15.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewEmployee.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle15;
             this.dataGridViewEmployee.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewEmployee.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column1,
@@ -278,14 +299,14 @@
             this.Column6,
             this.Column7,
             this.Column8});
-            dataGridViewCellStyle21.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle21.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle21.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            dataGridViewCellStyle21.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle21.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(153)))), ((int)(((byte)(137)))), ((int)(((byte)(207)))));
-            dataGridViewCellStyle21.SelectionForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle21.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewEmployee.DefaultCellStyle = dataGridViewCellStyle21;
+            dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle19.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle19.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            dataGridViewCellStyle19.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle19.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(153)))), ((int)(((byte)(137)))), ((int)(((byte)(207)))));
+            dataGridViewCellStyle19.SelectionForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle19.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewEmployee.DefaultCellStyle = dataGridViewCellStyle19;
             this.dataGridViewEmployee.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridViewEmployee.EnableHeadersVisualStyles = false;
             this.dataGridViewEmployee.GridColor = System.Drawing.Color.White;
@@ -294,21 +315,21 @@
             this.dataGridViewEmployee.Name = "dataGridViewEmployee";
             this.dataGridViewEmployee.ReadOnly = true;
             this.dataGridViewEmployee.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle22.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle22.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle22.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle22.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle22.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle22.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewEmployee.RowHeadersDefaultCellStyle = dataGridViewCellStyle22;
+            dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle20.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle20.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle20.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle20.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle20.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle20.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewEmployee.RowHeadersDefaultCellStyle = dataGridViewCellStyle20;
             this.dataGridViewEmployee.RowHeadersVisible = false;
             this.dataGridViewEmployee.RowHeadersWidth = 51;
-            dataGridViewCellStyle23.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle23.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle23.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle23.SelectionForeColor = System.Drawing.Color.Black;
-            this.dataGridViewEmployee.RowsDefaultCellStyle = dataGridViewCellStyle23;
+            dataGridViewCellStyle21.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle21.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle21.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle21.SelectionForeColor = System.Drawing.Color.Black;
+            this.dataGridViewEmployee.RowsDefaultCellStyle = dataGridViewCellStyle21;
             this.dataGridViewEmployee.RowTemplate.DividerHeight = 10;
             this.dataGridViewEmployee.RowTemplate.Height = 40;
             this.dataGridViewEmployee.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -318,8 +339,8 @@
             // 
             // Column1
             // 
-            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.Column1.DefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.Column1.DefaultCellStyle = dataGridViewCellStyle16;
             this.Column1.FillWeight = 46F;
             this.Column1.HeaderText = "";
             this.Column1.MinimumWidth = 6;
@@ -348,7 +369,7 @@
             // Column4
             // 
             this.Column4.FillWeight = 168F;
-            this.Column4.HeaderText = "Department";
+            this.Column4.HeaderText = "Type";
             this.Column4.MinimumWidth = 6;
             this.Column4.Name = "Column4";
             this.Column4.ReadOnly = true;
@@ -357,7 +378,7 @@
             // Column5
             // 
             this.Column5.FillWeight = 168F;
-            this.Column5.HeaderText = "Position";
+            this.Column5.HeaderText = "Amount";
             this.Column5.MinimumWidth = 6;
             this.Column5.Name = "Column5";
             this.Column5.ReadOnly = true;
@@ -365,12 +386,12 @@
             // 
             // Column6
             // 
-            dataGridViewCellStyle19.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle19.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle19.SelectionForeColor = System.Drawing.Color.Black;
-            this.Column6.DefaultCellStyle = dataGridViewCellStyle19;
+            dataGridViewCellStyle17.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.Color.Black;
+            this.Column6.DefaultCellStyle = dataGridViewCellStyle17;
             this.Column6.FillWeight = 120F;
-            this.Column6.HeaderText = "Gross Pay";
+            this.Column6.HeaderText = "Balance";
             this.Column6.MinimumWidth = 6;
             this.Column6.Name = "Column6";
             this.Column6.ReadOnly = true;
@@ -379,68 +400,19 @@
             // Column7
             // 
             this.Column7.FillWeight = 168F;
-            this.Column7.HeaderText = "Net Pay";
+            this.Column7.HeaderText = "Remarks";
             this.Column7.MinimumWidth = 6;
             this.Column7.Name = "Column7";
             this.Column7.ReadOnly = true;
             this.Column7.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
-            // labelMoveLoan
-            // 
-            this.labelMoveLoan.AutoSize = true;
-            this.labelMoveLoan.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.labelMoveLoan.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelMoveLoan.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(23)))), ((int)(((byte)(112)))));
-            this.labelMoveLoan.Location = new System.Drawing.Point(4, 8);
-            this.labelMoveLoan.Name = "labelMoveLoan";
-            this.labelMoveLoan.Size = new System.Drawing.Size(193, 25);
-            this.labelMoveLoan.TabIndex = 18;
-            this.labelMoveLoan.Text = "Loan Management >";
-            this.labelMoveLoan.Click += new System.EventHandler(this.labelMoveLoan_Click);
-            // 
-            // panelLoan
-            // 
-            this.panelLoan.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.panelLoan.Location = new System.Drawing.Point(8, 60);
-            this.panelLoan.Name = "panelLoan";
-            this.panelLoan.Size = new System.Drawing.Size(200, 33);
-            this.panelLoan.TabIndex = 21;
-            // 
-            // panelLoanAndExport
-            // 
-            this.panelLoanAndExport.Controls.Add(this.buttonExportAll);
-            this.panelLoanAndExport.Controls.Add(this.labelMoveLoan);
-            this.panelLoanAndExport.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelLoanAndExport.Location = new System.Drawing.Point(1038, 72);
-            this.panelLoanAndExport.Name = "panelLoanAndExport";
-            this.panelLoanAndExport.Size = new System.Drawing.Size(382, 39);
-            this.panelLoanAndExport.TabIndex = 21;
-            // 
-            // dataGridViewImageColumn1
-            // 
-            dataGridViewCellStyle24.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle24.NullValue = ((object)(resources.GetObject("dataGridViewCellStyle24.NullValue")));
-            dataGridViewCellStyle24.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle24.SelectionForeColor = System.Drawing.Color.Black;
-            this.dataGridViewImageColumn1.DefaultCellStyle = dataGridViewCellStyle24;
-            this.dataGridViewImageColumn1.FillWeight = 23F;
-            this.dataGridViewImageColumn1.HeaderText = "";
-            this.dataGridViewImageColumn1.Image = ((System.Drawing.Image)(resources.GetObject("dataGridViewImageColumn1.Image")));
-            this.dataGridViewImageColumn1.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Stretch;
-            this.dataGridViewImageColumn1.MinimumWidth = 6;
-            this.dataGridViewImageColumn1.Name = "dataGridViewImageColumn1";
-            this.dataGridViewImageColumn1.ReadOnly = true;
-            this.dataGridViewImageColumn1.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewImageColumn1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.dataGridViewImageColumn1.Width = 34;
-            // 
             // Column8
             // 
-            dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle20.NullValue = ((object)(resources.GetObject("dataGridViewCellStyle20.NullValue")));
-            dataGridViewCellStyle20.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle20.SelectionForeColor = System.Drawing.Color.Black;
-            this.Column8.DefaultCellStyle = dataGridViewCellStyle20;
+            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle18.NullValue = ((object)(resources.GetObject("dataGridViewCellStyle18.NullValue")));
+            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.Color.Black;
+            this.Column8.DefaultCellStyle = dataGridViewCellStyle18;
             this.Column8.FillWeight = 23F;
             this.Column8.HeaderText = "";
             this.Column8.Image = ((System.Drawing.Image)(resources.GetObject("Column8.Image")));
@@ -450,75 +422,49 @@
             this.Column8.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.Column8.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             // 
-            // pictureBoxFilters
-            // 
-            this.pictureBoxFilters.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pictureBoxFilters.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.filter__1__1;
-            this.pictureBoxFilters.Location = new System.Drawing.Point(97, 0);
-            this.pictureBoxFilters.Margin = new System.Windows.Forms.Padding(4);
-            this.pictureBoxFilters.Name = "pictureBoxFilters";
-            this.pictureBoxFilters.Size = new System.Drawing.Size(49, 46);
-            this.pictureBoxFilters.TabIndex = 7;
-            this.pictureBoxFilters.TabStop = false;
-            this.pictureBoxFilters.Click += new System.EventHandler(this.pictureBoxFilters_Click);
-            // 
-            // pictureBoxSearch
-            // 
-            this.pictureBoxSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.pictureBoxSearch.BackgroundImage = global::HRIS_JAP_ATTPAY.Properties.Resources.search;
-            this.pictureBoxSearch.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pictureBoxSearch.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pictureBoxSearch.Location = new System.Drawing.Point(331, 0);
-            this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(0);
-            this.pictureBoxSearch.Name = "pictureBoxSearch";
-            this.pictureBoxSearch.Size = new System.Drawing.Size(57, 52);
-            this.pictureBoxSearch.TabIndex = 3;
-            this.pictureBoxSearch.TabStop = false;
-            // 
-            // AdminPayroll
+            // AdminLoan
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.Controls.Add(this.tableLayoutPanelEmployee);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.Name = "AdminPayroll";
+            this.Name = "AdminLoan";
             this.Size = new System.Drawing.Size(1440, 842);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
+            this.panelPayrollAndLoan.ResumeLayout(false);
+            this.panelPayrollAndLoan.PerformLayout();
             this.panelFilter.ResumeLayout(false);
             this.panelFilter.PerformLayout();
-            this.panelDate.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFilters)).EndInit();
             this.panelSearch.ResumeLayout(false);
             this.panelSearch.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).EndInit();
             this.tableLayoutPanelEmployee.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewEmployee)).EndInit();
-            this.panelLoanAndExport.ResumeLayout(false);
-            this.panelLoanAndExport.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFilters)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
-        private System.Windows.Forms.ComboBox comboBoxSelectPayDate;
-        private System.Windows.Forms.Button buttonExportAll;
+
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.Panel panelDate;
+        private System.Windows.Forms.Panel panelPayrollAndLoan;
+        private System.Windows.Forms.Label labelMovePayroll;
+        private System.Windows.Forms.Panel panelFilter;
+        private System.Windows.Forms.Label labelFiltersName;
+        private System.Windows.Forms.PictureBox pictureBoxFilters;
         private System.Windows.Forms.Panel panelSearch;
+        private System.Windows.Forms.Panel panelLoan;
         private System.Windows.Forms.TextBox textBoxSearchEmployee;
         private System.Windows.Forms.PictureBox pictureBoxSearch;
         private System.Windows.Forms.Label labelAdminPayroll;
         private System.Windows.Forms.Label labelPayrollDate;
         private System.Windows.Forms.Label labelManageLeave;
-        private System.Windows.Forms.Panel panelFilter;
-        private System.Windows.Forms.Label labelFiltersName;
-        private System.Windows.Forms.PictureBox pictureBoxFilters;
+        private System.Windows.Forms.Label labelAddLoan;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanelEmployee;
         private System.Windows.Forms.DataGridView dataGridViewEmployee;
-        private System.Windows.Forms.DataGridViewImageColumn dataGridViewImageColumn1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
@@ -527,8 +473,5 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
         private System.Windows.Forms.DataGridViewImageColumn Column8;
-        private System.Windows.Forms.Panel panelLoan;
-        private System.Windows.Forms.Label labelMoveLoan;
-        private System.Windows.Forms.Panel panelLoanAndExport;
     }
 }

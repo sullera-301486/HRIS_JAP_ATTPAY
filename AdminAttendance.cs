@@ -13,14 +13,14 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class AdminAttendance : UserControl
     {
-        // 🔹 Firebase client
+        //  Firebase client
         private AttendanceFilterCriteria currentAttendanceFilters = new AttendanceFilterCriteria();
         private FirebaseClient firebase = new FirebaseClient(
             "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
         );
         private Dictionary<string, (string Department, string Position)> employeeDepartmentMap = new Dictionary<string, (string Department, string Position)>();
 
-        // 🔹 Store attendance records with their Firebase keys
+        //  Store attendance records with their Firebase keys
         private Dictionary<int, string> attendanceKeyMap = new Dictionary<int, string>();
 
         public AdminAttendance()
@@ -32,7 +32,7 @@ namespace HRIS_JAP_ATTPAY
             setTextBoxAttributes();
             setDataGridViewAttributes();
 
-            // 🔹 Load Firebase attendance data and populate date combo box
+            //  Load Firebase attendance data and populate date combo box
             DebugFirebaseData(); // Add this for debugging
             LoadFirebaseAttendanceData();
             PopulateDateComboBox();
@@ -264,7 +264,7 @@ namespace HRIS_JAP_ATTPAY
         }
 
         // ADD THESE METHODS (same as in the filter form):
-        // Helper method to get values safely - FIXED VERSION
+        // Helper method to get values safely
         private string GetValue(Dictionary<string, object> data, string key)
         {
             if (data == null) return "";
@@ -288,7 +288,6 @@ namespace HRIS_JAP_ATTPAY
             return value.ToString();
         }
 
-        // FIXED TryGetEmploymentInfoByIndex method
         private async Task<Dictionary<string, (string Department, string Position)>> TryGetEmploymentInfoByIndex()
         {
             var employmentDict = new Dictionary<string, (string Department, string Position)>();
@@ -499,7 +498,7 @@ namespace HRIS_JAP_ATTPAY
                 }
             }
 
-            // 🔹 Refresh attendance with selected date
+            // Refresh attendance with selected date
             LoadFirebaseAttendanceData(selectedDate);
         }
 
@@ -522,7 +521,7 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewAttendance.CellClick += dataGridViewAttendance_CellContentClick;
             dataGridViewAttendance.CellFormatting += dataGridViewAttendance_CellFormatting;
 
-            // 🔹 Define columns
+            // Define columns
             dataGridViewAttendance.Columns.Clear();
             dataGridViewAttendance.Columns.Add(new DataGridViewTextBoxColumn { Name = "RowNumber", HeaderText = "", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 25 });
             dataGridViewAttendance.Columns.Add(new DataGridViewTextBoxColumn { Name = "EmployeeId", HeaderText = "ID", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 80 });
@@ -709,7 +708,7 @@ namespace HRIS_JAP_ATTPAY
             return Math.Round(overtime, 2).ToString("0.00");
         }
 
-        // 🔹 NEW METHOD: Calculate status based on business rules
+        // NEW METHOD: Calculate status based on business rules
         private string CalculateStatus(string timeInStr, string timeOutStr, string existingStatus = "")
         {
             // If time in is N/A, then it's Absent

@@ -82,7 +82,7 @@ namespace HRIS_JAP_ATTPAY
             buttonAttendance.ForeColor = Color.FromArgb(43, 23, 112);
             buttonPayroll.BackColor = Color.FromArgb(126, 112, 175);
             buttonPayroll.ForeColor = Color.FromArgb(255, 255, 255);
-            panelLoaderAdmin.LoadUserControl(new AdminPayroll(currentEmployeeId));
+            panelLoaderAdmin.LoadUserControl(new AdminPayroll(AdminViewPanel, currentEmployeeId));
         }
 
         private void SetFont()

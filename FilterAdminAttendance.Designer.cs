@@ -168,6 +168,7 @@
             // 
             this.comboBoxSort.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
             this.comboBoxSort.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxSort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxSort.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxSort.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxSort.ForeColor = System.Drawing.Color.White;
@@ -177,12 +178,12 @@
             this.comboBoxSort.Name = "comboBoxSort";
             this.comboBoxSort.Size = new System.Drawing.Size(113, 28);
             this.comboBoxSort.TabIndex = 28;
-            this.comboBoxSort.Text = "A-Z";
             // 
             // comboBoxDate
             // 
             this.comboBoxDate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
             this.comboBoxDate.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxDate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxDate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxDate.ForeColor = System.Drawing.Color.White;
@@ -192,7 +193,6 @@
             this.comboBoxDate.Name = "comboBoxDate";
             this.comboBoxDate.Size = new System.Drawing.Size(419, 28);
             this.comboBoxDate.TabIndex = 29;
-            this.comboBoxDate.Text = "Select date";
             // 
             // textBoxName
             // 
@@ -224,6 +224,7 @@
             // 
             this.comboBoxDepartment.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
             this.comboBoxDepartment.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxDepartment.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxDepartment.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxDepartment.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxDepartment.ForeColor = System.Drawing.Color.White;
@@ -233,12 +234,12 @@
             this.comboBoxDepartment.Name = "comboBoxDepartment";
             this.comboBoxDepartment.Size = new System.Drawing.Size(196, 28);
             this.comboBoxDepartment.TabIndex = 32;
-            this.comboBoxDepartment.Text = "Select department";
             // 
             // comboBoxPosition
             // 
             this.comboBoxPosition.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
             this.comboBoxPosition.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxPosition.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxPosition.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxPosition.ForeColor = System.Drawing.Color.White;
@@ -248,7 +249,6 @@
             this.comboBoxPosition.Name = "comboBoxPosition";
             this.comboBoxPosition.Size = new System.Drawing.Size(194, 28);
             this.comboBoxPosition.TabIndex = 33;
-            this.comboBoxPosition.Text = "Select position";
             // 
             // labelStatus
             // 

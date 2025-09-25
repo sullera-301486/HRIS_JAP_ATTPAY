@@ -595,7 +595,7 @@
             this.comboBoxDepartment.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxDepartment.ForeColor = System.Drawing.Color.White;
             this.comboBoxDepartment.FormattingEnabled = true;
-            this.comboBoxDepartment.Location = new System.Drawing.Point(921, 76);
+            this.comboBoxDepartment.Location = new System.Drawing.Point(921, 72);
             this.comboBoxDepartment.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxDepartment.Name = "comboBoxDepartment";
             this.comboBoxDepartment.Size = new System.Drawing.Size(232, 33);

@@ -13,6 +13,8 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class AdminPayroll : UserControl
     {
+        private AttributesClassAlt panelLoaderAdminLoan;
+        public Panel AdminViewPanel;
         // Firebase client
         private FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
         private string currentEmployeeId;
@@ -21,7 +23,7 @@ namespace HRIS_JAP_ATTPAY
         // Search timer for delayed filtering
         private System.Threading.Timer searchTimer;
 
-        public AdminPayroll(string employeeId, string period = null)
+        public AdminPayroll(Panel targetPanel, string employeeId, string period = null)
         {
             currentEmployeeId = employeeId;
             payrollPeriod = period;
@@ -35,6 +37,9 @@ namespace HRIS_JAP_ATTPAY
 
             // Load data from Firebase
             LoadFirebaseData();
+
+            AdminViewPanel = targetPanel;
+            panelLoaderAdminLoan = new AttributesClassAlt(AdminViewPanel);
         }
 
         // Search functionality implementation
@@ -162,6 +167,7 @@ namespace HRIS_JAP_ATTPAY
             {
                 labelAdminPayroll.Font = AttributesClass.GetFont("Roboto-Light", 20f);
                 labelPayrollDate.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelMoveLoan.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Underline);
                 labelFiltersName.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
                 buttonExportAll.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 textBoxSearchEmployee.Font = AttributesClass.GetFont("Roboto-Light", 15f);
@@ -193,7 +199,7 @@ namespace HRIS_JAP_ATTPAY
         {
             if (e.RowIndex >= 0 && dataGridViewEmployee.Columns[e.ColumnIndex].Name == "Action")
             {
-                // 🔹 Get the selected employee ID from the grid
+                // Get the selected employee ID from the grid
                 string selectedEmployeeId = dataGridViewEmployee.Rows[e.RowIndex].Cells["EmployeeId"].Value?.ToString();
 
                 if (!string.IsNullOrEmpty(selectedEmployeeId))
@@ -201,7 +207,7 @@ namespace HRIS_JAP_ATTPAY
                     Form parentForm = this.FindForm();
                     PayrollSummary payrollSummaryForm = new PayrollSummary(currentEmployeeId);
 
-                    // 🔹 Pass the selected employee ID to the form
+                    // Pass the selected employee ID to the form
                     payrollSummaryForm.SetEmployeeId(selectedEmployeeId);
 
                     AttributesClass.ShowWithOverlay(parentForm, payrollSummaryForm);
@@ -209,7 +215,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🔹 Handle malformed JSON from Attendance
+        // Handle malformed JSON from Attendance
         private List<Dictionary<string, string>> ParseMalformedJson(string rawJson)
         {
             var records = new List<Dictionary<string, string>>();
@@ -410,7 +416,7 @@ namespace HRIS_JAP_ATTPAY
                     //  Get payroll ID
                     string payrollId = payrollData.ContainsKey(employeeId) ? payrollData[employeeId]["payroll_id"] : "";
 
-                    // ✅ Compute Gross Pay (basic + overtime + allowances/earnings)
+                    // Compute Gross Pay (basic + overtime + allowances/earnings)
                     decimal grossPay = basicPay + overtimePay;
 
                     if (!string.IsNullOrEmpty(payrollId) && payrollEarnings.ContainsKey(payrollId))
@@ -489,6 +495,11 @@ namespace HRIS_JAP_ATTPAY
             {
                 MessageBox.Show($"Error loading {childPath}: " + ex.Message);
             }
+        }
+
+        private void labelMoveLoan_Click(object sender, EventArgs e)
+        {
+            panelLoaderAdminLoan.LoadUserControl(new AdminLoan(AdminViewPanel, currentEmployeeId));
         }
     }
 }
