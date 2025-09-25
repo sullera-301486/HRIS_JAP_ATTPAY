@@ -499,6 +499,7 @@
             this.buttonReset.TabIndex = 89;
             this.buttonReset.Text = "Reset";
             this.buttonReset.UseVisualStyleBackColor = false;
+            this.buttonReset.Click += new System.EventHandler(this.buttonReset_Click_1);
             // 
             // buttonApply
             // 
@@ -514,6 +515,7 @@
             this.buttonApply.TabIndex = 88;
             this.buttonApply.Text = "Apply";
             this.buttonApply.UseVisualStyleBackColor = false;
+            this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click);
             // 
             // FilterAdminEmployee
             // 

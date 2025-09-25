@@ -6,6 +6,8 @@ using Firebase.Database;
 using Firebase.Database.Query;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -13,6 +15,10 @@ namespace HRIS_JAP_ATTPAY
     {
         // Firebase client
         private FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
+
+        // Store original data and current filters
+        private List<EmployeeData> allEmployees = new List<EmployeeData>();
+        private FilterCriteria currentFilters = new FilterCriteria();
 
         public AdminEmployee()
         {
@@ -26,6 +32,22 @@ namespace HRIS_JAP_ATTPAY
             LoadFirebaseData();
         }
 
+        // Helper class to store employee data
+        private class EmployeeData
+        {
+            public string EmployeeId { get; set; }
+            public string FullName { get; set; }
+            public string Department { get; set; }
+            public string Position { get; set; }
+            public string Contact { get; set; }
+            public string Email { get; set; }
+            public string Status { get; set; }
+            public string Gender { get; set; }
+            public string MaritalStatus { get; set; }
+            public string ContractType { get; set; }
+            public DateTime? DateHired { get; set; }
+        }
+
         private void label2_Click(object sender, EventArgs e)
         {
             Form parentForm = this.FindForm();
@@ -37,27 +59,289 @@ namespace HRIS_JAP_ATTPAY
         {
             Form parentForm = this.FindForm();
             FilterAdminEmployee filterAdminEmployeeForm = new FilterAdminEmployee();
+
+            // Subscribe to filter events
+            filterAdminEmployeeForm.FiltersApplied += ApplyFilters;
+            filterAdminEmployeeForm.FiltersReset += ResetFilters;
+
             AttributesClass.ShowWithOverlay(parentForm, filterAdminEmployeeForm);
+        }
+
+        private void ApplyFilters(FilterCriteria filters)
+        {
+            currentFilters = filters;
+
+            // DEBUG: Added filter debugging
+            System.Diagnostics.Debug.WriteLine("=== APPLYING FILTERS ===");
+            System.Diagnostics.Debug.WriteLine($"Department: '{filters.Department}'");
+            System.Diagnostics.Debug.WriteLine($"Position: '{filters.Position}'");
+            System.Diagnostics.Debug.WriteLine($"StatusActive: {filters.StatusActive}");
+            System.Diagnostics.Debug.WriteLine($"StatusNotActive: {filters.StatusNotActive}");
+            System.Diagnostics.Debug.WriteLine($"GenderMale: {filters.GenderMale}");
+            System.Diagnostics.Debug.WriteLine($"GenderFemale: {filters.GenderFemale}");
+            System.Diagnostics.Debug.WriteLine($"MaritalMarried: {filters.MaritalMarried}");
+            System.Diagnostics.Debug.WriteLine($"MaritalSingle: {filters.MaritalSingle}");
+            System.Diagnostics.Debug.WriteLine($"ContractRegular: {filters.ContractRegular}");
+            System.Diagnostics.Debug.WriteLine($"ContractIrregular: {filters.ContractIrregular}");
+            System.Diagnostics.Debug.WriteLine("========================");
+
+            ApplyAllFilters();
+        }
+
+        private void ResetFilters()
+        {
+            currentFilters = new FilterCriteria();
+            ApplyAllFilters();
+        }
+
+        private void ApplyAllFilters()
+        {
+            dataGridViewEmployee.Rows.Clear();
+
+            string searchText = textBoxSearchEmployee.Text.Trim().ToLower();
+
+            var filteredEmployees = allEmployees
+                .Where(emp => MatchesSearchText(emp, searchText) && MatchesFilterCriteria(emp))
+                .ToList();
+
+            // Apply sorting
+            filteredEmployees = ApplySorting(filteredEmployees);
+
+            // Populate grid with filtered data
+            int counter = 1;
+            foreach (var emp in filteredEmployees)
+            {
+                dataGridViewEmployee.Rows.Add(
+                    counter,
+                    emp.EmployeeId,
+                    emp.FullName,
+                    emp.Department,
+                    emp.Position,
+                    emp.Contact,
+                    emp.Email,
+                    Properties.Resources.ExpandRight
+                );
+                counter++;
+            }
+        }
+
+        private bool MatchesSearchText(EmployeeData emp, string searchText)
+        {
+            if (string.IsNullOrEmpty(searchText) || searchText == "find employee")
+                return true;
+
+            return (emp.FullName?.ToLower().Contains(searchText) ?? false) ||
+                   (emp.EmployeeId?.ToLower().Contains(searchText) ?? false) ||
+                   (emp.Department?.ToLower().Contains(searchText) ?? false) ||
+                   (emp.Position?.ToLower().Contains(searchText) ?? false) ||
+                   (emp.Email?.ToLower().Contains(searchText) ?? false);
+        }
+
+        // ONLY CHANGED METHOD - Fixed filtering logic
+        private bool MatchesFilterCriteria(EmployeeData emp)
+        {
+            // DEBUG: Added employee-level debugging
+            System.Diagnostics.Debug.WriteLine($"Filtering employee: {emp.FullName} - Dept: '{emp.Department}' - Pos: '{emp.Position}'");
+            System.Diagnostics.Debug.WriteLine($"Filter Dept: '{currentFilters.Department}' - Filter Pos: '{currentFilters.Position}'");
+
+            // Employee ID filter (optional if filter admin provides it)
+            if (!string.IsNullOrEmpty(currentFilters.EmployeeId))
+            {
+                if (!(emp.EmployeeId?.ToLower().Contains(currentFilters.EmployeeId.ToLower()) ?? false))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Employee ID filter failed for {emp.FullName}");
+                    return false;
+                }
+            }
+
+            // Name filters - FIXED
+            if (!string.IsNullOrEmpty(currentFilters.FirstName) &&
+                currentFilters.FirstName.Trim().ToLower() != "search name")
+            {
+                string searchFirstName = currentFilters.FirstName.Trim().ToLower();
+                if (!(emp.FullName?.ToLower().Contains(searchFirstName) ?? false))
+                {
+                    System.Diagnostics.Debug.WriteLine($"First name filter failed for {emp.FullName}");
+                    return false;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(currentFilters.LastName) &&
+                currentFilters.LastName.Trim().ToLower() != "search name")
+            {
+                string searchLastName = currentFilters.LastName.Trim().ToLower();
+                if (!(emp.FullName?.ToLower().Contains(searchLastName) ?? false))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Last name filter failed for {emp.FullName}");
+                    return false;
+                }
+            }
+
+            // MAJOR FIX: Department filter - Added check to exclude "Select department"
+            if (!string.IsNullOrEmpty(currentFilters.Department) &&
+                !currentFilters.Department.Equals("Select department", StringComparison.OrdinalIgnoreCase))
+            {
+                if (string.IsNullOrEmpty(emp.Department) ||
+                    !emp.Department.Equals(currentFilters.Department, StringComparison.OrdinalIgnoreCase))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Department filter failed for {emp.FullName}: emp='{emp.Department}' vs filter='{currentFilters.Department}'");
+                    return false;
+                }
+            }
+
+            // MAJOR FIX: Position filter - Added check to exclude "Select position"
+            if (!string.IsNullOrEmpty(currentFilters.Position) &&
+                !currentFilters.Position.Equals("Select position", StringComparison.OrdinalIgnoreCase))
+            {
+                if (string.IsNullOrEmpty(emp.Position) ||
+                    !emp.Position.Equals(currentFilters.Position, StringComparison.OrdinalIgnoreCase))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Position filter failed for {emp.FullName}: emp='{emp.Position}' vs filter='{currentFilters.Position}'");
+                    return false;
+                }
+            }
+
+            // Status filter - Added debugging
+            if (currentFilters.StatusActive || currentFilters.StatusNotActive)
+            {
+                bool statusMatch = false;
+                string empStatus = emp.Status ?? "Active";
+
+                if (currentFilters.StatusActive && empStatus.Equals("Active", StringComparison.OrdinalIgnoreCase))
+                    statusMatch = true;
+                if (currentFilters.StatusNotActive && (empStatus.Equals("Inactive", StringComparison.OrdinalIgnoreCase) ||
+                                                       empStatus.Equals("Not Active", StringComparison.OrdinalIgnoreCase)))
+                    statusMatch = true;
+
+                if (!statusMatch)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Status filter failed for {emp.FullName}: emp='{empStatus}' active={currentFilters.StatusActive} inactive={currentFilters.StatusNotActive}");
+                    return false;
+                }
+            }
+
+            // Gender filter - Added debugging
+            if (currentFilters.GenderMale || currentFilters.GenderFemale)
+            {
+                bool genderMatch = false;
+                if (currentFilters.GenderMale && (emp.Gender?.Equals("Male", StringComparison.OrdinalIgnoreCase) ?? false))
+                    genderMatch = true;
+                if (currentFilters.GenderFemale && (emp.Gender?.Equals("Female", StringComparison.OrdinalIgnoreCase) ?? false))
+                    genderMatch = true;
+
+                if (!genderMatch)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Gender filter failed for {emp.FullName}: emp='{emp.Gender}' male={currentFilters.GenderMale} female={currentFilters.GenderFemale}");
+                    return false;
+                }
+            }
+
+            // Marital status filter - Added debugging
+            if (currentFilters.MaritalMarried || currentFilters.MaritalSingle)
+            {
+                bool maritalMatch = false;
+                if (currentFilters.MaritalMarried && (emp.MaritalStatus?.Equals("Married", StringComparison.OrdinalIgnoreCase) ?? false))
+                    maritalMatch = true;
+                if (currentFilters.MaritalSingle && (emp.MaritalStatus?.Equals("Single", StringComparison.OrdinalIgnoreCase) ?? false))
+                    maritalMatch = true;
+
+                if (!maritalMatch)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Marital filter failed for {emp.FullName}: emp='{emp.MaritalStatus}' married={currentFilters.MaritalMarried} single={currentFilters.MaritalSingle}");
+                    return false;
+                }
+            }
+
+            // Contract type filter - Added debugging
+            if (currentFilters.ContractRegular || currentFilters.ContractIrregular)
+            {
+                bool contractMatch = false;
+                if (currentFilters.ContractRegular && (emp.ContractType?.Equals("Regular", StringComparison.OrdinalIgnoreCase) ?? false))
+                    contractMatch = true;
+                if (currentFilters.ContractIrregular &&
+                   ((emp.ContractType?.Equals("Irregular", StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (emp.ContractType?.Equals("Probationary", StringComparison.OrdinalIgnoreCase) ?? false)))
+                {
+                    contractMatch = true;
+                }
+
+                if (!contractMatch)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Contract filter failed for {emp.FullName}: emp='{emp.ContractType}' regular={currentFilters.ContractRegular} irregular={currentFilters.ContractIrregular}");
+                    return false;
+                }
+            }
+
+            // Date filter - Added debugging for date issues
+            if (!string.IsNullOrEmpty(currentFilters.DateFilterType) && !currentFilters.DateFilterType.Equals("Any", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!emp.DateHired.HasValue)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Date filter failed for {emp.FullName}: no date hired");
+                    return false;
+                }
+                DateTime dt = emp.DateHired.Value.Date;
+                DateTime now = DateTime.Now.Date;
+
+                switch (currentFilters.DateFilterType.ToLower())
+                {
+                    case "today":
+                        if (dt != now) return false;
+                        break;
+                    case "this week":
+                        var firstDay = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
+                        int diff = (7 + (int)now.DayOfWeek - (int)firstDay) % 7;
+                        DateTime startOfWeek = now.AddDays(-diff).Date;
+                        DateTime endOfWeek = startOfWeek.AddDays(6).Date;
+                        if (!(dt >= startOfWeek && dt <= endOfWeek)) return false;
+                        break;
+                    case "this month":
+                        if (dt.Year != now.Year || dt.Month != now.Month) return false;
+                        break;
+                    case "this year":
+                        if (dt.Year != now.Year) return false;
+                        break;
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine($"Employee {emp.FullName} PASSED all filters");
+            return true;
+        }
+
+        private List<EmployeeData> ApplySorting(List<EmployeeData> employees)
+        {
+            if (string.IsNullOrEmpty(currentFilters.SortBy))
+            {
+                return employees;
+            }
+
+            string sort = currentFilters.SortBy.ToLower();
+
+            if (sort == "a-z")
+            {
+                return employees.OrderBy(e => e.FullName).ToList();
+            }
+            else if (sort == "z-a")
+            {
+                return employees.OrderByDescending(e => e.FullName).ToList();
+            }
+            else if (sort == "newest-oldest")
+            {
+                return employees.OrderByDescending(e => e.EmployeeId).ToList();
+            }
+            else if (sort == "oldest-newest")
+            {
+                return employees.OrderBy(e => e.EmployeeId).ToList();
+            }
+            else
+            {
+                return employees;
+            }
         }
 
         private void textBoxSearchEmployee_TextChanged(object sender, EventArgs e)
         {
-            string searchText = textBoxSearchEmployee.Text.Trim().ToLower();
-
-            foreach (DataGridViewRow row in dataGridViewEmployee.Rows)
-            {
-                // Check if the row is not the new row and if the search text is not empty
-                if (!row.IsNewRow & searchText != "find employee")
-                {
-                    // Check various cells for a match (e.g., Name, ID, Department)
-                    bool isVisible = string.IsNullOrEmpty(searchText) ||
-                        (row.Cells["FullName"].Value?.ToString().ToLower().Contains(searchText) ?? false) ||
-                        (row.Cells["EmployeeId"].Value?.ToString().ToLower().Contains(searchText) ?? false) ||
-                        (row.Cells["Department"].Value?.ToString().ToLower().Contains(searchText) ?? false);
-
-                    row.Visible = isVisible;
-                }
-            }
+            ApplyAllFilters();
         }
 
         private void setDataGridViewAttributes()
@@ -87,7 +371,7 @@ namespace HRIS_JAP_ATTPAY
                 Name = "RowNumber",
                 HeaderText = "",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                FillWeight = 36 //  smaller width
+                FillWeight = 36
             };
             dataGridViewEmployee.Columns.Add(counterCol);
 
@@ -106,7 +390,7 @@ namespace HRIS_JAP_ATTPAY
                 HeaderText = "",
                 ImageLayout = DataGridViewImageCellLayout.Zoom,
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                FillWeight = 23 // smaller width
+                FillWeight = 23
             };
 
             actionCol.Image = Properties.Resources.ExpandRight;
@@ -149,142 +433,121 @@ namespace HRIS_JAP_ATTPAY
         {
             if (e.RowIndex >= 0 && dataGridViewEmployee.Columns[e.ColumnIndex].Name == "Action")
             {
-                //  Get values from the clicked row
                 string employeeId = dataGridViewEmployee.Rows[e.RowIndex].Cells["EmployeeId"].Value?.ToString();
-                string fullName = dataGridViewEmployee.Rows[e.RowIndex].Cells["FullName"].Value?.ToString();
                 string department = dataGridViewEmployee.Rows[e.RowIndex].Cells["Department"].Value?.ToString();
-                string position = dataGridViewEmployee.Rows[e.RowIndex].Cells["Position"].Value?.ToString();
 
                 Form parentForm = this.FindForm();
                 Form profileForm;
 
-                //  Check if HR
                 if (!string.IsNullOrEmpty(department) &&
                     department.Equals("Human Resources", StringComparison.OrdinalIgnoreCase))
                 {
-                    // HR employee
                     profileForm = new EmployeeProfile(employeeId);
                 }
                 else
                 {
-                    // Non-HR employee
                     profileForm = new EmployeeProfileHR(employeeId);
                 }
 
-                //  Show with overlay (like your AddNewEmployee & Filter forms)
                 AttributesClass.ShowWithOverlay(parentForm, profileForm);
             }
         }
 
-        //  Load Firebase data into DataGridView - FIXED VERSION
+        // FIXED: Handle corrupted EmploymentInfo data with multiple fallback methods
         private async void LoadFirebaseData()
         {
             try
             {
                 dataGridViewEmployee.Rows.Clear();
+                allEmployees.Clear();
 
-                //  Get EmployeeDetails
+                // Get EmployeeDetails (this should work fine)
                 var firebaseEmployees = await firebase
                     .Child("EmployeeDetails")
-                    .OnceAsync<dynamic>();
+                    .OnceAsync<Dictionary<string, object>>();
 
-                //  Get EmploymentInfo - handle mixed structure
-                var firebaseEmployment = await firebase
-                    .Child("EmploymentInfo")
-                    .OnceAsync<dynamic>();
+                System.Diagnostics.Debug.WriteLine($"Found {firebaseEmployees.Count} employee details");
 
-                //  Employment info lookup - dynamic handling
-                var employmentDict = new Dictionary<string, (string Department, string Position)>();
+                // Try multiple approaches to get EmploymentInfo
+                var employmentDict = new Dictionary<string, (string Department, string Position, string Status, string ContractType, DateTime? DateHired)>();
 
-                if (firebaseEmployment != null)
+                // Approach 1: Try to get individual records by index
+                employmentDict = await TryGetEmploymentInfoByIndex();
+
+                // Approach 2: If first approach failed, try manual parsing
+                if (employmentDict.Count == 0)
                 {
-                    foreach (var emp in firebaseEmployment)
-                    {
-                        if (emp?.Object == null) continue;
-
-                        try
-                        {
-                            dynamic empData = emp.Object;
-
-                            //  Dynamic employee_id extraction
-                            string empId = ExtractEmployeeId(empData, emp.Key);
-
-                            if (string.IsNullOrEmpty(empId)) continue;
-
-                            //  Dynamic department extraction
-                            string dept = empData.department ?? empData.Department ?? "";
-                            string pos = empData.position ?? empData.Position ?? "";
-
-                            //  Only add if we have valid data
-                            if (!string.IsNullOrEmpty(empId) && (!string.IsNullOrEmpty(dept) || !string.IsNullOrEmpty(pos)))
-                            {
-                                //  Handle duplicates - prefer the most complete record
-                                if (!employmentDict.ContainsKey(empId) ||
-                                    (string.IsNullOrEmpty(employmentDict[empId].Department) && !string.IsNullOrEmpty(dept)))
-                                {
-                                    employmentDict[empId] = (dept, pos);
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            //  Skip problematic records but continue processing others
-                            System.Diagnostics.Debug.WriteLine($"Skipped employment record: {ex.Message}");
-                            continue;
-                        }
-                    }
+                    System.Diagnostics.Debug.WriteLine("Trying manual parsing approach...");
+                    employmentDict = await TryManualEmploymentInfoParsing();
                 }
 
-                int counter = 1;
+                System.Diagnostics.Debug.WriteLine($"Found {employmentDict.Count} employment records");
+
+                // Process each employee
                 foreach (var fbEmp in firebaseEmployees)
                 {
                     try
                     {
-                        dynamic data = fbEmp.Object;
+                        var data = fbEmp.Object as Dictionary<string, object>;
+                        if (data == null) continue;
 
-                        //  Dynamic employee ID extraction
-                        string employeeId = data.employee_id ?? data.Key ?? "";
-                        string fullName = FormatFullName(data.first_name, data.middle_name, data.last_name);
-                        string contact = data.contact ?? "";
-                        string email = data.email ?? "";
+                        // Extract employee data
+                        string employeeId = GetValue(data, "employee_id");
+                        string firstName = GetValue(data, "first_name");
+                        string middleName = GetValue(data, "middle_name");
+                        string lastName = GetValue(data, "last_name");
+                        string contact = GetValue(data, "contact");
+                        string email = GetValue(data, "email");
+                        string gender = GetValue(data, "gender");
+                        string maritalStatus = GetValue(data, "marital_status");
 
-                        //  Get employment info with fallback
+                        // Get employment info
                         string department = "";
                         string position = "";
+                        string status = "Active";
+                        string contractType = "";
+                        DateTime? dateHired = null;
+
                         if (!string.IsNullOrEmpty(employeeId) && employmentDict.ContainsKey(employeeId))
                         {
                             var employmentInfo = employmentDict[employeeId];
                             department = employmentInfo.Department;
                             position = employmentInfo.Position;
+                            status = employmentInfo.Status;
+                            contractType = employmentInfo.ContractType;
+                            dateHired = employmentInfo.DateHired;
                         }
 
-                        //  Add row with counter + image
-                        dataGridViewEmployee.Rows.Add(
-                            counter,
-                            employeeId,
-                            fullName,
-                            department,
-                            position,
-                            contact,
-                            email,
-                            Properties.Resources.ExpandRight
-                        );
+                        var employee = new EmployeeData
+                        {
+                            EmployeeId = employeeId,
+                            FullName = FormatFullName(firstName, middleName, lastName),
+                            Department = department,
+                            Position = position,
+                            Contact = contact,
+                            Email = email,
+                            Gender = gender,
+                            MaritalStatus = maritalStatus,
+                            Status = status,
+                            ContractType = contractType,
+                            DateHired = dateHired
+                        };
 
-                        counter++;
+                        allEmployees.Add(employee);
+
+                        System.Diagnostics.Debug.WriteLine($"Added employee {employeeId}: {department} - {position}");
                     }
                     catch (Exception ex)
                     {
-                        //  Skip problematic employee records but continue
                         System.Diagnostics.Debug.WriteLine($"Skipped employee record: {ex.Message}");
                         continue;
                     }
                 }
 
-                //  Show summary
-                if (dataGridViewEmployee.Rows.Count > 0)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Successfully loaded {dataGridViewEmployee.Rows.Count} employees");
-                }
+                // Apply current filters after loading data
+                ApplyAllFilters();
+
+                System.Diagnostics.Debug.WriteLine($"Loaded {allEmployees.Count} employees total");
             }
             catch (Exception ex)
             {
@@ -296,49 +559,205 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        //  Helper method to extract employee ID dynamically
-        private string ExtractEmployeeId(dynamic empData, string firebaseKey)
+        // Approach 1: Get individual records by index to avoid corrupted array
+        private async Task<Dictionary<string, (string Department, string Position, string Status, string ContractType, DateTime? DateHired)>> TryGetEmploymentInfoByIndex()
         {
-            //  Priority 1: Check for employee_id in the data
-            string empId = empData.employee_id ?? empData.EmployeeId ?? "";
+            var employmentDict = new Dictionary<string, (string Department, string Position, string Status, string ContractType, DateTime? DateHired)>();
 
-            //  Priority 2: If no employee_id in data, check if key is an employee ID format
-            if (string.IsNullOrEmpty(empId))
+            try
             {
-                //  Check if the Firebase key matches employee ID pattern (like "JAP-001")
-                if (!string.IsNullOrEmpty(firebaseKey) && firebaseKey.StartsWith("JAP-"))
+                // Try indices 1 through 10 (since index 0 is null)
+                for (int i = 1; i <= 10; i++)
                 {
-                    empId = firebaseKey;
-                }
-                //  If key is numeric, this might be an array index, so we need to rely on data
-                else if (int.TryParse(firebaseKey, out _))
-                {
-                    // This is likely an array index record, we'll use the employee_id from data
-                    // If empId is still empty, this record will be skipped
+                    try
+                    {
+                        var record = await firebase
+                            .Child("EmploymentInfo")
+                            .Child(i.ToString())
+                            .OnceSingleAsync<Dictionary<string, object>>();
+
+                        if (record != null)
+                        {
+                            string empId = GetValue(record, "employee_id");
+                            if (!string.IsNullOrEmpty(empId))
+                            {
+                                string dept = GetValue(record, "department");
+                                string pos = GetValue(record, "position");
+                                string status = GetValue(record, "status");
+                                string contractType = GetValue(record, "contract_type");
+
+                                DateTime? dateHired = null;
+                                string dateStr = GetValue(record, "date_of_joining");
+                                if (!string.IsNullOrEmpty(dateStr) && DateTime.TryParse(dateStr, out DateTime hiredDate))
+                                    dateHired = hiredDate;
+
+                                employmentDict[empId] = (dept, pos, status, contractType, dateHired);
+                                System.Diagnostics.Debug.WriteLine($"Index {i}: Found employment for {empId}");
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // Stop when we can't find more records
+                        break;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Index approach failed: {ex.Message}");
+            }
 
-            return empId?.Trim() ?? "";
+            return employmentDict;
         }
 
-        //  Helper method to format full name safely
-        private string FormatFullName(object firstName, object middleName, object lastName)
+        // Approach 2: Manual parsing of corrupted JSON response
+        private async Task<Dictionary<string, (string Department, string Position, string Status, string ContractType, DateTime? DateHired)>> TryManualEmploymentInfoParsing()
         {
-            string first = firstName?.ToString() ?? "";
-            string middle = middleName?.ToString() ?? "";
-            string last = lastName?.ToString() ?? "";
+            var employmentDict = new Dictionary<string, (string Department, string Position, string Status, string ContractType, DateTime? DateHired)>();
 
-            // Clean up extra spaces
+            try
+            {
+                // Get the raw response as string
+                var response = await firebase
+                    .Child("EmploymentInfo")
+                    .OnceAsync<object>();
+
+                if (response == null || !response.Any()) return employmentDict;
+
+                // Convert to string for manual parsing
+                string rawData = response.First()?.Object?.ToString() ?? "";
+
+                if (string.IsNullOrEmpty(rawData)) return employmentDict;
+
+                System.Diagnostics.Debug.WriteLine($"Raw data length: {rawData.Length}");
+
+                // Use regex to extract employee records from corrupted JSON
+                // Pattern to match employee_id, department, and position
+                var pattern = @"employee_id['""]?:['""]([^'""]+)['""][^}]*?department['""]?:['""]([^'""]*)[^}]*?position['""]?:['""]([^'""]*)";
+                var matches = Regex.Matches(rawData, pattern, RegexOptions.Singleline);
+
+                System.Diagnostics.Debug.WriteLine($"Found {matches.Count} matches with regex");
+
+                foreach (Match match in matches)
+                {
+                    if (match.Groups.Count >= 4)
+                    {
+                        string empId = match.Groups[1].Value.Trim();
+                        string dept = match.Groups[2].Value.Trim();
+                        string pos = match.Groups[3].Value.Trim();
+
+                        if (!string.IsNullOrEmpty(empId))
+                        {
+                            employmentDict[empId] = (dept, pos, "Active", "", null);
+                            System.Diagnostics.Debug.WriteLine($"Manual parse: {empId} -> {dept} / {pos}");
+                        }
+                    }
+                }
+
+                // If regex failed, try simple string searching
+                if (employmentDict.Count == 0)
+                {
+                    employmentDict = ExtractEmploymentInfoFromString(rawData);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Manual parsing failed: {ex.Message}");
+            }
+
+            return employmentDict;
+        }
+
+        // Fallback: Simple string extraction
+        private Dictionary<string, (string Department, string Position, string Status, string ContractType, DateTime? DateHired)> ExtractEmploymentInfoFromString(string rawData)
+        {
+            var employmentDict = new Dictionary<string, (string Department, string Position, string Status, string ContractType, DateTime? DateHired)>();
+
+            try
+            {
+                // Look for JAP employee IDs in the string
+                var employeeIdMatches = Regex.Matches(rawData, @"JAP-\d+", RegexOptions.IgnoreCase);
+
+                foreach (Match empIdMatch in employeeIdMatches)
+                {
+                    string empId = empIdMatch.Value;
+                    string dept = "";
+                    string pos = "";
+
+                    // Extract text around the employee ID to find department and position
+                    int startIndex = Math.Max(0, empIdMatch.Index - 200);
+                    int length = Math.Min(400, rawData.Length - startIndex);
+                    string context = rawData.Substring(startIndex, length);
+
+                    // Look for department and position near the employee ID
+                    var deptMatch = Regex.Match(context, @"department['""]?:['""]([^'""]+)", RegexOptions.IgnoreCase);
+                    if (deptMatch.Success) dept = deptMatch.Groups[1].Value;
+
+                    var posMatch = Regex.Match(context, @"position['""]?:['""]([^'""]+)", RegexOptions.IgnoreCase);
+                    if (posMatch.Success) pos = posMatch.Groups[1].Value;
+
+                    if (!string.IsNullOrEmpty(empId))
+                    {
+                        employmentDict[empId] = (dept, pos, "Active", "", null);
+                        System.Diagnostics.Debug.WriteLine($"String extraction: {empId} -> {dept} / {pos}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"String extraction failed: {ex.Message}");
+            }
+
+            return employmentDict;
+        }
+
+        // Helper method to get values safely from dictionary
+        private string GetValue(Dictionary<string, object> data, string key)
+        {
+            if (data != null && data.ContainsKey(key) && data[key] != null)
+                return data[key].ToString();
+            return "";
+        }
+
+        private string FormatFullName(string firstName, string middleName, string lastName)
+        {
+            string first = firstName ?? "";
+            string middle = middleName ?? "";
+            string last = lastName ?? "";
+
             string fullName = $"{first} {middle} {last}".Trim();
             while (fullName.Contains("  "))
                 fullName = fullName.Replace("  ", " ");
 
             return fullName;
         }
+
         public void RefreshData()
         {
-            // Refresh the data grid view
             LoadFirebaseData();
         }
+    }
+
+    public class FilterCriteria
+    {
+        public string EmployeeId { get; set; } = "";
+        public string FirstName { get; set; } = "";
+        public string LastName { get; set; } = "";
+        public string Department { get; set; } = "";
+        public string Position { get; set; } = "";
+        public string DateFilterType { get; set; } = "";
+        public string SortBy { get; set; } = "";
+        public string Day { get; set; } = "";
+        public string Month { get; set; } = "";
+        public string Year { get; set; } = "";
+        public bool StatusActive { get; set; } = false;
+        public bool StatusNotActive { get; set; } = false;
+        public bool GenderMale { get; set; } = false;
+        public bool GenderFemale { get; set; } = false;
+        public bool MaritalMarried { get; set; } = false;
+        public bool MaritalSingle { get; set; } = false;
+        public bool ContractRegular { get; set; } = false;
+        public bool ContractIrregular { get; set; } = false;
     }
 }

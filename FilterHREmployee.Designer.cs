@@ -234,6 +234,7 @@
             this.buttonReset.TabIndex = 91;
             this.buttonReset.Text = "Reset";
             this.buttonReset.UseVisualStyleBackColor = false;
+            this.buttonReset.Click += new System.EventHandler(this.buttonReset_Click);
             // 
             // buttonApply
             // 
@@ -248,6 +249,7 @@
             this.buttonApply.TabIndex = 90;
             this.buttonApply.Text = "Apply";
             this.buttonApply.UseVisualStyleBackColor = false;
+            this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click);
             // 
             // FilterHREmployee
             // 

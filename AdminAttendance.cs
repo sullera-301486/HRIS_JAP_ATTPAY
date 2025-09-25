@@ -14,9 +14,11 @@ namespace HRIS_JAP_ATTPAY
     public partial class AdminAttendance : UserControl
     {
         // 🔹 Firebase client
+        private AttendanceFilterCriteria currentAttendanceFilters = new AttendanceFilterCriteria();
         private FirebaseClient firebase = new FirebaseClient(
             "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
         );
+        private Dictionary<string, (string Department, string Position)> employeeDepartmentMap = new Dictionary<string, (string Department, string Position)>();
 
         // 🔹 Store attendance records with their Firebase keys
         private Dictionary<int, string> attendanceKeyMap = new Dictionary<int, string>();
@@ -34,6 +36,396 @@ namespace HRIS_JAP_ATTPAY
             DebugFirebaseData(); // Add this for debugging
             LoadFirebaseAttendanceData();
             PopulateDateComboBox();
+
+        }
+        private void ApplyAttendanceFilters(AttendanceFilterCriteria filters)
+        {
+            currentAttendanceFilters = filters;
+
+            // Debug the applied filters
+            System.Diagnostics.Debug.WriteLine("=== APPLYING ATTENDANCE FILTERS ===");
+            System.Diagnostics.Debug.WriteLine($"EmployeeId: '{filters.EmployeeId}'");
+            System.Diagnostics.Debug.WriteLine($"Name: '{filters.Name}'");
+            System.Diagnostics.Debug.WriteLine($"Department: '{filters.Department}'");
+            System.Diagnostics.Debug.WriteLine($"Position: '{filters.Position}'");
+            System.Diagnostics.Debug.WriteLine($"StatusPresent: {filters.StatusPresent}");
+            System.Diagnostics.Debug.WriteLine($"StatusAbsent: {filters.StatusAbsent}");
+            System.Diagnostics.Debug.WriteLine($"StatusLate: {filters.StatusLate}");
+            System.Diagnostics.Debug.WriteLine($"StatusEarlyOut: {filters.StatusEarlyOut}");
+            System.Diagnostics.Debug.WriteLine($"HoursEight: {filters.HoursEight}");
+            System.Diagnostics.Debug.WriteLine($"HoursBelowEight: {filters.HoursBelowEight}");
+            System.Diagnostics.Debug.WriteLine($"OvertimeOneHour: {filters.OvertimeOneHour}");
+            System.Diagnostics.Debug.WriteLine($"OvertimeTwoHoursPlus: {filters.OvertimeTwoHoursPlus}");
+            System.Diagnostics.Debug.WriteLine("================================");
+            ApplyAllAttendanceFilters();
+        }
+
+        private void ResetAttendanceFilters()
+        {
+            currentAttendanceFilters = new AttendanceFilterCriteria();
+            ApplyAllAttendanceFilters();
+        }
+
+        private void ApplyAllAttendanceFilters()
+        {
+            string searchText = textBoxSearchEmployee.Text.Trim().ToLower();
+
+            foreach (DataGridViewRow row in dataGridViewAttendance.Rows)
+            {
+                if (!row.IsNewRow)
+                {
+                    bool matchesSearch = MatchesSearchText(row, searchText);
+                    bool matchesFilters = MatchesAttendanceFilters(row);
+
+                    System.Diagnostics.Debug.WriteLine($"Row {row.Index}: Search={matchesSearch}, Filters={matchesFilters}, Final={matchesSearch && matchesFilters}");
+
+                    row.Visible = matchesSearch && matchesFilters;
+                }
+            }
+        }
+
+        private bool MatchesSearchText(DataGridViewRow row, string searchText)
+        {
+            if (string.IsNullOrEmpty(searchText) || searchText == "find employee")
+                return true;
+
+            string employeeId = row.Cells["EmployeeId"].Value?.ToString()?.ToLower() ?? "";
+            string fullName = row.Cells["FullName"].Value?.ToString()?.ToLower() ?? "";
+            string status = row.Cells["Status"].Value?.ToString()?.ToLower() ?? "";
+
+            return employeeId.Contains(searchText) ||
+                   fullName.Contains(searchText) ||
+                   status.Contains(searchText);
+        }
+
+        private bool MatchesAttendanceFilters(DataGridViewRow row)
+        {
+            string employeeId = row.Cells["EmployeeId"].Value?.ToString() ?? "";
+            string fullName = row.Cells["FullName"].Value?.ToString() ?? "";
+
+            System.Diagnostics.Debug.WriteLine($"Filtering attendance row: EmployeeId={employeeId}, Name={fullName}");
+
+            // Employee ID filter
+            if (!string.IsNullOrEmpty(currentAttendanceFilters.EmployeeId) &&
+                currentAttendanceFilters.EmployeeId.Trim().ToLower() != "search id")
+            {
+                if (!employeeId.ToLower().Contains(currentAttendanceFilters.EmployeeId.ToLower()))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Employee ID filter failed: {employeeId} vs {currentAttendanceFilters.EmployeeId}");
+                    return false;
+                }
+            }
+
+            // Name filter
+            if (!string.IsNullOrEmpty(currentAttendanceFilters.Name) &&
+                currentAttendanceFilters.Name.Trim().ToLower() != "search name")
+            {
+                if (!fullName.ToLower().Contains(currentAttendanceFilters.Name.ToLower()))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Name filter failed: {fullName} vs {currentAttendanceFilters.Name}");
+                    return false;
+                }
+            }
+
+            // Department filter
+            if (!string.IsNullOrEmpty(currentAttendanceFilters.Department) &&
+                !currentAttendanceFilters.Department.Equals("Select department", StringComparison.OrdinalIgnoreCase))
+            {
+                if (employeeDepartmentMap.ContainsKey(employeeId))
+                {
+                    string empDepartment = employeeDepartmentMap[employeeId].Department;
+                    if (string.IsNullOrEmpty(empDepartment) ||
+                        !empDepartment.Equals(currentAttendanceFilters.Department, StringComparison.OrdinalIgnoreCase))
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Department filter failed: {empDepartment} vs {currentAttendanceFilters.Department}");
+                        return false;
+                    }
+                }
+                else
+                {
+                    // If we don't have department info for this employee, filter them out
+                    System.Diagnostics.Debug.WriteLine($"Department filter failed: No department info for {employeeId}");
+                    return false;
+                }
+            }
+
+            // Position filter
+            if (!string.IsNullOrEmpty(currentAttendanceFilters.Position) &&
+                !currentAttendanceFilters.Position.Equals("Select position", StringComparison.OrdinalIgnoreCase))
+            {
+                if (employeeDepartmentMap.ContainsKey(employeeId))
+                {
+                    string empPosition = employeeDepartmentMap[employeeId].Position;
+                    if (string.IsNullOrEmpty(empPosition) ||
+                        !empPosition.Equals(currentAttendanceFilters.Position, StringComparison.OrdinalIgnoreCase))
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Position filter failed: {empPosition} vs {currentAttendanceFilters.Position}");
+                        return false;
+                    }
+                }
+                else
+                {
+                    // If we don't have position info for this employee, filter them out
+                    System.Diagnostics.Debug.WriteLine($"Position filter failed: No position info for {employeeId}");
+                    return false;
+                }
+            }
+
+            // Status filters
+            if (currentAttendanceFilters.StatusPresent || currentAttendanceFilters.StatusAbsent ||
+                currentAttendanceFilters.StatusLate || currentAttendanceFilters.StatusEarlyOut)
+            {
+                bool statusMatch = false;
+                string status = row.Cells["Status"].Value?.ToString() ?? "";
+
+                if (currentAttendanceFilters.StatusPresent && status.Equals("On Time", StringComparison.OrdinalIgnoreCase))
+                    statusMatch = true;
+                if (currentAttendanceFilters.StatusAbsent && status.Equals("Absent", StringComparison.OrdinalIgnoreCase))
+                    statusMatch = true;
+                if (currentAttendanceFilters.StatusLate && status.Equals("Late", StringComparison.OrdinalIgnoreCase))
+                    statusMatch = true;
+                if (currentAttendanceFilters.StatusEarlyOut && status.Equals("Early Out", StringComparison.OrdinalIgnoreCase))
+                    statusMatch = true;
+
+                if (!statusMatch)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Status filter failed: {status}");
+                    return false;
+                }
+            }
+
+            // Hours worked filters
+            if (currentAttendanceFilters.HoursEight || currentAttendanceFilters.HoursBelowEight)
+            {
+                bool hoursMatch = false;
+                string hoursWorkedStr = row.Cells["HoursWorked"].Value?.ToString() ?? "0";
+
+                if (double.TryParse(hoursWorkedStr, out double hoursWorked))
+                {
+                    if (currentAttendanceFilters.HoursEight && Math.Abs(hoursWorked - 8.0) < 0.1)
+                        hoursMatch = true;
+                    if (currentAttendanceFilters.HoursBelowEight && hoursWorked < 8.0)
+                        hoursMatch = true;
+                }
+
+                if (!hoursMatch)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Hours filter failed: {hoursWorkedStr}");
+                    return false;
+                }
+            }
+
+            // Overtime filters
+            if (currentAttendanceFilters.OvertimeOneHour || currentAttendanceFilters.OvertimeTwoHoursPlus)
+            {
+                bool overtimeMatch = false;
+                string overtimeStr = row.Cells["OvertimeHours"].Value?.ToString() ?? "0";
+
+                if (double.TryParse(overtimeStr, out double overtime))
+                {
+                    if (currentAttendanceFilters.OvertimeOneHour && Math.Abs(overtime - 1.0) < 0.1)
+                        overtimeMatch = true;
+                    if (currentAttendanceFilters.OvertimeTwoHoursPlus && overtime >= 2.0)
+                        overtimeMatch = true;
+                }
+
+                if (!overtimeMatch)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Overtime filter failed: {overtimeStr}");
+                    return false;
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine($"Attendance row PASSED all filters");
+            return true;
+        }
+        private async Task LoadEmployeeDepartmentMapping()
+        {
+            try
+            {
+                employeeDepartmentMap.Clear();
+
+                // Try to get employment info using multiple approaches
+                var employmentDict = await TryGetEmploymentInfoByIndex();
+
+                // If first approach failed, try manual parsing
+                if (employmentDict.Count == 0)
+                {
+                    employmentDict = await TryManualEmploymentInfoParsing();
+                }
+
+                employeeDepartmentMap = employmentDict;
+                System.Diagnostics.Debug.WriteLine($"Loaded department mapping for {employeeDepartmentMap.Count} employees");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to load employee department mapping: {ex.Message}");
+            }
+        }
+
+        // ADD THESE METHODS (same as in the filter form):
+        // Helper method to get values safely - FIXED VERSION
+        private string GetValue(Dictionary<string, object> data, string key)
+        {
+            if (data == null) return "";
+
+            if (!data.ContainsKey(key)) return "";
+
+            var value = data[key];
+            if (value == null) return "";
+
+            // Handle different data types that Firebase might return
+            if (value is string stringValue)
+                return stringValue;
+
+            if (value is Newtonsoft.Json.Linq.JValue jValue)
+                return jValue.Value?.ToString() ?? "";
+
+            if (value is Newtonsoft.Json.Linq.JToken jToken)
+                return jToken.ToString();
+
+            // For other types, convert to string
+            return value.ToString();
+        }
+
+        // FIXED TryGetEmploymentInfoByIndex method
+        private async Task<Dictionary<string, (string Department, string Position)>> TryGetEmploymentInfoByIndex()
+        {
+            var employmentDict = new Dictionary<string, (string Department, string Position)>();
+
+            try
+            {
+                // First, try to get the entire EmploymentInfo node to see its structure
+                var employmentInfoNode = await firebase.Child("EmploymentInfo").OnceSingleAsync<object>();
+
+                if (employmentInfoNode == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("EmploymentInfo node is null");
+                    return employmentDict;
+                }
+
+                // Try different approaches based on the data structure
+                try
+                {
+                    // Approach 1: Try as indexed records (1, 2, 3, etc.)
+                    for (int i = 1; i <= 20; i++) // Increased range to cover more records
+                    {
+                        try
+                        {
+                            var record = await firebase
+                                .Child("EmploymentInfo")
+                                .Child(i.ToString())
+                                .OnceSingleAsync<Dictionary<string, object>>();
+
+                            if (record != null)
+                            {
+                                string empId = GetValue(record, "employee_id");
+                                if (!string.IsNullOrEmpty(empId))
+                                {
+                                    string dept = GetValue(record, "department");
+                                    string pos = GetValue(record, "position");
+                                    employmentDict[empId] = (dept, pos);
+                                    System.Diagnostics.Debug.WriteLine($"Loaded employment info for {empId}: {dept}, {pos}");
+                                }
+                            }
+                            else
+                            {
+                                // If we hit a null record, we might have reached the end
+                                break;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // Log but continue trying
+                            System.Diagnostics.Debug.WriteLine($"Failed to get record {i}: {ex.Message}");
+
+                            // If we get consecutive failures, break
+                            if (i > 5 && employmentDict.Count == 0)
+                                break;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Index approach failed: {ex.Message}");
+                }
+
+                // Approach 2: Try to get all records at once if index approach didn't work well
+                if (employmentDict.Count == 0)
+                {
+                    try
+                    {
+                        var allRecords = await firebase.Child("EmploymentInfo").OnceAsync<Dictionary<string, object>>();
+
+                        foreach (var firebaseRecord in allRecords)
+                        {
+                            if (firebaseRecord.Object != null)
+                            {
+                                string empId = GetValue(firebaseRecord.Object, "employee_id");
+                                if (!string.IsNullOrEmpty(empId))
+                                {
+                                    string dept = GetValue(firebaseRecord.Object, "department");
+                                    string pos = GetValue(firebaseRecord.Object, "position");
+                                    employmentDict[empId] = (dept, pos);
+                                    System.Diagnostics.Debug.WriteLine($"Loaded employment info (bulk) for {empId}: {dept}, {pos}");
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Bulk approach failed: {ex.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"TryGetEmploymentInfoByIndex failed: {ex.Message}");
+            }
+
+            System.Diagnostics.Debug.WriteLine($"Total employment records loaded: {employmentDict.Count}");
+            return employmentDict;
+        }
+
+        private async Task<Dictionary<string, (string Department, string Position)>> TryManualEmploymentInfoParsing()
+        {
+            var employmentDict = new Dictionary<string, (string Department, string Position)>();
+
+            try
+            {
+                var response = await firebase
+                    .Child("EmploymentInfo")
+                    .OnceAsync<object>();
+
+                if (response == null || !response.Any()) return employmentDict;
+
+                string rawData = response.First()?.Object?.ToString() ?? "";
+                if (string.IsNullOrEmpty(rawData)) return employmentDict;
+
+                var pattern = @"employee_id['""]?:['""]([^'""]+)['""][^}]*?department['""]?:['""]([^'""]*)[^}]*?position['""]?:['""]([^'""]*)";
+                var matches = Regex.Matches(rawData, pattern, RegexOptions.Singleline);
+
+                foreach (Match match in matches)
+                {
+                    if (match.Groups.Count >= 4)
+                    {
+                        string empId = match.Groups[1].Value.Trim();
+                        string dept = match.Groups[2].Value.Trim();
+                        string pos = match.Groups[3].Value.Trim();
+
+                        if (!string.IsNullOrEmpty(empId))
+                        {
+                            employmentDict[empId] = (dept, pos);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Attendance: Manual parsing failed: {ex.Message}");
+            }
+
+            return employmentDict;
         }
 
         private void textBoxSearchEmployee_TextChanged(object sender, EventArgs e)
@@ -69,6 +461,7 @@ namespace HRIS_JAP_ATTPAY
                     row.Visible = isMatch;
                 }
             }
+            ApplyAllAttendanceFilters();
         }
 
         private void labelManageLeave_Click(object sender, EventArgs e)
@@ -82,6 +475,11 @@ namespace HRIS_JAP_ATTPAY
         {
             Form parentForm = this.FindForm();
             FilterAdminAttendance filterAdminAttendanceForm = new FilterAdminAttendance();
+
+            // Subscribe to filter events
+            filterAdminAttendanceForm.FiltersApplied += ApplyAttendanceFilters;
+            filterAdminAttendanceForm.FiltersReset += ResetAttendanceFilters;
+
             AttributesClass.ShowWithOverlay(parentForm, filterAdminAttendanceForm);
         }
 
