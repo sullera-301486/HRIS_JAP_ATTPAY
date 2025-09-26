@@ -34,8 +34,8 @@ namespace HRIS_JAP_ATTPAY
         private void labelAddLoan_Click(object sender, EventArgs e)
         {
             Form parentForm = this.FindForm();
-            LoanDetails loanDetails= new LoanDetails(currentEmployeeId);
-            AttributesClass.ShowWithOverlay(parentForm, loanDetails);
+            AddLoan addLoan = new AddLoan(currentEmployeeId);
+            AttributesClass.ShowWithOverlay(parentForm, addLoan);
         }
 
         private void setFont()
@@ -95,6 +95,20 @@ namespace HRIS_JAP_ATTPAY
             };
             actionCol.Image = Properties.Resources.ExpandRight;
             dataGridViewEmployee.Columns.Add(actionCol);
+            //start of test code to populate datagridview; replace with database data in future
+            for (int i = 1; i <= 20; i++)
+            {
+                dataGridViewEmployee.Rows.Add(
+                    i,                          // First column = loop count
+                    "ID-" + i,                  // ID
+                    "Name " + i,                // Name
+                    "Type " + i,                // Type
+                    "Amount " + i,              // Amount
+                    "Balance " + i,             // Balance
+                    "Remarks for row " + i      // Remarks
+                );
+                //end of test code to populate datagridview; replace with database data in future
+            }
         }
 
         private void dataGridViewEmployee_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
@@ -112,25 +126,23 @@ namespace HRIS_JAP_ATTPAY
         {
             if (e.RowIndex >= 0 && dataGridViewEmployee.Columns[e.ColumnIndex].Name == "Action")
             {
-                // Get the selected employee ID from the grid
-                string selectedEmployeeId = dataGridViewEmployee.Rows[e.RowIndex].Cells["EmployeeId"].Value?.ToString();
-
-                if (!string.IsNullOrEmpty(selectedEmployeeId))
-                {
                     Form parentForm = this.FindForm();
-                    PayrollSummary payrollSummaryForm = new PayrollSummary(currentEmployeeId);
-
-                    // Pass the selected employee ID to the form
-                    payrollSummaryForm.SetEmployeeId(selectedEmployeeId);
-
-                    AttributesClass.ShowWithOverlay(parentForm, payrollSummaryForm);
-                }
+                    LoanDetails loanDetails = new LoanDetails(currentEmployeeId);
+                    AttributesClass.ShowWithOverlay(parentForm, loanDetails);
+                    //temporary code; replace with logic similar to previous datagridview in future
             }
         }
 
         private void setTextBoxAttributes()
         {
             AttributesClass.TextboxPlaceholder(textBoxSearchEmployee, "Find Employee");
+        }
+
+        private void pictureBoxFilters_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            FilterAdminLoan filterAdminLoan = new FilterAdminLoan();
+            AttributesClass.ShowWithOverlay(parentForm, filterAdminLoan);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace HRIS_JAP_ATTPAY
 {
-    partial class ConfirmPayrollUpdate
+    partial class ConfirmAddLoan
     {
         /// <summary>
         /// Required designer variable.
@@ -44,7 +44,7 @@
             this.XpictureBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.XpictureBox.Name = "XpictureBox";
             this.XpictureBox.Size = new System.Drawing.Size(51, 50);
-            this.XpictureBox.TabIndex = 33;
+            this.XpictureBox.TabIndex = 38;
             this.XpictureBox.TabStop = false;
             this.XpictureBox.Click += new System.EventHandler(this.XpictureBox_Click);
             // 
@@ -59,7 +59,7 @@
             this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(135, 37);
-            this.buttonCancel.TabIndex = 32;
+            this.buttonCancel.TabIndex = 37;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = false;
             this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
@@ -75,22 +75,20 @@
             this.buttonConfirm.Margin = new System.Windows.Forms.Padding(4);
             this.buttonConfirm.Name = "buttonConfirm";
             this.buttonConfirm.Size = new System.Drawing.Size(135, 37);
-            this.buttonConfirm.TabIndex = 31;
+            this.buttonConfirm.TabIndex = 36;
             this.buttonConfirm.Text = "Confirm";
             this.buttonConfirm.UseVisualStyleBackColor = false;
-            this.buttonConfirm.Click += new System.EventHandler(this.buttonConfirm_Click);
             // 
             // labelMessage
             // 
             this.labelMessage.AutoSize = true;
             this.labelMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelMessage.Location = new System.Drawing.Point(53, 103);
+            this.labelMessage.Location = new System.Drawing.Point(81, 108);
             this.labelMessage.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelMessage.Name = "labelMessage";
-            this.labelMessage.Size = new System.Drawing.Size(303, 72);
-            this.labelMessage.TabIndex = 30;
-            this.labelMessage.Text = "Are you sure you want to save the \r\nchanges to this employee’s payroll \r\ninformat" +
-    "ion?";
+            this.labelMessage.Size = new System.Drawing.Size(255, 48);
+            this.labelMessage.TabIndex = 35;
+            this.labelMessage.Text = "Are you sure you want to add\r\nthis new loan?\r\n";
             this.labelMessage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelRequestConfirm
@@ -98,14 +96,14 @@
             this.labelRequestConfirm.AutoSize = true;
             this.labelRequestConfirm.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelRequestConfirm.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(34)))), ((int)(((byte)(31)))));
-            this.labelRequestConfirm.Location = new System.Drawing.Point(51, 53);
+            this.labelRequestConfirm.Location = new System.Drawing.Point(88, 58);
             this.labelRequestConfirm.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelRequestConfirm.Name = "labelRequestConfirm";
-            this.labelRequestConfirm.Size = new System.Drawing.Size(294, 31);
-            this.labelRequestConfirm.TabIndex = 29;
-            this.labelRequestConfirm.Text = "Confirm Payroll Update";
+            this.labelRequestConfirm.Size = new System.Drawing.Size(231, 31);
+            this.labelRequestConfirm.TabIndex = 34;
+            this.labelRequestConfirm.Text = "Confirm Add Loan";
             // 
-            // ConfirmPayrollUpdate
+            // ConfirmAddLoan
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -117,10 +115,9 @@
             this.Controls.Add(this.labelMessage);
             this.Controls.Add(this.labelRequestConfirm);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "ConfirmPayrollUpdate";
+            this.Name = "ConfirmAddLoan";
             this.ShowInTaskbar = false;
-            this.Text = "ConfirmPayrollUpdate";
+            this.Text = "ConfirmAddLoan";
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

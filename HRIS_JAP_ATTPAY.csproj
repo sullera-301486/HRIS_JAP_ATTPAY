@@ -191,6 +191,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddLoan.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddLoan.Designer.cs">
+      <DependentUpon>AddLoan.cs</DependentUpon>
+    </Compile>
     <Compile Include="AddNewEmployee.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -270,6 +276,12 @@
     <Compile Include="ConfirmAddEmployee.Designer.cs">
       <DependentUpon>ConfirmAddEmployee.cs</DependentUpon>
     </Compile>
+    <Compile Include="ConfirmAddLoan.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmAddLoan.Designer.cs">
+      <DependentUpon>ConfirmAddLoan.cs</DependentUpon>
+    </Compile>
     <Compile Include="ConfirmDeleteTask.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -287,6 +299,12 @@
     </Compile>
     <Compile Include="ConfirmLeaveEntry.Designer.cs">
       <DependentUpon>ConfirmLeaveEntry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfirmLoanUpdate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmLoanUpdate.Designer.cs">
+      <DependentUpon>ConfirmLoanUpdate.cs</DependentUpon>
     </Compile>
     <Compile Include="ConfirmPayrollExportAll.cs">
       <SubType>Form</SubType>
@@ -341,6 +359,12 @@
     </Compile>
     <Compile Include="EmployeeProfileHR.Designer.cs">
       <DependentUpon>EmployeeProfileHR.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FilterAdminLoan.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FilterAdminLoan.Designer.cs">
+      <DependentUpon>FilterAdminLoan.cs</DependentUpon>
     </Compile>
     <Compile Include="FilterHREmployee.cs">
       <SubType>Form</SubType>
@@ -537,6 +561,9 @@
     <Compile Include="UserProfile.Designer.cs">
       <DependentUpon>UserProfile.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="AddLoan.resx">
+      <DependentUpon>AddLoan.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AddNewEmployee.resx">
       <DependentUpon>AddNewEmployee.cs</DependentUpon>
     </EmbeddedResource>
@@ -576,6 +603,9 @@
     <EmbeddedResource Include="ConfirmAddEmployee.resx">
       <DependentUpon>ConfirmAddEmployee.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmAddLoan.resx">
+      <DependentUpon>ConfirmAddLoan.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ConfirmDeleteTask.resx">
       <DependentUpon>ConfirmDeleteTask.cs</DependentUpon>
     </EmbeddedResource>
@@ -584,6 +614,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ConfirmLeaveEntry.resx">
       <DependentUpon>ConfirmLeaveEntry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmLoanUpdate.resx">
+      <DependentUpon>ConfirmLoanUpdate.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ConfirmPayrollExportAll.resx">
       <DependentUpon>ConfirmPayrollExportAll.cs</DependentUpon>
@@ -611,6 +644,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EmployeeProfileHR.resx">
       <DependentUpon>EmployeeProfileHR.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FilterAdminLoan.resx">
+      <DependentUpon>FilterAdminLoan.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FilterHREmployee.resx">
       <DependentUpon>FilterHREmployee.cs</DependentUpon>

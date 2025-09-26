@@ -34,13 +34,13 @@ namespace HRIS_JAP_ATTPAY
             {
                 comboBoxSelectedInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelAmount.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                textBoxAmountInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                textBoxBalanceInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelBalance.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelBalanceInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelAmountInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelBimonthlyAmortization.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 textBoxBimonthlyAmortizationInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelEndDate.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelEndDateInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                textBoxEndDateInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelID.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelIDInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelLoanDetails.Font = AttributesClass.GetFont("Roboto-Regular", 20f);
@@ -55,11 +55,20 @@ namespace HRIS_JAP_ATTPAY
                 labelTotalPaymentInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelType.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelTypeInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                buttonCancel.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                buttonUpdate.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Font load failed: " + ex.Message);
             }
+        }
+
+        private void buttonUpdate_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            ConfirmLoanUpdate confirmLoanUpdate = new ConfirmLoanUpdate();
+            AttributesClass.ShowWithOverlay(parentForm, confirmLoanUpdate);
         }
     }
 }
