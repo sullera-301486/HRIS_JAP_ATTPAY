@@ -31,14 +31,12 @@
             this.pictureBoxSortLogo = new System.Windows.Forms.PictureBox();
             this.XpictureBox = new System.Windows.Forms.PictureBox();
             this.labelSearchFilters = new System.Windows.Forms.Label();
-            this.labelDate = new System.Windows.Forms.Label();
             this.labelSort = new System.Windows.Forms.Label();
             this.labelName = new System.Windows.Forms.Label();
             this.labelID = new System.Windows.Forms.Label();
             this.labelDepartment = new System.Windows.Forms.Label();
             this.labelPosition = new System.Windows.Forms.Label();
             this.comboBoxSort = new System.Windows.Forms.ComboBox();
-            this.comboBoxDate = new System.Windows.Forms.ComboBox();
             this.textBoxName = new System.Windows.Forms.TextBox();
             this.textBoxID = new System.Windows.Forms.TextBox();
             this.comboBoxDepartment = new System.Windows.Forms.ComboBox();
@@ -58,8 +56,8 @@
             this.checkBoxBelowEightHours = new System.Windows.Forms.CheckBox();
             this.checkBoxOneHour = new System.Windows.Forms.CheckBox();
             this.checkBoxAboveTwoHours = new System.Windows.Forms.CheckBox();
-            this.buttonReset = new System.Windows.Forms.Button();
             this.buttonApply = new System.Windows.Forms.Button();
+            this.buttonReset = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSortLogo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
             this.SuspendLayout();
@@ -98,17 +96,6 @@
             this.labelSearchFilters.TabIndex = 21;
             this.labelSearchFilters.Text = "Search Filters";
             // 
-            // labelDate
-            // 
-            this.labelDate.AutoSize = true;
-            this.labelDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelDate.Location = new System.Drawing.Point(32, 79);
-            this.labelDate.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelDate.Name = "labelDate";
-            this.labelDate.Size = new System.Drawing.Size(70, 25);
-            this.labelDate.TabIndex = 22;
-            this.labelDate.Text = "DATE";
-            // 
             // labelSort
             // 
             this.labelSort.AutoSize = true;
@@ -124,7 +111,7 @@
             // 
             this.labelName.AutoSize = true;
             this.labelName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelName.Location = new System.Drawing.Point(32, 158);
+            this.labelName.Location = new System.Drawing.Point(32, 114);
             this.labelName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelName.Name = "labelName";
             this.labelName.Size = new System.Drawing.Size(74, 25);
@@ -135,7 +122,7 @@
             // 
             this.labelID.AutoSize = true;
             this.labelID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelID.Location = new System.Drawing.Point(253, 158);
+            this.labelID.Location = new System.Drawing.Point(253, 114);
             this.labelID.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelID.Name = "labelID";
             this.labelID.Size = new System.Drawing.Size(33, 25);
@@ -146,7 +133,7 @@
             // 
             this.labelDepartment.AutoSize = true;
             this.labelDepartment.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelDepartment.Location = new System.Drawing.Point(32, 227);
+            this.labelDepartment.Location = new System.Drawing.Point(32, 183);
             this.labelDepartment.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelDepartment.Name = "labelDepartment";
             this.labelDepartment.Size = new System.Drawing.Size(159, 25);
@@ -157,7 +144,7 @@
             // 
             this.labelPosition.AutoSize = true;
             this.labelPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelPosition.Location = new System.Drawing.Point(253, 227);
+            this.labelPosition.Location = new System.Drawing.Point(253, 183);
             this.labelPosition.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelPosition.Name = "labelPosition";
             this.labelPosition.Size = new System.Drawing.Size(116, 25);
@@ -179,28 +166,13 @@
             this.comboBoxSort.Size = new System.Drawing.Size(113, 28);
             this.comboBoxSort.TabIndex = 28;
             // 
-            // comboBoxDate
-            // 
-            this.comboBoxDate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.comboBoxDate.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.comboBoxDate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxDate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBoxDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBoxDate.ForeColor = System.Drawing.Color.White;
-            this.comboBoxDate.FormattingEnabled = true;
-            this.comboBoxDate.Location = new System.Drawing.Point(37, 116);
-            this.comboBoxDate.Margin = new System.Windows.Forms.Padding(4);
-            this.comboBoxDate.Name = "comboBoxDate";
-            this.comboBoxDate.Size = new System.Drawing.Size(419, 28);
-            this.comboBoxDate.TabIndex = 29;
-            // 
             // textBoxName
             // 
             this.textBoxName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
             this.textBoxName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxName.ForeColor = System.Drawing.Color.White;
-            this.textBoxName.Location = new System.Drawing.Point(37, 187);
+            this.textBoxName.Location = new System.Drawing.Point(37, 143);
             this.textBoxName.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxName.Name = "textBoxName";
             this.textBoxName.Size = new System.Drawing.Size(197, 26);
@@ -213,7 +185,7 @@
             this.textBoxID.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxID.ForeColor = System.Drawing.Color.White;
-            this.textBoxID.Location = new System.Drawing.Point(258, 187);
+            this.textBoxID.Location = new System.Drawing.Point(258, 143);
             this.textBoxID.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxID.Name = "textBoxID";
             this.textBoxID.Size = new System.Drawing.Size(194, 26);
@@ -229,7 +201,7 @@
             this.comboBoxDepartment.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxDepartment.ForeColor = System.Drawing.Color.White;
             this.comboBoxDepartment.FormattingEnabled = true;
-            this.comboBoxDepartment.Location = new System.Drawing.Point(37, 256);
+            this.comboBoxDepartment.Location = new System.Drawing.Point(37, 212);
             this.comboBoxDepartment.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxDepartment.Name = "comboBoxDepartment";
             this.comboBoxDepartment.Size = new System.Drawing.Size(196, 28);
@@ -244,7 +216,7 @@
             this.comboBoxPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxPosition.ForeColor = System.Drawing.Color.White;
             this.comboBoxPosition.FormattingEnabled = true;
-            this.comboBoxPosition.Location = new System.Drawing.Point(258, 256);
+            this.comboBoxPosition.Location = new System.Drawing.Point(258, 212);
             this.comboBoxPosition.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxPosition.Name = "comboBoxPosition";
             this.comboBoxPosition.Size = new System.Drawing.Size(194, 28);
@@ -254,7 +226,7 @@
             // 
             this.labelStatus.AutoSize = true;
             this.labelStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelStatus.Location = new System.Drawing.Point(32, 299);
+            this.labelStatus.Location = new System.Drawing.Point(32, 255);
             this.labelStatus.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelStatus.Name = "labelStatus";
             this.labelStatus.Size = new System.Drawing.Size(100, 25);
@@ -267,7 +239,7 @@
             this.checkBoxPresent.Cursor = System.Windows.Forms.Cursors.Hand;
             this.checkBoxPresent.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.checkBoxPresent.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBoxPresent.Location = new System.Drawing.Point(37, 337);
+            this.checkBoxPresent.Location = new System.Drawing.Point(37, 293);
             this.checkBoxPresent.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxPresent.Name = "checkBoxPresent";
             this.checkBoxPresent.Size = new System.Drawing.Size(97, 29);
@@ -281,7 +253,7 @@
             this.checkBoxLate.Cursor = System.Windows.Forms.Cursors.Hand;
             this.checkBoxLate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.checkBoxLate.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBoxLate.Location = new System.Drawing.Point(37, 374);
+            this.checkBoxLate.Location = new System.Drawing.Point(37, 330);
             this.checkBoxLate.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxLate.Name = "checkBoxLate";
             this.checkBoxLate.Size = new System.Drawing.Size(68, 29);
@@ -295,7 +267,7 @@
             this.checkBoxAbsent.Cursor = System.Windows.Forms.Cursors.Hand;
             this.checkBoxAbsent.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.checkBoxAbsent.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBoxAbsent.Location = new System.Drawing.Point(258, 337);
+            this.checkBoxAbsent.Location = new System.Drawing.Point(258, 293);
             this.checkBoxAbsent.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxAbsent.Name = "checkBoxAbsent";
             this.checkBoxAbsent.Size = new System.Drawing.Size(92, 29);
@@ -309,7 +281,7 @@
             this.checkBoxEarlyOut.Cursor = System.Windows.Forms.Cursors.Hand;
             this.checkBoxEarlyOut.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.checkBoxEarlyOut.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBoxEarlyOut.Location = new System.Drawing.Point(258, 374);
+            this.checkBoxEarlyOut.Location = new System.Drawing.Point(258, 330);
             this.checkBoxEarlyOut.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxEarlyOut.Name = "checkBoxEarlyOut";
             this.checkBoxEarlyOut.Size = new System.Drawing.Size(111, 29);
@@ -321,7 +293,7 @@
             // 
             this.labelTimeIn.AutoSize = true;
             this.labelTimeIn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTimeIn.Location = new System.Drawing.Point(32, 426);
+            this.labelTimeIn.Location = new System.Drawing.Point(32, 382);
             this.labelTimeIn.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelTimeIn.Name = "labelTimeIn";
             this.labelTimeIn.Size = new System.Drawing.Size(91, 25);
@@ -332,7 +304,7 @@
             // 
             this.labelTimeOut.AutoSize = true;
             this.labelTimeOut.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTimeOut.Location = new System.Drawing.Point(253, 426);
+            this.labelTimeOut.Location = new System.Drawing.Point(253, 382);
             this.labelTimeOut.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelTimeOut.Name = "labelTimeOut";
             this.labelTimeOut.Size = new System.Drawing.Size(116, 25);
@@ -345,7 +317,7 @@
             this.textBoxTimeIn.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxTimeIn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxTimeIn.ForeColor = System.Drawing.Color.White;
-            this.textBoxTimeIn.Location = new System.Drawing.Point(37, 455);
+            this.textBoxTimeIn.Location = new System.Drawing.Point(37, 411);
             this.textBoxTimeIn.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxTimeIn.Name = "textBoxTimeIn";
             this.textBoxTimeIn.Size = new System.Drawing.Size(197, 26);
@@ -358,7 +330,7 @@
             this.textBoxTimeOut.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxTimeOut.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxTimeOut.ForeColor = System.Drawing.Color.White;
-            this.textBoxTimeOut.Location = new System.Drawing.Point(258, 455);
+            this.textBoxTimeOut.Location = new System.Drawing.Point(258, 411);
             this.textBoxTimeOut.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxTimeOut.Name = "textBoxTimeOut";
             this.textBoxTimeOut.Size = new System.Drawing.Size(194, 26);
@@ -369,7 +341,7 @@
             // 
             this.labelHoursWorked.AutoSize = true;
             this.labelHoursWorked.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelHoursWorked.Location = new System.Drawing.Point(32, 502);
+            this.labelHoursWorked.Location = new System.Drawing.Point(32, 458);
             this.labelHoursWorked.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelHoursWorked.Name = "labelHoursWorked";
             this.labelHoursWorked.Size = new System.Drawing.Size(190, 25);
@@ -380,7 +352,7 @@
             // 
             this.labelOvertime.AutoSize = true;
             this.labelOvertime.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelOvertime.Location = new System.Drawing.Point(253, 502);
+            this.labelOvertime.Location = new System.Drawing.Point(253, 458);
             this.labelOvertime.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelOvertime.Name = "labelOvertime";
             this.labelOvertime.Size = new System.Drawing.Size(124, 25);
@@ -394,7 +366,7 @@
             this.checkBoxEightHours.Cursor = System.Windows.Forms.Cursors.Hand;
             this.checkBoxEightHours.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.checkBoxEightHours.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBoxEightHours.Location = new System.Drawing.Point(37, 531);
+            this.checkBoxEightHours.Location = new System.Drawing.Point(37, 487);
             this.checkBoxEightHours.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxEightHours.Name = "checkBoxEightHours";
             this.checkBoxEightHours.Size = new System.Drawing.Size(98, 29);
@@ -409,7 +381,7 @@
             this.checkBoxBelowEightHours.Cursor = System.Windows.Forms.Cursors.Hand;
             this.checkBoxBelowEightHours.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.checkBoxBelowEightHours.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBoxBelowEightHours.Location = new System.Drawing.Point(37, 568);
+            this.checkBoxBelowEightHours.Location = new System.Drawing.Point(37, 524);
             this.checkBoxBelowEightHours.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxBelowEightHours.Name = "checkBoxBelowEightHours";
             this.checkBoxBelowEightHours.Size = new System.Drawing.Size(156, 29);
@@ -424,7 +396,7 @@
             this.checkBoxOneHour.Cursor = System.Windows.Forms.Cursors.Hand;
             this.checkBoxOneHour.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.checkBoxOneHour.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBoxOneHour.Location = new System.Drawing.Point(258, 531);
+            this.checkBoxOneHour.Location = new System.Drawing.Point(258, 487);
             this.checkBoxOneHour.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxOneHour.Name = "checkBoxOneHour";
             this.checkBoxOneHour.Size = new System.Drawing.Size(88, 29);
@@ -439,29 +411,13 @@
             this.checkBoxAboveTwoHours.Cursor = System.Windows.Forms.Cursors.Hand;
             this.checkBoxAboveTwoHours.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.checkBoxAboveTwoHours.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBoxAboveTwoHours.Location = new System.Drawing.Point(258, 568);
+            this.checkBoxAboveTwoHours.Location = new System.Drawing.Point(258, 524);
             this.checkBoxAboveTwoHours.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxAboveTwoHours.Name = "checkBoxAboveTwoHours";
             this.checkBoxAboveTwoHours.Size = new System.Drawing.Size(115, 29);
             this.checkBoxAboveTwoHours.TabIndex = 48;
             this.checkBoxAboveTwoHours.Text = "2 Hours +";
             this.checkBoxAboveTwoHours.UseVisualStyleBackColor = false;
-            // 
-            // buttonReset
-            // 
-            this.buttonReset.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(154)))), ((int)(((byte)(154)))));
-            this.buttonReset.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.buttonReset.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonReset.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonReset.ForeColor = System.Drawing.Color.White;
-            this.buttonReset.Location = new System.Drawing.Point(258, 638);
-            this.buttonReset.Margin = new System.Windows.Forms.Padding(4);
-            this.buttonReset.Name = "buttonReset";
-            this.buttonReset.Size = new System.Drawing.Size(176, 41);
-            this.buttonReset.TabIndex = 50;
-            this.buttonReset.Text = "Reset";
-            this.buttonReset.UseVisualStyleBackColor = false;
-            this.buttonReset.Click += new System.EventHandler(this.buttonReset_Click);
             // 
             // buttonApply
             // 
@@ -470,7 +426,7 @@
             this.buttonApply.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonApply.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonApply.ForeColor = System.Drawing.Color.White;
-            this.buttonApply.Location = new System.Drawing.Point(57, 638);
+            this.buttonApply.Location = new System.Drawing.Point(57, 594);
             this.buttonApply.Margin = new System.Windows.Forms.Padding(4);
             this.buttonApply.Name = "buttonApply";
             this.buttonApply.Size = new System.Drawing.Size(176, 41);
@@ -479,12 +435,28 @@
             this.buttonApply.UseVisualStyleBackColor = false;
             this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click);
             // 
+            // buttonReset
+            // 
+            this.buttonReset.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(154)))), ((int)(((byte)(154)))));
+            this.buttonReset.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.buttonReset.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonReset.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonReset.ForeColor = System.Drawing.Color.White;
+            this.buttonReset.Location = new System.Drawing.Point(258, 594);
+            this.buttonReset.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonReset.Name = "buttonReset";
+            this.buttonReset.Size = new System.Drawing.Size(176, 41);
+            this.buttonReset.TabIndex = 50;
+            this.buttonReset.Text = "Reset";
+            this.buttonReset.UseVisualStyleBackColor = false;
+            this.buttonReset.Click += new System.EventHandler(this.buttonReset_Click);
+            // 
             // FilterAdminAttendance
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(493, 703);
+            this.ClientSize = new System.Drawing.Size(493, 661);
             this.Controls.Add(this.buttonReset);
             this.Controls.Add(this.buttonApply);
             this.Controls.Add(this.checkBoxAboveTwoHours);
@@ -506,14 +478,12 @@
             this.Controls.Add(this.comboBoxDepartment);
             this.Controls.Add(this.textBoxID);
             this.Controls.Add(this.textBoxName);
-            this.Controls.Add(this.comboBoxDate);
             this.Controls.Add(this.comboBoxSort);
             this.Controls.Add(this.labelPosition);
             this.Controls.Add(this.labelDepartment);
             this.Controls.Add(this.labelID);
             this.Controls.Add(this.labelName);
             this.Controls.Add(this.labelSort);
-            this.Controls.Add(this.labelDate);
             this.Controls.Add(this.labelSearchFilters);
             this.Controls.Add(this.pictureBoxSortLogo);
             this.Controls.Add(this.XpictureBox);
@@ -534,14 +504,12 @@
         private System.Windows.Forms.PictureBox XpictureBox;
         private System.Windows.Forms.PictureBox pictureBoxSortLogo;
         private System.Windows.Forms.Label labelSearchFilters;
-        private System.Windows.Forms.Label labelDate;
         private System.Windows.Forms.Label labelSort;
         private System.Windows.Forms.Label labelName;
         private System.Windows.Forms.Label labelID;
         private System.Windows.Forms.Label labelDepartment;
         private System.Windows.Forms.Label labelPosition;
         private System.Windows.Forms.ComboBox comboBoxSort;
-        private System.Windows.Forms.ComboBox comboBoxDate;
         private System.Windows.Forms.TextBox textBoxName;
         private System.Windows.Forms.TextBox textBoxID;
         private System.Windows.Forms.ComboBox comboBoxDepartment;
@@ -561,7 +529,7 @@
         private System.Windows.Forms.CheckBox checkBoxBelowEightHours;
         private System.Windows.Forms.CheckBox checkBoxOneHour;
         private System.Windows.Forms.CheckBox checkBoxAboveTwoHours;
-        private System.Windows.Forms.Button buttonReset;
         private System.Windows.Forms.Button buttonApply;
+        private System.Windows.Forms.Button buttonReset;
     }
 }

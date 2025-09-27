@@ -317,25 +317,28 @@ namespace HRIS_JAP_ATTPAY
 
             string sort = currentFilters.SortBy.ToLower();
 
-            if (sort == "a-z")
+            switch (sort)
             {
-                return employees.OrderBy(e => e.FullName).ToList();
-            }
-            else if (sort == "z-a")
-            {
-                return employees.OrderByDescending(e => e.FullName).ToList();
-            }
-            else if (sort == "newest-oldest")
-            {
-                return employees.OrderByDescending(e => e.EmployeeId).ToList();
-            }
-            else if (sort == "oldest-newest")
-            {
-                return employees.OrderBy(e => e.EmployeeId).ToList();
-            }
-            else
-            {
-                return employees;
+                case "a-z":
+                    return employees.OrderBy(e => e.FullName).ToList();
+
+                case "z-a":
+                    return employees.OrderByDescending(e => e.FullName).ToList();
+
+                case "newest-oldest":
+                    // Sort by DateHired (newest first) then by EmployeeId as fallback
+                    return employees.OrderByDescending(e => e.DateHired ?? DateTime.MinValue)
+                                   .ThenByDescending(e => e.EmployeeId)
+                                   .ToList();
+
+                case "oldest-newest":
+                    // Sort by DateHired (oldest first) then by EmployeeId as fallback
+                    return employees.OrderBy(e => e.DateHired ?? DateTime.MaxValue)
+                                   .ThenBy(e => e.EmployeeId)
+                                   .ToList();
+
+                default:
+                    return employees;
             }
         }
 

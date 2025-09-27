@@ -26,6 +26,9 @@ namespace HRIS_JAP_ATTPAY
 
             // ADDED: Load departments and positions from Firebase
             LoadDepartmentsAndPositions();
+
+            // ADDED: Initialize sorting options
+            InitializeSortingOptions();
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
@@ -48,7 +51,6 @@ namespace HRIS_JAP_ATTPAY
             {
                 buttonApply.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
                 buttonReset.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
-                comboBoxDate.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 comboBoxDepartment.Font = AttributesClass.GetFont("Roboto-Light", 11f);
                 comboBoxPosition.Font = AttributesClass.GetFont("Roboto-Light", 11f);
                 comboBoxSort.Font = AttributesClass.GetFont("Roboto-Light", 12f);
@@ -60,7 +62,6 @@ namespace HRIS_JAP_ATTPAY
                 labelContract.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelDashA.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelDashB.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelDate.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelDateOfBirth.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelDepartment.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelFirstName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
@@ -251,7 +252,6 @@ namespace HRIS_JAP_ATTPAY
                 Department = comboBoxDepartment.SelectedItem?.ToString() ?? "",
                 Position = comboBoxPosition.SelectedItem?.ToString() ?? "",
                 SortBy = comboBoxSort.SelectedItem?.ToString() ?? "",
-                DateFilterType = comboBoxDate.SelectedItem?.ToString() ?? "",
                 Day = textBoxDay.Text.Trim(),
                 Month = textBoxMonth.Text.Trim(),
                 Year = textBoxYear.Text.Trim(),
@@ -273,6 +273,20 @@ namespace HRIS_JAP_ATTPAY
         {
             FiltersReset?.Invoke();
             this.Close();
+        }
+        private void InitializeSortingOptions()
+        {
+            comboBoxSort.Items.Clear();
+            comboBoxSort.Items.AddRange(new object[] {
+        "A-Z",
+        "Z-A",
+        "Newest-Oldest",
+        "Oldest-Newest"
+    });
+
+            // Set default selection if needed
+            if (comboBoxSort.Items.Count > 0)
+                comboBoxSort.SelectedIndex = 0;
         }
     }
 }

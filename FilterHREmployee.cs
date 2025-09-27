@@ -30,6 +30,9 @@ namespace HRIS_JAP_ATTPAY
 
             // ADDED: Load departments and positions from Firebase
             LoadDepartmentsAndPositions();
+
+            // ADDED: Initialize sorting options
+            InitializeSortingOptions();
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
@@ -43,7 +46,7 @@ namespace HRIS_JAP_ATTPAY
             {
                 buttonApply.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
                 buttonReset.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
-                comboBoxDate.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+
                 comboBoxDepartment.Font = AttributesClass.GetFont("Roboto-Light", 11f);
                 comboBoxPosition.Font = AttributesClass.GetFont("Roboto-Light", 11f);
                 comboBoxSort.Font = AttributesClass.GetFont("Roboto-Light", 12f);
@@ -51,7 +54,7 @@ namespace HRIS_JAP_ATTPAY
                 textBoxID.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelID.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelDate.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+
                 labelDepartment.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelSearchFilters.Font = AttributesClass.GetFont("Roboto-Regular", 18f);
@@ -233,7 +236,6 @@ namespace HRIS_JAP_ATTPAY
                 Name = textBoxName.Text.Trim(),
                 Department = comboBoxDepartment.SelectedItem?.ToString() ?? "",
                 Position = comboBoxPosition.SelectedItem?.ToString() ?? "",
-                DateFilterType = comboBoxDate.SelectedItem?.ToString() ?? "",
                 SortBy = comboBoxSort.SelectedItem?.ToString() ?? ""
             };
 
@@ -245,6 +247,20 @@ namespace HRIS_JAP_ATTPAY
         {
             FiltersReset?.Invoke();
             this.Close();
+        }
+        private void InitializeSortingOptions()
+        {
+            comboBoxSort.Items.Clear();
+            comboBoxSort.Items.AddRange(new object[] {
+                "A-Z",
+                "Z-A",
+                "Newest-Oldest",
+                "Oldest-Newest"
+            });
+
+            // Set default selection if needed
+            if (comboBoxSort.Items.Count > 0)
+                comboBoxSort.SelectedIndex = 0;
         }
     }
 }

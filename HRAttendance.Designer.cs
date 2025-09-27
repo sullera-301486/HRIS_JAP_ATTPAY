@@ -81,7 +81,6 @@
             this.labelAddLeave.Size = new System.Drawing.Size(135, 25);
             this.labelAddLeave.TabIndex = 11;
             this.labelAddLeave.Text = "Add Leave +";
-            this.labelAddLeave.Click += new System.EventHandler(this.labelAddLeave_Click);
             // 
             // tableLayoutPanelFilterAndSearch
             // 

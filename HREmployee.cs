@@ -170,26 +170,41 @@ namespace HRIS_JAP_ATTPAY
 
             string sort = currentFilters.SortBy.ToLower();
 
-            if (sort == "a-z")
+            switch (sort)
             {
-                return employees.OrderBy(e => e.FullName).ToList();
+                case "a-z":
+                    return employees.OrderBy(e => e.FullName).ToList();
+
+                case "z-a":
+                    return employees.OrderByDescending(e => e.FullName).ToList();
+
+                case "newest-oldest":
+                    // Sort by EmployeeId (newest first) - assuming higher IDs are newer
+                    return employees.OrderByDescending(e => ExtractNumericId(e.EmployeeId))
+                                   .ThenByDescending(e => e.EmployeeId)
+                                   .ToList();
+
+                case "oldest-newest":
+                    // Sort by EmployeeId (oldest first) - assuming lower IDs are older
+                    return employees.OrderBy(e => ExtractNumericId(e.EmployeeId))
+                                   .ThenBy(e => e.EmployeeId)
+                                   .ToList();
+
+                default:
+                    return employees;
             }
-            else if (sort == "z-a")
-            {
-                return employees.OrderByDescending(e => e.FullName).ToList();
-            }
-            else if (sort == "newest-oldest")
-            {
-                return employees.OrderByDescending(e => e.EmployeeId).ToList();
-            }
-            else if (sort == "oldest-newest")
-            {
-                return employees.OrderBy(e => e.EmployeeId).ToList();
-            }
-            else
-            {
-                return employees;
-            }
+        }
+        private int ExtractNumericId(string employeeId)
+        {
+            if (string.IsNullOrEmpty(employeeId))
+                return 0;
+
+            // Extract numbers from ID (e.g., "JAP-001" -> 1)
+            var match = System.Text.RegularExpressions.Regex.Match(employeeId, @"\d+");
+            if (match.Success && int.TryParse(match.Value, out int numericId))
+                return numericId;
+
+            return 0;
         }
 
         private void button1_Click(object sender, EventArgs e)

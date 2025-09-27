@@ -32,14 +32,12 @@
             this.comboBoxDepartment = new System.Windows.Forms.ComboBox();
             this.textBoxID = new System.Windows.Forms.TextBox();
             this.textBoxName = new System.Windows.Forms.TextBox();
-            this.comboBoxDate = new System.Windows.Forms.ComboBox();
             this.comboBoxSort = new System.Windows.Forms.ComboBox();
             this.labelPosition = new System.Windows.Forms.Label();
             this.labelDepartment = new System.Windows.Forms.Label();
             this.labelID = new System.Windows.Forms.Label();
             this.labelName = new System.Windows.Forms.Label();
             this.labelSort = new System.Windows.Forms.Label();
-            this.labelDate = new System.Windows.Forms.Label();
             this.labelSearchFilters = new System.Windows.Forms.Label();
             this.pictureBoxSortLogo = new System.Windows.Forms.PictureBox();
             this.XpictureBox = new System.Windows.Forms.PictureBox();
@@ -58,7 +56,7 @@
             this.comboBoxPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxPosition.ForeColor = System.Drawing.Color.White;
             this.comboBoxPosition.FormattingEnabled = true;
-            this.comboBoxPosition.Location = new System.Drawing.Point(223, 210);
+            this.comboBoxPosition.Location = new System.Drawing.Point(223, 182);
             this.comboBoxPosition.Name = "comboBoxPosition";
             this.comboBoxPosition.Size = new System.Drawing.Size(149, 28);
             this.comboBoxPosition.TabIndex = 48;
@@ -72,7 +70,7 @@
             this.comboBoxDepartment.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxDepartment.ForeColor = System.Drawing.Color.White;
             this.comboBoxDepartment.FormattingEnabled = true;
-            this.comboBoxDepartment.Location = new System.Drawing.Point(40, 210);
+            this.comboBoxDepartment.Location = new System.Drawing.Point(40, 182);
             this.comboBoxDepartment.Name = "comboBoxDepartment";
             this.comboBoxDepartment.Size = new System.Drawing.Size(148, 28);
             this.comboBoxDepartment.TabIndex = 47;
@@ -83,7 +81,7 @@
             this.textBoxID.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxID.ForeColor = System.Drawing.Color.White;
-            this.textBoxID.Location = new System.Drawing.Point(223, 152);
+            this.textBoxID.Location = new System.Drawing.Point(223, 124);
             this.textBoxID.Name = "textBoxID";
             this.textBoxID.Size = new System.Drawing.Size(146, 26);
             this.textBoxID.TabIndex = 46;
@@ -95,25 +93,11 @@
             this.textBoxName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxName.ForeColor = System.Drawing.Color.White;
-            this.textBoxName.Location = new System.Drawing.Point(40, 152);
+            this.textBoxName.Location = new System.Drawing.Point(40, 124);
             this.textBoxName.Name = "textBoxName";
             this.textBoxName.Size = new System.Drawing.Size(148, 26);
             this.textBoxName.TabIndex = 45;
             this.textBoxName.Text = "Search name";
-            // 
-            // comboBoxDate
-            // 
-            this.comboBoxDate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.comboBoxDate.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.comboBoxDate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxDate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBoxDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBoxDate.ForeColor = System.Drawing.Color.White;
-            this.comboBoxDate.FormattingEnabled = true;
-            this.comboBoxDate.Location = new System.Drawing.Point(40, 96);
-            this.comboBoxDate.Name = "comboBoxDate";
-            this.comboBoxDate.Size = new System.Drawing.Size(332, 28);
-            this.comboBoxDate.TabIndex = 44;
             // 
             // comboBoxSort
             // 
@@ -133,7 +117,7 @@
             // 
             this.labelPosition.AutoSize = true;
             this.labelPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelPosition.Location = new System.Drawing.Point(218, 184);
+            this.labelPosition.Location = new System.Drawing.Point(218, 156);
             this.labelPosition.Name = "labelPosition";
             this.labelPosition.Size = new System.Drawing.Size(89, 25);
             this.labelPosition.TabIndex = 42;
@@ -143,7 +127,7 @@
             // 
             this.labelDepartment.AutoSize = true;
             this.labelDepartment.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelDepartment.Location = new System.Drawing.Point(36, 184);
+            this.labelDepartment.Location = new System.Drawing.Point(36, 156);
             this.labelDepartment.Name = "labelDepartment";
             this.labelDepartment.Size = new System.Drawing.Size(123, 25);
             this.labelDepartment.TabIndex = 41;
@@ -153,7 +137,7 @@
             // 
             this.labelID.AutoSize = true;
             this.labelID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelID.Location = new System.Drawing.Point(218, 126);
+            this.labelID.Location = new System.Drawing.Point(218, 98);
             this.labelID.Name = "labelID";
             this.labelID.Size = new System.Drawing.Size(33, 25);
             this.labelID.TabIndex = 40;
@@ -163,7 +147,7 @@
             // 
             this.labelName.AutoSize = true;
             this.labelName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelName.Location = new System.Drawing.Point(36, 126);
+            this.labelName.Location = new System.Drawing.Point(36, 98);
             this.labelName.Name = "labelName";
             this.labelName.Size = new System.Drawing.Size(68, 25);
             this.labelName.TabIndex = 39;
@@ -178,16 +162,6 @@
             this.labelSort.Size = new System.Drawing.Size(52, 25);
             this.labelSort.TabIndex = 38;
             this.labelSort.Text = "Sort";
-            // 
-            // labelDate
-            // 
-            this.labelDate.AutoSize = true;
-            this.labelDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelDate.Location = new System.Drawing.Point(36, 64);
-            this.labelDate.Name = "labelDate";
-            this.labelDate.Size = new System.Drawing.Size(57, 25);
-            this.labelDate.TabIndex = 37;
-            this.labelDate.Text = "Date";
             // 
             // labelSearchFilters
             // 
@@ -228,7 +202,7 @@
             this.buttonReset.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonReset.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonReset.ForeColor = System.Drawing.Color.White;
-            this.buttonReset.Location = new System.Drawing.Point(212, 259);
+            this.buttonReset.Location = new System.Drawing.Point(212, 231);
             this.buttonReset.Name = "buttonReset";
             this.buttonReset.Size = new System.Drawing.Size(132, 35);
             this.buttonReset.TabIndex = 91;
@@ -243,7 +217,7 @@
             this.buttonApply.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonApply.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonApply.ForeColor = System.Drawing.Color.White;
-            this.buttonApply.Location = new System.Drawing.Point(58, 259);
+            this.buttonApply.Location = new System.Drawing.Point(58, 231);
             this.buttonApply.Name = "buttonApply";
             this.buttonApply.Size = new System.Drawing.Size(132, 35);
             this.buttonApply.TabIndex = 90;
@@ -255,21 +229,19 @@
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(406, 309);
+            this.ClientSize = new System.Drawing.Size(406, 287);
             this.Controls.Add(this.buttonReset);
             this.Controls.Add(this.buttonApply);
             this.Controls.Add(this.comboBoxPosition);
             this.Controls.Add(this.comboBoxDepartment);
             this.Controls.Add(this.textBoxID);
             this.Controls.Add(this.textBoxName);
-            this.Controls.Add(this.comboBoxDate);
             this.Controls.Add(this.comboBoxSort);
             this.Controls.Add(this.labelPosition);
             this.Controls.Add(this.labelDepartment);
             this.Controls.Add(this.labelID);
             this.Controls.Add(this.labelName);
             this.Controls.Add(this.labelSort);
-            this.Controls.Add(this.labelDate);
             this.Controls.Add(this.labelSearchFilters);
             this.Controls.Add(this.pictureBoxSortLogo);
             this.Controls.Add(this.XpictureBox);
@@ -290,14 +262,12 @@
         private System.Windows.Forms.ComboBox comboBoxDepartment;
         private System.Windows.Forms.TextBox textBoxID;
         private System.Windows.Forms.TextBox textBoxName;
-        private System.Windows.Forms.ComboBox comboBoxDate;
         private System.Windows.Forms.ComboBox comboBoxSort;
         private System.Windows.Forms.Label labelPosition;
         private System.Windows.Forms.Label labelDepartment;
         private System.Windows.Forms.Label labelID;
         private System.Windows.Forms.Label labelName;
         private System.Windows.Forms.Label labelSort;
-        private System.Windows.Forms.Label labelDate;
         private System.Windows.Forms.Label labelSearchFilters;
         private System.Windows.Forms.PictureBox pictureBoxSortLogo;
         private System.Windows.Forms.PictureBox XpictureBox;

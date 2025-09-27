@@ -1,15 +1,16 @@
-﻿using System;
+﻿using Firebase.Database;
+using Firebase.Database.Query;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Firebase.Database;
-using Firebase.Database.Query;
-using System.Text.RegularExpressions;
+using System.Windows.Forms.VisualStyles;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -30,6 +31,9 @@ namespace HRIS_JAP_ATTPAY
 
             // Load departments and positions from Firebase
             LoadDepartmentsAndPositions();
+
+            // FIXED: Initialize sorting options with correct values
+            InitializeSortingOptions();
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
@@ -43,7 +47,6 @@ namespace HRIS_JAP_ATTPAY
             {
                 buttonApply.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
                 buttonReset.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
-                comboBoxDate.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 comboBoxDepartment.Font = AttributesClass.GetFont("Roboto-Light", 11f);
                 comboBoxPosition.Font = AttributesClass.GetFont("Roboto-Light", 11f);
                 comboBoxSort.Font = AttributesClass.GetFont("Roboto-Light", 12f);
@@ -51,7 +54,6 @@ namespace HRIS_JAP_ATTPAY
                 textBoxName.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxTimeIn.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxTimeOut.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelDate.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelDepartment.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelHoursWorked.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelID.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
@@ -158,7 +160,7 @@ namespace HRIS_JAP_ATTPAY
 
             try
             {
-                for (int i = 1; i <= 10; i++)
+                for (int i = 1; i <= 20; i++) // Increased from 10 to 20 to match AdminAttendance
                 {
                     try
                     {
@@ -177,10 +179,17 @@ namespace HRIS_JAP_ATTPAY
                                 employmentDict[empId] = (dept, pos);
                             }
                         }
+                        else
+                        {
+                            // If we hit a null record, we might have reached the end
+                            break;
+                        }
                     }
                     catch
                     {
-                        break;
+                        // If we get consecutive failures, break
+                        if (i > 5 && employmentDict.Count == 0)
+                            break;
                     }
                 }
             }
@@ -266,7 +275,6 @@ namespace HRIS_JAP_ATTPAY
                 Name = textBoxName.Text.Trim(),
                 Department = comboBoxDepartment.SelectedItem?.ToString() ?? "",
                 Position = comboBoxPosition.SelectedItem?.ToString() ?? "",
-                DateFilterType = comboBoxDate.SelectedItem?.ToString() ?? "",
                 SortBy = comboBoxSort.SelectedItem?.ToString() ?? "",
                 TimeIn = textBoxTimeIn.Text.Trim(),
                 TimeOut = textBoxTimeOut.Text.Trim(),
@@ -286,6 +294,7 @@ namespace HRIS_JAP_ATTPAY
                 OvertimeTwoHoursPlus = checkBoxAboveTwoHours.Checked
             };
 
+            System.Diagnostics.Debug.WriteLine($"Filter Apply: SortBy = '{filters.SortBy}'");
             FiltersApplied?.Invoke(filters);
             this.Close();
         }
@@ -294,6 +303,21 @@ namespace HRIS_JAP_ATTPAY
         {
             FiltersReset?.Invoke();
             this.Close();
+        }
+
+        // FIXED: Initialize sorting options with correct case matching
+        private void InitializeSortingOptions()
+        {
+            comboBoxSort.Items.Clear();
+            comboBoxSort.Items.AddRange(new object[] {
+                "A-Z",              // Will become "a-z" when toLower()
+                "Z-A",              // Will become "z-a" when toLower()
+                "Newest-Oldest",    // Will become "newest-oldest" when toLower()
+                "Oldest-Newest"     // Will become "oldest-newest" when toLower()
+            });
+
+            // Don't set default selection - let it be empty initially
+            // This way we can see if sorting is being applied
         }
     }
 
