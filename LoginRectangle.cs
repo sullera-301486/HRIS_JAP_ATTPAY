@@ -102,7 +102,7 @@ namespace HRIS_JAP_ATTPAY
                 }
 
                 string computedHash = ComputeHash(enteredPassword + user.salt);
-
+                AttributesScanner.CheckScannerStatus();
                 if (computedHash.Equals(user.password_hash, StringComparison.OrdinalIgnoreCase))
                 {
                     labelFailed.Visible = false;

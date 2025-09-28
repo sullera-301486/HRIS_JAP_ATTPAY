@@ -264,6 +264,7 @@
       <DependentUpon>AttendanceNotificationItems.cs</DependentUpon>
     </Compile>
     <Compile Include="AttributesClassAlt.cs" />
+    <Compile Include="AttributesScanner.cs" />
     <Compile Include="Calendar.cs">
       <SubType>UserControl</SubType>
     </Compile>
