@@ -134,6 +134,7 @@
             this.buttonScanRFID.TabIndex = 10;
             this.buttonScanRFID.Text = "Scan RFID";
             this.buttonScanRFID.UseVisualStyleBackColor = false;
+            this.buttonScanRFID.Click += new System.EventHandler(this.buttonScanRFID_Click);
             // 
             // XpictureBox
             // 

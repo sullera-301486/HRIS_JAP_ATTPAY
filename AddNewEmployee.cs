@@ -440,5 +440,12 @@ namespace HRIS_JAP_ATTPAY
                 }
             }
         }
+
+        private void buttonScanRFID_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            ScanRFID scanRFID = new ScanRFID();
+            AttributesClass.ShowWithOverlay(parentForm, scanRFID);
+        }
     }
 }

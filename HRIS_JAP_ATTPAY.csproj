@@ -532,6 +532,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ScanRFID.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ScanRFID.Designer.cs">
+      <DependentUpon>ScanRFID.cs</DependentUpon>
+    </Compile>
     <Compile Include="SummaryNotificationItem.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -731,6 +737,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FilterAdminAttendance.resx">
       <DependentUpon>FilterAdminAttendance.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ScanRFID.resx">
+      <DependentUpon>ScanRFID.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SummaryNotificationItem.resx">
       <DependentUpon>SummaryNotificationItem.cs</DependentUpon>
