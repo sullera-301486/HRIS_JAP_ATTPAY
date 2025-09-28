@@ -52,7 +52,17 @@ namespace HRIS_JAP_ATTPAY
 
         private void AttributesScanner_OnScannerInput(object sender, string data)
         {
-            Console.WriteLine("Scanned: " + data);
+
+            if (ScanRFID.ActiveInstance != null)
+            {
+                // special handling for ScanRFID
+                ScanRFID.ActiveInstance.HandleScannedDataInstance(data);
+            }
+            else
+            {
+                Console.WriteLine("Scanned: " + data);
+                // normal scanner behavior; attendance logging, add database logic here
+            }
         }
     }
 }

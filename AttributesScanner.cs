@@ -34,10 +34,6 @@ public static class AttributesScanner
     // Event: apps subscribe here
     public static event EventHandler<string> OnScannerInput;
 
-    // -------------------
-    // Public API
-    // -------------------
-
     public static bool IsScannerConnected()
     {
         return GetConnectedScanners().Count > 0;
@@ -68,10 +64,6 @@ public static class AttributesScanner
             lastKeyTime = 0;
         }
     }
-
-    // -------------------
-    // Private helpers
-    // -------------------
 
     private static List<string> GetConnectedScanners()
     {

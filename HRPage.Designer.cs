@@ -68,6 +68,7 @@ namespace HRIS_JAP_ATTPAY
             this.Name = "HRForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "JAP HRIS HR";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.HRForm_FormClosing);
             this.Load += new System.EventHandler(this.HRPage_Load);
             this.ResumeLayout(false);
 

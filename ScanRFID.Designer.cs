@@ -82,6 +82,8 @@
             this.Name = "ScanRFID";
             this.ShowInTaskbar = false;
             this.Text = "ScanRFID";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ScanRFID_FormClosing);
+            this.Load += new System.EventHandler(this.ScanRFID_Load);
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).EndInit();
             this.ResumeLayout(false);
 

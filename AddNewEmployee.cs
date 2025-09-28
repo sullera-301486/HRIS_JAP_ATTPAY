@@ -444,8 +444,13 @@ namespace HRIS_JAP_ATTPAY
         private void buttonScanRFID_Click(object sender, EventArgs e)
         {
             Form parentForm = this.FindForm();
-            ScanRFID scanRFID = new ScanRFID();
+            ScanRFID scanRFID = new ScanRFID(this);
             AttributesClass.ShowWithOverlay(parentForm, scanRFID);
+        }
+
+        public void SetRFIDTag(string tag)
+        {
+            labelRFIDTagInput.Text = tag;
         }
     }
 }

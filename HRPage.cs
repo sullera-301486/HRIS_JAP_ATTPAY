@@ -30,7 +30,23 @@ namespace HRIS_JAP_ATTPAY
         {
             panelLoaderMenu.LoadUserControl(new HRMenu(HRViewPanel, currentUserId));
             panelLoaderView.LoadUserControl(new HROverview(currentUserId));
+            if (AttributesScanner.IsScannerConnected())
+            {
+                AttributesScanner.OnScannerInput += AttributesScanner_OnScannerInput;
+                AttributesScanner.StartScannerMonitor();
+            }
         }
 
+        private void HRForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            AttributesScanner.OnScannerInput -= AttributesScanner_OnScannerInput;
+            AttributesScanner.StopScannerMonitor();
+        }
+
+        private void AttributesScanner_OnScannerInput(object sender, string data)
+        {
+           Console.WriteLine("Scanned: " + data);
+           // normal scanner behavior; attendance logging, add database logic here
+        }
     }
 }
