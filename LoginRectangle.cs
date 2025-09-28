@@ -100,10 +100,18 @@ namespace HRIS_JAP_ATTPAY
                     labelFailed.Visible = true;
                     return;
                 }
-
+                if (AttributesScanner.IsScannerConnected())
+                {
+                    Console.WriteLine("Scanner detected. Starting monitor...");
+                }
+                else
+                {
+                    Console.WriteLine("No scanner detected. Monitor not started.");
+                }
                 string computedHash = ComputeHash(enteredPassword + user.salt);
-                AttributesScanner.CheckScannerStatus();
                 if (computedHash.Equals(user.password_hash, StringComparison.OrdinalIgnoreCase))
+
+
                 {
                     labelFailed.Visible = false;
 

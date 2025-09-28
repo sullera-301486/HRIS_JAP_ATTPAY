@@ -35,6 +35,24 @@ namespace HRIS_JAP_ATTPAY
         {
             panelLoaderMenu.LoadUserControl(new AdminMenu(AdminViewPanel, currentUserId, currentEmployeeId));
             panelLoaderView.LoadUserControl(new AdminOverview(currentUserId));
+
+            if (AttributesScanner.IsScannerConnected())
+            {
+                AttributesScanner.OnScannerInput += AttributesScanner_OnScannerInput;
+                AttributesScanner.StartScannerMonitor();
+            }
+
+        }
+
+        private void AdminForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            AttributesScanner.OnScannerInput -= AttributesScanner_OnScannerInput;
+            AttributesScanner.StopScannerMonitor();
+        }
+
+        private void AttributesScanner_OnScannerInput(object sender, string data)
+        {
+            Console.WriteLine("Scanned: " + data);
         }
     }
 }
