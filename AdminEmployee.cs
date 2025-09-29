@@ -19,6 +19,7 @@ namespace HRIS_JAP_ATTPAY
         // Store original data and current filters
         private List<EmployeeData> allEmployees = new List<EmployeeData>();
         private FilterCriteria currentFilters = new FilterCriteria();
+        private static AdminEmployee _instance;
 
         public AdminEmployee()
         {
@@ -27,6 +28,7 @@ namespace HRIS_JAP_ATTPAY
             setFont();
             setTextBoxAttributes();
             setDataGridViewAttributes();
+            _instance = this;
 
             // Load Firebase data
             LoadFirebaseData();
@@ -739,6 +741,10 @@ namespace HRIS_JAP_ATTPAY
         public void RefreshData()
         {
             LoadFirebaseData();
+        }
+        public static void RefreshEmployeeData()
+        {
+            _instance?.RefreshData();
         }
     }
 

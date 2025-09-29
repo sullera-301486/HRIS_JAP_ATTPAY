@@ -17,6 +17,8 @@ namespace HRIS_JAP_ATTPAY
         private readonly string employeeId;
         private readonly FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
         public bool UserConfirmed { get; private set; } = false;
+
+
         public EmployeeProfile(string employeeId)
         {
             InitializeComponent();
@@ -401,50 +403,52 @@ namespace HRIS_JAP_ATTPAY
         {
             using (ConfirmArchive confirmForm = new ConfirmArchive(employeeId))
             {
-                confirmForm.StartPosition = FormStartPosition.CenterParent;
-                confirmForm.ShowDialog(this); // Just show the dialog, don't check result
-
-                // Only check the UserConfirmed property
-                if (confirmForm.UserConfirmed)
+                confirmForm.EmployeeArchived += () =>
                 {
-                    await ExecuteArchiveAndRefresh();
-                }
-                else
+                    // Direct call to refresh
+                    AdminEmployee.RefreshEmployeeData();
+
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                    MessageBox.Show("Employee archived successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                };
+
+                confirmForm.StartPosition = FormStartPosition.CenterParent;
+                var result = confirmForm.ShowDialog(this);
+
+                if (!(result == DialogResult.OK || confirmForm.UserConfirmed))
                 {
                     MessageBox.Show("Archive cancelled.", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
 
-        private async Task ExecuteArchiveAndRefresh()
-        {
-            // Refresh the AdminEmployee data
-            RefreshAdminEmployee();
-
-            // Close the current form
-            this.Close();
-
-            // Optional: Show success message
-            MessageBox.Show("Employee archived successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
         private void RefreshAdminEmployee()
         {
-            // Find the AdminEmployee user control in the parent form hierarchy
-            Form parentForm = this.FindForm();
-            if (parentForm != null)
+            try
             {
-                var adminEmployeeControl = FindControl<AdminEmployee>(parentForm);
-                if (adminEmployeeControl != null)
+                // Find the AdminEmployee user control in the parent form hierarchy
+                Form parentForm = this.FindForm();
+                if (parentForm != null)
                 {
-                    // Call RefreshData on the found AdminEmployee control
-                    adminEmployeeControl.RefreshData();
+                    var adminEmployeeControl = FindControl<AdminEmployee>(parentForm);
+                    if (adminEmployeeControl != null)
+                    {
+                        // This will automatically reload the data
+                        adminEmployeeControl.RefreshData();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error refreshing AdminEmployee: {ex.Message}");
             }
         }
 
         private T FindControl<T>(Control control) where T : Control
         {
+            if (control == null) return null;
+
             foreach (Control child in control.Controls)
             {
                 if (child is T found)

@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -129,11 +130,75 @@ namespace HRIS_JAP_ATTPAY
                     textBoxDateOfExit.Text = empInfo.date_of_exit;
                     textBoxManager.Text = empInfo.manager_name;
                 }
+
+                // ✅ Load User data for password
+                await LoadUserData(employeeId);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error loading employee data: " + ex.Message,
                                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async Task LoadUserData(string employeeId)
+        {
+            try
+            {
+                // Find the user record that matches this employee ID
+                var users = await firebase
+                    .Child("Users")
+                    .OnceAsync<UserModel>();
+
+                var user = users.FirstOrDefault(u => u.Object?.employee_id == employeeId);
+                if (user != null)
+                {
+                    // Show placeholder text when no password is entered
+                    textboxPassword.Text = "••••••••";
+                    textboxPassword.ForeColor = Color.Gray;
+
+                    // Add event handlers to handle placeholder behavior
+                    textboxPassword.Enter += PasswordTextBox_Enter;
+                    textboxPassword.Leave += PasswordTextBox_Leave;
+                }
+                else
+                {
+                    textboxPassword.Text = "No password set";
+                    textboxPassword.ForeColor = Color.Gray;
+
+                    // Add event handlers to handle placeholder behavior
+                    textboxPassword.Enter += PasswordTextBox_Enter;
+                    textboxPassword.Leave += PasswordTextBox_Leave;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading user data: " + ex.Message,
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void PasswordTextBox_Enter(object sender, EventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            if (textBox.Text == "••••••••" || textBox.Text == "No password set")
+            {
+                textBox.Text = "";
+                textBox.ForeColor = SystemColors.WindowText;
+            }
+        }
+
+        private void PasswordTextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            if (string.IsNullOrWhiteSpace(textBox.Text))
+            {
+                // Determine which placeholder to show based on user existence
+                var users = firebase.Child("Users").OnceAsync<UserModel>().Result;
+                var userExists = users.Any(u => u.Object?.employee_id == selectedEmployeeId);
+
+                textBox.Text = userExists ? "••••••••" : "No password set";
+                textBox.ForeColor = Color.Gray;
             }
         }
 
@@ -190,6 +255,7 @@ namespace HRIS_JAP_ATTPAY
                 labelMaritalStatus.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelMiddleName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelNationality.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelPassword.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelPersonalInformation.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
                 labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelPositionInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
@@ -216,6 +282,7 @@ namespace HRIS_JAP_ATTPAY
                 textBoxNationality.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxWorkHoursA.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxWorkHoursB.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                textboxPassword.Font = AttributesClass.GetFont("Roboto-Light", 12f);
             }
             catch (Exception ex)
             {
@@ -233,9 +300,8 @@ namespace HRIS_JAP_ATTPAY
             using (EditAttendanceConfirm confirmForm = new EditAttendanceConfirm())
             {
                 confirmForm.StartPosition = FormStartPosition.CenterParent;
-                confirmForm.ShowDialog(this); // Just show the dialog, don't check result
+                confirmForm.ShowDialog(this);
 
-                // Only check the UserConfirmed property
                 if (confirmForm.UserConfirmed)
                 {
                     await ExecuteFinalUpdate();
@@ -262,11 +328,17 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                // 2. Update EmployeeDetails - PASS THE imageUrl PARAMETER
+                // 2. Update EmployeeDetails
                 await UpdateEmployeeDetails(imageUrl);
 
                 // 3. Update EmploymentInfo
                 await UpdateEmploymentInfo();
+
+                // 4. Update Password if provided - USING THE COPIED LOGIC FROM AddNewEmployee
+                if (!string.IsNullOrEmpty(textboxPassword.Text.Trim()))
+                {
+                    await UpdateUserPassword(selectedEmployeeId, textboxPassword.Text.Trim());
+                }
 
                 MessageBox.Show("Employee profile updated successfully!", "Success",
                                MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -279,7 +351,6 @@ namespace HRIS_JAP_ATTPAY
                                MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
 
         private async Task UpdateEmployeeDetails(string imageUrl = null)
         {
@@ -325,6 +396,113 @@ namespace HRIS_JAP_ATTPAY
                 .Child("EmploymentInfo")
                 .Child(selectedEmployeeId)
                 .PutAsync(employmentInfo);
+        }
+
+        // COPIED FROM AddNewEmployee.cs - Password functionality
+        private async Task UpdateUserPassword(string employeeId, string newPassword)
+        {
+            try
+            {
+                // Find the user record that matches this employee ID
+                var users = await firebase
+                    .Child("Users")
+                    .OnceAsync<UserModel>();
+
+                var user = users.FirstOrDefault(u => u.Object?.employee_id == employeeId);
+
+                if (user != null)
+                {
+                    // Generate salt and hash for the new password - USING COPIED LOGIC
+                    string numericPart = employeeId.Split('-')[1]; // Extract "001" from "JAP-001"
+                    string salt = "RANDOMSALT" + numericPart; // Format like "RANDOMSALT2" for JAP-002
+                    string passwordHash = HashPassword(newPassword, salt);
+
+                    // Update the user record with new password
+                    var updatedUser = new UserModel
+                    {
+                        user_id = user.Object.user_id,
+                        employee_id = user.Object.employee_id,
+                        password_hash = passwordHash,
+                        salt = salt,
+                        isAdmin = user.Object.isAdmin,
+                        created_at = user.Object.created_at
+                    };
+
+                    await firebase
+                        .Child("Users")
+                        .Child(user.Key)
+                        .PutAsync(updatedUser);
+                }
+                else
+                {
+                    // Create new user record if it doesn't exist - USING COPIED LOGIC
+                    await CreateNewUser(employeeId, newPassword);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating password: {ex.Message}", "Error",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // COPIED FROM AddNewEmployee.cs
+        private async Task CreateNewUser(string employeeId, string password)
+        {
+            try
+            {
+                // Generate a new user ID
+                var users = await firebase.Child("Users").OnceAsync<UserModel>();
+                int newUserId = users.Count + 1;
+
+                // Generate salt and hash - USING COPIED LOGIC
+                string numericPart = employeeId.Split('-')[1]; // Extract "001" from "JAP-001"
+                string salt = "RANDOMSALT" + numericPart; // Format like "RANDOMSALT2" for JAP-002
+                string passwordHash = HashPassword(password, salt);
+
+                var newUser = new UserModel
+                {
+                    user_id = newUserId.ToString(),
+                    employee_id = employeeId,
+                    password_hash = passwordHash,
+                    salt = salt,
+                    isAdmin = "False",
+                    created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
+                };
+
+                await firebase
+                    .Child("Users")
+                    .Child(newUserId.ToString())
+                    .PutAsync(newUser);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error creating user: {ex.Message}", "Error",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // COPIED FROM AddNewEmployee.cs - Password hashing methods
+        private string GenerateRandomSalt()
+        {
+            byte[] saltBytes = new byte[16];
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                rng.GetBytes(saltBytes);
+            }
+            return Convert.ToBase64String(saltBytes);
+        }
+
+        // COPIED FROM AddNewEmployee.cs
+        private string HashPassword(string password, string salt)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                byte[] passwordBytes = Encoding.UTF8.GetBytes(password + salt);
+                byte[] hashBytes = sha256.ComputeHash(passwordBytes);
+                // Return uppercase hash to match JAP-002 format
+                return BitConverter.ToString(hashBytes).Replace("-", "").ToUpper();
+            }
         }
 
         // CORRECTED for Firebase Storage v7.3
@@ -441,6 +619,28 @@ namespace HRIS_JAP_ATTPAY
                 return false;
             }
         }
+
+        private void textboxPassword_TextChanged(object sender, EventArgs e)
+        {
+            // Optional: Add real-time validation or strength indicator
+            if (!string.IsNullOrEmpty(textboxPassword.Text))
+            {
+                // You can add password strength validation here
+                if (textboxPassword.Text.Length < 6)
+                {
+                    // Weak password indicator
+                    textboxPassword.ForeColor = Color.Red;
+                }
+                else
+                {
+                    textboxPassword.ForeColor = Color.Green;
+                }
+            }
+            else
+            {
+                textboxPassword.ForeColor = SystemColors.WindowText;
+            }
+        }
     }
 
     // 🔹 Firebase models
@@ -473,5 +673,14 @@ namespace HRIS_JAP_ATTPAY
         public string manager_name { get; set; }
         public string created_at { get; set; }
     }
-}
 
+    public class UserModel
+    {
+        public string user_id { get; set; }
+        public string employee_id { get; set; }
+        public string password_hash { get; set; }
+        public string salt { get; set; }
+        public string isAdmin { get; set; }
+        public string created_at { get; set; }
+    }
+}

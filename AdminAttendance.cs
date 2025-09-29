@@ -13,16 +13,15 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class AdminAttendance : UserControl
     {
-        //  Firebase client
+        // Firebase client
         private AttendanceFilterCriteria currentAttendanceFilters = new AttendanceFilterCriteria();
         private FirebaseClient firebase = new FirebaseClient(
             "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
         );
         private Dictionary<string, (string Department, string Position)> employeeDepartmentMap = new Dictionary<string, (string Department, string Position)>();
         private bool isLoading = false;
-        //  Store attendance records with their Firebase keys
+        // Store attendance records with their Firebase keys
         private Dictionary<int, string> attendanceKeyMap = new Dictionary<int, string>();
-
         public AdminAttendance()
         {
             InitializeComponent();
@@ -38,6 +37,7 @@ namespace HRIS_JAP_ATTPAY
             setFont();
             setTextBoxAttributes();
             setDataGridViewAttributes();
+           
 
             // Load data asynchronously
             LoadDataAsync();
@@ -543,7 +543,6 @@ namespace HRIS_JAP_ATTPAY
             ApplyAllAttendanceFilters();
         }
 
-
         private void labelManageLeave_Click(object sender, EventArgs e)
         {
             Form parentForm = this.FindForm();
@@ -611,6 +610,17 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewAttendance.Columns.Add(new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "Status", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 80 });
             dataGridViewAttendance.Columns.Add(new DataGridViewTextBoxColumn { Name = "OvertimeHours", HeaderText = "Overtime Hours", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 80 });
             dataGridViewAttendance.Columns.Add(new DataGridViewTextBoxColumn { Name = "VerificationMethod", HeaderText = "Verification", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 80 });
+
+            // ADD HIDDEN COLUMN FOR ATTENDANCE DATE
+            dataGridViewAttendance.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "AttendanceDate",
+                HeaderText = "Attendance Date",
+                Visible = false,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                FillWeight = 80
+            });
+
             dataGridViewAttendance.Columns.Add(new DataGridViewImageColumn
             {
                 Name = "Action",
@@ -620,6 +630,9 @@ namespace HRIS_JAP_ATTPAY
                 FillWeight = 25,
                 Image = Properties.Resources.VerticalThreeDots
             });
+
+            // Add cell click event for action column
+            dataGridViewAttendance.CellClick += dataGridViewAttendance_CellContentClick;
         }
 
         private void setFont()
@@ -654,9 +667,9 @@ namespace HRIS_JAP_ATTPAY
         {
             dataGridViewAttendance.Cursor = Cursors.Default;
         }
+
         private void dataGridViewAttendance_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-
             if (e.RowIndex >= 0 && dataGridViewAttendance.Columns[e.ColumnIndex].Name == "Action")
             {
                 // Get the selected row data
@@ -669,10 +682,13 @@ namespace HRIS_JAP_ATTPAY
                     firebaseKey = attendanceKeyMap[e.RowIndex];
                 }
 
+                // GET ATTENDANCE DATE FROM HIDDEN COLUMN
+                string attendanceDate = selectedRow.Cells["AttendanceDate"].Value?.ToString();
+
                 Form parentForm = this.FindForm();
                 EditAttendance editAttendanceForm = new EditAttendance();
 
-                // Pass the attendance data AND the Firebase key to the edit form
+                // Pass the attendance data AND the Firebase key AND attendance date to the edit form
                 editAttendanceForm.SetAttendanceData(
                     selectedRow.Cells["EmployeeId"].Value?.ToString(),
                     selectedRow.Cells["FullName"].Value?.ToString(),
@@ -682,7 +698,8 @@ namespace HRIS_JAP_ATTPAY
                     selectedRow.Cells["Status"].Value?.ToString(),
                     selectedRow.Cells["OvertimeHours"].Value?.ToString(),
                     selectedRow.Cells["VerificationMethod"].Value?.ToString(),
-                    firebaseKey  // Pass the Firebase key
+                    firebaseKey,
+                    attendanceDate  // PASS THE ATTENDANCE DATE
                 );
 
                 AttributesClass.ShowWithOverlay(parentForm, editAttendanceForm);
@@ -1062,7 +1079,8 @@ namespace HRIS_JAP_ATTPAY
                 {
                     dataGridViewAttendance.Invoke((MethodInvoker)delegate
                     {
-                        dataGridViewAttendance.Rows.Add(
+                        // ADD ROW WITH ALL COLUMNS INCLUDING HIDDEN ATTENDANCE DATE
+                        int newRowIndex = dataGridViewAttendance.Rows.Add(
                             counter,
                             employeeId,
                             fullName,
@@ -1072,14 +1090,16 @@ namespace HRIS_JAP_ATTPAY
                             status,
                             overtime,
                             verification,
+                            attendanceDateStr, // STORE IN HIDDEN COLUMN
                             Properties.Resources.VerticalThreeDots
                         );
-                        attendanceKeyMap[rowIndex] = firebaseKey;
+                        attendanceKeyMap[newRowIndex] = firebaseKey;
                     });
                 }
                 else
                 {
-                    dataGridViewAttendance.Rows.Add(
+                    // ADD ROW WITH ALL COLUMNS INCLUDING HIDDEN ATTENDANCE DATE
+                    int newRowIndex = dataGridViewAttendance.Rows.Add(
                         counter,
                         employeeId,
                         fullName,
@@ -1089,9 +1109,10 @@ namespace HRIS_JAP_ATTPAY
                         status,
                         overtime,
                         verification,
+                        attendanceDateStr, // STORE IN HIDDEN COLUMN
                         Properties.Resources.VerticalThreeDots
                     );
-                    attendanceKeyMap[rowIndex] = firebaseKey;
+                    attendanceKeyMap[newRowIndex] = firebaseKey;
                 }
 
                 return true;

@@ -37,7 +37,7 @@ namespace HRIS_JAP_ATTPAY
 
         public void SetAttendanceData(string employeeId, string fullName, string timeIn, string timeOut,
                              string hoursWorked, string status, string overtimeHours, string verificationMethod,
-                             string firebaseKey)
+                             string firebaseKey, string attendanceDate = null)
         {
             currentEmployeeId = employeeId;
             currentFirebaseKey = firebaseKey;
@@ -51,26 +51,33 @@ namespace HRIS_JAP_ATTPAY
             labelOvertimeInput.Text = overtimeHours ?? "0.00";
             labelStatusInput.Text = status ?? "Absent";
 
-            // Set the editable fields
-            textBoxTimeIn.Text = timeIn ?? "";
-            textBoxTimeOut.Text = timeOut ?? "";
+            // Set the editable fields - extract only time portion
+            textBoxTimeIn.Text = ExtractTimeOnly(timeIn) ?? "";
+            textBoxTimeOut.Text = ExtractTimeOnly(timeOut) ?? "";
 
             // You'll need to load overtime_in and overtime_out from Firebase if they exist
-            // For now, set them to empty or you can modify your main form to pass these values
             textBoxOverTimeIn.Text = ""; // You'll need to load actual values here
             textBoxOverTimeOut.Text = ""; // You'll need to load actual values here
 
             statusColorCheck();
-            // Set the date (you'll need to get this from the main form or Firebase)
-            // Try to extract date from the original time in or use current date
-            if (!string.IsNullOrEmpty(timeIn) && timeIn != "N/A")
+
+            // Set the date - priority: provided attendanceDate > extract from timeIn > current date
+            if (!string.IsNullOrEmpty(attendanceDate))
+            {
+                // Use the explicitly provided date
+                labelDateInput.Text = attendanceDate;
+                currentDate = attendanceDate;
+            }
+            else if (!string.IsNullOrEmpty(timeIn) && timeIn != "N/A")
             {
                 try
                 {
-                    if (DateTime.TryParse(timeIn, out DateTime timeInDate))
+                    // Try to extract date from the original timeIn (which may contain full datetime)
+                    string extractedDate = ExtractDateFromDateTime(timeIn);
+                    if (!string.IsNullOrEmpty(extractedDate))
                     {
-                        labelDateInput.Text = timeInDate.ToString("yyyy-MM-dd");
-                        currentDate = labelDateInput.Text;
+                        labelDateInput.Text = extractedDate;
+                        currentDate = extractedDate;
                     }
                     else
                     {
@@ -94,6 +101,61 @@ namespace HRIS_JAP_ATTPAY
             UpdateOvertimeFieldsState();
 
             Console.WriteLine($"EditAttendance: Firebase Key = {currentFirebaseKey}, Employee ID = {currentEmployeeId}, Date = {currentDate}");
+            Console.WriteLine($"Original TimeIn: {timeIn}, Extracted Time: {textBoxTimeIn.Text}");
+        }
+
+        private string ExtractTimeOnly(string datetimeString)
+        {
+            if (string.IsNullOrEmpty(datetimeString) || datetimeString.Equals("N/A", StringComparison.OrdinalIgnoreCase))
+                return "N/A";
+
+            try
+            {
+                if (DateTime.TryParse(datetimeString, out DateTime dt))
+                {
+                    // Return time in 12-hour format with AM/PM
+                    return dt.ToString("hh:mm tt").ToLower();
+                }
+                else
+                {
+                    // If it's already just a time string, return as is
+                    return datetimeString;
+                }
+            }
+            catch
+            {
+                return datetimeString;
+            }
+        }
+
+        private string ExtractDateFromDateTime(string datetimeString)
+        {
+            if (string.IsNullOrEmpty(datetimeString) || datetimeString.Equals("N/A", StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            try
+            {
+                // First, check if it's a full datetime string with date
+                if (datetimeString.Contains("-") && datetimeString.Length >= 10)
+                {
+                    string datePart = datetimeString.Substring(0, 10);
+                    if (DateTime.TryParse(datePart, out DateTime date))
+                    {
+                        return date.ToString("yyyy-MM-dd");
+                    }
+                }
+
+                // Try parsing as full datetime
+                if (DateTime.TryParse(datetimeString, out DateTime dt))
+                {
+                    return dt.ToString("yyyy-MM-dd");
+                }
+            }
+            catch
+            {
+                // Ignore parsing errors
+            }
+            return null;
         }
 
         private void buttonSendRequest_Click(object sender, EventArgs e)

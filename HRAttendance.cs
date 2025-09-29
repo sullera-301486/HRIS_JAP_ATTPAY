@@ -23,6 +23,7 @@ namespace HRIS_JAP_ATTPAY
         private AttendanceFilterCriteria currentAttendanceFilters = new AttendanceFilterCriteria();
         private Dictionary<string, (string Department, string Position)> employeeDepartmentMap = new Dictionary<string, (string Department, string Position)>();
         private Dictionary<int, string> attendanceKeyMap = new Dictionary<int, string>();
+        private Button btnGenerateAttendance;
 
         private bool isLoading = false;
 
@@ -39,10 +40,107 @@ namespace HRIS_JAP_ATTPAY
             setFont();
             setTextBoxAttributes();
             setDataGridViewAttributes();
+            InitializeGenerateButton(); // Add generate button
 
             LoadEmployeeDepartmentMapping();
             LoadFirebaseAttendanceData();
             PopulateDateComboBox();
+        }
+
+        private void InitializeGenerateButton()
+        {
+            btnGenerateAttendance = new Button();
+            btnGenerateAttendance.Text = "Generate Weekly Attendance";
+            btnGenerateAttendance.BackColor = Color.FromArgb(153, 137, 207);
+            btnGenerateAttendance.ForeColor = Color.White;
+            btnGenerateAttendance.FlatStyle = FlatStyle.Flat;
+            btnGenerateAttendance.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+            btnGenerateAttendance.Size = new Size(220, 35);
+            btnGenerateAttendance.Location = new Point(800, 80);
+            btnGenerateAttendance.Click += BtnGenerateAttendance_Click;
+
+            this.Controls.Add(btnGenerateAttendance);
+        }
+
+        private async void BtnGenerateAttendance_Click(object sender, EventArgs e)
+        {
+            await GenerateWeeklyAttendance();
+        }
+
+        private async Task GenerateWeeklyAttendance()
+        {
+            try
+            {
+                Cursor.Current = Cursors.WaitCursor;
+                btnGenerateAttendance.Enabled = false;
+
+                var generator = new AttendanceGenerator();
+                DateTime currentWeekMonday = generator.GetCurrentWeekMonday();
+
+                // Check if this week is already generated
+                bool weekGenerated = await generator.IsWeekGenerated(currentWeekMonday);
+
+                if (weekGenerated)
+                {
+                    var result = MessageBox.Show("Attendance for this week already exists. Do you want to regenerate it?",
+                        "Confirm Regeneration", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                    if (result == DialogResult.No)
+                    {
+                        return;
+                    }
+                }
+
+                // Show progress
+                var progressForm = new Form()
+                {
+                    Size = new Size(300, 150),
+                    StartPosition = FormStartPosition.CenterParent,
+                    FormBorderStyle = FormBorderStyle.FixedDialog,
+                    Text = "Generating Attendance",
+                    MaximizeBox = false,
+                    MinimizeBox = false
+                };
+
+                var progressLabel = new Label()
+                {
+                    Text = "Generating weekly attendance records...",
+                    Location = new Point(20, 20),
+                    Size = new Size(250, 20)
+                };
+
+                var progressBar = new ProgressBar()
+                {
+                    Location = new Point(20, 50),
+                    Size = new Size(250, 20),
+                    Style = ProgressBarStyle.Marquee
+                };
+
+                progressForm.Controls.Add(progressLabel);
+                progressForm.Controls.Add(progressBar);
+                progressForm.Show();
+
+                // Generate attendance
+                await generator.GenerateWeeklyAttendance(currentWeekMonday);
+
+                progressForm.Close();
+
+                MessageBox.Show($"Weekly attendance from {currentWeekMonday:yyyy-MM-dd} to {currentWeekMonday.AddDays(5):yyyy-MM-dd} generated successfully!",
+                    "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Refresh the attendance data
+                LoadFirebaseAttendanceData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error generating attendance: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
+                btnGenerateAttendance.Enabled = true;
+            }
         }
 
         // 🔹 FILTER HANDLERS
@@ -438,7 +536,7 @@ namespace HRIS_JAP_ATTPAY
         }
 
         // 🔹 LOAD EMPLOYEE DEPARTMENT MAPPING (same as before)
-        private async Task LoadEmployeeDepartmentMapping()
+        private async void LoadEmployeeDepartmentMapping()
         {
             try
             {
@@ -594,6 +692,17 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewAttendance.Columns.Add(new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "Status", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 80 });
             dataGridViewAttendance.Columns.Add(new DataGridViewTextBoxColumn { Name = "OvertimeHours", HeaderText = "Overtime Hours", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 80 });
             dataGridViewAttendance.Columns.Add(new DataGridViewTextBoxColumn { Name = "VerificationMethod", HeaderText = "Verification", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 80 });
+
+            // ADD HIDDEN COLUMN FOR ATTENDANCE DATE
+            dataGridViewAttendance.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "AttendanceDate",
+                HeaderText = "Attendance Date",
+                Visible = false,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                FillWeight = 80
+            });
+
             dataGridViewAttendance.Columns.Add(new DataGridViewImageColumn
             {
                 Name = "Action",
@@ -603,6 +712,9 @@ namespace HRIS_JAP_ATTPAY
                 FillWeight = 25,
                 Image = Properties.Resources.VerticalThreeDots
             });
+
+            // Add cell click event for action column
+            dataGridViewAttendance.CellClick += dataGridViewAttendance_CellClick;
         }
 
         // UPDATED CELL FORMATTING TO MATCH ADMINATTENDANCE
@@ -655,9 +767,58 @@ namespace HRIS_JAP_ATTPAY
         {
             if (e.RowIndex >= 0 && dataGridViewAttendance.Columns[e.ColumnIndex].Name == "Action")
             {
+                // Get the selected row data
+                DataGridViewRow selectedRow = dataGridViewAttendance.Rows[e.RowIndex];
+
+                // Get the Firebase key for this record
+                string firebaseKey = null;
+                if (attendanceKeyMap.ContainsKey(e.RowIndex))
+                {
+                    firebaseKey = attendanceKeyMap[e.RowIndex];
+                }
+
+                // GET ATTENDANCE DATE FROM HIDDEN COLUMN
+                string attendanceDate = selectedRow.Cells["AttendanceDate"].Value?.ToString();
+
                 Form parentForm = this.FindForm();
                 EditAttendance editAttendanceForm = new EditAttendance();
+
+                // Pass the attendance data AND the Firebase key AND attendance date to the edit form
+                editAttendanceForm.SetAttendanceData(
+                    selectedRow.Cells["EmployeeId"].Value?.ToString(),
+                    selectedRow.Cells["FullName"].Value?.ToString(),
+                    selectedRow.Cells["TimeIn"].Value?.ToString(),
+                    selectedRow.Cells["TimeOut"].Value?.ToString(),
+                    selectedRow.Cells["HoursWorked"].Value?.ToString(),
+                    selectedRow.Cells["Status"].Value?.ToString(),
+                    selectedRow.Cells["OvertimeHours"].Value?.ToString(),
+                    selectedRow.Cells["VerificationMethod"].Value?.ToString(),
+                    firebaseKey,
+                    attendanceDate  // PASS THE ATTENDANCE DATE
+                );
+
                 AttributesClass.ShowWithOverlay(parentForm, editAttendanceForm);
+
+                // Refresh data after editing
+                editAttendanceForm.FormClosed += (s, args) => {
+                    if (editAttendanceForm.DataUpdated)
+                    {
+                        // Refresh with current filter
+                        string selectedText = comboBoxSelectDate.SelectedItem?.ToString();
+                        DateTime? selectedDate = null;
+
+                        if (!string.IsNullOrEmpty(selectedText) && selectedText != "All Dates")
+                        {
+                            DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
+                                System.Globalization.CultureInfo.InvariantCulture,
+                                System.Globalization.DateTimeStyles.None,
+                                out DateTime parsedDate);
+                            selectedDate = parsedDate;
+                        }
+
+                        LoadFirebaseAttendanceData(selectedDate);
+                    }
+                };
             }
         }
 
@@ -854,7 +1015,8 @@ namespace HRIS_JAP_ATTPAY
                 {
                     dataGridViewAttendance.Invoke((MethodInvoker)delegate
                     {
-                        dataGridViewAttendance.Rows.Add(
+                        // ADD ROW WITH ALL COLUMNS INCLUDING HIDDEN ATTENDANCE DATE
+                        int newRowIndex = dataGridViewAttendance.Rows.Add(
                             counter,
                             employeeId,
                             fullName,
@@ -864,14 +1026,16 @@ namespace HRIS_JAP_ATTPAY
                             status,
                             overtime,
                             verification,
+                            attendanceDateStr, // STORE IN HIDDEN COLUMN
                             Properties.Resources.VerticalThreeDots
                         );
-                        attendanceKeyMap[rowIndex] = firebaseKey;
+                        attendanceKeyMap[newRowIndex] = firebaseKey;
                     });
                 }
                 else
                 {
-                    dataGridViewAttendance.Rows.Add(
+                    // ADD ROW WITH ALL COLUMNS INCLUDING HIDDEN ATTENDANCE DATE
+                    int newRowIndex = dataGridViewAttendance.Rows.Add(
                         counter,
                         employeeId,
                         fullName,
@@ -881,9 +1045,10 @@ namespace HRIS_JAP_ATTPAY
                         status,
                         overtime,
                         verification,
+                        attendanceDateStr, // STORE IN HIDDEN COLUMN
                         Properties.Resources.VerticalThreeDots
                     );
-                    attendanceKeyMap[rowIndex] = firebaseKey;
+                    attendanceKeyMap[newRowIndex] = firebaseKey;
                 }
 
                 return true;
@@ -948,6 +1113,12 @@ namespace HRIS_JAP_ATTPAY
         {
             currentAttendanceFilters.SortBy = "newest-oldest";
             ApplyAllAttendanceFilters();
+        }
+        private void labelAddLeave_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            ManageLeave manageLeaveForm = new ManageLeave();
+            AttributesClass.ShowWithOverlay(parentForm, manageLeaveForm);
         }
     }
 }

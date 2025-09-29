@@ -694,6 +694,7 @@
             this.comboBoxDepartment.Name = "comboBoxDepartment";
             this.comboBoxDepartment.Size = new System.Drawing.Size(229, 33);
             this.comboBoxDepartment.TabIndex = 34;
+            this.comboBoxDepartment.SelectedIndexChanged += new System.EventHandler(this.comboBoxDepartment_SelectedIndexChanged);
             // 
             // labelAltWorkHours
             // 

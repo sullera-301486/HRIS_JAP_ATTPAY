@@ -20,6 +20,9 @@ namespace HRIS_JAP_ATTPAY
         // Add this property
         public bool UserConfirmed { get; private set; }
 
+        // Add this event to notify when archiving is complete
+        public event Action EmployeeArchived;
+
         public ConfirmArchive(string employeeId)
         {
             InitializeComponent();
@@ -191,6 +194,10 @@ namespace HRIS_JAP_ATTPAY
                 // Set UserConfirmed to true on success
                 this.UserConfirmed = true;
                 this.DialogResult = DialogResult.OK;
+
+                // Trigger the event to notify that employee was archived
+                EmployeeArchived?.Invoke();
+
                 this.Close();
             }
             catch (Exception ex)
@@ -205,30 +212,32 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
+                // EmploymentInfo is stored as an object, not an array
                 var employmentData = await firebase
                     .Child("EmploymentInfo")
-                    .OnceSingleAsync<object>();
+                    .OnceSingleAsync<Dictionary<string, dynamic>>();
 
                 if (employmentData != null)
                 {
-                    var employmentArray = Newtonsoft.Json.Linq.JArray.FromObject(employmentData);
-
-                    foreach (var item in employmentArray)
+                    // Find the employment record by employee_id
+                    foreach (var kvp in employmentData)
                     {
-                        if (item != null && item.Type != Newtonsoft.Json.Linq.JTokenType.Null)
+                        if (kvp.Value != null)
                         {
-                            var empId = item["employee_id"]?.ToString();
+                            // Check if this is the employee we're looking for
+                            var empId = kvp.Value.employee_id?.ToString();
                             if (empId == employeeId)
                             {
-                                return item;
+                                return kvp.Value;
                             }
                         }
                     }
                 }
                 return null;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error getting employment info: {ex.Message}");
                 return null;
             }
         }
@@ -243,11 +252,14 @@ namespace HRIS_JAP_ATTPAY
                     .Child(employeeId)
                     .DeleteAsync();
 
-                // Remove from EmploymentInfo (array)
-                await RemoveFromEmploymentInfoArray();
+                // Remove from EmploymentInfo
+                await RemoveFromEmploymentInfo();
 
-                // Remove from Work_Schedule (array)
-                await RemoveFromWorkScheduleArray();
+                // Remove from Work_Schedule
+                await RemoveFromWorkSchedule();
+
+                // Remove user access
+                await RemoveUserAccess();
             }
             catch (Exception ex)
             {
@@ -256,35 +268,39 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private async Task RemoveFromEmploymentInfoArray()
+        private async Task RemoveFromEmploymentInfo()
         {
             try
             {
                 var employmentData = await firebase
                     .Child("EmploymentInfo")
-                    .OnceSingleAsync<object>();
+                    .OnceSingleAsync<Dictionary<string, dynamic>>();
 
                 if (employmentData != null)
                 {
-                    var employmentArray = Newtonsoft.Json.Linq.JArray.FromObject(employmentData);
-                    var newArray = new Newtonsoft.Json.Linq.JArray();
-
-                    foreach (var item in employmentArray)
+                    // Find the employment key for this employee
+                    string employmentKeyToRemove = null;
+                    foreach (var kvp in employmentData)
                     {
-                        if (item != null && item.Type != Newtonsoft.Json.Linq.JTokenType.Null)
+                        if (kvp.Value != null)
                         {
-                            var empId = item["employee_id"]?.ToString();
-                            if (empId != employeeId)
+                            var empId = kvp.Value.employee_id?.ToString();
+                            if (empId == employeeId)
                             {
-                                newArray.Add(item);
+                                employmentKeyToRemove = kvp.Key;
+                                break;
                             }
                         }
                     }
 
-                    // Update the entire array
-                    await firebase
-                        .Child("EmploymentInfo")
-                        .PutAsync(newArray);
+                    // Remove the employment record
+                    if (!string.IsNullOrEmpty(employmentKeyToRemove))
+                    {
+                        await firebase
+                            .Child("EmploymentInfo")
+                            .Child(employmentKeyToRemove)
+                            .DeleteAsync();
+                    }
                 }
             }
             catch (Exception ex)
@@ -293,27 +309,27 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private async Task RemoveFromWorkScheduleArray()
+        private async Task RemoveFromWorkSchedule()
         {
             try
             {
+                // Work_Schedule is stored as an array
                 var scheduleData = await firebase
                     .Child("Work_Schedule")
-                    .OnceSingleAsync<object>();
+                    .OnceSingleAsync<List<dynamic>>();
 
                 if (scheduleData != null)
                 {
-                    var scheduleArray = Newtonsoft.Json.Linq.JArray.FromObject(scheduleData);
-                    var newArray = new Newtonsoft.Json.Linq.JArray();
+                    var newScheduleList = new List<dynamic>();
 
-                    foreach (var item in scheduleArray)
+                    foreach (var item in scheduleData)
                     {
-                        if (item != null && item.Type != Newtonsoft.Json.Linq.JTokenType.Null)
+                        if (item != null)
                         {
-                            var empId = item["employee_id"]?.ToString();
+                            var empId = item.employee_id?.ToString();
                             if (empId != employeeId)
                             {
-                                newArray.Add(item);
+                                newScheduleList.Add(item);
                             }
                         }
                     }
@@ -321,12 +337,54 @@ namespace HRIS_JAP_ATTPAY
                     // Update the entire array
                     await firebase
                         .Child("Work_Schedule")
-                        .PutAsync(newArray);
+                        .PutAsync(newScheduleList);
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error removing from work schedule: {ex.Message}");
+            }
+        }
+
+        private async Task RemoveUserAccess()
+        {
+            try
+            {
+                var usersData = await firebase
+                    .Child("Users")
+                    .OnceSingleAsync<Dictionary<string, dynamic>>();
+
+                if (usersData != null)
+                {
+                    // Find the user key for this employee
+                    string userKeyToRemove = null;
+                    foreach (var kvp in usersData)
+                    {
+                        if (kvp.Value != null)
+                        {
+                            var empId = kvp.Value.employee_id?.ToString();
+                            if (empId == employeeId)
+                            {
+                                userKeyToRemove = kvp.Key;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Remove the user
+                    if (!string.IsNullOrEmpty(userKeyToRemove))
+                    {
+                        await firebase
+                            .Child("Users")
+                            .Child(userKeyToRemove)
+                            .DeleteAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error removing user access: {ex.Message}");
+                throw; // Re-throw to handle in the main method
             }
         }
 

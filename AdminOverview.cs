@@ -20,6 +20,8 @@ namespace HRIS_JAP_ATTPAY
         private DateTime? lastEmployeeCacheUpdate = null;
         private const int CACHE_EXPIRY_MINUTES = 5;
         private string currentUserId;
+        private Dictionary<int, string> todoItemKeys = new Dictionary<int, string>();
+
         public AdminOverview(string userId)
         {
             InitializeComponent();
@@ -36,7 +38,6 @@ namespace HRIS_JAP_ATTPAY
             LoadAttendanceSummary(DateTime.Today);
             PopulateDateComboBox();
             LoadTodoList();
-
         }
 
         private void setFont()
@@ -75,6 +76,7 @@ namespace HRIS_JAP_ATTPAY
                 MessageBox.Show("Font load failed: " + ex.Message);
             }
         }
+
         private async void PopulateDateComboBox()
         {
             try
@@ -114,6 +116,7 @@ namespace HRIS_JAP_ATTPAY
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private async Task<List<string>> GetAllAttendanceDatesAsync()
         {
             var uniqueDates = new HashSet<string>();
@@ -198,6 +201,7 @@ namespace HRIS_JAP_ATTPAY
 
             LoadAttendanceSummary(selectedDate);
         }
+
         private async void LoadAttendanceSummary(DateTime date)
         {
             try
@@ -208,11 +212,11 @@ namespace HRIS_JAP_ATTPAY
                 labelLateNumber.Text = "0";
                 labelAbsentNumber.Text = "0";
 
-                // Load employee data
-                var employees = await GetAllAttendanceDatesAsync();
-                int totalEmployees = employees.Count;
+                // Load ALL employee data and filter out archived employees
+                var allEmployees = await GetAllActiveEmployeesAsync();
+                int totalEmployees = allEmployees.Count;
 
-                // If no employees found, show zeros
+                // If no active employees found, show zeros
                 if (totalEmployees == 0)
                 {
                     labelTotalNumber.Text = "0";
@@ -228,10 +232,10 @@ namespace HRIS_JAP_ATTPAY
                 int lateCount = 0;
                 int absentCount = 0;
 
-                // Load ALL attendance data and filter locally (no index required)
+                // Load ALL attendance data and filter locally
                 var allAttendanceData = await firebase.Child("Attendance").OnceSingleAsync<JArray>();
 
-                // Create a set of employees who attended on the selected date
+                // Create a set of active employees who attended on the selected date
                 var attendedEmployees = new HashSet<string>();
                 string targetDate = date.ToString("yyyy-MM-dd");
 
@@ -263,7 +267,8 @@ namespace HRIS_JAP_ATTPAY
                                 matchesDate = timeInDate.ToString("yyyy-MM-dd") == targetDate;
                             }
 
-                            if (matchesDate && !string.IsNullOrEmpty(employeeId))
+                            // Only count if employee is active (not archived) and matches date
+                            if (matchesDate && !string.IsNullOrEmpty(employeeId) && allEmployees.Contains(employeeId))
                             {
                                 attendedEmployees.Add(employeeId);
 
@@ -309,7 +314,42 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
+        // New method to get all active employees (excluding archived ones)
+        private async Task<HashSet<string>> GetAllActiveEmployeesAsync()
+        {
+            var activeEmployees = new HashSet<string>();
 
+            try
+            {
+                // Load current employees
+                var currentEmployees = await firebase.Child("EmployeeDetails").OnceAsync<JObject>();
+                if (currentEmployees != null)
+                {
+                    foreach (var employee in currentEmployees)
+                    {
+                        activeEmployees.Add(employee.Key);
+                    }
+                }
+
+                // Load archived employees and remove them from active list
+                var archivedEmployees = await firebase.Child("ArchivedEmployees").OnceAsync<JObject>();
+                if (archivedEmployees != null)
+                {
+                    foreach (var archivedEmployee in archivedEmployees)
+                    {
+                        activeEmployees.Remove(archivedEmployee.Key);
+                    }
+                }
+
+                return activeEmployees;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading active employees: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return activeEmployees;
+            }
+        }
 
         private void setPayrollLogsDataGridViewAttributes()
         {
@@ -392,10 +432,12 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewAlertAbsent.ColumnHeadersHeight = 40;
             dataGridViewAlertAbsent.DefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Light", 10f);
             dataGridViewAlertAbsent.ColumnHeadersDefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-            for (int i = 1; i < 10; i++) //test code; will be replaced with actual data from database
-            {
-                dataGridViewAlertAbsent.Rows.Add("Franz Louies Deloritos", i);
-            }
+
+            // Clear existing rows
+            dataGridViewAlertAbsent.Rows.Clear();
+
+            // Load today's absent employees
+            LoadTodaysAbsentEmployees();
         }
 
         private void setAlertLateDataGridViewAttributes()
@@ -405,9 +447,186 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewAlertLate.ColumnHeadersHeight = 40;
             dataGridViewAlertLate.DefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Light", 10f);
             dataGridViewAlertLate.ColumnHeadersDefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-            for (int i = 1; i < 10; i++) //test code; will be replaced with actual data from database
+
+            // Clear existing rows
+            dataGridViewAlertLate.Rows.Clear();
+
+            // Load today's late/early out employees
+            LoadTodaysLateEmployees();
+        }
+
+        private async void LoadTodaysAbsentEmployees()
+        {
+            try
             {
-                dataGridViewAlertLate.Rows.Add("Franz Louies Deloritos", i);
+                var today = DateTime.Today.ToString("yyyy-MM-dd");
+                var activeEmployees = await GetAllActiveEmployeesAsync();
+
+                // Get today's attendance records
+                var allAttendanceData = await firebase.Child("Attendance").OnceSingleAsync<JArray>();
+                var attendedToday = new HashSet<string>();
+
+                if (allAttendanceData != null)
+                {
+                    foreach (var attendanceItem in allAttendanceData)
+                    {
+                        if (attendanceItem != null && attendanceItem.Type != JTokenType.Null)
+                        {
+                            string attendanceDateStr = attendanceItem["attendance_date"]?.ToString() ?? "";
+                            string timeInStr = attendanceItem["time_in"]?.ToString() ?? "";
+                            string employeeId = attendanceItem["employee_id"]?.ToString() ?? "";
+
+                            bool matchesDate = false;
+                            if (!string.IsNullOrEmpty(attendanceDateStr) && attendanceDateStr == today)
+                            {
+                                matchesDate = true;
+                            }
+                            else if (!matchesDate && !string.IsNullOrEmpty(timeInStr) &&
+                                     DateTime.TryParse(timeInStr, out DateTime timeInDate))
+                            {
+                                matchesDate = timeInDate.ToString("yyyy-MM-dd") == today;
+                            }
+
+                            if (matchesDate && !string.IsNullOrEmpty(employeeId))
+                            {
+                                attendedToday.Add(employeeId);
+                            }
+                        }
+                    }
+                }
+
+                // Find absent employees (active employees who didn't attend today)
+                var absentEmployees = activeEmployees.Where(empId => !attendedToday.Contains(empId)).ToList();
+
+                // Load employee names and count absences
+                var employeeDetails = await firebase.Child("EmployeeDetails").OnceAsync<JObject>();
+                var absenceCounts = new Dictionary<string, int>();
+
+                foreach (var empId in absentEmployees)
+                {
+                    if (employeeDetails.Any(e => e.Key == empId))
+                    {
+                        var empData = employeeDetails.First(e => e.Key == empId).Object;
+                        string firstName = empData["first_name"]?.ToString() ?? "";
+                        string lastName = empData["last_name"]?.ToString() ?? "";
+                        string fullName = $"{firstName} {lastName}".Trim();
+
+                        if (absenceCounts.ContainsKey(fullName))
+                        {
+                            absenceCounts[fullName]++;
+                        }
+                        else
+                        {
+                            absenceCounts[fullName] = 1;
+                        }
+                    }
+                }
+
+                // Add to DataGridView
+                foreach (var entry in absenceCounts)
+                {
+                    dataGridViewAlertAbsent.Rows.Add(entry.Key, entry.Value);
+                }
+
+                // If no absent employees, show message
+                if (dataGridViewAlertAbsent.Rows.Count == 0)
+                {
+                    dataGridViewAlertAbsent.Rows.Add("No absent employees today", "0");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading absent employees: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                dataGridViewAlertAbsent.Rows.Add("Error loading data", "0");
+            }
+        }
+
+        private async void LoadTodaysLateEmployees()
+        {
+            try
+            {
+                var today = DateTime.Today.ToString("yyyy-MM-dd");
+
+                // Get today's attendance records with late/early out status
+                var allAttendanceData = await firebase.Child("Attendance").OnceSingleAsync<JArray>();
+                var lateEmployees = new Dictionary<string, int>();
+
+                if (allAttendanceData != null)
+                {
+                    foreach (var attendanceItem in allAttendanceData)
+                    {
+                        if (attendanceItem != null && attendanceItem.Type != JTokenType.Null)
+                        {
+                            string attendanceDateStr = attendanceItem["attendance_date"]?.ToString() ?? "";
+                            string timeInStr = attendanceItem["time_in"]?.ToString() ?? "";
+                            string status = attendanceItem["status"]?.ToString() ?? "";
+                            string employeeId = attendanceItem["employee_id"]?.ToString() ?? "";
+
+                            bool matchesDate = false;
+                            if (!string.IsNullOrEmpty(attendanceDateStr) && attendanceDateStr == today)
+                            {
+                                matchesDate = true;
+                            }
+                            else if (!matchesDate && !string.IsNullOrEmpty(timeInStr) &&
+                                     DateTime.TryParse(timeInStr, out DateTime timeInDate))
+                            {
+                                matchesDate = timeInDate.ToString("yyyy-MM-dd") == today;
+                            }
+
+                            if (matchesDate && !string.IsNullOrEmpty(employeeId) &&
+                                (status.ToLower() == "late" || status.ToLower() == "early out"))
+                            {
+                                if (lateEmployees.ContainsKey(employeeId))
+                                {
+                                    lateEmployees[employeeId]++;
+                                }
+                                else
+                                {
+                                    lateEmployees[employeeId] = 1;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Load employee names
+                var employeeDetails = await firebase.Child("EmployeeDetails").OnceAsync<JObject>();
+                var lateEmployeeCounts = new Dictionary<string, int>();
+
+                foreach (var entry in lateEmployees)
+                {
+                    string empId = entry.Key;
+                    int count = entry.Value;
+
+                    if (employeeDetails.Any(e => e.Key == empId))
+                    {
+                        var empData = employeeDetails.First(e => e.Key == empId).Object;
+                        string firstName = empData["first_name"]?.ToString() ?? "";
+                        string lastName = empData["last_name"]?.ToString() ?? "";
+                        string fullName = $"{firstName} {lastName}".Trim();
+
+                        lateEmployeeCounts[fullName] = count;
+                    }
+                }
+
+                // Add to DataGridView
+                foreach (var entry in lateEmployeeCounts)
+                {
+                    dataGridViewAlertLate.Rows.Add(entry.Key, entry.Value);
+                }
+
+                // If no late employees, show message
+                if (dataGridViewAlertLate.Rows.Count == 0)
+                {
+                    dataGridViewAlertLate.Rows.Add("No late/early out employees today", "0");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading late employees: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                dataGridViewAlertLate.Rows.Add("Error loading data", "0");
             }
         }
 
@@ -425,7 +644,7 @@ namespace HRIS_JAP_ATTPAY
         {
             //border design
             Color borderColor = Color.FromArgb(96, 81, 148);
-            int borderWidth = 1;               
+            int borderWidth = 1;
 
             //draw the border
             ControlPaint.DrawBorder(e.Graphics, panelPayrollLog.ClientRectangle,
@@ -510,7 +729,7 @@ namespace HRIS_JAP_ATTPAY
                 borderColor, borderWidth, ButtonBorderStyle.Solid,
                 borderColor, borderWidth, ButtonBorderStyle.Solid);
         }
-       
+
         private void panelCalendar_Resize(object sender, EventArgs e)
         {
             panelCalendar.Invalidate();
@@ -627,7 +846,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-
         private void labelTodoAdd_Click(object sender, EventArgs e)
         {
             Form parentForm = this.FindForm();
@@ -643,8 +861,6 @@ namespace HRIS_JAP_ATTPAY
         {
             LoadTodoList();
         }
-
-        private Dictionary<int, string> todoItemKeys = new Dictionary<int, string>(); // Add this at class level
 
         private async void LoadTodoList()
         {
@@ -711,4 +927,3 @@ namespace HRIS_JAP_ATTPAY
         }
     }
 }
-
