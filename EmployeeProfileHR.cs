@@ -137,9 +137,9 @@ namespace HRIS_JAP_ATTPAY
             try
             {
                 var employeeResponse = await firebase
-                    .Child("EmployeeDetails")
-                    .Child(employeeId)
-                    .OnceSingleAsync<dynamic>();
+                .Child("EmployeeDetails")
+                .Child(employeeId)
+                .OnceSingleAsync<dynamic>();
 
                 if (employeeResponse != null)
                 {
@@ -252,65 +252,58 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // Get all employment info records
                 var employmentData = await firebase
-                    .Child("EmploymentInfo")
-                    .OnceAsync<dynamic>();
+                .Child("EmploymentInfo")
+                .OnceAsync<object>();
 
-                // Find the record for this employee
-                var employeeEmploymentInfo = employmentData
-                    .FirstOrDefault(x => x.Object?.employee_id?.ToString() == employeeId);
-
-                if (employeeEmploymentInfo != null)
+                if (employmentData != null)
                 {
-                    dynamic empInfo = employeeEmploymentInfo.Object;
+                    foreach (var item in employmentData)
+                    {
+                        if (item?.Object != null)
+                        {
+                            var empObj = JObject.FromObject(item.Object);
+                            var empId = empObj["employee_id"]?.ToString();
 
-                    SafeSetLabelText(labelDepartmentInput, empInfo?.department?.ToString());
-                    SafeSetLabelText(labelPositionInput, empInfo?.position?.ToString());
-                    SafeSetLabelText(labelContractTypeInput, empInfo?.contract_type?.ToString());
-                    SafeSetLabelText(labelManagerInput, empInfo?.manager_name?.ToString());
+                            if (empId == employeeId)
+                            {
+                                SafeSetLabelText(labelDepartmentInput, empObj["department"]?.ToString());
+                                SafeSetLabelText(labelPositionInput, empObj["position"]?.ToString());
+                                SafeSetLabelText(labelContractTypeInput, empObj["contract_type"]?.ToString());
+                                SafeSetLabelText(labelManagerInput, empObj["manager_name"]?.ToString());
 
-                    // Date of joining
-                    if (!string.IsNullOrEmpty(empInfo?.date_of_joining?.ToString()))
-                    {
-                        if (DateTime.TryParse(empInfo.date_of_joining.ToString(), out DateTime doj))
-                            SafeSetLabelText(labelDateOfJoiningInput, doj.ToString("yyyy-MM-dd"));
-                        else
-                            SafeSetLabelText(labelDateOfJoiningInput, empInfo.date_of_joining.ToString());
-                    }
-                    else
-                    {
-                        SafeSetLabelText(labelDateOfJoiningInput, "N/A");
-                    }
+                                // Date of joining
+                                if (!string.IsNullOrEmpty(empObj["date_of_joining"]?.ToString()))
+                                {
+                                    if (DateTime.TryParse(empObj["date_of_joining"].ToString(), out DateTime doj))
+                                        SafeSetLabelText(labelDateOfJoiningInput, doj.ToString("yyyy-MM-dd"));
+                                    else
+                                        SafeSetLabelText(labelDateOfJoiningInput, empObj["date_of_joining"].ToString());
+                                }
+                                else
+                                {
+                                    SafeSetLabelText(labelDateOfJoiningInput, "N/A");
+                                }
 
-                    // Date of exit
-                    if (!string.IsNullOrEmpty(empInfo?.date_of_exit?.ToString()))
-                    {
-                        if (DateTime.TryParse(empInfo.date_of_exit.ToString(), out DateTime doe))
-                            SafeSetLabelText(labelDateOfExitInput, doe.ToString("yyyy-MM-dd"));
-                        else
-                            SafeSetLabelText(labelDateOfExitInput, empInfo.date_of_exit.ToString());
-                    }
-                    else
-                    {
-                        SafeSetLabelText(labelDateOfExitInput, "N/A");
+                                // Date of exit
+                                if (!string.IsNullOrEmpty(empObj["date_of_exit"]?.ToString()))
+                                {
+                                    if (DateTime.TryParse(empObj["date_of_exit"].ToString(), out DateTime doe))
+                                        SafeSetLabelText(labelDateOfExitInput, doe.ToString("yyyy-MM-dd"));
+                                    else
+                                        SafeSetLabelText(labelDateOfExitInput, empObj["date_of_exit"].ToString());
+                                }
+                                else
+                                {
+                                    SafeSetLabelText(labelDateOfExitInput, "N/A");
+                                }
+                                return;
+                            }
+                        }
                     }
                 }
-                else
-                {
-                    // Set defaults if no data found
-                    SafeSetLabelText(labelDepartmentInput, "N/A");
-                    SafeSetLabelText(labelPositionInput, "N/A");
-                    SafeSetLabelText(labelContractTypeInput, "N/A");
-                    SafeSetLabelText(labelManagerInput, "N/A");
-                    SafeSetLabelText(labelDateOfJoiningInput, "N/A");
-                    SafeSetLabelText(labelDateOfExitInput, "N/A");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading employment info: {ex.Message}");
-                // Set defaults on error
+
+                // Set defaults if no data found
                 SafeSetLabelText(labelDepartmentInput, "N/A");
                 SafeSetLabelText(labelPositionInput, "N/A");
                 SafeSetLabelText(labelContractTypeInput, "N/A");
@@ -318,83 +311,216 @@ namespace HRIS_JAP_ATTPAY
                 SafeSetLabelText(labelDateOfJoiningInput, "N/A");
                 SafeSetLabelText(labelDateOfExitInput, "N/A");
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading employment info: {ex.Message}");
+            }
         }
 
         private async Task LoadWorkScheduleManual()
         {
             try
             {
-                var scheduleData = await firebase
-                    .Child("Work_Schedule")
-                    .OnceAsync<dynamic>();
-
+                // Containers for parsed schedule
                 var regularDays = new List<string>();
                 var alternateDays = new List<string>();
                 string regularStart = "", regularEnd = "", alternateStart = "", alternateEnd = "";
 
-                var dayMap = new Dictionary<string, string>
-        {
-            {"Monday", "M"}, {"Tuesday", "T"}, {"Wednesday", "W"},
-            {"Thursday", "Th"}, {"Friday", "F"}, {"Saturday", "S"}, {"Sunday", "Su"}
-        };
+                var dayMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+{
+{"Monday", "M"}, {"Tuesday", "T"}, {"Wednesday", "W"},
+{"Thursday", "Th"}, {"Friday", "F"}, {"Saturday", "S"}, {"Sunday", "Su"}
+};
 
-                foreach (var item in scheduleData)
+                bool anyFound = false;
+
+                // Helper to get property value case-insensitively (and some common name variants)
+                string GetProp(JObject o, params string[] names)
                 {
-                    if (item.Object != null)
+                    foreach (var name in names)
                     {
-                        var empId = item.Object?.employee_id?.ToString();
-                        if (empId == employeeId)
+                        var p = o.Properties().FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+                        if (p != null) return p.Value?.ToString();
+                    }
+
+                    // Try normalized match (remove underscores, lowercase)
+                    foreach (var name in names)
+                    {
+                        var target = name.Replace("_", "").ToLower();
+                        var p = o.Properties().FirstOrDefault(x => x.Name.Replace("_", "").ToLower() == target);
+                        if (p != null) return p.Value?.ToString();
+                    }
+
+                    return null;
+                }
+
+                // Local function to process a schedule JObject
+                void ProcessSchedObj(JObject schedObj)
+                {
+                    if (schedObj == null) return;
+
+                    var empId = GetProp(schedObj, "employee_id", "employeeId", "emp_id")?.Trim();
+                    if (string.IsNullOrEmpty(empId)) return;
+                    if (!string.Equals(empId, employeeId, StringComparison.OrdinalIgnoreCase)) return;
+
+                    anyFound = true;
+
+                    var scheduleType = GetProp(schedObj, "schedule_type", "type", "scheduleType");
+                    var dayOfWeek = GetProp(schedObj, "day_of_week", "day", "dayOfWeek");
+                    var startTime = GetProp(schedObj, "start_time", "start", "startTime", "time_start");
+                    var endTime = GetProp(schedObj, "end_time", "end", "endTime", "time_end");
+
+                    // Normalize day to short form
+                    string shortDay = null;
+                    if (!string.IsNullOrEmpty(dayOfWeek))
+                    {
+                        if (!dayMap.TryGetValue(dayOfWeek.Trim(), out shortDay))
                         {
-                            var scheduleType = item.Object?.schedule_type?.ToString();
-                            var dayOfWeek = item.Object?.day_of_week?.ToString();
-                            var startTime = item.Object?.start_time?.ToString();
-                            var endTime = item.Object?.end_time?.ToString();
+                            // fallback to first 3 letters (capitalized)
+                            var clean = dayOfWeek.Trim();
+                            shortDay = clean.Length >= 3 ? clean.Substring(0, 3) : clean;
+                        }
+                    }
 
-                            var shortDay = dayMap.ContainsKey(dayOfWeek) ? dayMap[dayOfWeek] : dayOfWeek;
+                    if (scheduleType?.Equals("Regular", StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        if (!string.IsNullOrEmpty(shortDay) && !regularDays.Contains(shortDay))
+                            regularDays.Add(shortDay);
 
-                            if (scheduleType?.Equals("Regular", StringComparison.OrdinalIgnoreCase) == true)
-                            {
-                                if (!regularDays.Contains(shortDay))
-                                    regularDays.Add(shortDay);
+                        if (string.IsNullOrEmpty(regularStart) && !string.IsNullOrEmpty(startTime))
+                        {
+                            regularStart = startTime;
+                            regularEnd = endTime;
+                        }
+                    }
+                    else // treat everything else as alternate if not explicitly Regular
+                    {
+                        if (!string.IsNullOrEmpty(shortDay) && !alternateDays.Contains(shortDay))
+                            alternateDays.Add(shortDay);
 
-                                if (string.IsNullOrEmpty(regularStart))
-                                {
-                                    regularStart = startTime;
-                                    regularEnd = endTime;
-                                }
-                            }
-                            else if (scheduleType?.Equals("Alternate", StringComparison.OrdinalIgnoreCase) == true)
-                            {
-                                if (!alternateDays.Contains(shortDay))
-                                    alternateDays.Add(shortDay);
-
-                                if (string.IsNullOrEmpty(alternateStart))
-                                {
-                                    alternateStart = startTime;
-                                    alternateEnd = endTime;
-                                }
-                            }
+                        if (string.IsNullOrEmpty(alternateStart) && !string.IsNullOrEmpty(startTime))
+                        {
+                            alternateStart = startTime;
+                            alternateEnd = endTime;
                         }
                     }
                 }
 
-                SafeSetLabelText(labelWorkDaysInput, regularDays.Any() ? string.Join(" - ", regularDays) : "N/A");
+                // Attempt 1: Read as keyed collection (most common Firebase shape)
+                try
+                {
+                    var scheduleList = await firebase
+                    .Child("Work_Schedule")
+                    .OnceAsync<object>();
+
+                    if (scheduleList != null && scheduleList.Any())
+                    {
+                        foreach (var item in scheduleList)
+                        {
+                            if (item?.Object == null) continue;
+
+                            // item.Object can be a JObject-like or primitive - convert safely
+                            try
+                            {
+                                var schedObj = JObject.FromObject(item.Object);
+                                // If schedObj looks like nested keyed children (no employee_id at root), iterate its properties
+                                if (!schedObj.Properties().Any(p => string.Equals(p.Name, "employee_id", StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    // e.g. keyed object: { "-Mx...": { ... }, "-Mx...2": { ... } }
+                                    foreach (var prop in schedObj.Properties())
+                                    {
+                                        if (prop.Value is JObject childObj)
+                                            ProcessSchedObj(childObj);
+                                        else if (prop.Value is JArray childArr)
+                                        {
+                                            foreach (var child in childArr.OfType<JObject>())
+                                                ProcessSchedObj(child);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    ProcessSchedObj(schedObj);
+                                }
+                            }
+                            catch
+                            {
+                                // ignore malformed item and continue
+                                continue;
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    // Ignore and fallback to single fetch below
+                }
+
+                // Attempt 2: If nothing found yet, try OnceSingleAsync and handle array/object shapes
+                if (!anyFound)
+                {
+                    try
+                    {
+                        var scheduleSingle = await firebase
+                        .Child("Work_Schedule")
+                        .OnceSingleAsync<object>();
+
+                        if (scheduleSingle != null)
+                        {
+                            var token = JToken.FromObject(scheduleSingle);
+
+                            if (token.Type == JTokenType.Array)
+                            {
+                                foreach (var child in token)
+                                {
+                                    if (child.Type == JTokenType.Object)
+                                        ProcessSchedObj((JObject)child);
+                                }
+                            }
+                            else if (token.Type == JTokenType.Object)
+                            {
+                                var rootObj = (JObject)token;
+
+                                // If root has employee_id, it's a single object schedule
+                                if (rootObj.Properties().Any(p => string.Equals(p.Name, "employee_id", StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    ProcessSchedObj(rootObj);
+                                }
+                                else
+                                {
+                                    // Otherwise, treat as keyed children
+                                    foreach (var prop in rootObj.Properties())
+                                    {
+                                        if (prop.Value.Type == JTokenType.Object)
+                                            ProcessSchedObj((JObject)prop.Value);
+                                        else if (prop.Value.Type == JTokenType.Array)
+                                        {
+                                            foreach (var child in prop.Value.OfType<JObject>())
+                                                ProcessSchedObj(child);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // ignore fallback errors
+                    }
+                }
+
+                // Finalize UI update - set N/A if nothing found or set collected values
+                SafeSetLabelText(labelWorkDaysInput, regularDays.Any() ? string.Join(", ", regularDays) : "N/A");
                 SafeSetLabelText(labelWorkHoursInputA, !string.IsNullOrEmpty(regularStart) ? regularStart : "N/A");
                 SafeSetLabelText(labelWorkHoursInputB, !string.IsNullOrEmpty(regularEnd) ? regularEnd : "N/A");
-                SafeSetLabelText(labelAltWorkDaysInput, alternateDays.Any() ? string.Join(" - ", alternateDays) : "N/A");
+
+                SafeSetLabelText(labelAltWorkDaysInput, alternateDays.Any() ? string.Join(", ", alternateDays) : "N/A");
                 SafeSetLabelText(labelAltWorkHoursInputA, !string.IsNullOrEmpty(alternateStart) ? alternateStart : "N/A");
                 SafeSetLabelText(labelAltWorkHoursInputB, !string.IsNullOrEmpty(alternateEnd) ? alternateEnd : "N/A");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading work schedule: {ex.Message}");
-                // Set defaults on error
-                SafeSetLabelText(labelWorkDaysInput, "N/A");
-                SafeSetLabelText(labelWorkHoursInputA, "N/A");
-                SafeSetLabelText(labelWorkHoursInputB, "N/A");
-                SafeSetLabelText(labelAltWorkDaysInput, "N/A");
-                SafeSetLabelText(labelAltWorkHoursInputA, "N/A");
-                SafeSetLabelText(labelAltWorkHoursInputB, "N/A");
             }
         }
 
