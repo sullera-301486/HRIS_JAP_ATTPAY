@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Firebase.Database;
+using Firebase.Database.Query;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -15,11 +13,17 @@ namespace HRIS_JAP_ATTPAY
         private DateTime createdAt;
         private Timer refreshTimer;
 
+        // 🔹 Firebase client (your actual DB URL)
+        private static FirebaseClient firebase = new FirebaseClient(
+            "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        );
+
         public LeaveNotificationItems()
         {
             InitializeComponent();
             SetFont();
         }
+
         private void SetFont()
         {
             try
@@ -37,7 +41,6 @@ namespace HRIS_JAP_ATTPAY
                 label5.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
                 btnApprove.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 btnDecline.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
-
             }
             catch (Exception ex)
             {
@@ -45,14 +48,27 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        public void SetData(string title, string submitted, string employee,
-                     string leaveType, string period, string notes, Image photo = null)
+        /// <summary>
+        /// Bind data from LeaveRequestData. Saves to Firebase if saveToFirebase = true.
+        /// </summary>
+        public async void SetData(
+            string title,
+            string submitted,
+            string employee,
+            string leaveType,
+            string start,
+            string end,
+            string notes,
+            Image photo = null,
+            DateTime? created = null,
+            bool saveToFirebase = true,
+            string firebaseKey = null)
         {
             lblLeaveTitle.Text = title;
             lblSubmittedLeave.Text = submitted;
             lblEmployeeLeave.Text = employee;
             lblLeave.Text = leaveType;
-            lblPeriod.Text = period;
+            lblPeriod.Text = $"{start} - {end}";
             lblNotes.Text = notes;
 
             if (photo != null)
@@ -61,22 +77,42 @@ namespace HRIS_JAP_ATTPAY
                 picEmployee.Image = photo;
             }
 
-            // store when this notification was created
-            createdAt = DateTime.Now;
-
+            createdAt = created ?? DateTime.Now;
             UpdateTimeAgo();
 
-            // start auto-refresh timer if not already started
             if (refreshTimer == null)
             {
                 refreshTimer = new Timer();
-                refreshTimer.Interval = 60000; // 1 min
+                refreshTimer.Interval = 60000;
                 refreshTimer.Tick += (s, e) => UpdateTimeAgo();
                 refreshTimer.Start();
             }
+
+            // Store Firebase key (so buttons know what to delete)
+            this.Tag = firebaseKey;
+
+            // 🔹 Save to Firebase if it's a new record
+            if (saveToFirebase)
+            {
+                var leaveNotif = new LeaveNotificationModel
+                {
+                    Title = title,
+                    SubmittedBy = submitted,
+                    Employee = employee,
+                    LeaveType = leaveType,
+                    Period = $"{start} - {end}",
+                    Notes = notes,
+                    CreatedAt = createdAt.ToString("yyyy-MM-dd HH:mm:ss")
+                };
+
+                await SaveLeaveNotificationAsync(leaveNotif);
+            }
         }
 
-        private void UpdateTimeAgo()
+        /// <summary>
+        /// Update the 'time ago' text.
+        /// </summary>
+        public void UpdateTimeAgo()
         {
             TimeSpan diff = DateTime.Now - createdAt;
 
@@ -90,6 +126,66 @@ namespace HRIS_JAP_ATTPAY
                 lblTimeAgo.Text = $"{(int)diff.TotalDays}d ago";
         }
 
+        // 🔹 Save to Firebase
+        private static async Task SaveLeaveNotificationAsync(LeaveNotificationModel leaveNotif)
+        {
+            await firebase
+              .Child("LeaveNotifications")
+              .PostAsync(leaveNotif);
+        }
+
+        // 🔹 Load all notifications from Firebase
+        public static async Task<List<LeaveNotificationModelWithKey>> GetAllLeaveNotificationsAsync()
+        {
+            var notifications = await firebase
+                .Child("LeaveNotifications")
+                .OnceAsync<LeaveNotificationModel>();
+
+            List<LeaveNotificationModelWithKey> list = new List<LeaveNotificationModelWithKey>();
+            foreach (var item in notifications)
+            {
+                list.Add(new LeaveNotificationModelWithKey
+                {
+                    Key = item.Key,
+                    Title = item.Object.Title,
+                    SubmittedBy = item.Object.SubmittedBy,
+                    Employee = item.Object.Employee,
+                    LeaveType = item.Object.LeaveType,
+                    Period = item.Object.Period,
+                    Notes = item.Object.Notes,
+                    CreatedAt = item.Object.CreatedAt
+                });
+            }
+            return list;
+        }
+
+        // 🔹 Delete notification from Firebase
+        public static async Task DeleteNotificationAsync(string key)
+        {
+            await firebase
+                .Child("LeaveNotifications")
+                .Child(key)
+                .DeleteAsync();
+        }
+
+        // 🔹 Model class
+        public class LeaveNotificationModel
+        {
+            public string Title { get; set; }
+            public string SubmittedBy { get; set; }
+            public string Employee { get; set; }
+            public string LeaveType { get; set; }
+            public string Period { get; set; }
+            public string Notes { get; set; }
+            public string CreatedAt { get; set; }
+        }
+
+        // 🔹 Model with Firebase key (for updates/deletes)
+        public class LeaveNotificationModelWithKey : LeaveNotificationModel
+        {
+            public string Key { get; set; }
+        }
+
         // Button events
         public event EventHandler ApproveClicked;
         public event EventHandler DeclineClicked;
@@ -99,8 +195,19 @@ namespace HRIS_JAP_ATTPAY
             ApproveClicked?.Invoke(this, EventArgs.Empty);
         }
 
-        private void btnDecline_Click(object sender, EventArgs e)
+        // 🔹 Decline button removes from Firebase + UI
+        private async void btnDecline_Click(object sender, EventArgs e)
         {
+            if (Tag is string firebaseKey && !string.IsNullOrEmpty(firebaseKey))
+            {
+                // Remove from Firebase
+                await DeleteNotificationAsync(firebaseKey);
+            }
+
+            // Remove from parent container (UI)
+            this.Parent?.Controls.Remove(this);
+
+            // Fire event
             DeclineClicked?.Invoke(this, EventArgs.Empty);
         }
     }

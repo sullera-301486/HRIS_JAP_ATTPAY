@@ -1117,8 +1117,8 @@ namespace HRIS_JAP_ATTPAY
         private void labelAddLeave_Click(object sender, EventArgs e)
         {
             Form parentForm = this.FindForm();
-            ManageLeave manageLeaveForm = new ManageLeave();
-            AttributesClass.ShowWithOverlay(parentForm, manageLeaveForm);
+            LeaveRequest LeaveRequestForm = new LeaveRequest();
+            AttributesClass.ShowWithOverlay(parentForm, LeaveRequestForm);
         }
     }
 }

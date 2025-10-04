@@ -1,22 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HRIS_JAP_ATTPAY
 {
     public partial class LeaveRequestConfirm : Form
     {
-        public LeaveRequestConfirm()
+        private readonly LeaveRequestData request;
+
+        public LeaveRequestConfirm(LeaveRequestData req)
         {
             InitializeComponent();
             setFont();
+            request = req;
+            LoadPreview();
         }
+
         private void setFont()
         {
             try
@@ -32,18 +30,27 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private void XpictureBox_Click(object sender, EventArgs e)
+        private void LoadPreview()
         {
-            this.Close();  
+
         }
 
-        private void buttonConfirm_Click(object sender, EventArgs e)
+        private void XpictureBox_Click(object sender, EventArgs e)
         {
-
+            this.DialogResult = DialogResult.Cancel;
+            this.Close();
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
+            this.DialogResult = DialogResult.Cancel;
+            this.Close();
+        }
+
+        private void buttonConfirm_Click(object sender, EventArgs e)
+        {
+            // confirm returns OK to the caller (LeaveRequest) which will save the request
+            this.DialogResult = DialogResult.OK;
             this.Close();
         }
     }

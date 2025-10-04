@@ -56,20 +56,19 @@
             this.panel1.Controls.Add(this.XpictureBox);
             this.panel1.Controls.Add(this.labelRequestLeaveEntry);
             this.panel1.Controls.Add(this.labelLeaveRequest);
-            this.panel1.Location = new System.Drawing.Point(-3, -1);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4);
+            this.panel1.Location = new System.Drawing.Point(-2, -1);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(588, 108);
+            this.panel1.Size = new System.Drawing.Size(441, 88);
             this.panel1.TabIndex = 1;
             // 
             // XpictureBox
             // 
             this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
-            this.XpictureBox.Location = new System.Drawing.Point(530, 2);
-            this.XpictureBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.XpictureBox.Location = new System.Drawing.Point(398, 2);
+            this.XpictureBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.XpictureBox.Name = "XpictureBox";
-            this.XpictureBox.Size = new System.Drawing.Size(51, 50);
+            this.XpictureBox.Size = new System.Drawing.Size(38, 41);
             this.XpictureBox.TabIndex = 19;
             this.XpictureBox.TabStop = false;
             this.XpictureBox.Click += new System.EventHandler(this.XpictureBox_Click);
@@ -79,10 +78,9 @@
             this.labelRequestLeaveEntry.AutoSize = true;
             this.labelRequestLeaveEntry.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelRequestLeaveEntry.ForeColor = System.Drawing.Color.Black;
-            this.labelRequestLeaveEntry.Location = new System.Drawing.Point(41, 70);
-            this.labelRequestLeaveEntry.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelRequestLeaveEntry.Location = new System.Drawing.Point(31, 57);
             this.labelRequestLeaveEntry.Name = "labelRequestLeaveEntry";
-            this.labelRequestLeaveEntry.Size = new System.Drawing.Size(184, 24);
+            this.labelRequestLeaveEntry.Size = new System.Drawing.Size(144, 18);
             this.labelRequestLeaveEntry.TabIndex = 0;
             this.labelRequestLeaveEntry.Text = "Request Leave Entry";
             // 
@@ -91,10 +89,9 @@
             this.labelLeaveRequest.AutoSize = true;
             this.labelLeaveRequest.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelLeaveRequest.ForeColor = System.Drawing.Color.Red;
-            this.labelLeaveRequest.Location = new System.Drawing.Point(39, 23);
-            this.labelLeaveRequest.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelLeaveRequest.Location = new System.Drawing.Point(29, 19);
             this.labelLeaveRequest.Name = "labelLeaveRequest";
-            this.labelLeaveRequest.Size = new System.Drawing.Size(214, 36);
+            this.labelLeaveRequest.Size = new System.Drawing.Size(174, 29);
             this.labelLeaveRequest.TabIndex = 0;
             this.labelLeaveRequest.Text = "Leave Request";
             // 
@@ -113,19 +110,17 @@
             this.panel2.Controls.Add(this.labelPeriod);
             this.panel2.Controls.Add(this.labelLeaveType);
             this.panel2.Controls.Add(this.labelName);
-            this.panel2.Location = new System.Drawing.Point(0, 110);
-            this.panel2.Margin = new System.Windows.Forms.Padding(4);
+            this.panel2.Location = new System.Drawing.Point(0, 89);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(585, 322);
+            this.panel2.Size = new System.Drawing.Size(439, 262);
             this.panel2.TabIndex = 2;
             // 
             // labelDash
             // 
             this.labelDash.AutoSize = true;
-            this.labelDash.Location = new System.Drawing.Point(349, 92);
-            this.labelDash.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDash.Location = new System.Drawing.Point(262, 75);
             this.labelDash.Name = "labelDash";
-            this.labelDash.Size = new System.Drawing.Size(14, 16);
+            this.labelDash.Size = new System.Drawing.Size(13, 13);
             this.labelDash.TabIndex = 2;
             this.labelDash.Text = "_";
             // 
@@ -136,10 +131,9 @@
             this.buttonCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonCancel.ForeColor = System.Drawing.Color.White;
-            this.buttonCancel.Location = new System.Drawing.Point(452, 264);
-            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonCancel.Location = new System.Drawing.Point(339, 214);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(117, 37);
+            this.buttonCancel.Size = new System.Drawing.Size(88, 30);
             this.buttonCancel.TabIndex = 12;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = false;
@@ -152,10 +146,9 @@
             this.buttonSendRequest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonSendRequest.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonSendRequest.ForeColor = System.Drawing.Color.White;
-            this.buttonSendRequest.Location = new System.Drawing.Point(260, 264);
-            this.buttonSendRequest.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonSendRequest.Location = new System.Drawing.Point(195, 214);
             this.buttonSendRequest.Name = "buttonSendRequest";
-            this.buttonSendRequest.Size = new System.Drawing.Size(180, 37);
+            this.buttonSendRequest.Size = new System.Drawing.Size(135, 30);
             this.buttonSendRequest.TabIndex = 11;
             this.buttonSendRequest.Text = "Send Request";
             this.buttonSendRequest.UseVisualStyleBackColor = false;
@@ -164,11 +157,10 @@
             // textBoxReasonInput
             // 
             this.textBoxReasonInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxReasonInput.Location = new System.Drawing.Point(43, 158);
-            this.textBoxReasonInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxReasonInput.Location = new System.Drawing.Point(32, 128);
             this.textBoxReasonInput.Multiline = true;
             this.textBoxReasonInput.Name = "textBoxReasonInput";
-            this.textBoxReasonInput.Size = new System.Drawing.Size(485, 77);
+            this.textBoxReasonInput.Size = new System.Drawing.Size(365, 63);
             this.textBoxReasonInput.TabIndex = 8;
             // 
             // textBoxEndPeriod
@@ -177,12 +169,11 @@
             this.textBoxEndPeriod.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxEndPeriod.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxEndPeriod.ForeColor = System.Drawing.Color.White;
-            this.textBoxEndPeriod.Location = new System.Drawing.Point(372, 95);
-            this.textBoxEndPeriod.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxEndPeriod.Location = new System.Drawing.Point(279, 77);
             this.textBoxEndPeriod.Name = "textBoxEndPeriod";
-            this.textBoxEndPeriod.Size = new System.Drawing.Size(157, 23);
+            this.textBoxEndPeriod.Size = new System.Drawing.Size(118, 19);
             this.textBoxEndPeriod.TabIndex = 7;
-            this.textBoxEndPeriod.Text = "End of Leave";
+            this.textBoxEndPeriod.Text = "mm/dd/yyyy";
             this.textBoxEndPeriod.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // textBoxStartPeriod
@@ -191,26 +182,28 @@
             this.textBoxStartPeriod.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxStartPeriod.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxStartPeriod.ForeColor = System.Drawing.Color.White;
-            this.textBoxStartPeriod.Location = new System.Drawing.Point(183, 95);
-            this.textBoxStartPeriod.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxStartPeriod.Location = new System.Drawing.Point(137, 77);
             this.textBoxStartPeriod.Name = "textBoxStartPeriod";
-            this.textBoxStartPeriod.Size = new System.Drawing.Size(160, 23);
+            this.textBoxStartPeriod.Size = new System.Drawing.Size(120, 19);
             this.textBoxStartPeriod.TabIndex = 6;
-            this.textBoxStartPeriod.Text = "Start of Leave";
+            this.textBoxStartPeriod.Text = "mm/dd/yyyy";
             this.textBoxStartPeriod.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // comboBoxLeaveTypeInput
             // 
             this.comboBoxLeaveTypeInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
             this.comboBoxLeaveTypeInput.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxLeaveTypeInput.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxLeaveTypeInput.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxLeaveTypeInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxLeaveTypeInput.ForeColor = System.Drawing.Color.White;
             this.comboBoxLeaveTypeInput.FormattingEnabled = true;
-            this.comboBoxLeaveTypeInput.Location = new System.Drawing.Point(183, 52);
-            this.comboBoxLeaveTypeInput.Margin = new System.Windows.Forms.Padding(4);
+            this.comboBoxLeaveTypeInput.Items.AddRange(new object[] {
+            "Vacation",
+            "Sick"});
+            this.comboBoxLeaveTypeInput.Location = new System.Drawing.Point(137, 42);
             this.comboBoxLeaveTypeInput.Name = "comboBoxLeaveTypeInput";
-            this.comboBoxLeaveTypeInput.Size = new System.Drawing.Size(345, 28);
+            this.comboBoxLeaveTypeInput.Size = new System.Drawing.Size(260, 24);
             this.comboBoxLeaveTypeInput.TabIndex = 5;
             // 
             // textBoxNameInput
@@ -219,10 +212,9 @@
             this.textBoxNameInput.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxNameInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxNameInput.ForeColor = System.Drawing.Color.White;
-            this.textBoxNameInput.Location = new System.Drawing.Point(183, 20);
-            this.textBoxNameInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxNameInput.Location = new System.Drawing.Point(137, 16);
             this.textBoxNameInput.Name = "textBoxNameInput";
-            this.textBoxNameInput.Size = new System.Drawing.Size(347, 23);
+            this.textBoxNameInput.Size = new System.Drawing.Size(260, 19);
             this.textBoxNameInput.TabIndex = 4;
             this.textBoxNameInput.Tag = "";
             // 
@@ -230,10 +222,9 @@
             // 
             this.labelReason.AutoSize = true;
             this.labelReason.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelReason.Location = new System.Drawing.Point(37, 129);
-            this.labelReason.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelReason.Location = new System.Drawing.Point(28, 105);
             this.labelReason.Name = "labelReason";
-            this.labelReason.Size = new System.Drawing.Size(85, 25);
+            this.labelReason.Size = new System.Drawing.Size(71, 20);
             this.labelReason.TabIndex = 3;
             this.labelReason.Text = "Reason";
             // 
@@ -241,10 +232,9 @@
             // 
             this.labelPeriod.AutoSize = true;
             this.labelPeriod.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelPeriod.Location = new System.Drawing.Point(37, 94);
-            this.labelPeriod.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPeriod.Location = new System.Drawing.Point(28, 76);
             this.labelPeriod.Name = "labelPeriod";
-            this.labelPeriod.Size = new System.Drawing.Size(74, 25);
+            this.labelPeriod.Size = new System.Drawing.Size(60, 20);
             this.labelPeriod.TabIndex = 2;
             this.labelPeriod.Text = "Period";
             // 
@@ -252,10 +242,9 @@
             // 
             this.labelLeaveType.AutoSize = true;
             this.labelLeaveType.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelLeaveType.Location = new System.Drawing.Point(37, 57);
-            this.labelLeaveType.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelLeaveType.Location = new System.Drawing.Point(28, 46);
             this.labelLeaveType.Name = "labelLeaveType";
-            this.labelLeaveType.Size = new System.Drawing.Size(126, 25);
+            this.labelLeaveType.Size = new System.Drawing.Size(100, 20);
             this.labelLeaveType.TabIndex = 1;
             this.labelLeaveType.Text = "Leave Type";
             // 
@@ -263,23 +252,21 @@
             // 
             this.labelName.AutoSize = true;
             this.labelName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelName.Location = new System.Drawing.Point(37, 18);
-            this.labelName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelName.Location = new System.Drawing.Point(28, 15);
             this.labelName.Name = "labelName";
-            this.labelName.Size = new System.Drawing.Size(68, 25);
+            this.labelName.Size = new System.Drawing.Size(55, 20);
             this.labelName.TabIndex = 0;
             this.labelName.Text = "Name";
             // 
             // LeaveRequest
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(583, 431);
+            this.ClientSize = new System.Drawing.Size(437, 350);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "LeaveRequest";
             this.ShowInTaskbar = false;
             this.Text = "LeaveRequest";

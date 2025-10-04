@@ -506,6 +506,7 @@
     <Compile Include="NewLeave.Designer.cs">
       <DependentUpon>NewLeave.cs</DependentUpon>
     </Compile>
+    <Compile Include="NotificationItems.cs" />
     <Compile Include="PayrollExportData.cs" />
     <Compile Include="PayrollSummary.cs">
       <SubType>Form</SubType>
