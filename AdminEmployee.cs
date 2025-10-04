@@ -434,18 +434,22 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewEmployee.Cursor = Cursors.Default;
         }
 
-        private void dataGridViewEmployee_CellClick(object sender, DataGridViewCellEventArgs e)
+        private async void dataGridViewEmployee_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0 && dataGridViewEmployee.Columns[e.ColumnIndex].Name == "Action")
             {
                 string employeeId = dataGridViewEmployee.Rows[e.RowIndex].Cells["EmployeeId"].Value?.ToString();
-                string department = dataGridViewEmployee.Rows[e.RowIndex].Cells["Department"].Value?.ToString();
+
+                if (string.IsNullOrEmpty(employeeId))
+                    return;
+
+                // Check if employee is a USER (has record in Users node)
+                bool isUser = await CheckIfEmployeeIsUser(employeeId);
 
                 Form parentForm = this.FindForm();
                 Form profileForm;
 
-                if (!string.IsNullOrEmpty(department) &&
-                    department.Equals("Human Resources", StringComparison.OrdinalIgnoreCase))
+                if (isUser)
                 {
                     profileForm = new EmployeeProfile(employeeId);
                 }
@@ -455,6 +459,38 @@ namespace HRIS_JAP_ATTPAY
                 }
 
                 AttributesClass.ShowWithOverlay(parentForm, profileForm);
+            }
+        }
+
+        private async Task<bool> CheckIfEmployeeIsUser(string employeeId)
+        {
+            try
+            {
+                // Get all users from Firebase
+                var users = await firebase
+                    .Child("Users")
+                    .OnceAsync<Dictionary<string, object>>();
+
+                // Check if any user has matching employee_id
+                foreach (var user in users)
+                {
+                    var userData = user.Object as Dictionary<string, object>;
+                    if (userData != null)
+                    {
+                        string userEmployeeId = GetValue(userData, "employee_id");
+                        if (userEmployeeId == employeeId)
+                        {
+                            return true; // Employee is a USER
+                        }
+                    }
+                }
+
+                return false; // No user record found
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error checking user status: {ex.Message}");
+                return false; // Default to EmployeeProfileHR on error
             }
         }
 

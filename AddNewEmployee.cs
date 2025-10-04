@@ -1,13 +1,14 @@
-﻿    using System;
-    using System.Drawing;
-    using System.Windows.Forms;
-    using System.Threading.Tasks;
-    using Firebase.Database;
+﻿    using Firebase.Database;
     using Firebase.Database.Query;
+    using Newtonsoft.Json.Linq;
+    using System;
+using System.Collections.Generic;
+    using System.Drawing;
     using System.IO;
     using System.Net.Http;
     using System.Net.Http.Headers;
-    using Newtonsoft.Json.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Forms;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -71,9 +72,10 @@ namespace HRIS_JAP_ATTPAY
         private void AddNewEmployee_Load(object sender, EventArgs e)
         {
             System.Windows.Forms.CheckBox[] dayBoxes = {
-                    checkBoxM, checkBoxT, checkBoxW, checkBoxTh, checkBoxF, checkBoxS,
-                    checkBoxAltM, checkBoxAltT, checkBoxAltW, checkBoxAltTh, checkBoxAltF, checkBoxAltS
-                };
+        checkBoxM, checkBoxT, checkBoxW, checkBoxTh, checkBoxF, checkBoxS,
+        checkBoxAltM, checkBoxAltT, checkBoxAltW, checkBoxAltTh, checkBoxAltF, checkBoxAltS
+    };
+
             foreach (var cb in dayBoxes)
             {
                 cb.Appearance = Appearance.Button;
@@ -92,16 +94,103 @@ namespace HRIS_JAP_ATTPAY
                     {
                         box.BackColor = Color.FromArgb(96, 81, 148);  // Selected
                         box.ForeColor = Color.White;
+
+                        // Disable the corresponding checkbox in the other schedule
+                        DisableCorrespondingDay(box);
                     }
                     else
                     {
                         box.BackColor = Color.FromArgb(217, 217, 217); // Unselected
                         box.ForeColor = Color.Black;
+
+                        // Enable the corresponding checkbox in the other schedule
+                        EnableCorrespondingDay(box);
                     }
+
+                    // Update alternate textbox accessibility whenever any alternate checkbox changes
+                    UpdateAlternateTextboxAccessibility();
                 };
 
                 cb.Checked = false;
             }
+
+            // Initialize alternate textbox state
+            UpdateAlternateTextboxAccessibility();
+        }
+        private void UpdateAlternateTextboxAccessibility()
+        {
+            // Check if any alternate workday is checked
+            bool anyAltDayChecked = checkBoxAltM.Checked || checkBoxAltT.Checked ||
+                                   checkBoxAltW.Checked || checkBoxAltTh.Checked ||
+                                   checkBoxAltF.Checked || checkBoxAltS.Checked;
+
+            // Enable/disable alternate work hours textboxes based on alternate day selection
+            textBoxAltWorkHoursA.Enabled = anyAltDayChecked;
+            textBoxAltWorkHoursB.Enabled = anyAltDayChecked;
+
+            // Optional: Change appearance to visually indicate disabled state
+            if (anyAltDayChecked)
+            {
+                textBoxAltWorkHoursA.BackColor = SystemColors.Window;
+                textBoxAltWorkHoursB.BackColor = SystemColors.Window;
+                textBoxAltWorkHoursA.ForeColor = SystemColors.WindowText;
+                textBoxAltWorkHoursB.ForeColor = SystemColors.WindowText;
+            }
+            else
+            {
+                textBoxAltWorkHoursA.BackColor = SystemColors.Control;
+                textBoxAltWorkHoursB.BackColor = SystemColors.Control;
+                textBoxAltWorkHoursA.ForeColor = SystemColors.GrayText;
+                textBoxAltWorkHoursB.ForeColor = SystemColors.GrayText;
+
+                // Optional: Clear the text when disabled
+                textBoxAltWorkHoursA.Text = "";
+                textBoxAltWorkHoursB.Text = "";
+            }
+        }
+
+
+        private void DisableCorrespondingDay(CheckBox checkedBox)
+        {
+            CheckBox correspondingBox = GetCorrespondingCheckbox(checkedBox);
+            if (correspondingBox != null)
+            {
+                correspondingBox.Enabled = false;
+            }
+        }
+
+        private void EnableCorrespondingDay(CheckBox uncheckedBox)
+        {
+            CheckBox correspondingBox = GetCorrespondingCheckbox(uncheckedBox);
+            if (correspondingBox != null)
+            {
+                correspondingBox.Enabled = true;
+            }
+        }
+
+        private CheckBox GetCorrespondingCheckbox(CheckBox sourceBox)
+        {
+            // Map regular days to alternate days and vice versa
+            Dictionary<CheckBox, CheckBox> dayMapping = new Dictionary<CheckBox, CheckBox>
+    {
+        // Regular to Alternate mapping
+        { checkBoxM, checkBoxAltM },
+        { checkBoxT, checkBoxAltT },
+        { checkBoxW, checkBoxAltW },
+        { checkBoxTh, checkBoxAltTh },
+        { checkBoxF, checkBoxAltF },
+        { checkBoxS, checkBoxAltS },
+        
+        // Alternate to Regular mapping
+        { checkBoxAltM, checkBoxM },
+        { checkBoxAltT, checkBoxT },
+        { checkBoxAltW, checkBoxW },
+        { checkBoxAltTh, checkBoxTh },
+        { checkBoxAltF, checkBoxF },
+        { checkBoxAltS, checkBoxS }
+    };
+
+            return dayMapping.ContainsKey(sourceBox) ? dayMapping[sourceBox] : null;
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)

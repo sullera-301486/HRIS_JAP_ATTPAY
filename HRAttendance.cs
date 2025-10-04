@@ -40,7 +40,6 @@ namespace HRIS_JAP_ATTPAY
             setFont();
             setTextBoxAttributes();
             setDataGridViewAttributes();
-
             LoadEmployeeDepartmentMapping();
             LoadFirebaseAttendanceData();
             PopulateDateComboBox();

@@ -95,6 +95,7 @@ namespace HRIS_JAP_ATTPAY
                 {
                     editParent.SetRFIDTag(data);
                 }
+
             }
         }
     }

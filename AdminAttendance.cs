@@ -631,8 +631,6 @@ namespace HRIS_JAP_ATTPAY
                 Image = Properties.Resources.VerticalThreeDots
             });
 
-            // Add cell click event for action column
-            dataGridViewAttendance.CellClick += dataGridViewAttendance_CellContentClick;
         }
 
         private void setFont()
