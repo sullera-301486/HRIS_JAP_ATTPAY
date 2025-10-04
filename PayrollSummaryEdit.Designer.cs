@@ -76,7 +76,7 @@
             this.labelOvertimePerHourAmountBaseInput = new System.Windows.Forms.Label();
             this.labelOvertimePerMinuteAmountBaseInput = new System.Windows.Forms.Label();
             this.labelBasicPayCredit = new System.Windows.Forms.Label();
-            this.labelOvertimeCredit = new System.Windows.Forms.Label();
+            this.labelOvertimePerHourCredit = new System.Windows.Forms.Label();
             this.labelBasicPay = new System.Windows.Forms.Label();
             this.labelOvertimePerHour = new System.Windows.Forms.Label();
             this.labelOvertimePerMinute = new System.Windows.Forms.Label();
@@ -144,6 +144,7 @@
             this.textBoxVacationLeaveCredit = new System.Windows.Forms.TextBox();
             this.textBoxSickLeaveCredit = new System.Windows.Forms.TextBox();
             this.textBoxDailyRateInput = new System.Windows.Forms.TextBox();
+            this.labelOvertimePerMinuteCredit = new System.Windows.Forms.Label();
             this.panel3.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -731,17 +732,17 @@
             this.labelBasicPayCredit.Text = "12.50";
             this.labelBasicPayCredit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // labelOvertimeCredit
+            // labelOvertimePerHourCredit
             // 
-            this.labelOvertimeCredit.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.labelOvertimeCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelOvertimeCredit.Location = new System.Drawing.Point(411, 346);
-            this.labelOvertimeCredit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelOvertimeCredit.Name = "labelOvertimeCredit";
-            this.labelOvertimeCredit.Size = new System.Drawing.Size(133, 31);
-            this.labelOvertimeCredit.TabIndex = 187;
-            this.labelOvertimeCredit.Text = "0";
-            this.labelOvertimeCredit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelOvertimePerHourCredit.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelOvertimePerHourCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelOvertimePerHourCredit.Location = new System.Drawing.Point(411, 346);
+            this.labelOvertimePerHourCredit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelOvertimePerHourCredit.Name = "labelOvertimePerHourCredit";
+            this.labelOvertimePerHourCredit.Size = new System.Drawing.Size(133, 31);
+            this.labelOvertimePerHourCredit.TabIndex = 187;
+            this.labelOvertimePerHourCredit.Text = "0";
+            this.labelOvertimePerHourCredit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelBasicPay
             // 
@@ -1574,12 +1575,25 @@
             this.textBoxDailyRateInput.TabIndex = 279;
             this.textBoxDailyRateInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
+            // labelOvertimePerMinuteCredit
+            // 
+            this.labelOvertimePerMinuteCredit.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelOvertimePerMinuteCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelOvertimePerMinuteCredit.Location = new System.Drawing.Point(411, 377);
+            this.labelOvertimePerMinuteCredit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelOvertimePerMinuteCredit.Name = "labelOvertimePerMinuteCredit";
+            this.labelOvertimePerMinuteCredit.Size = new System.Drawing.Size(133, 31);
+            this.labelOvertimePerMinuteCredit.TabIndex = 280;
+            this.labelOvertimePerMinuteCredit.Text = "0";
+            this.labelOvertimePerMinuteCredit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // PayrollSummaryEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1219, 844);
+            this.Controls.Add(this.labelOvertimePerMinuteCredit);
             this.Controls.Add(this.textBoxDailyRateInput);
             this.Controls.Add(this.textBoxSickLeaveCredit);
             this.Controls.Add(this.textBoxVacationLeaveCredit);
@@ -1653,7 +1667,7 @@
             this.Controls.Add(this.labelOvertimePerHourAmountBaseInput);
             this.Controls.Add(this.labelOvertimePerMinuteAmountBaseInput);
             this.Controls.Add(this.labelBasicPayCredit);
-            this.Controls.Add(this.labelOvertimeCredit);
+            this.Controls.Add(this.labelOvertimePerHourCredit);
             this.Controls.Add(this.labelBasicPay);
             this.Controls.Add(this.labelOvertimePerHour);
             this.Controls.Add(this.labelOvertimePerMinute);
@@ -1756,7 +1770,7 @@
         private System.Windows.Forms.Label labelOvertimePerHourAmountBaseInput;
         private System.Windows.Forms.Label labelOvertimePerMinuteAmountBaseInput;
         private System.Windows.Forms.Label labelBasicPayCredit;
-        private System.Windows.Forms.Label labelOvertimeCredit;
+        private System.Windows.Forms.Label labelOvertimePerHourCredit;
         private System.Windows.Forms.Label labelBasicPay;
         private System.Windows.Forms.Label labelOvertimePerHour;
         private System.Windows.Forms.Label labelOvertimePerMinute;
@@ -1824,5 +1838,6 @@
         private System.Windows.Forms.TextBox textBoxVacationLeaveCredit;
         private System.Windows.Forms.TextBox textBoxSickLeaveCredit;
         private System.Windows.Forms.TextBox textBoxDailyRateInput;
+        private System.Windows.Forms.Label labelOvertimePerMinuteCredit;
     }
 }

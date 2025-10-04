@@ -50,7 +50,7 @@ namespace HRIS_JAP_ATTPAY
 
             // If search is empty, show all rows immediately
             if (string.IsNullOrEmpty(textBoxSearchEmployee.Text) ||
-                textBoxSearchEmployee.Text == "find employee")
+                textBoxSearchEmployee.Text == "Find Employee")
             {
                 foreach (DataGridViewRow row in dataGridViewEmployee.Rows)
                 {
@@ -75,7 +75,7 @@ namespace HRIS_JAP_ATTPAY
             string searchText = textBoxSearchEmployee.Text.Trim();
 
             // If search is empty, show all rows
-            if (string.IsNullOrEmpty(searchText) || searchText == "find employee")
+            if (string.IsNullOrEmpty(searchText) || searchText == "Find Employee")
             {
                 foreach (DataGridViewRow row in dataGridViewEmployee.Rows)
                 {
