@@ -23,7 +23,7 @@ namespace HRIS_JAP_ATTPAY
         private AttendanceFilterCriteria currentAttendanceFilters = new AttendanceFilterCriteria();
         private Dictionary<string, (string Department, string Position)> employeeDepartmentMap = new Dictionary<string, (string Department, string Position)>();
         private Dictionary<int, string> attendanceKeyMap = new Dictionary<int, string>();
-        private Button btnGenerateAttendance;
+        
 
         private bool isLoading = false;
 
@@ -40,108 +40,13 @@ namespace HRIS_JAP_ATTPAY
             setFont();
             setTextBoxAttributes();
             setDataGridViewAttributes();
-            InitializeGenerateButton(); // Add generate button
 
             LoadEmployeeDepartmentMapping();
             LoadFirebaseAttendanceData();
             PopulateDateComboBox();
         }
 
-        private void InitializeGenerateButton()
-        {
-            btnGenerateAttendance = new Button();
-            btnGenerateAttendance.Text = "Generate Weekly Attendance";
-            btnGenerateAttendance.BackColor = Color.FromArgb(153, 137, 207);
-            btnGenerateAttendance.ForeColor = Color.White;
-            btnGenerateAttendance.FlatStyle = FlatStyle.Flat;
-            btnGenerateAttendance.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-            btnGenerateAttendance.Size = new Size(220, 35);
-            btnGenerateAttendance.Location = new Point(800, 80);
-            btnGenerateAttendance.Click += BtnGenerateAttendance_Click;
-
-            this.Controls.Add(btnGenerateAttendance);
-        }
-
-        private async void BtnGenerateAttendance_Click(object sender, EventArgs e)
-        {
-            await GenerateWeeklyAttendance();
-        }
-
-        private async Task GenerateWeeklyAttendance()
-        {
-            try
-            {
-                Cursor.Current = Cursors.WaitCursor;
-                btnGenerateAttendance.Enabled = false;
-
-                var generator = new AttendanceGenerator();
-                DateTime currentWeekMonday = generator.GetCurrentWeekMonday();
-
-                // Check if this week is already generated
-                bool weekGenerated = await generator.IsWeekGenerated(currentWeekMonday);
-
-                if (weekGenerated)
-                {
-                    var result = MessageBox.Show("Attendance for this week already exists. Do you want to regenerate it?",
-                        "Confirm Regeneration", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                    if (result == DialogResult.No)
-                    {
-                        return;
-                    }
-                }
-
-                // Show progress
-                var progressForm = new Form()
-                {
-                    Size = new Size(300, 150),
-                    StartPosition = FormStartPosition.CenterParent,
-                    FormBorderStyle = FormBorderStyle.FixedDialog,
-                    Text = "Generating Attendance",
-                    MaximizeBox = false,
-                    MinimizeBox = false
-                };
-
-                var progressLabel = new Label()
-                {
-                    Text = "Generating weekly attendance records...",
-                    Location = new Point(20, 20),
-                    Size = new Size(250, 20)
-                };
-
-                var progressBar = new ProgressBar()
-                {
-                    Location = new Point(20, 50),
-                    Size = new Size(250, 20),
-                    Style = ProgressBarStyle.Marquee
-                };
-
-                progressForm.Controls.Add(progressLabel);
-                progressForm.Controls.Add(progressBar);
-                progressForm.Show();
-
-                // Generate attendance
-                await generator.GenerateWeeklyAttendance(currentWeekMonday);
-
-                progressForm.Close();
-
-                MessageBox.Show($"Weekly attendance from {currentWeekMonday:yyyy-MM-dd} to {currentWeekMonday.AddDays(5):yyyy-MM-dd} generated successfully!",
-                    "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                // Refresh the attendance data
-                LoadFirebaseAttendanceData();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error generating attendance: {ex.Message}", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                Cursor.Current = Cursors.Default;
-                btnGenerateAttendance.Enabled = true;
-            }
-        }
+      
 
         // 🔹 FILTER HANDLERS
         private void ApplyAttendanceFilters(AttendanceFilterCriteria filters)
