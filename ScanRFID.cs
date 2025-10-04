@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,9 +13,21 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class ScanRFID : Form
     {
-        private AddNewEmployee parentForm; // store reference
+        private object parentForm; // store reference
         public static ScanRFID ActiveInstance { get; private set; }
         public ScanRFID(AddNewEmployee parent)
+        {
+            InitializeComponent();
+            setFont();
+            parentForm = parent;
+        }
+        public ScanRFID(EditEmployeeProfileHR parent)
+        {
+            InitializeComponent();
+            setFont();
+            parentForm = parent;
+        }
+        public ScanRFID(EditEmployeeProfile parent)
         {
             InitializeComponent();
             setFont();
@@ -49,13 +62,39 @@ namespace HRIS_JAP_ATTPAY
             {
                 labelRFIDResult.Invoke(new Action(() => labelRFIDResult.Text = "Tag ID: " + data));
                 labelScanRFID.Invoke(new Action(() => labelScanRFID.Text = "RFID Detected"));
-                parentForm.Invoke(new Action(() => parentForm.SetRFIDTag(data)));
+
+                // Handle different parent types with Invoke
+                if (parentForm is AddNewEmployee addParent)
+                {
+                    addParent.Invoke(new Action(() => addParent.SetRFIDTag(data)));
+                }
+                else if (parentForm is EditEmployeeProfileHR hrParent)
+                {
+                    hrParent.Invoke(new Action(() => hrParent.SetRFIDTag(data)));
+                }
+                else if (parentForm is EditEmployeeProfile editParent)
+                {
+                    editParent.Invoke(new Action(() => editParent.SetRFIDTag(data)));
+                }
             }
             else
             {
                 labelScanRFID.Text = "RFID Detected";
                 labelRFIDResult.Text = "Tag ID: " + data;
-                parentForm.SetRFIDTag(data);
+
+                // Handle different parent types without Invoke
+                if (parentForm is AddNewEmployee addParent)
+                {
+                    addParent.SetRFIDTag(data);
+                }
+                else if (parentForm is EditEmployeeProfileHR hrParent)
+                {
+                    hrParent.SetRFIDTag(data);
+                }
+                else if (parentForm is EditEmployeeProfile editParent)
+                {
+                    editParent.SetRFIDTag(data);
+                }
             }
         }
     }

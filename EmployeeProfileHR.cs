@@ -252,68 +252,71 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
+                // Get all employment info records
                 var employmentData = await firebase
                     .Child("EmploymentInfo")
-                    .OnceSingleAsync<object>();
+                    .OnceAsync<dynamic>();
 
-                if (employmentData != null)
+                // Find the record for this employee
+                var employeeEmploymentInfo = employmentData
+                    .FirstOrDefault(x => x.Object?.employee_id?.ToString() == employeeId);
+
+                if (employeeEmploymentInfo != null)
                 {
-                    var employmentArray = JArray.FromObject(employmentData);
+                    dynamic empInfo = employeeEmploymentInfo.Object;
 
-                    foreach (var item in employmentArray)
+                    SafeSetLabelText(labelDepartmentInput, empInfo?.department?.ToString());
+                    SafeSetLabelText(labelPositionInput, empInfo?.position?.ToString());
+                    SafeSetLabelText(labelContractTypeInput, empInfo?.contract_type?.ToString());
+                    SafeSetLabelText(labelManagerInput, empInfo?.manager_name?.ToString());
+
+                    // Date of joining
+                    if (!string.IsNullOrEmpty(empInfo?.date_of_joining?.ToString()))
                     {
-                        if (item != null && item.Type != JTokenType.Null)
-                        {
-                            var empId = item["employee_id"]?.ToString();
-                            if (empId == employeeId)
-                            {
-                                SafeSetLabelText(labelDepartmentInput, item["department"]?.ToString());
-                                SafeSetLabelText(labelPositionInput, item["position"]?.ToString());
-                                SafeSetLabelText(labelContractTypeInput, item["contract_type"]?.ToString());
-                                SafeSetLabelText(labelManagerInput, item["manager_name"]?.ToString());
+                        if (DateTime.TryParse(empInfo.date_of_joining.ToString(), out DateTime doj))
+                            SafeSetLabelText(labelDateOfJoiningInput, doj.ToString("yyyy-MM-dd"));
+                        else
+                            SafeSetLabelText(labelDateOfJoiningInput, empInfo.date_of_joining.ToString());
+                    }
+                    else
+                    {
+                        SafeSetLabelText(labelDateOfJoiningInput, "N/A");
+                    }
 
-                                // Date of joining
-                                if (!string.IsNullOrEmpty(item["date_of_joining"]?.ToString()))
-                                {
-                                    if (DateTime.TryParse(item["date_of_joining"].ToString(), out DateTime doj))
-                                        SafeSetLabelText(labelDateOfJoiningInput, doj.ToString("yyyy-MM-dd"));
-                                    else
-                                        SafeSetLabelText(labelDateOfJoiningInput, item["date_of_joining"].ToString());
-                                }
-                                else
-                                {
-                                    SafeSetLabelText(labelDateOfJoiningInput, "N/A");
-                                }
-
-                                // Date of exit
-                                if (!string.IsNullOrEmpty(item["date_of_exit"]?.ToString()))
-                                {
-                                    if (DateTime.TryParse(item["date_of_exit"].ToString(), out DateTime doe))
-                                        SafeSetLabelText(labelDateOfExitInput, doe.ToString("yyyy-MM-dd"));
-                                    else
-                                        SafeSetLabelText(labelDateOfExitInput, item["date_of_exit"].ToString());
-                                }
-                                else
-                                {
-                                    SafeSetLabelText(labelDateOfExitInput, "N/A");
-                                }
-                                return;
-                            }
-                        }
+                    // Date of exit
+                    if (!string.IsNullOrEmpty(empInfo?.date_of_exit?.ToString()))
+                    {
+                        if (DateTime.TryParse(empInfo.date_of_exit.ToString(), out DateTime doe))
+                            SafeSetLabelText(labelDateOfExitInput, doe.ToString("yyyy-MM-dd"));
+                        else
+                            SafeSetLabelText(labelDateOfExitInput, empInfo.date_of_exit.ToString());
+                    }
+                    else
+                    {
+                        SafeSetLabelText(labelDateOfExitInput, "N/A");
                     }
                 }
-
-                // Set defaults if no data found
+                else
+                {
+                    // Set defaults if no data found
+                    SafeSetLabelText(labelDepartmentInput, "N/A");
+                    SafeSetLabelText(labelPositionInput, "N/A");
+                    SafeSetLabelText(labelContractTypeInput, "N/A");
+                    SafeSetLabelText(labelManagerInput, "N/A");
+                    SafeSetLabelText(labelDateOfJoiningInput, "N/A");
+                    SafeSetLabelText(labelDateOfExitInput, "N/A");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading employment info: {ex.Message}");
+                // Set defaults on error
                 SafeSetLabelText(labelDepartmentInput, "N/A");
                 SafeSetLabelText(labelPositionInput, "N/A");
                 SafeSetLabelText(labelContractTypeInput, "N/A");
                 SafeSetLabelText(labelManagerInput, "N/A");
                 SafeSetLabelText(labelDateOfJoiningInput, "N/A");
                 SafeSetLabelText(labelDateOfExitInput, "N/A");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading employment info: {ex.Message}");
             }
         }
 
@@ -323,72 +326,75 @@ namespace HRIS_JAP_ATTPAY
             {
                 var scheduleData = await firebase
                     .Child("Work_Schedule")
-                    .OnceSingleAsync<object>();
+                    .OnceAsync<dynamic>();
 
-                if (scheduleData != null)
+                var regularDays = new List<string>();
+                var alternateDays = new List<string>();
+                string regularStart = "", regularEnd = "", alternateStart = "", alternateEnd = "";
+
+                var dayMap = new Dictionary<string, string>
+        {
+            {"Monday", "M"}, {"Tuesday", "T"}, {"Wednesday", "W"},
+            {"Thursday", "Th"}, {"Friday", "F"}, {"Saturday", "S"}, {"Sunday", "Su"}
+        };
+
+                foreach (var item in scheduleData)
                 {
-                    var scheduleArray = JArray.FromObject(scheduleData);
-                    var regularDays = new List<string>();
-                    var alternateDays = new List<string>();
-                    string regularStart = "", regularEnd = "", alternateStart = "", alternateEnd = "";
-
-                    var dayMap = new Dictionary<string, string>
+                    if (item.Object != null)
                     {
-                        {"Monday", "M"}, {"Tuesday", "T"}, {"Wednesday", "W"},
-                        {"Thursday", "Th"}, {"Friday", "F"}, {"Saturday", "S"}, {"Sunday", "Su"}
-                    };
-
-                    foreach (var item in scheduleArray)
-                    {
-                        if (item != null && item.Type != JTokenType.Null)
+                        var empId = item.Object?.employee_id?.ToString();
+                        if (empId == employeeId)
                         {
-                            var empId = item["employee_id"]?.ToString();
-                            if (empId == employeeId)
+                            var scheduleType = item.Object?.schedule_type?.ToString();
+                            var dayOfWeek = item.Object?.day_of_week?.ToString();
+                            var startTime = item.Object?.start_time?.ToString();
+                            var endTime = item.Object?.end_time?.ToString();
+
+                            var shortDay = dayMap.ContainsKey(dayOfWeek) ? dayMap[dayOfWeek] : dayOfWeek;
+
+                            if (scheduleType?.Equals("Regular", StringComparison.OrdinalIgnoreCase) == true)
                             {
-                                var scheduleType = item["schedule_type"]?.ToString();
-                                var dayOfWeek = item["day_of_week"]?.ToString();
-                                var startTime = item["start_time"]?.ToString();
-                                var endTime = item["end_time"]?.ToString();
+                                if (!regularDays.Contains(shortDay))
+                                    regularDays.Add(shortDay);
 
-                                var shortDay = dayMap.ContainsKey(dayOfWeek) ? dayMap[dayOfWeek] : dayOfWeek;
-
-                                if (scheduleType?.Equals("Regular", StringComparison.OrdinalIgnoreCase) == true)
+                                if (string.IsNullOrEmpty(regularStart))
                                 {
-                                    if (!regularDays.Contains(shortDay))
-                                        regularDays.Add(shortDay);
-
-                                    if (string.IsNullOrEmpty(regularStart))
-                                    {
-                                        regularStart = startTime;
-                                        regularEnd = endTime;
-                                    }
+                                    regularStart = startTime;
+                                    regularEnd = endTime;
                                 }
-                                else if (scheduleType?.Equals("Alternate", StringComparison.OrdinalIgnoreCase) == true)
-                                {
-                                    if (!alternateDays.Contains(shortDay))
-                                        alternateDays.Add(shortDay);
+                            }
+                            else if (scheduleType?.Equals("Alternate", StringComparison.OrdinalIgnoreCase) == true)
+                            {
+                                if (!alternateDays.Contains(shortDay))
+                                    alternateDays.Add(shortDay);
 
-                                    if (string.IsNullOrEmpty(alternateStart))
-                                    {
-                                        alternateStart = startTime;
-                                        alternateEnd = endTime;
-                                    }
+                                if (string.IsNullOrEmpty(alternateStart))
+                                {
+                                    alternateStart = startTime;
+                                    alternateEnd = endTime;
                                 }
                             }
                         }
                     }
-
-                    SafeSetLabelText(labelWorkDaysInput, regularDays.Any() ? string.Join(" - ", regularDays) : "N/A");
-                    SafeSetLabelText(labelWorkHoursInputA, !string.IsNullOrEmpty(regularStart) ? regularStart : "N/A");
-                    SafeSetLabelText(labelWorkHoursInputB, !string.IsNullOrEmpty(regularEnd) ? regularEnd : "N/A");
-                    SafeSetLabelText(labelAltWorkDaysInput, alternateDays.Any() ? string.Join(" - ", alternateDays) : "N/A");
-                    SafeSetLabelText(labelAltWorkHoursInputA, !string.IsNullOrEmpty(alternateStart) ? alternateStart : "N/A");
-                    SafeSetLabelText(labelAltWorkHoursInputB, !string.IsNullOrEmpty(alternateEnd) ? alternateEnd : "N/A");
                 }
+
+                SafeSetLabelText(labelWorkDaysInput, regularDays.Any() ? string.Join(" - ", regularDays) : "N/A");
+                SafeSetLabelText(labelWorkHoursInputA, !string.IsNullOrEmpty(regularStart) ? regularStart : "N/A");
+                SafeSetLabelText(labelWorkHoursInputB, !string.IsNullOrEmpty(regularEnd) ? regularEnd : "N/A");
+                SafeSetLabelText(labelAltWorkDaysInput, alternateDays.Any() ? string.Join(" - ", alternateDays) : "N/A");
+                SafeSetLabelText(labelAltWorkHoursInputA, !string.IsNullOrEmpty(alternateStart) ? alternateStart : "N/A");
+                SafeSetLabelText(labelAltWorkHoursInputB, !string.IsNullOrEmpty(alternateEnd) ? alternateEnd : "N/A");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading work schedule: {ex.Message}");
+                // Set defaults on error
+                SafeSetLabelText(labelWorkDaysInput, "N/A");
+                SafeSetLabelText(labelWorkHoursInputA, "N/A");
+                SafeSetLabelText(labelWorkHoursInputB, "N/A");
+                SafeSetLabelText(labelAltWorkDaysInput, "N/A");
+                SafeSetLabelText(labelAltWorkHoursInputA, "N/A");
+                SafeSetLabelText(labelAltWorkHoursInputB, "N/A");
             }
         }
 

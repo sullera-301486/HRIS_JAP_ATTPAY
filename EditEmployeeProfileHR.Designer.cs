@@ -103,6 +103,7 @@
             this.labelEditEmployeeDesc = new System.Windows.Forms.Label();
             this.labelEditEmployeeDetails = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.buttonScanRFID = new System.Windows.Forms.Button();
             this.XpictureBox = new System.Windows.Forms.PictureBox();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxEmployee)).BeginInit();
@@ -1067,6 +1068,12 @@
             this.comboBoxDepartment.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxDepartment.ForeColor = System.Drawing.Color.White;
             this.comboBoxDepartment.FormattingEnabled = true;
+            this.comboBoxDepartment.Items.AddRange(new object[] {
+            "Engeering",
+            "Purchasing",
+            "Operations",
+            "Finance",
+            "Human Resource"});
             this.comboBoxDepartment.Location = new System.Drawing.Point(921, 77);
             this.comboBoxDepartment.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxDepartment.Name = "comboBoxDepartment";
@@ -1111,6 +1118,7 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.White;
+            this.panel1.Controls.Add(this.buttonScanRFID);
             this.panel1.Controls.Add(this.XpictureBox);
             this.panel1.Controls.Add(this.labelEditEmployeeDesc);
             this.panel1.Controls.Add(this.labelEditEmployeeDetails);
@@ -1120,6 +1128,22 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1209, 121);
             this.panel1.TabIndex = 6;
+            // 
+            // buttonScanRFID
+            // 
+            this.buttonScanRFID.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(81)))), ((int)(((byte)(148)))));
+            this.buttonScanRFID.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.buttonScanRFID.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonScanRFID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonScanRFID.ForeColor = System.Drawing.Color.White;
+            this.buttonScanRFID.Location = new System.Drawing.Point(990, 75);
+            this.buttonScanRFID.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonScanRFID.Name = "buttonScanRFID";
+            this.buttonScanRFID.Size = new System.Drawing.Size(161, 42);
+            this.buttonScanRFID.TabIndex = 133;
+            this.buttonScanRFID.Text = "Scan RFID";
+            this.buttonScanRFID.UseVisualStyleBackColor = false;
+            this.buttonScanRFID.Click += new System.EventHandler(this.buttonScanRFID_Click);
             // 
             // XpictureBox
             // 
@@ -1235,5 +1259,6 @@
         private System.Windows.Forms.Label labelEditEmployeeDetails;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ComboBox comboBoxDepartment;
+        private System.Windows.Forms.Button buttonScanRFID;
     }
 }

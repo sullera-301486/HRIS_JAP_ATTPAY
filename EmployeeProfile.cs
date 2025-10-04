@@ -158,6 +158,10 @@ namespace HRIS_JAP_ATTPAY
                     SafeSetLabelText(labelNationalityInput, employee?.nationality?.ToString());
                     SafeSetLabelText(labelRFIDTagInput, employee?.rfid_tag?.ToString());
 
+                    // Password handling - display as fixed asterisks
+                    string password = employee?.password?.ToString();
+                    SafeSetLabelText(labelPasswordInput, MaskPassword(password));
+
                     // Date of birth handling
                     if (!string.IsNullOrEmpty(employee?.date_of_birth?.ToString()))
                     {
@@ -195,6 +199,20 @@ namespace HRIS_JAP_ATTPAY
             {
                 MessageBox.Show("Error loading employee data: " + ex.Message);
             }
+        }
+
+        // Alternative method with fixed asterisk length for security
+        private string MaskPassword(string password)
+        {
+            if (string.IsNullOrEmpty(password))
+                return "********";
+
+            // Always show 8 asterisks regardless of actual password length
+            return "********";
+
+            // Or if you want to show actual length but with a minimum:
+            // int displayLength = Math.Max(8, Math.Min(password.Length, 12));
+            // return new string('*', displayLength);
         }
 
         private void SafeSetLabelText(Label label, string text)
