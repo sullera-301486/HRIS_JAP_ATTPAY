@@ -297,28 +297,44 @@ namespace HRIS_JAP_ATTPAY
 
         private async Task UpdateEmployeeDetails(string imageUrl = null)
         {
-            var employeeDetails = new EmployeeDetailsModel
+            try
             {
-                employee_id = selectedEmployeeId,
-                first_name = textBoxFirstName.Text,
-                middle_name = textBoxMiddleName.Text,
-                last_name = textBoxLastName.Text,
-                date_of_birth = textBoxDateOfBirth.Text,
-                gender = textBoxGender.Text,
-                marital_status = textBoxMaritalStatus.Text,
-                nationality = textBoxNationality.Text,
-                contact = textBoxContact.Text,
-                email = textBoxEmail.Text,
-                address = textBoxAddress.Text,
-                rfid_tag = labelRFIDTagInput.Text,
-                image_url = imageUrl, // Use new image URL if provided
-                created_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-            };
+                // First, get the existing employee data to preserve the current image URL if no new image was uploaded
+                var existingEmployee = await firebase
+                    .Child("EmployeeDetails")
+                    .Child(selectedEmployeeId)
+                    .OnceSingleAsync<EmployeeDetailsModel>();
 
-            await firebase
-                .Child("EmployeeDetails")
-                .Child(selectedEmployeeId)
-                .PutAsync(employeeDetails);
+                var employeeDetails = new EmployeeDetailsModel
+                {
+                    employee_id = selectedEmployeeId,
+                    first_name = textBoxFirstName.Text,
+                    middle_name = textBoxMiddleName.Text,
+                    last_name = textBoxLastName.Text,
+                    date_of_birth = textBoxDateOfBirth.Text,
+                    gender = textBoxGender.Text,
+                    marital_status = textBoxMaritalStatus.Text,
+                    nationality = textBoxNationality.Text,
+                    contact = textBoxContact.Text,
+                    email = textBoxEmail.Text,
+                    address = textBoxAddress.Text,
+                    rfid_tag = labelRFIDTagInput.Text,
+                    // Use new image URL if provided, otherwise keep existing image URL
+                    image_url = !string.IsNullOrEmpty(imageUrl) ? imageUrl : (existingEmployee?.image_url ?? ""),
+                    created_at = existingEmployee?.created_at ?? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                };
+
+                await firebase
+                    .Child("EmployeeDetails")
+                    .Child(selectedEmployeeId)
+                    .PutAsync(employeeDetails);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating employee details: {ex.Message}", "Error",
+                               MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw; // Re-throw to be handled by the calling method
+            }
         }
 
         private async Task UpdateEmploymentInfo()
@@ -453,12 +469,31 @@ namespace HRIS_JAP_ATTPAY
                 return false;
             }
         }
+
+        private void buttonScanRFID_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            ScanRFID scanRFID = new ScanRFID(this); // This will use the new constructor
+            AttributesClass.ShowWithOverlay(parentForm, scanRFID);
+        }
+
+        public void SetRFIDTag(string tag)
+        {
+            if (labelRFIDTagInput.InvokeRequired)
+            {
+                labelRFIDTagInput.Invoke(new Action(() => labelRFIDTagInput.Text = tag));
+            }
+            else
+            {
+                labelRFIDTagInput.Text = tag;
+            }
+        }
     }
 
 
-    // 🔹 Firebase models
-   
-    public static class HttpClientExtensionss
+        // 🔹 Firebase models
+
+        public static class HttpClientExtensionss
     {
         public static Task<HttpResponseMessage> PatchAsync(this HttpClient client, string requestUri, HttpContent content)
         {
