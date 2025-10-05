@@ -386,9 +386,7 @@
     <Compile Include="LeaveNotificationItems.Designer.cs">
       <DependentUpon>LeaveNotificationItems.cs</DependentUpon>
     </Compile>
-    <Compile Include="LoanDetails.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="LoanDetails.cs" />
     <Compile Include="LoanDetails.Designer.cs">
       <DependentUpon>LoanDetails.cs</DependentUpon>
     </Compile>
