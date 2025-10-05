@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace HRIS_JAP_ATTPAY
 {
+    //UPDATED
     public partial class AdminLoan : UserControl
     {
         private AttributesClassAlt panelLoaderAdminPayroll;
