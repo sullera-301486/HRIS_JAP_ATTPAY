@@ -14,19 +14,34 @@ using System.Text.RegularExpressions;
 
 namespace HRIS_JAP_ATTPAY
 {
+    // Static helper class for extension methods
+    public static class DictionaryExtensions
+    {
+        public static object GetValueOrDefault(this Dictionary<string, object> dict, string key)
+        {
+            return dict.ContainsKey(key) ? dict[key] : null;
+        }
+
+        public static string GetValueOrDefault(this Dictionary<string, string> dict, string key, string defaultValue = "")
+        {
+            return dict.ContainsKey(key) ? dict[key] : defaultValue;
+        }
+    }
+
     public partial class LoanDetails : Form
     {
         private string currentEmployeeId;
         private FirebaseClient firebase;
-        private List<Dictionary<string, string>> allEmployeeLoans;
+        private List<Dictionary<string, object>> allEmployeeLoans;
 
         public LoanDetails(string employeeId)
         {
             InitializeComponent();
             setFont();
-            currentEmployeeId = employeeId;
 
-            // Initialize Firebase client
+            currentEmployeeId = string.IsNullOrWhiteSpace(employeeId) ? "" : employeeId;
+            Console.WriteLine($"LoanDetails initialized with Employee ID: '{currentEmployeeId}'");
+
             try
             {
                 firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
@@ -37,17 +52,13 @@ namespace HRIS_JAP_ATTPAY
                 return;
             }
 
-            // Load loan data when form is created
-            LoadLoanData();
+            // ✅ Ensure combo box event is subscribed
+            comboBoxSelectedInput.SelectedIndexChanged += comboBoxSelectedInput_SelectedIndexChanged;
+
+            LoadData();
         }
 
-        // Helper method to replace GetValueOrDefault
-        private string GetValueOrDefault(Dictionary<string, string> dict, string key, string defaultValue = "")
-        {
-            return dict.ContainsKey(key) ? dict[key] : defaultValue;
-        }
-
-        private async void LoadLoanData()
+        private async void LoadData()
         {
             try
             {
@@ -57,106 +68,13 @@ namespace HRIS_JAP_ATTPAY
                     return;
                 }
 
-                // Show loading state
                 SetLoadingState(true);
-
-                // Get employee details
-                object employeeDetails = null;
-                try
-                {
-                    employeeDetails = await firebase
-                        .Child("EmployeeDetails")
-                        .Child(currentEmployeeId)
-                        .OnceSingleAsync<object>();
-                    Console.WriteLine($"Loaded employee details for: {currentEmployeeId}");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Warning: Could not load employee details: {ex.Message}");
-                    // Continue without employee details
-                }
-
-                // Get all employee loans using raw JSON approach
-                allEmployeeLoans = new List<Dictionary<string, string>>();
-                try
-                {
-                    // Get raw JSON response
-                    var jsonResponse = await firebase
-                        .Child("EmployeeLoans")
-                        .OnceAsJsonAsync();
-
-                    string rawJson = jsonResponse.ToString();
-                    Console.WriteLine($"Raw JSON response length: {rawJson.Length}");
-
-                    // Parse the malformed JSON
-                    var loanRecords = ParseMalformedJson(rawJson);
-                    Console.WriteLine($"Parsed {loanRecords.Count} total loan records");
-
-                    // Debug: Print all employee IDs found in loans
-                    Console.WriteLine("All employee IDs found in loans:");
-                    foreach (var loan in loanRecords)
-                    {
-                        if (loan.ContainsKey("employee_id"))
-                        {
-                            Console.WriteLine($"  - Employee ID: {loan["employee_id"]}, Loan Type: {GetValueOrDefault(loan, "loan_type", "Unknown")}");
-                        }
-                    }
-
-                    // Filter loans for current employee
-                    var employeeLoans = new List<Dictionary<string, string>>();
-                    foreach (var loan in loanRecords)
-                    {
-                        if (loan.ContainsKey("employee_id") && loan["employee_id"] == currentEmployeeId)
-                        {
-                            employeeLoans.Add(loan);
-                            Console.WriteLine($"Found loan for {currentEmployeeId}: {GetValueOrDefault(loan, "loan_type", "Unknown")}");
-                        }
-                    }
-
-                    Console.WriteLine($"Found {employeeLoans.Count} loans for employee {currentEmployeeId}");
-
-                    // Store all loans for combo box switching
-                    allEmployeeLoans = employeeLoans;
-
-                    // Populate combo box with loan types
-                    comboBoxSelectedInput.Items.Clear();
-                    foreach (var loan in employeeLoans)
-                    {
-                        string loanType = loan.ContainsKey("loan_type") ? loan["loan_type"] : "Unknown";
-                        if (!string.IsNullOrEmpty(loanType) && !comboBoxSelectedInput.Items.Contains(loanType))
-                        {
-                            comboBoxSelectedInput.Items.Add(loanType);
-                            Console.WriteLine($"Added loan type to combo box: {loanType}");
-                        }
-                    }
-
-                    // Select first loan if available
-                    if (comboBoxSelectedInput.Items.Count > 0)
-                    {
-                        comboBoxSelectedInput.SelectedIndex = 0;
-                        DisplayLoanDetails(employeeLoans[0], employeeDetails);
-                        Console.WriteLine($"Displaying first loan: {GetValueOrDefault(employeeLoans[0], "loan_type", "Unknown")}");
-                    }
-                    else
-                    {
-                        MessageBox.Show($"No loans found for employee {currentEmployeeId}. Please check if the employee ID is correct.");
-                        Console.WriteLine($"No loans found for employee: {currentEmployeeId}");
-                        this.Close();
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error loading loans: {ex.Message}");
-                    Console.WriteLine($"Loan loading error: {ex.Message}\n{ex.StackTrace}");
-                    return;
-                }
-
+                await LoadAndDisplayEmployeeDetailsImproved();
+                await LoadAndDisplayEmployeeLoans();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading loan data: {ex.Message}");
-                Console.WriteLine($"Error: {ex.Message}\n{ex.StackTrace}");
+                MessageBox.Show($"Error loading data: {ex.Message}");
             }
             finally
             {
@@ -164,293 +82,308 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // Handle malformed JSON from Firebase
-        private List<Dictionary<string, string>> ParseMalformedJson(string rawJson)
+        private async Task LoadAndDisplayEmployeeDetailsImproved()
         {
-            var records = new List<Dictionary<string, string>>();
             try
             {
-                // Clean the JSON - fix common issues in Firebase response
-                string cleanedJson = rawJson
-                    .Replace("\n", "").Replace("\r", "").Replace("\t", "")
-                    .Replace("'", "\"")  // Replace single quotes with double quotes
-                    .Replace("(", "[").Replace(")", "]")  // Fix parentheses
-                    .Replace("[null,", "[")  // Remove null entries
-                    .Replace("], [", ",").Replace("}, {", "},{")  // Fix array formatting
-                    .Replace("},(", "},{").Replace("),{", "},{")  // More fixes
-                    .Replace("[[", "[").Replace("]]", "]");  // Fix double brackets
-
-                Console.WriteLine($"Cleaned JSON length: {cleanedJson.Length}");
-
-                // Extract objects using regex
-                var matches = Regex.Matches(cleanedJson, @"\{[^{}]*\}");
-                Console.WriteLine($"Found {matches.Count} JSON objects using regex");
-
-                foreach (Match match in matches)
+                if (string.IsNullOrEmpty(currentEmployeeId))
                 {
-                    try
-                    {
-                        var record = new Dictionary<string, string>();
-                        string objectStr = match.Value;
+                    SetDefaultEmployeeInfo();
+                    return;
+                }
 
-                        // Extract key-value pairs with improved regex
-                        var kvpMatches = Regex.Matches(objectStr, @"""([^""]+)""\s*:\s*(""[^""]*""|[\d\.]+|true|false|null)");
-                        foreach (Match kvpMatch in kvpMatches)
+                Console.WriteLine($"Loading employee details for: '{currentEmployeeId}'");
+
+                try
+                {
+                    var employee = await firebase
+                        .Child("EmployeeDetails")
+                        .Child(currentEmployeeId)
+                        .OnceSingleAsync<Dictionary<string, object>>();
+
+                    if (employee != null && employee.Count > 0)
+                    {
+                        DisplayEmployeeDetailsImproved(employee);
+                        return;
+                    }
+                }
+                catch (Exception ex1)
+                {
+                    Console.WriteLine($"Direct access failed: {ex1.Message}");
+                }
+
+                try
+                {
+                    var allEmployees = await firebase
+                        .Child("EmployeeDetails")
+                        .OnceAsync<Dictionary<string, object>>();
+
+                    if (allEmployees != null)
+                    {
+                        var employee = allEmployees
+                            .Where(x => x.Key == currentEmployeeId)
+                            .Select(x => x.Object)
+                            .FirstOrDefault();
+
+                        if (employee != null && employee.Count > 0)
                         {
-                            if (kvpMatch.Groups.Count >= 3)
+                            DisplayEmployeeDetailsImproved(employee);
+                            return;
+                        }
+                    }
+                }
+                catch (Exception ex2)
+                {
+                    Console.WriteLine($"Filter method failed: {ex2.Message}");
+                }
+
+                SetDefaultEmployeeInfo();
+                Console.WriteLine($"Employee {currentEmployeeId} not found in database");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading employee details: {ex.Message}");
+                SetDefaultEmployeeInfo();
+            }
+        }
+
+        private void DisplayEmployeeDetailsImproved(Dictionary<string, object> employeeData)
+        {
+            try
+            {
+                string firstName = GetSafeString(employeeData, "first_name");
+                string middleName = GetSafeString(employeeData, "middle_name");
+                string lastName = GetSafeString(employeeData, "last_name");
+                string department = GetSafeString(employeeData, "department");
+                string position = GetSafeString(employeeData, "position");
+                string fullName = BuildFullName(firstName, middleName, lastName);
+
+                SafeSetLabelText(labelIDInput, currentEmployeeId);
+                SafeSetLabelText(labelNameInput, fullName);
+
+                if (Controls.Find("labelDepartmentInput", true).FirstOrDefault() is Label lblDept)
+                    SafeSetLabelText(lblDept, department);
+
+                if (Controls.Find("labelPositionInput", true).FirstOrDefault() is Label lblPos)
+                    SafeSetLabelText(lblPos, position);
+            }
+            catch
+            {
+                SetDefaultEmployeeInfo();
+            }
+        }
+
+        private string GetSafeString(Dictionary<string, object> dict, string key)
+        {
+            if (dict.ContainsKey(key) && dict[key] != null)
+            {
+                string value = dict[key].ToString();
+                return string.IsNullOrWhiteSpace(value) ? "N/A" : value.Trim();
+            }
+            return "N/A";
+        }
+
+        private string BuildFullName(string firstName, string middleName, string lastName)
+        {
+            var nameParts = new List<string> { firstName, middleName, lastName }
+                .Where(part => !string.IsNullOrWhiteSpace(part) && part != "N/A")
+                .Select(part => part.Trim());
+
+            string fullName = string.Join(" ", nameParts);
+            return string.IsNullOrWhiteSpace(fullName) ? "Unknown Employee" : fullName;
+        }
+
+        private void SafeSetLabelText(Label label, string text)
+        {
+            if (label.InvokeRequired)
+                label.Invoke(new Action(() => label.Text = text ?? "N/A"));
+            else
+                label.Text = text ?? "N/A";
+        }
+
+        private void SetDefaultEmployeeInfo()
+        {
+            SafeSetLabelText(labelIDInput, currentEmployeeId ?? "Unknown");
+            SafeSetLabelText(labelNameInput, "Employee Not Found");
+
+            if (Controls.Find("labelDepartmentInput", true).FirstOrDefault() is Label lblDept)
+                SafeSetLabelText(lblDept, "N/A");
+
+            if (Controls.Find("labelPositionInput", true).FirstOrDefault() is Label lblPos)
+                SafeSetLabelText(lblPos, "N/A");
+        }
+
+        private async Task LoadAndDisplayEmployeeLoans()
+        {
+            try
+            {
+                var loansData = await firebase.Child("EmployeeLoans").OnceSingleAsync<object>();
+                var employeeLoans = new List<Dictionary<string, object>>();
+
+                if (loansData != null)
+                {
+                    string json = Newtonsoft.Json.JsonConvert.SerializeObject(loansData);
+                    var jArray = Newtonsoft.Json.JsonConvert.DeserializeObject<JArray>(json);
+
+                    if (jArray != null)
+                    {
+                        foreach (var item in jArray)
+                        {
+                            if (item.Type == JTokenType.Null) continue;
+
+                            var loanDict = new Dictionary<string, object>();
+                            foreach (JProperty property in item.Children<JProperty>())
+                                loanDict[property.Name] = property.Value?.ToString() ?? "";
+
+                            if (loanDict.ContainsKey("employee_id"))
                             {
-                                string key = kvpMatch.Groups[1].Value;
-                                string value = kvpMatch.Groups[2].Value.Trim('"');
-                                record[key] = value;
+                                string loanEmployeeId = loanDict["employee_id"]?.ToString();
+                                if (!string.IsNullOrEmpty(loanEmployeeId) &&
+                                    loanEmployeeId.Trim().Equals(currentEmployeeId.Trim(), StringComparison.OrdinalIgnoreCase))
+                                {
+                                    employeeLoans.Add(loanDict);
+                                }
                             }
                         }
+                    }
+                }
 
-                        if (record.Count > 0)
-                        {
-                            records.Add(record);
-                            Console.WriteLine($"Parsed object with {record.Count} fields, EmployeeID: {GetValueOrDefault(record, "employee_id", "Not Found")}");
-                        }
-                    }
-                    catch (Exception ex)
+                allEmployeeLoans = employeeLoans;
+                UpdateLoansUI(employeeLoans);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading employee loans: {ex.Message}");
+                UpdateLoansUI(new List<Dictionary<string, object>>());
+            }
+        }
+
+        private void UpdateLoansUI(List<Dictionary<string, object>> employeeLoans)
+        {
+            try
+            {
+                comboBoxSelectedInput.Items.Clear();
+
+                // ✅ Temporarily detach event to avoid early firing
+                comboBoxSelectedInput.SelectedIndexChanged -= comboBoxSelectedInput_SelectedIndexChanged;
+
+                if (employeeLoans.Count > 0)
+                {
+                    foreach (var loan in employeeLoans)
                     {
-                        Console.WriteLine($"Error parsing object: {ex.Message}");
-                        continue;
+                        string loanType = loan.GetValueOrDefault("loan_type")?.ToString() ?? "Unknown";
+                        string loanId = loan.GetValueOrDefault("loan_id")?.ToString() ?? "N/A";
+                        comboBoxSelectedInput.Items.Add($"{loanType} (ID: {loanId})");
                     }
+
+                    // ✅ Reattach event after loading
+                    comboBoxSelectedInput.SelectedIndexChanged += comboBoxSelectedInput_SelectedIndexChanged;
+                    comboBoxSelectedInput.SelectedIndex = 0;
+
+                    // ✅ Explicitly refresh UI for first loan
+                    DisplayLoanDetails(employeeLoans[0]);
+                }
+                else
+                {
+                    DisplayNoLoans();
+                    MessageBox.Show($"No loans found for employee {currentEmployeeId}.");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("JSON parsing error: " + ex.Message);
-                Console.WriteLine($"JSON parsing error: {ex.Message}\n{ex.StackTrace}");
+                Console.WriteLine($"Error updating loans UI: {ex.Message}");
+                DisplayNoLoans();
             }
-
-            Console.WriteLine($"Total records parsed: {records.Count}");
-            return records;
         }
 
-        private void SetLoadingState(bool isLoading)
-        {
-            // You can add a loading indicator here if needed
-            comboBoxSelectedInput.Enabled = !isLoading;
-            buttonEdit.Enabled = !isLoading;
-            buttonCancel.Enabled = !isLoading;
-        }
-
-        private void DisplayLoanDetails(Dictionary<string, string> loanData, object employeeDetails)
+        private void DisplayLoanDetails(Dictionary<string, object> loanData)
         {
             try
             {
-                Console.WriteLine($"Displaying loan details for employee: {currentEmployeeId}");
-
-                // Display employee information
-                if (employeeDetails != null)
-                {
-                    var empData = ParseFirebaseObject(employeeDetails);
-                    string firstName = empData.ContainsKey("first_name") ? empData["first_name"] : "";
-                    string middleName = empData.ContainsKey("middle_name") ? empData["middle_name"] : "";
-                    string lastName = empData.ContainsKey("last_name") ? empData["last_name"] : "";
-
-                    labelIDInput.Text = currentEmployeeId;
-                    labelNameInput.Text = $"{firstName} {middleName} {lastName}".Trim();
-                    Console.WriteLine($"Employee: {labelNameInput.Text}");
-                }
-                else
-                {
-                    labelIDInput.Text = currentEmployeeId;
-                    labelNameInput.Text = "Unknown";
-                    Console.WriteLine("Employee details not found");
-                }
-
-                // Display loan details
-                string loanType = loanData.ContainsKey("loan_type") ? loanData["loan_type"] : "Unknown";
+                string loanType = loanData.GetValueOrDefault("loan_type")?.ToString() ?? "N/A";
                 labelTypeInput.Text = loanType;
-                Console.WriteLine($"Loan Type: {loanType}");
 
-                // Loan amount
-                if (loanData.ContainsKey("loan_amount") && decimal.TryParse(loanData["loan_amount"], out decimal loanAmount))
-                {
+                if (decimal.TryParse(loanData.GetValueOrDefault("loan_amount")?.ToString(), out decimal loanAmount))
                     labelAmountInput.Text = $"₱ {loanAmount:N2}";
-                    Console.WriteLine($"Loan Amount: {loanAmount:N2}");
-                }
-                else
-                {
-                    labelAmountInput.Text = "₱ 0.00";
-                    Console.WriteLine("Loan Amount: Not found or invalid");
-                }
+                else labelAmountInput.Text = "₱ 0.00";
 
-                // Balance
-                if (loanData.ContainsKey("balance") && decimal.TryParse(loanData["balance"], out decimal balance))
-                {
+                if (decimal.TryParse(loanData.GetValueOrDefault("balance")?.ToString(), out decimal balance))
                     labelBalanceInput.Text = $"₱ {balance:N2}";
-                    Console.WriteLine($"Balance: {balance:N2}");
-                }
-                else
+                else labelBalanceInput.Text = "₱ 0.00";
+
+                labelStartDateInput.Text = FormatDate(loanData.GetValueOrDefault("start_date")?.ToString() ?? "N/A");
+                labelEndDateInput.Text = FormatDate(loanData.GetValueOrDefault("end_date")?.ToString() ?? "N/A");
+
+                // <-- UPDATED: show total payment in "done/terms" format (e.g., "0/48")
+                int paymentDone = 0;
+                int paymentTerms = 0;
+
+                if (!int.TryParse(loanData.GetValueOrDefault("total_payment_done")?.ToString(), out paymentDone))
+                    paymentDone = 0;
+
+                if (!int.TryParse(loanData.GetValueOrDefault("total_payment_terms")?.ToString(), out paymentTerms))
+                    paymentTerms = 0;
+
+                labelTotalPaymentInput.Text = $"{paymentDone}/{paymentTerms}";
+                Console.WriteLine($"Total Payment Done: {paymentDone}/{paymentTerms}");
+
+                if (int.TryParse(loanData.GetValueOrDefault("total_payment_terms")?.ToString(), out int paymentTermsForCalc) &&
+                    decimal.TryParse(loanData.GetValueOrDefault("loan_amount")?.ToString(), out decimal amount) &&
+                    paymentTermsForCalc > 0)
                 {
-                    labelBalanceInput.Text = "₱ 0.00";
-                    Console.WriteLine("Balance: Not found or invalid");
-                }
-
-                // Dates
-                string startDate = loanData.ContainsKey("start_date") ? FormatDate(loanData["start_date"]) : "N/A";
-                string endDate = loanData.ContainsKey("end_date") ? FormatDate(loanData["end_date"]) : "N/A";
-                labelStartDateInput.Text = startDate;
-                labelEndDateInput.Text = endDate;
-                Console.WriteLine($"Dates: {startDate} to {endDate}");
-
-                // Payment information
-                int totalPaymentDone = 0;
-                int totalPaymentTerms = 0;
-
-                if (loanData.ContainsKey("total_payment_done") && int.TryParse(loanData["total_payment_done"], out totalPaymentDone))
-                {
-                    labelTotalPaymentInput.Text = $"{totalPaymentDone}";
-                }
-                else
-                {
-                    labelTotalPaymentInput.Text = "0";
-                }
-
-                if (loanData.ContainsKey("total_payment_terms") && int.TryParse(loanData["total_payment_terms"], out totalPaymentTerms))
-                {
-                    // Calculate amortizations
-                    if (loanData.ContainsKey("loan_amount") && decimal.TryParse(loanData["loan_amount"], out decimal amt) && totalPaymentTerms > 0)
-                    {
-                        decimal monthlyAmortization = amt / totalPaymentTerms;
-                        decimal bimonthlyAmortization = monthlyAmortization / 2;
-
-                        labelMonthlyAmortizationInput.Text = $"₱ {monthlyAmortization:N2}";
-                        labelBimonthlyAmortizationInput.Text = $"₱ {bimonthlyAmortization:N2}";
-                        Console.WriteLine($"Amortization: Monthly {monthlyAmortization:N2}, Bi-monthly {bimonthlyAmortization:N2}");
-                    }
-                    else
-                    {
-                        labelMonthlyAmortizationInput.Text = "₱ 0.00";
-                        labelBimonthlyAmortizationInput.Text = "₱ 0.00";
-                    }
+                    decimal monthly = amount / paymentTermsForCalc;
+                    decimal biMonthly = monthly / 2;
+                    labelMonthlyAmortizationInput.Text = $"₱ {monthly:N2}";
+                    labelBimonthlyAmortizationInput.Text = $"₱ {biMonthly:N2}";
                 }
                 else
                 {
                     labelMonthlyAmortizationInput.Text = "₱ 0.00";
                     labelBimonthlyAmortizationInput.Text = "₱ 0.00";
                 }
-
-                Console.WriteLine("Loan details displayed successfully");
-
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show($"Error displaying loan details: {ex.Message}");
-                Console.WriteLine($"Display error: {ex.Message}\n{ex.StackTrace}");
+                DisplayNoLoans();
             }
+        }
+
+        private void DisplayNoLoans()
+        {
+            labelTypeInput.Text = "N/A";
+            labelAmountInput.Text = "₱ 0.00";
+            labelBalanceInput.Text = "₱ 0.00";
+            labelStartDateInput.Text = "N/A";
+            labelEndDateInput.Text = "N/A";
+            // <-- UPDATED default to match "done/terms" format
+            labelTotalPaymentInput.Text = "0/0";
+            labelMonthlyAmortizationInput.Text = "₱ 0.00";
+            labelBimonthlyAmortizationInput.Text = "₱ 0.00";
         }
 
         private string FormatDate(string dateString)
         {
-            try
-            {
-                if (DateTime.TryParse(dateString, out DateTime date))
-                {
-                    return date.ToString("MMM dd, yyyy");
-                }
-                return dateString; // Return original if parsing fails
-            }
-            catch
-            {
-                return dateString;
-            }
+            if (DateTime.TryParse(dateString, out DateTime date))
+                return date.ToString("MMM dd, yyyy");
+            return dateString;
         }
 
-        private Dictionary<string, string> ParseFirebaseObject(object firebaseObject)
+        private void SetLoadingState(bool isLoading)
         {
-            var result = new Dictionary<string, string>();
-
-            try
-            {
-                if (firebaseObject == null) return result;
-
-                // Handle JObject directly
-                if (firebaseObject is JObject jObject)
-                {
-                    foreach (var property in jObject.Properties())
-                    {
-                        result[property.Name] = property.Value?.ToString() ?? "";
-                    }
-                    return result;
-                }
-
-                // Handle dictionary types
-                if (firebaseObject is IDictionary<string, object> dict)
-                {
-                    foreach (var kvp in dict)
-                    {
-                        result[kvp.Key] = kvp.Value?.ToString() ?? "";
-                    }
-                    return result;
-                }
-
-                // Fallback: serialize to JSON and parse
-                string json = Newtonsoft.Json.JsonConvert.SerializeObject(firebaseObject);
-                var parsed = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-
-                if (parsed != null)
-                {
-                    foreach (var kvp in parsed)
-                    {
-                        result[kvp.Key] = kvp.Value?.ToString() ?? "";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error parsing Firebase object: {ex.Message}");
-            }
-
-            return result;
+            comboBoxSelectedInput.Enabled = !isLoading;
+            buttonEdit.Enabled = !isLoading;
+            buttonCancel.Enabled = !isLoading;
         }
 
+        // ✅ Final fixed combo box logic
         private void comboBoxSelectedInput_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // When user selects different loan type, reload that loan's details
-            if (comboBoxSelectedInput.SelectedItem != null && allEmployeeLoans != null)
-            {
-                string selectedLoanType = comboBoxSelectedInput.SelectedItem.ToString();
-                Console.WriteLine($"User selected loan type: {selectedLoanType}");
+            if (allEmployeeLoans == null || allEmployeeLoans.Count == 0) return;
+            int index = comboBoxSelectedInput.SelectedIndex;
+            if (index < 0 || index >= allEmployeeLoans.Count) return;
 
-                // Find the loan with matching type
-                var selectedLoan = allEmployeeLoans.FirstOrDefault(loan =>
-                    loan.ContainsKey("loan_type") && loan["loan_type"] == selectedLoanType);
-
-                if (selectedLoan != null)
-                {
-                    // Get employee details again
-                    ReloadEmployeeDetailsAndDisplay(selectedLoan);
-                }
-            }
-        }
-
-        private async void ReloadEmployeeDetailsAndDisplay(Dictionary<string, string> loanData)
-        {
-            try
-            {
-                object employeeDetails = null;
-                try
-                {
-                    employeeDetails = await firebase
-                        .Child("EmployeeDetails")
-                        .Child(currentEmployeeId)
-                        .OnceSingleAsync<object>();
-                }
-                catch
-                {
-                    // Continue without employee details
-                }
-
-                DisplayLoanDetails(loanData, employeeDetails);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error reloading loan details: {ex.Message}");
-            }
+            var selectedLoan = allEmployeeLoans[index];
+            DisplayLoanDetails(selectedLoan);
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
