@@ -332,6 +332,7 @@
     <Compile Include="ConfirmProfileUpdate.Designer.cs">
       <DependentUpon>ConfirmProfileUpdate.cs</DependentUpon>
     </Compile>
+    <Compile Include="DailyAttendanceService.cs" />
     <Compile Include="EditAttendance.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -32,7 +32,7 @@ namespace HRIS_JAP_ATTPAY
             // Load departments and positions from Firebase
             LoadDepartmentsAndPositions();
 
-            // FIXED: Initialize sorting options with correct values
+            // FIXED: Initialize sorting options with only A-Z and Z-A based on first name
             InitializeSortingOptions();
         }
 
@@ -305,19 +305,18 @@ namespace HRIS_JAP_ATTPAY
             this.Close();
         }
 
-        // FIXED: Initialize sorting options with correct case matching
+        // FIXED: Initialize sorting options with only A-Z and Z-A (based on first name initial)
         private void InitializeSortingOptions()
         {
             comboBoxSort.Items.Clear();
+
+            // Only include A-Z and Z-A sorting options
             comboBoxSort.Items.AddRange(new object[] {
-                "A-Z",              // Will become "a-z" when toLower()
-                "Z-A",              // Will become "z-a" when toLower()
-                "Newest-Oldest",    // Will become "newest-oldest" when toLower()
-                "Oldest-Newest"     // Will become "oldest-newest" when toLower()
+                "A-Z",  // Sort by first name A-Z
+                "Z-A"   // Sort by first name Z-A
             });
 
             // Don't set default selection - let it be empty initially
-            // This way we can see if sorting is being applied
         }
     }
 

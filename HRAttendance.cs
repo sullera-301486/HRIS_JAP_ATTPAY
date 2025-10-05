@@ -23,7 +23,7 @@ namespace HRIS_JAP_ATTPAY
         private AttendanceFilterCriteria currentAttendanceFilters = new AttendanceFilterCriteria();
         private Dictionary<string, (string Department, string Position)> employeeDepartmentMap = new Dictionary<string, (string Department, string Position)>();
         private Dictionary<int, string> attendanceKeyMap = new Dictionary<int, string>();
-        
+
 
         private bool isLoading = false;
 
@@ -45,7 +45,7 @@ namespace HRIS_JAP_ATTPAY
             PopulateDateComboBox();
         }
 
-      
+
 
         // 🔹 FILTER HANDLERS
         private void ApplyAttendanceFilters(AttendanceFilterCriteria filters)
@@ -103,6 +103,7 @@ namespace HRIS_JAP_ATTPAY
         }
 
         // 🔹 SORTING
+        // 🔹 SORTING - FIXED TO USE EXISTING EXTRACTFIRSTNAME METHOD
         private List<DataGridViewRow> ApplySorting(List<DataGridViewRow> rows)
         {
             System.Diagnostics.Debug.WriteLine($"ApplySorting called with {rows.Count} rows");
@@ -121,36 +122,20 @@ namespace HRIS_JAP_ATTPAY
                 switch (sort)
                 {
                     case "a-z":
-                        System.Diagnostics.Debug.WriteLine("Applying A-Z sort");
-                        return rows.OrderBy(r => r.Cells["FullName"]?.Value?.ToString() ?? "",
-                                          StringComparer.OrdinalIgnoreCase).ToList();
-
-                    case "z-a":
-                        System.Diagnostics.Debug.WriteLine("Applying Z-A sort");
-                        return rows.OrderByDescending(r => r.Cells["FullName"]?.Value?.ToString() ?? "",
-                                                  StringComparer.OrdinalIgnoreCase).ToList();
-
-                    case "oldest-newest":
-                        System.Diagnostics.Debug.WriteLine("Applying Oldest-Newest sort");
+                        System.Diagnostics.Debug.WriteLine("Applying A-Z sort by first name");
                         return rows.OrderBy(r =>
                         {
-                            string timeIn = r.Cells["TimeIn"]?.Value?.ToString() ?? "";
-                            string timeOut = r.Cells["TimeOut"]?.Value?.ToString() ?? "";
-                            DateTime sortDate = GetAttendanceDateForSorting(timeIn, timeOut);
-                            System.Diagnostics.Debug.WriteLine($"Row sort date: {sortDate}");
-                            return sortDate;
-                        }).ToList();
+                            string fullName = r.Cells["FullName"]?.Value?.ToString() ?? "";
+                            return ExtractFirstName(fullName); // Use your existing method
+                        }, StringComparer.OrdinalIgnoreCase).ToList();
 
-                    case "newest-oldest":
-                        System.Diagnostics.Debug.WriteLine("Applying Newest-Oldest sort");
+                    case "z-a":
+                        System.Diagnostics.Debug.WriteLine("Applying Z-A sort by first name");
                         return rows.OrderByDescending(r =>
                         {
-                            string timeIn = r.Cells["TimeIn"]?.Value?.ToString() ?? "";
-                            string timeOut = r.Cells["TimeOut"]?.Value?.ToString() ?? "";
-                            DateTime sortDate = GetAttendanceDateForSorting(timeIn, timeOut);
-                            System.Diagnostics.Debug.WriteLine($"Row sort date: {sortDate}");
-                            return sortDate;
-                        }).ToList();
+                            string fullName = r.Cells["FullName"]?.Value?.ToString() ?? "";
+                            return ExtractFirstName(fullName); // Use your existing method
+                        }, StringComparer.OrdinalIgnoreCase).ToList();
 
                     default:
                         System.Diagnostics.Debug.WriteLine($"Unknown sort option: {sort}");
@@ -855,42 +840,21 @@ namespace HRIS_JAP_ATTPAY
                 string hoursWorkedStr = attendance["hours_worked"]?.ToString() ?? "0.00";
                 string existingStatus = attendance["status"]?.ToString() ?? "";
 
-                // Apply date filter if a date is selected - SAME AS ADMINATTENDANCE
+                // Apply date filter if a date is selected - STRICT FILTERING
                 if (selectedDate.HasValue)
                 {
                     bool shouldInclude = false;
 
-                    // Check attendance_date first
+                    // Only use attendance_date field for filtering - no fallbacks
                     if (!string.IsNullOrEmpty(attendanceDateStr) && DateTime.TryParse(attendanceDateStr, out DateTime attendanceDate))
                     {
                         if (attendanceDate.Date == selectedDate.Value.Date)
-                        {
                             shouldInclude = true;
-                        }
                     }
 
-                    // Check time_in date if not already included
-                    if (!shouldInclude && !string.IsNullOrEmpty(timeInStr) && DateTime.TryParse(timeInStr, out DateTime timeInDate))
-                    {
-                        if (timeInDate.Date == selectedDate.Value.Date)
-                        {
-                            shouldInclude = true;
-                        }
-                    }
-
-                    // Check time_out date if not already included
-                    if (!shouldInclude && !string.IsNullOrEmpty(timeOutStr) && DateTime.TryParse(timeOutStr, out DateTime timeOutDate))
-                    {
-                        if (timeOutDate.Date == selectedDate.Value.Date)
-                        {
-                            shouldInclude = true;
-                        }
-                    }
-
+                    // If no attendance_date or it doesn't match, exclude the record
                     if (!shouldInclude)
-                    {
                         return false;
-                    }
                 }
 
                 string employeeId = attendance["employee_id"]?.ToString() ?? "N/A";
@@ -994,30 +958,6 @@ namespace HRIS_JAP_ATTPAY
             AttributesClass.TextboxPlaceholder(textBoxSearchEmployee, "Find Employee");
         }
 
-        // Sorting methods for external access (if needed)
-        public void SortAttendanceAZ()
-        {
-            currentAttendanceFilters.SortBy = "a-z";
-            ApplyAllAttendanceFilters();
-        }
-
-        public void SortAttendanceZA()
-        {
-            currentAttendanceFilters.SortBy = "z-a";
-            ApplyAllAttendanceFilters();
-        }
-
-        public void SortAttendanceOldestNewest()
-        {
-            currentAttendanceFilters.SortBy = "oldest-newest";
-            ApplyAllAttendanceFilters();
-        }
-
-        public void SortAttendanceNewestOldest()
-        {
-            currentAttendanceFilters.SortBy = "newest-oldest";
-            ApplyAllAttendanceFilters();
-        }
         private void labelAddLeave_Click(object sender, EventArgs e)
         {
             Form parentForm = this.FindForm();

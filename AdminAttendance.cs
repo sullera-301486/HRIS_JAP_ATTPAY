@@ -37,7 +37,7 @@ namespace HRIS_JAP_ATTPAY
             setFont();
             setTextBoxAttributes();
             setDataGridViewAttributes();
-           
+
 
             // Load data asynchronously
             LoadDataAsync();
@@ -85,6 +85,9 @@ namespace HRIS_JAP_ATTPAY
             string searchText = textBoxSearchEmployee.Text.Trim().ToLower();
             var filteredRows = new List<DataGridViewRow>();
 
+            System.Diagnostics.Debug.WriteLine($"ApplyAllAttendanceFilters: SearchText='{searchText}', SortBy='{currentAttendanceFilters?.SortBy}'");
+
+            // First, collect all rows that match search and filters
             foreach (DataGridViewRow row in dataGridViewAttendance.Rows)
             {
                 if (!row.IsNewRow)
@@ -99,36 +102,48 @@ namespace HRIS_JAP_ATTPAY
                 }
             }
 
-            System.Diagnostics.Debug.WriteLine($"Filtered rows count: {filteredRows.Count}");
+            System.Diagnostics.Debug.WriteLine($"Filtered rows count before sorting: {filteredRows.Count}");
 
-            // IMPORTANT: Check if we have a sort criteria before calling ApplySorting
+            // Debug: Print filtered rows before sorting
+            foreach (var row in filteredRows)
+            {
+                string name = row.Cells["FullName"]?.Value?.ToString() ?? "";
+                System.Diagnostics.Debug.WriteLine($"Before sorting: '{name}'");
+            }
+
+            // ALWAYS apply sorting if we have a sort criteria
+            List<DataGridViewRow> finalRows;
+
             if (!string.IsNullOrEmpty(currentAttendanceFilters?.SortBy))
             {
                 System.Diagnostics.Debug.WriteLine($"Calling ApplySorting with: {currentAttendanceFilters.SortBy}");
-                var sortedRows = ApplySorting(filteredRows);
-                System.Diagnostics.Debug.WriteLine($"After sorting, rows count: {sortedRows.Count}");
-
-                foreach (var row in sortedRows)
-                    row.Visible = true;
+                finalRows = ApplySorting(filteredRows);
             }
             else
             {
                 System.Diagnostics.Debug.WriteLine("No sorting applied - SortBy is empty or null");
-                foreach (var row in filteredRows)
-                    row.Visible = true;
+                finalRows = filteredRows;
             }
+
+            System.Diagnostics.Debug.WriteLine($"Final rows count after sorting: {finalRows.Count}");
+
+            // Make the final rows visible
+            foreach (var row in finalRows)
+                row.Visible = true;
 
             UpdateRowNumbers();
         }
 
         // 🔹 SORTING - FIXED TO MATCH HRAttendance
+        // 🔹 SORTING - FIXED TO USE EXISTING EXTRACTFIRSTNAME METHOD
+        // 🔹 SORTING - FIXED VERSION
         private List<DataGridViewRow> ApplySorting(List<DataGridViewRow> rows)
         {
             System.Diagnostics.Debug.WriteLine($"ApplySorting called with {rows.Count} rows");
 
             if (currentAttendanceFilters == null || string.IsNullOrEmpty(currentAttendanceFilters.SortBy))
             {
-                System.Diagnostics.Debug.WriteLine("No sort criteria specified");
+                System.Diagnostics.Debug.WriteLine("No sort criteria specified - returning rows as-is");
                 return rows;
             }
 
@@ -137,69 +152,55 @@ namespace HRIS_JAP_ATTPAY
 
             try
             {
+                List<DataGridViewRow> sortedRows = new List<DataGridViewRow>();
+
                 switch (sort)
                 {
                     case "a-z":
-                        return rows.OrderBy(r => r.Cells["FullName"]?.Value?.ToString() ?? "",
-                                          StringComparer.OrdinalIgnoreCase).ToList();
+                        System.Diagnostics.Debug.WriteLine("Applying A-Z sort by FIRST LETTER");
+                        sortedRows = rows.OrderBy(r =>
+                        {
+                            string fullName = r.Cells["FullName"]?.Value?.ToString() ?? "";
+                            char firstLetter = ExtractFirstLetter(fullName);
+                            System.Diagnostics.Debug.WriteLine($"A-Z Sorting: '{fullName}' -> '{firstLetter}'");
+                            return firstLetter;
+                        }).ToList();
+                        break;
 
                     case "z-a":
-                        return rows.OrderByDescending(r => r.Cells["FullName"]?.Value?.ToString() ?? "",
-                                                  StringComparer.OrdinalIgnoreCase).ToList();
-
-                    case "oldest-newest":
-                        return rows.OrderBy(r =>
+                        System.Diagnostics.Debug.WriteLine("Applying Z-A sort by FIRST LETTER");
+                        sortedRows = rows.OrderByDescending(r =>
                         {
-                            string timeIn = r.Cells["TimeIn"]?.Value?.ToString() ?? "";
-                            string timeOut = r.Cells["TimeOut"]?.Value?.ToString() ?? "";
-                            return GetAttendanceDateForSorting(timeIn, timeOut);
+                            string fullName = r.Cells["FullName"]?.Value?.ToString() ?? "";
+                            char firstLetter = ExtractFirstLetter(fullName);
+                            System.Diagnostics.Debug.WriteLine($"Z-A Sorting: '{fullName}' -> '{firstLetter}'");
+                            return firstLetter;
                         }).ToList();
-
-                    case "newest-oldest":
-                        return rows.OrderByDescending(r =>
-                        {
-                            string timeIn = r.Cells["TimeIn"]?.Value?.ToString() ?? "";
-                            string timeOut = r.Cells["TimeOut"]?.Value?.ToString() ?? "";
-                            return GetAttendanceDateForSorting(timeIn, timeOut);
-                        }).ToList();
+                        break;
 
                     default:
-                        return rows;
+                        System.Diagnostics.Debug.WriteLine($"Unknown sort option: {sort} - returning original order");
+                        sortedRows = rows;
+                        break;
                 }
+
+                System.Diagnostics.Debug.WriteLine($"After sorting, rows count: {sortedRows.Count}");
+
+                // Debug: Print the sorted order
+                foreach (var row in sortedRows)
+                {
+                    string name = row.Cells["FullName"]?.Value?.ToString() ?? "";
+                    char firstLetter = ExtractFirstLetter(name);
+                    System.Diagnostics.Debug.WriteLine($"Sorted: '{name}' (First letter: '{firstLetter}')");
+                }
+
+                return sortedRows;
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"ERROR in ApplySorting: {ex.Message}");
                 return rows;
             }
-        }
-
-        private DateTime GetAttendanceDateForSorting(string timeIn, string timeOut)
-        {
-            // Try to parse the date from timeIn first
-            if (!string.IsNullOrEmpty(timeIn) && timeIn != "N/A")
-            {
-                if (DateTime.TryParse(timeIn, out DateTime timeInDate))
-                    return timeInDate;
-
-                // Try parsing with time-only formats
-                if (DateTime.TryParseExact(timeIn, "h:mm tt", System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None, out timeInDate))
-                    return DateTime.Today.AddHours(timeInDate.Hour).AddMinutes(timeInDate.Minute);
-            }
-
-            // If timeIn fails, try timeOut
-            if (!string.IsNullOrEmpty(timeOut) && timeOut != "N/A")
-            {
-                if (DateTime.TryParse(timeOut, out DateTime timeOutDate))
-                    return timeOutDate;
-
-                if (DateTime.TryParseExact(timeOut, "h:mm tt", System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None, out timeOutDate))
-                    return DateTime.Today.AddHours(timeOutDate.Hour).AddMinutes(timeOutDate.Minute);
-            }
-
-            return DateTime.MinValue;
         }
 
         private void UpdateRowNumbers()
@@ -335,62 +336,27 @@ namespace HRIS_JAP_ATTPAY
             return true;
         }
 
-        private string ExtractFirstName(string fullName)
+        private char ExtractFirstLetter(string fullName)
         {
             if (string.IsNullOrEmpty(fullName))
-                return "";
-
-            string[] nameParts = fullName.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            return nameParts.Length > 0 ? nameParts[0] : "";
-        }
-
-        // Helper method to get attendance date for sorting
-        private DateTime GetAttendanceDate(string timeIn, string timeOut)
-        {
-            if (!string.IsNullOrEmpty(timeIn) && timeIn != "N/A")
             {
-                if (DateTime.TryParse(timeIn, out DateTime timeInDate))
-                    return timeInDate.Date;
+                System.Diagnostics.Debug.WriteLine("ExtractFirstLetter: Empty fullName");
+                return ' '; // Space will sort before letters
             }
 
-            if (!string.IsNullOrEmpty(timeOut) && timeOut != "N/A")
-            {
-                if (DateTime.TryParse(timeOut, out DateTime timeOutDate))
-                    return timeOutDate.Date;
-            }
+            // Clean up the name - remove extra spaces and get the very first character
+            fullName = fullName.Trim();
 
-            return DateTime.MinValue;
-        }
+            if (fullName.Length == 0)
+                return ' ';
 
-        private DateTime ParseAttendanceDate(string timeIn, string timeOut)
-        {
-            // Try to parse time in first
-            if (!string.IsNullOrEmpty(timeIn) && timeIn != "N/A")
-            {
-                if (DateTime.TryParse(timeIn, out DateTime tIn))
-                    return tIn;
+            char firstLetter = fullName[0];
 
-                // Try parsing with common formats
-                string[] formats = { "HH:mm", "hh:mm tt", "yyyy-MM-dd HH:mm:ss", "MM/dd/yyyy HH:mm:ss" };
-                if (DateTime.TryParseExact(timeIn, formats, System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None, out tIn))
-                    return tIn;
-            }
+            // Convert to uppercase for consistent sorting
+            firstLetter = char.ToUpper(firstLetter);
 
-            // If time in fails, try time out
-            if (!string.IsNullOrEmpty(timeOut) && timeOut != "N/A")
-            {
-                if (DateTime.TryParse(timeOut, out DateTime tOut))
-                    return tOut;
-
-                string[] formats = { "HH:mm", "hh:mm tt", "yyyy-MM-dd HH:mm:ss", "MM/dd/yyyy HH:mm:ss" };
-                if (DateTime.TryParseExact(timeOut, formats, System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None, out tOut))
-                    return tOut;
-            }
-
-            // If both fail, return minimum date (will appear at top for oldest-first, bottom for newest-first)
-            return DateTime.MinValue;
+            System.Diagnostics.Debug.WriteLine($"ExtractFirstLetter: '{fullName}' -> '{firstLetter}'");
+            return firstLetter;
         }
 
         // ADD THESE METHODS (same as in the filter form):
@@ -1025,29 +991,19 @@ namespace HRIS_JAP_ATTPAY
                 string attendanceDateStr = attendance["attendance_date"]?.ToString() ?? "";
                 string existingStatus = attendance["status"]?.ToString() ?? "";
 
-                // Apply date filter if a date is selected - SAME AS HRAttendance
+                // Apply date filter if a date is selected - STRICT FILTERING
                 if (selectedDate.HasValue)
                 {
                     bool shouldInclude = false;
 
+                    // Only use attendance_date field for filtering - no fallbacks
                     if (!string.IsNullOrEmpty(attendanceDateStr) && DateTime.TryParse(attendanceDateStr, out DateTime attendanceDate))
                     {
                         if (attendanceDate.Date == selectedDate.Value.Date)
                             shouldInclude = true;
                     }
 
-                    if (!shouldInclude && !string.IsNullOrEmpty(timeInStr) && DateTime.TryParse(timeInStr, out DateTime timeInDate))
-                    {
-                        if (timeInDate.Date == selectedDate.Value.Date)
-                            shouldInclude = true;
-                    }
-
-                    if (!shouldInclude && !string.IsNullOrEmpty(timeOutStr) && DateTime.TryParse(timeOutStr, out DateTime timeOutDate))
-                    {
-                        if (timeOutDate.Date == selectedDate.Value.Date)
-                            shouldInclude = true;
-                    }
-
+                    // If no attendance_date or it doesn't match, exclude the record
                     if (!shouldInclude)
                         return false;
                 }
@@ -1120,31 +1076,6 @@ namespace HRIS_JAP_ATTPAY
                 Console.WriteLine($"Error processing attendance record: {ex.Message}");
                 return false;
             }
-        }
-
-        // Sorting methods for external access
-        public void SortAttendanceAZ()
-        {
-            currentAttendanceFilters.SortBy = "a-z";
-            ApplyAllAttendanceFilters();
-        }
-
-        public void SortAttendanceZA()
-        {
-            currentAttendanceFilters.SortBy = "z-a";
-            ApplyAllAttendanceFilters();
-        }
-
-        public void SortAttendanceOldestNewest()
-        {
-            currentAttendanceFilters.SortBy = "oldest-newest";
-            ApplyAllAttendanceFilters();
-        }
-
-        public void SortAttendanceNewestOldest()
-        {
-            currentAttendanceFilters.SortBy = "newest-oldest";
-            ApplyAllAttendanceFilters();
         }
     }
 }
