@@ -47,27 +47,62 @@ namespace HRIS_JAP_ATTPAY
 
         private async void buttonSendRequest_Click(object sender, EventArgs e)
         {
-            // build request object
+            string employeeInput = textBoxNameInput.Text?.Trim();
+            string leaveType = comboBoxLeaveTypeInput.Text?.Trim();
+            string start = textBoxStartPeriod.Text?.Trim();
+            string end = textBoxEndPeriod.Text?.Trim();
+            string notes = textBoxReasonInput.Text?.Trim();
+
+            // 🔹 Ensure all fields are filled
+            if (string.IsNullOrWhiteSpace(employeeInput) ||
+                string.IsNullOrWhiteSpace(leaveType) ||
+                string.IsNullOrWhiteSpace(start) ||
+                string.IsNullOrWhiteSpace(end))
+            {
+                MessageBox.Show("Please fill in all required fields.", "Missing Information",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 🔹 Validate if the employee exists in the database
+            bool isValidEmployee = await IsEmployeeValidAsync(employeeInput);
+            if (!isValidEmployee)
+            {
+                MessageBox.Show(
+                    $"Employee '{employeeInput}' does not exist in the database.",
+                    "Invalid Employee",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+                return;
+            }
+
+            // 🔹 SubmittedBy = currently logged-in user
+            string submittedBy = !string.IsNullOrEmpty(SessionClass.CurrentEmployeeName)
+                ? SessionClass.CurrentEmployeeName
+                : "Unknown User";
+
+            // 🔹 Build the request object
             var request = new LeaveNotificationItems.LeaveNotificationModel
             {
-                Title = $"Leave Request - {comboBoxLeaveTypeInput.Text?.Trim()}",
-                SubmittedBy = textBoxNameInput.Text?.Trim(),
-                Employee = textBoxNameInput.Text?.Trim(),
-                LeaveType = comboBoxLeaveTypeInput.Text?.Trim(),
-                Period = $"{textBoxStartPeriod.Text?.Trim()} - {textBoxEndPeriod.Text?.Trim()}",
-                Notes = textBoxReasonInput.Text?.Trim(),
+                Title = $"Leave Request - {leaveType}",
+                SubmittedBy = submittedBy,    // Logged-in user
+                Employee = employeeInput,     // Employee typed in textbox
+                LeaveType = leaveType,
+                Period = $"{start} - {end}",
+                Notes = notes,
                 CreatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
             };
 
-            // confirm dialog for preview
+            // 🔹 Show confirm preview window
             var preview = new LeaveRequestData
             {
                 Title = request.Title,
                 SubmittedBy = request.SubmittedBy,
                 EmployeeName = request.Employee,
                 LeaveType = request.LeaveType,
-                Start = textBoxStartPeriod.Text?.Trim(),
-                End = textBoxEndPeriod.Text?.Trim(),
+                Start = start,
+                End = end,
                 Notes = request.Notes,
                 Photo = null,
                 CreatedAt = DateTime.Now
@@ -78,20 +113,60 @@ namespace HRIS_JAP_ATTPAY
                 var result = confirm.ShowDialog();
                 if (result == DialogResult.OK)
                 {
-                    // 🔹 Save directly to Firebase
+                    // 🔹 Save to Firebase
                     await FirebaseSave(request);
 
-                    MessageBox.Show("Leave request submitted successfully!",
-                        "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(
+                        "Leave request submitted successfully!",
+                        "Success",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
 
                     this.Close();
                 }
             }
         }
 
+        // 🔹 Save to Firebase
         private async Task FirebaseSave(LeaveNotificationItems.LeaveNotificationModel notif)
         {
             await firebase.Child("LeaveNotifications").PostAsync(notif);
+        }
+
+        // 🔹 Validate if employee name exists in EmployeeDetails node
+        private static async Task<bool> IsEmployeeValidAsync(string employeeName)
+        {
+            if (string.IsNullOrWhiteSpace(employeeName))
+                return false;
+
+            var employees = await firebase
+                .Child("EmployeeDetails")
+                .OnceAsync<dynamic>();
+
+            foreach (var emp in employees)
+            {
+                try
+                {
+                    string first = emp.Object.first_name ?? "";
+                    string middle = emp.Object.middle_name ?? "";
+                    string last = emp.Object.last_name ?? "";
+
+                    string fullNameWithMiddle = $"{first} {middle} {last}".Replace("  ", " ").Trim();
+                    string fullNameNoMiddle = $"{first} {last}".Trim();
+
+                    if (string.Equals(employeeName, fullNameWithMiddle, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(employeeName, fullNameNoMiddle, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+            return false;
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
