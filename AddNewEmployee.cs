@@ -1,14 +1,14 @@
-﻿    using Firebase.Database;
-    using Firebase.Database.Query;
-    using Newtonsoft.Json.Linq;
-    using System;
+﻿using Firebase.Database;
+using Firebase.Database.Query;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
-    using System.Drawing;
-    using System.IO;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Threading.Tasks;
-    using System.Windows.Forms;
+using System.Drawing;
+using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -30,6 +30,11 @@ namespace HRIS_JAP_ATTPAY
             // initialize firestore client here
             firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
             InitializeDepartmentComboBox();
+            // Initialize alternate textbox state
+            UpdateAlternateTextboxAccessibility();
+
+            // Initialize password field accessibility
+            UpdatePasswordFieldAccessibility();
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
@@ -208,6 +213,12 @@ namespace HRIS_JAP_ATTPAY
 
                 if (result == DialogResult.OK || confirmForm.UserConfirmed) // Check both for safety
                 {
+                    // Validate work schedule before proceeding
+                    if (!ValidateWorkSchedule())
+                    {
+                        return;
+                    }
+
                     await AddEmployeeToFirebaseAsync();
                 }
                 else
@@ -332,22 +343,6 @@ namespace HRIS_JAP_ATTPAY
                 string managerName = textBoxManager.Text.Trim();
                 string password = textBoxPassword.Text.Trim(); // Get the password
 
-                // For shift schedule & work days & alt schedule
-                string workHoursA = textBoxWorkHoursA.Text.Trim();
-                string workHoursB = textBoxWorkHoursB.Text.Trim();
-                string altWorkHoursA = textBoxAltWorkHoursA.Text.Trim();
-                string altWorkHoursB = textBoxAltWorkHoursB.Text.Trim();
-
-                // Collect which day boxes are checked
-                bool[] workDays = {
-            checkBoxM.Checked, checkBoxT.Checked, checkBoxW.Checked,
-            checkBoxTh.Checked, checkBoxF.Checked, checkBoxS.Checked
-        };
-                bool[] altWorkDays = {
-            checkBoxAltM.Checked, checkBoxAltT.Checked, checkBoxAltW.Checked,
-            checkBoxAltTh.Checked, checkBoxAltF.Checked, checkBoxAltS.Checked
-        };
-
                 // RFID TAG HANDLING - Use scanned RFID if available, otherwise use employee ID
                 string rfidTag = !string.IsNullOrEmpty(labelRFIDTagInput.Text) && labelRFIDTagInput.Text != "Scan RFID Tag"
                     ? labelRFIDTagInput.Text
@@ -402,58 +397,10 @@ namespace HRIS_JAP_ATTPAY
                     .Child(employmentId)
                     .PutAsync(employmentInfoObj);
 
-                // Push schedules for regular work days
-                string[] days = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+                // 3. Add work schedules based on checkbox selections (NEW CORRECTED VERSION)
+                await AddWorkSchedulesAsync(employeeId);
 
-                // Generate schedule IDs following your pattern (1, 2, 3, etc.)
-                int scheduleCounter = 1;
-
-                for (int i = 0; i < workDays.Length; i++)
-                {
-                    if (workDays[i])
-                    {
-                        string scheduleId = scheduleCounter.ToString();
-                        var scheduleObj = new
-                        {
-                            schedule_id = scheduleId,
-                            employee_id = employeeId,
-                            day_of_week = days[i],
-                            start_time = workHoursA,
-                            end_time = workHoursB,
-                            schedule_type = "Regular"
-                        };
-                        await firebase
-                            .Child("Work_Schedule")
-                            .Child(scheduleId)
-                            .PutAsync(scheduleObj);
-                        scheduleCounter++;
-                    }
-                }
-
-                // Alternate schedule if any alt days checked
-                for (int i = 0; i < altWorkDays.Length; i++)
-                {
-                    if (altWorkDays[i])
-                    {
-                        string scheduleId = scheduleCounter.ToString();
-                        var scheduleObj = new
-                        {
-                            schedule_id = scheduleId,
-                            employee_id = employeeId,
-                            day_of_week = days[i],
-                            start_time = altWorkHoursA,
-                            end_time = altWorkHoursB,
-                            schedule_type = "Alternate"
-                        };
-                        await firebase
-                            .Child("Work_Schedule")
-                            .Child(scheduleId)
-                            .PutAsync(scheduleObj);
-                        scheduleCounter++;
-                    }
-                }
-
-                // DETERMINE IF EMPLOYEE SHOULD BE A USER BASED ON PASSWORD
+                // 4. DETERMINE IF EMPLOYEE SHOULD BE A USER BASED ON PASSWORD
                 if (!string.IsNullOrEmpty(password))
                 {
                     // Create user account with password (like JAP-001 and JAP-002)
@@ -598,20 +545,260 @@ namespace HRIS_JAP_ATTPAY
         {
             labelRFIDTagInput.Text = tag;
         }
+        private void InitializeDepartmentComboBox()
+        {
+            // Add departments to combobox
+            comboBoxDepartment.Items.AddRange(new string[] {
+                    "Engineering",
+                    "Purchasing",
+                    "Operations",
+                    "Finance",
+                    "Human Resource"
+            });
+        }
 
         private void comboBoxDepartment_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // This method is for handling when selection changes, not for initializing
-            // You can add selection change logic here if needed later
+            UpdatePasswordFieldAccessibility();
+        }
+        private void UpdatePasswordFieldAccessibility()
+        {
+            string selectedDepartment = comboBoxDepartment.SelectedItem?.ToString();
+
+            if (selectedDepartment == "Human Resource")
+            {
+                // Enable password field for HR department
+                textBoxPassword.Enabled = true;
+                textBoxPassword.BackColor = SystemColors.Window;
+                textBoxPassword.ForeColor = SystemColors.WindowText;
+
+                // Clear any placeholder text and set actual text if needed
+                if (textBoxPassword.Text == "HR department only" || textBoxPassword.Text == "Select HR department to enable")
+                {
+                    textBoxPassword.Text = "";
+                }
+            }
+            else
+            {
+                // Disable password field for other departments
+                textBoxPassword.Enabled = false;
+                textBoxPassword.BackColor = SystemColors.Control;
+                textBoxPassword.ForeColor = SystemColors.GrayText;
+                textBoxPassword.Text = "HR department only"; // Use Text instead of PlaceholderText
+            }
+        }
+        private async Task<int> GetNextScheduleId()
+        {
+            try
+            {
+                // Use HttpClient to get raw JSON to properly handle array
+                using (var httpClient = new HttpClient())
+                {
+                    // CORRECTED URL - fixed "trdb" to "rtdb"
+                    var response = await httpClient.GetAsync("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Work_Schedule.json");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var json = await response.Content.ReadAsStringAsync();
+
+                        // If empty or null, start from 1
+                        if (string.IsNullOrEmpty(json) || json == "null")
+                            return 1;
+
+                        var schedulesArray = Newtonsoft.Json.JsonConvert.DeserializeObject<Newtonsoft.Json.Linq.JArray>(json);
+
+                        if (schedulesArray == null || schedulesArray.Count == 0)
+                            return 1;
+
+                        int maxId = 0;
+                        foreach (var item in schedulesArray)
+                        {
+                            if (item != null && item.Type != Newtonsoft.Json.Linq.JTokenType.Null)
+                            {
+                                var scheduleId = item["schedule_id"]?.ToString();
+                                if (int.TryParse(scheduleId, out int id))
+                                {
+                                    if (id > maxId)
+                                        maxId = id;
+                                }
+                            }
+                        }
+
+                        return maxId + 1;
+                    }
+                }
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting next schedule ID: {ex.Message}");
+                return 1;
+            }
         }
 
-        private void InitializeDepartmentComboBox()
+        private bool ValidateWorkSchedule()
         {
-            if (comboBoxDepartment.Items.Count == 0)
+            // Check if at least one day is selected
+            CheckBox[] allCheckboxes = {
+                checkBoxM, checkBoxT, checkBoxW, checkBoxTh, checkBoxF, checkBoxS,
+                checkBoxAltM, checkBoxAltT, checkBoxAltW, checkBoxAltTh, checkBoxAltF, checkBoxAltS
+            };
+
+            bool hasSelectedDays = false;
+            foreach (var cb in allCheckboxes)
             {
-                string[] departments = { "IT Department", "Human Resource", "Accounting Department" };
-                comboBoxDepartment.Items.AddRange(departments);
+                if (cb != null && cb.Checked)
+                {
+                    hasSelectedDays = true;
+                    break;
+                }
             }
+
+            if (!hasSelectedDays)
+            {
+                MessageBox.Show("Please select at least one work day for the employee.",
+                               "Work Schedule Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            // Check if regular schedule has time when days are selected
+            CheckBox[] regularDays = { checkBoxM, checkBoxT, checkBoxW, checkBoxTh, checkBoxF, checkBoxS };
+            bool hasRegularDays = false;
+            foreach (var cb in regularDays)
+            {
+                if (cb != null && cb.Checked)
+                {
+                    hasRegularDays = true;
+                    break;
+                }
+            }
+
+            if (hasRegularDays && (string.IsNullOrEmpty(textBoxWorkHoursA.Text) || string.IsNullOrEmpty(textBoxWorkHoursB.Text)))
+            {
+                MessageBox.Show("Please enter work hours for the selected regular days.",
+                               "Work Hours Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            // Check if alternate schedule has time when days are selected
+            CheckBox[] altDays = { checkBoxAltM, checkBoxAltT, checkBoxAltW, checkBoxAltTh, checkBoxAltF, checkBoxAltS };
+            bool hasAltDays = false;
+            foreach (var cb in altDays)
+            {
+                if (cb != null && cb.Checked)
+                {
+                    hasAltDays = true;
+                    break;
+                }
+            }
+
+            if (hasAltDays && (string.IsNullOrEmpty(textBoxAltWorkHoursA.Text) || string.IsNullOrEmpty(textBoxAltWorkHoursB.Text)))
+            {
+                MessageBox.Show("Please enter work hours for the selected alternate days.",
+                               "Work Hours Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            return true;
+        }
+        private async Task AddWorkSchedulesAsync(string employeeId)
+        {
+            try
+            {
+                // Get the next available array index and schedule_id
+                int nextArrayIndex = await GetNextScheduleArrayIndex();
+                int nextScheduleId = await GetNextScheduleId();
+
+                string[] days = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+
+                // Regular work schedule
+                CheckBox[] regularDays = { checkBoxM, checkBoxT, checkBoxW, checkBoxTh, checkBoxF, checkBoxS };
+                string workHoursA = textBoxWorkHoursA.Text.Trim();
+                string workHoursB = textBoxWorkHoursB.Text.Trim();
+
+                for (int i = 0; i < regularDays.Length; i++)
+                {
+                    if (regularDays[i] != null && regularDays[i].Checked)
+                    {
+                        await CreateScheduleArrayEntry(nextArrayIndex, nextScheduleId, employeeId, days[i], workHoursA, workHoursB, "Regular");
+                        nextArrayIndex++;
+                        nextScheduleId++;
+                    }
+                }
+
+                // Alternate work schedule
+                CheckBox[] altDays = { checkBoxAltM, checkBoxAltT, checkBoxAltW, checkBoxAltTh, checkBoxAltF, checkBoxAltS };
+                string altWorkHoursA = textBoxAltWorkHoursA.Text.Trim();
+                string altWorkHoursB = textBoxAltWorkHoursB.Text.Trim();
+
+                for (int i = 0; i < altDays.Length; i++)
+                {
+                    if (altDays[i] != null && altDays[i].Checked)
+                    {
+                        await CreateScheduleArrayEntry(nextArrayIndex, nextScheduleId, employeeId, days[i], altWorkHoursA, altWorkHoursB, "Alternate");
+                        nextArrayIndex++;
+                        nextScheduleId++;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error adding work schedules: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async Task<int> GetNextScheduleArrayIndex()
+        {
+            try
+            {
+                // Use HttpClient to get raw JSON to properly handle array
+                using (var httpClient = new HttpClient())
+                {
+                    // CORRECTED URL - fixed "trdb" to "rtdb"
+                    var response = await httpClient.GetAsync("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Work_Schedule.json");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var json = await response.Content.ReadAsStringAsync();
+
+                        // If empty or null, start from 0
+                        if (string.IsNullOrEmpty(json) || json == "null")
+                            return 0;
+
+                        // Parse as JArray to handle array structure
+                        var schedulesArray = Newtonsoft.Json.JsonConvert.DeserializeObject<Newtonsoft.Json.Linq.JArray>(json);
+
+                        if (schedulesArray == null || schedulesArray.Count == 0)
+                            return 0;
+
+                        // Find the highest index (array position)
+                        return schedulesArray.Count;
+                    }
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting next schedule array index: {ex.Message}");
+                return 0;
+            }
+        }
+
+        private async Task CreateScheduleArrayEntry(int arrayIndex, int scheduleId, string employeeId, string dayOfWeek, string startTime, string endTime, string scheduleType)
+        {
+            var scheduleObj = new
+            {
+                schedule_id = scheduleId.ToString(),
+                employee_id = employeeId,
+                day_of_week = dayOfWeek,
+                start_time = startTime,
+                end_time = endTime,
+                schedule_type = scheduleType
+            };
+
+            // Use array index as the key - this will maintain the array structure in Firebase
+            await firebase
+                .Child("Work_Schedule")
+                .Child(arrayIndex.ToString())
+                .PutAsync(scheduleObj);
         }
     }
 }
