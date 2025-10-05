@@ -140,17 +140,17 @@ namespace HRIS_JAP_ATTPAY
                 // Format the date consistently
                 string formattedDate = FormatDate(textBoxDueDate.Text);
 
-                // Create task object
-                var newTask = new
-                {
-                    task = textBoxTaskDesc.Text.Trim(),
-                    dueDate = formattedDate,
-                    createdDate = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss"),
-                    status = "Pending",
-                    priority = "Medium",
-                    assignedTo = currentUserId,
-                    createdBy = currentUserId
-                };
+                // Create task object - CRITICAL: assignedTo = currentUserId
+                var newTask = new Dictionary<string, object>
+        {
+            { "task", textBoxTaskDesc.Text.Trim() },
+            { "dueDate", formattedDate },
+            { "createdDate", DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss") },
+            { "status", "Pending" },
+            { "priority", "Medium" },
+            { "assignedTo", currentUserId }, // This ensures individual assignment
+            { "createdBy", currentUserId }
+        };
 
                 // Add to Firebase
                 var result = await firebase
@@ -175,8 +175,5 @@ namespace HRIS_JAP_ATTPAY
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-
-
     }
 }
