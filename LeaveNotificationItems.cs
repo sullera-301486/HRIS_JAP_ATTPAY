@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Net.Http; // 🆕 for downloading the image
 using Firebase.Database;
 using Firebase.Database.Query;
 
@@ -36,10 +37,10 @@ namespace HRIS_JAP_ATTPAY
                 lblPeriod.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 lblNotes.Font = AttributesClass.GetFont("Roboto-Light", 9f);
                 lblTimeAgo.Font = AttributesClass.GetFont("Roboto-Regular", 9f);
-                label2.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
-                label3.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
-                label6.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
-                label5.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
+                label2.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
+                label3.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
+                label6.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
+                label5.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
                 btnApprove.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 btnDecline.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
             }
@@ -76,6 +77,11 @@ namespace HRIS_JAP_ATTPAY
             {
                 picEmployee.SizeMode = PictureBoxSizeMode.Zoom;
                 picEmployee.Image = photo;
+            }
+            else
+            {
+                // 🆕 Try to load employee image automatically
+                await LoadEmployeeImageAsync(submitted);
             }
 
             createdAt = created ?? DateTime.Now;
@@ -118,6 +124,45 @@ namespace HRIS_JAP_ATTPAY
                 };
 
                 await SaveLeaveNotificationAsync(leaveNotif);
+            }
+        }
+
+        // 🆕 Load employee photo from Firebase Storage URL
+        private async Task LoadEmployeeImageAsync(string submittedBy)
+        {
+            try
+            {
+                var employees = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
+
+                foreach (var emp in employees)
+                {
+                    string fullName = $"{emp.Object.first_name} {emp.Object.middle_name} {emp.Object.last_name}".Trim();
+                    string firstName = emp.Object.first_name?.ToString();
+                    string imageUrl = emp.Object.image_url?.ToString();
+
+                    if (string.IsNullOrEmpty(imageUrl))
+                        continue;
+
+                    // Match by full name or first name
+                    if (string.Equals(fullName, submittedBy, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(firstName, submittedBy, StringComparison.OrdinalIgnoreCase))
+                    {
+                        using (HttpClient client = new HttpClient())
+                        {
+                            var bytes = await client.GetByteArrayAsync(imageUrl);
+                            using (var ms = new System.IO.MemoryStream(bytes))
+                            {
+                                picEmployee.SizeMode = PictureBoxSizeMode.Zoom;
+                                picEmployee.Image = Image.FromStream(ms);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error loading employee image: " + ex.Message);
             }
         }
 
