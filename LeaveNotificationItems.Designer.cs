@@ -53,10 +53,9 @@
             this.btnDecline.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDecline.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnDecline.ForeColor = System.Drawing.Color.White;
-            this.btnDecline.Location = new System.Drawing.Point(881, 154);
-            this.btnDecline.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnDecline.Location = new System.Drawing.Point(661, 125);
             this.btnDecline.Name = "btnDecline";
-            this.btnDecline.Size = new System.Drawing.Size(145, 33);
+            this.btnDecline.Size = new System.Drawing.Size(109, 27);
             this.btnDecline.TabIndex = 38;
             this.btnDecline.Text = "Decline";
             this.btnDecline.UseVisualStyleBackColor = false;
@@ -68,10 +67,9 @@
             this.btnApprove.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnApprove.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnApprove.ForeColor = System.Drawing.Color.White;
-            this.btnApprove.Location = new System.Drawing.Point(728, 154);
-            this.btnApprove.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnApprove.Location = new System.Drawing.Point(546, 125);
             this.btnApprove.Name = "btnApprove";
-            this.btnApprove.Size = new System.Drawing.Size(145, 33);
+            this.btnApprove.Size = new System.Drawing.Size(109, 27);
             this.btnApprove.TabIndex = 37;
             this.btnApprove.Text = "Approve";
             this.btnApprove.UseVisualStyleBackColor = false;
@@ -80,10 +78,9 @@
             // lblEmployeeLeave
             // 
             this.lblEmployeeLeave.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblEmployeeLeave.Location = new System.Drawing.Point(349, 87);
-            this.lblEmployeeLeave.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblEmployeeLeave.Location = new System.Drawing.Point(239, 71);
             this.lblEmployeeLeave.Name = "lblEmployeeLeave";
-            this.lblEmployeeLeave.Size = new System.Drawing.Size(139, 33);
+            this.lblEmployeeLeave.Size = new System.Drawing.Size(225, 27);
             this.lblEmployeeLeave.TabIndex = 26;
             this.lblEmployeeLeave.Text = "N/A";
             this.lblEmployeeLeave.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -91,10 +88,9 @@
             // lblSubmittedLeave
             // 
             this.lblSubmittedLeave.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSubmittedLeave.Location = new System.Drawing.Point(349, 50);
-            this.lblSubmittedLeave.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblSubmittedLeave.Location = new System.Drawing.Point(236, 41);
             this.lblSubmittedLeave.Name = "lblSubmittedLeave";
-            this.lblSubmittedLeave.Size = new System.Drawing.Size(139, 33);
+            this.lblSubmittedLeave.Size = new System.Drawing.Size(228, 27);
             this.lblSubmittedLeave.TabIndex = 25;
             this.lblSubmittedLeave.Text = "N/A";
             this.lblSubmittedLeave.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -103,10 +99,9 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(164, 91);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label3.Location = new System.Drawing.Point(123, 74);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(104, 24);
+            this.label3.Size = new System.Drawing.Size(82, 18);
             this.label3.TabIndex = 24;
             this.label3.Text = "Employee";
             // 
@@ -114,10 +109,9 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(164, 54);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Location = new System.Drawing.Point(123, 44);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(132, 24);
+            this.label2.Size = new System.Drawing.Size(107, 18);
             this.label2.TabIndex = 23;
             this.label2.Text = "Submitted By";
             // 
@@ -125,20 +119,18 @@
             // 
             this.lblLeaveTitle.AutoSize = true;
             this.lblLeaveTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLeaveTitle.Location = new System.Drawing.Point(163, 15);
-            this.lblLeaveTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblLeaveTitle.Location = new System.Drawing.Point(122, 12);
             this.lblLeaveTitle.Name = "lblLeaveTitle";
-            this.lblLeaveTitle.Size = new System.Drawing.Size(202, 25);
+            this.lblLeaveTitle.Size = new System.Drawing.Size(168, 20);
             this.lblLeaveTitle.TabIndex = 22;
             this.lblLeaveTitle.Text = "Manual edit request";
             // 
             // lblPeriod
             // 
             this.lblPeriod.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPeriod.Location = new System.Drawing.Point(688, 87);
-            this.lblPeriod.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblPeriod.Location = new System.Drawing.Point(572, 71);
             this.lblPeriod.Name = "lblPeriod";
-            this.lblPeriod.Size = new System.Drawing.Size(139, 33);
+            this.lblPeriod.Size = new System.Drawing.Size(197, 27);
             this.lblPeriod.TabIndex = 42;
             this.lblPeriod.Text = "N/A";
             this.lblPeriod.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -146,10 +138,9 @@
             // lblLeave
             // 
             this.lblLeave.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLeave.Location = new System.Drawing.Point(688, 50);
-            this.lblLeave.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblLeave.Location = new System.Drawing.Point(569, 41);
             this.lblLeave.Name = "lblLeave";
-            this.lblLeave.Size = new System.Drawing.Size(139, 33);
+            this.lblLeave.Size = new System.Drawing.Size(200, 27);
             this.lblLeave.TabIndex = 41;
             this.lblLeave.Text = "N/A";
             this.lblLeave.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -158,10 +149,9 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(503, 91);
-            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label5.Location = new System.Drawing.Point(470, 74);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(71, 24);
+            this.label5.Size = new System.Drawing.Size(57, 18);
             this.label5.TabIndex = 40;
             this.label5.Text = "Period";
             // 
@@ -169,10 +159,9 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(503, 54);
-            this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label6.Location = new System.Drawing.Point(470, 44);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(119, 24);
+            this.label6.Size = new System.Drawing.Size(93, 18);
             this.label6.TabIndex = 39;
             this.label6.Text = "Leave Type";
             // 
@@ -180,29 +169,26 @@
             // 
             this.panel1.BackColor = System.Drawing.Color.Silver;
             this.panel1.Controls.Add(this.lblNotes);
-            this.panel1.Location = new System.Drawing.Point(21, 124);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel1.Location = new System.Drawing.Point(16, 101);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(699, 85);
+            this.panel1.Size = new System.Drawing.Size(524, 69);
             this.panel1.TabIndex = 43;
             // 
             // lblNotes
             // 
             this.lblNotes.BackColor = System.Drawing.Color.White;
             this.lblNotes.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblNotes.Location = new System.Drawing.Point(4, 4);
-            this.lblNotes.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblNotes.Location = new System.Drawing.Point(3, 3);
             this.lblNotes.Name = "lblNotes";
-            this.lblNotes.Size = new System.Drawing.Size(691, 78);
+            this.lblNotes.Size = new System.Drawing.Size(518, 63);
             this.lblNotes.TabIndex = 0;
             this.lblNotes.Text = "Note";
             // 
             // picEmployee
             // 
-            this.picEmployee.Location = new System.Drawing.Point(21, 15);
-            this.picEmployee.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.picEmployee.Location = new System.Drawing.Point(16, 12);
             this.picEmployee.Name = "picEmployee";
-            this.picEmployee.Size = new System.Drawing.Size(120, 98);
+            this.picEmployee.Size = new System.Drawing.Size(90, 80);
             this.picEmployee.TabIndex = 21;
             this.picEmployee.TabStop = false;
             // 
@@ -210,16 +196,17 @@
             // 
             this.lblTimeAgo.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTimeAgo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(144)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.lblTimeAgo.Location = new System.Drawing.Point(860, 18);
+            this.lblTimeAgo.Location = new System.Drawing.Point(645, 15);
+            this.lblTimeAgo.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblTimeAgo.Name = "lblTimeAgo";
-            this.lblTimeAgo.Size = new System.Drawing.Size(166, 23);
+            this.lblTimeAgo.Size = new System.Drawing.Size(124, 19);
             this.lblTimeAgo.TabIndex = 44;
             this.lblTimeAgo.Text = "Sample";
             this.lblTimeAgo.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // LeaveNotificationItems
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.Controls.Add(this.lblTimeAgo);
@@ -236,9 +223,8 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.lblLeaveTitle);
             this.Controls.Add(this.picEmployee);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "LeaveNotificationItems";
-            this.Size = new System.Drawing.Size(1033, 213);
+            this.Size = new System.Drawing.Size(775, 173);
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.picEmployee)).EndInit();
             this.ResumeLayout(false);

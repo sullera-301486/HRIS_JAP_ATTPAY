@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Net.Http; // 🆕 for downloading the image
 using Firebase.Database;
 using Firebase.Database.Query;
 
@@ -13,7 +15,7 @@ namespace HRIS_JAP_ATTPAY
         private DateTime createdAt;
         private Timer refreshTimer;
 
-        // 🔹 Firebase client (your actual DB URL)
+        // 🔹 Firebase client
         private static FirebaseClient firebase = new FirebaseClient(
             "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
         );
@@ -35,10 +37,10 @@ namespace HRIS_JAP_ATTPAY
                 lblPeriod.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 lblNotes.Font = AttributesClass.GetFont("Roboto-Light", 9f);
                 lblTimeAgo.Font = AttributesClass.GetFont("Roboto-Regular", 9f);
-                label2.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
-                label3.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
-                label6.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
-                label5.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
+                label2.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
+                label3.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
+                label6.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
+                label5.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
                 btnApprove.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 btnDecline.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
             }
@@ -76,6 +78,11 @@ namespace HRIS_JAP_ATTPAY
                 picEmployee.SizeMode = PictureBoxSizeMode.Zoom;
                 picEmployee.Image = photo;
             }
+            else
+            {
+                // 🆕 Try to load employee image automatically
+                await LoadEmployeeImageAsync(submitted);
+            }
 
             createdAt = created ?? DateTime.Now;
             UpdateTimeAgo();
@@ -83,17 +90,28 @@ namespace HRIS_JAP_ATTPAY
             if (refreshTimer == null)
             {
                 refreshTimer = new Timer();
-                refreshTimer.Interval = 60000;
+                refreshTimer.Interval = 60000; // every minute
                 refreshTimer.Tick += (s, e) => UpdateTimeAgo();
                 refreshTimer.Start();
             }
 
-            // Store Firebase key (so buttons know what to delete)
             this.Tag = firebaseKey;
 
-            // 🔹 Save to Firebase if it's a new record
+            // 🔹 Validate employee name before saving (only if new)
             if (saveToFirebase)
             {
+                bool isValid = await IsEmployeeValidAsync(employee);
+                if (!isValid)
+                {
+                    MessageBox.Show(
+                        $"Employee '{employee}' does not exist in the database.",
+                        "Invalid Employee",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+                    return;
+                }
+
                 var leaveNotif = new LeaveNotificationModel
                 {
                     Title = title,
@@ -109,9 +127,45 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        /// <summary>
-        /// Update the 'time ago' text.
-        /// </summary>
+        // 🆕 Load employee photo from Firebase Storage URL
+        private async Task LoadEmployeeImageAsync(string submittedBy)
+        {
+            try
+            {
+                var employees = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
+
+                foreach (var emp in employees)
+                {
+                    string fullName = $"{emp.Object.first_name} {emp.Object.middle_name} {emp.Object.last_name}".Trim();
+                    string firstName = emp.Object.first_name?.ToString();
+                    string imageUrl = emp.Object.image_url?.ToString();
+
+                    if (string.IsNullOrEmpty(imageUrl))
+                        continue;
+
+                    // Match by full name or first name
+                    if (string.Equals(fullName, submittedBy, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(firstName, submittedBy, StringComparison.OrdinalIgnoreCase))
+                    {
+                        using (HttpClient client = new HttpClient())
+                        {
+                            var bytes = await client.GetByteArrayAsync(imageUrl);
+                            using (var ms = new System.IO.MemoryStream(bytes))
+                            {
+                                picEmployee.SizeMode = PictureBoxSizeMode.Zoom;
+                                picEmployee.Image = Image.FromStream(ms);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error loading employee image: " + ex.Message);
+            }
+        }
+
         public void UpdateTimeAgo()
         {
             TimeSpan diff = DateTime.Now - createdAt;
@@ -130,11 +184,11 @@ namespace HRIS_JAP_ATTPAY
         private static async Task SaveLeaveNotificationAsync(LeaveNotificationModel leaveNotif)
         {
             await firebase
-              .Child("LeaveNotifications")
-              .PostAsync(leaveNotif);
+                .Child("LeaveNotifications")
+                .PostAsync(leaveNotif);
         }
 
-        // 🔹 Load all notifications from Firebase
+        // 🔹 Load all notifications from Firebase (sorted by newest)
         public static async Task<List<LeaveNotificationModelWithKey>> GetAllLeaveNotificationsAsync()
         {
             var notifications = await firebase
@@ -142,6 +196,7 @@ namespace HRIS_JAP_ATTPAY
                 .OnceAsync<LeaveNotificationModel>();
 
             List<LeaveNotificationModelWithKey> list = new List<LeaveNotificationModelWithKey>();
+
             foreach (var item in notifications)
             {
                 list.Add(new LeaveNotificationModelWithKey
@@ -156,10 +211,20 @@ namespace HRIS_JAP_ATTPAY
                     CreatedAt = item.Object.CreatedAt
                 });
             }
+
+            // ✅ Sort by actual DateTime newest → oldest
+            list.Sort((a, b) =>
+            {
+                DateTime aDate, bDate;
+                DateTime.TryParse(a.CreatedAt, out aDate);
+                DateTime.TryParse(b.CreatedAt, out bDate);
+                return bDate.CompareTo(aDate);
+            });
+
             return list;
         }
 
-        // 🔹 Delete notification from Firebase
+        // 🔹 Delete from Firebase
         public static async Task DeleteNotificationAsync(string key)
         {
             await firebase
@@ -168,7 +233,23 @@ namespace HRIS_JAP_ATTPAY
                 .DeleteAsync();
         }
 
-        // 🔹 Model class
+        // 🔹 Validate if employee name exists
+        private static async Task<bool> IsEmployeeValidAsync(string employeeName)
+        {
+            var employees = await firebase
+                .Child("EmployeeDetails")
+                .OnceAsync<dynamic>();
+
+            foreach (var emp in employees)
+            {
+                string fullName = $"{emp.Object.first_name} {emp.Object.middle_name} {emp.Object.last_name}".Trim();
+                if (string.Equals(fullName, employeeName, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
+        }
+
+        // 🔹 Models
         public class LeaveNotificationModel
         {
             public string Title { get; set; }
@@ -180,13 +261,12 @@ namespace HRIS_JAP_ATTPAY
             public string CreatedAt { get; set; }
         }
 
-        // 🔹 Model with Firebase key (for updates/deletes)
         public class LeaveNotificationModelWithKey : LeaveNotificationModel
         {
             public string Key { get; set; }
         }
 
-        // Button events
+        // 🔹 Button Events
         public event EventHandler ApproveClicked;
         public event EventHandler DeclineClicked;
 
@@ -195,19 +275,14 @@ namespace HRIS_JAP_ATTPAY
             ApproveClicked?.Invoke(this, EventArgs.Empty);
         }
 
-        // 🔹 Decline button removes from Firebase + UI
         private async void btnDecline_Click(object sender, EventArgs e)
         {
             if (Tag is string firebaseKey && !string.IsNullOrEmpty(firebaseKey))
             {
-                // Remove from Firebase
                 await DeleteNotificationAsync(firebaseKey);
             }
 
-            // Remove from parent container (UI)
             this.Parent?.Controls.Remove(this);
-
-            // Fire event
             DeclineClicked?.Invoke(this, EventArgs.Empty);
         }
     }

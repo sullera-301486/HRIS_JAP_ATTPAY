@@ -443,26 +443,26 @@ namespace HRIS_JAP_ATTPAY
                 if (string.IsNullOrEmpty(employeeId))
                     return;
 
-                // Check if employee is a USER (has record in Users node)
-                bool isUser = await CheckIfEmployeeIsUser(employeeId);
+                // Check if employee has user account (has password/is HR)
+                bool hasUserAccount = await CheckIfEmployeeHasUserAccount(employeeId);
 
                 Form parentForm = this.FindForm();
                 Form profileForm;
 
-                if (isUser)
+                if (hasUserAccount)
                 {
-                    profileForm = new EmployeeProfile(employeeId);
+                    profileForm = new EmployeeProfile(employeeId); // HR employees get EmployeeProfile
                 }
                 else
                 {
-                    profileForm = new EmployeeProfileHR(employeeId);
+                    profileForm = new EmployeeProfileHR(employeeId); // Non-HR employees get EmployeeProfileHR
                 }
 
                 AttributesClass.ShowWithOverlay(parentForm, profileForm);
             }
         }
 
-        private async Task<bool> CheckIfEmployeeIsUser(string employeeId)
+        private async Task<bool> CheckIfEmployeeHasUserAccount(string employeeId)
         {
             try
             {
@@ -480,19 +480,156 @@ namespace HRIS_JAP_ATTPAY
                         string userEmployeeId = GetValue(userData, "employee_id");
                         if (userEmployeeId == employeeId)
                         {
-                            return true; // Employee is a USER
+                            return true; // Employee has user account (is HR)
                         }
                     }
                 }
 
-                return false; // No user record found
+                return false; // No user account found (not HR)
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error checking user status: {ex.Message}");
-                return false; // Default to EmployeeProfileHR on error
+                System.Diagnostics.Debug.WriteLine($"Error checking user account: {ex.Message}");
+                return false;
             }
         }
+        public async Task GrantUserAccess(string employeeId, string password = "default123")
+        {
+            try
+            {
+                // Check if user already exists
+                bool hasAccount = await CheckIfEmployeeHasUserAccount(employeeId);
+                if (hasAccount)
+                {
+                    System.Diagnostics.Debug.WriteLine($"User account already exists for {employeeId}");
+                    return;
+                }
+
+                // Get employee details to create user account
+                var employeeDetails = await firebase
+                    .Child("EmployeeDetails")
+                    .Child(employeeId)
+                    .OnceSingleAsync<Dictionary<string, object>>();
+
+                if (employeeDetails == null)
+                {
+                    throw new Exception($"Employee details not found for {employeeId}");
+                }
+
+                // Generate new user ID
+                string newUserId = await GenerateNewUserId();
+
+                // Hash the password
+                string salt = GenerateRandomSalt();
+                string passwordHash = HashPassword(password, salt);
+
+                // Create user object
+                var userData = new Dictionary<string, object>
+        {
+            { "user_id", newUserId },
+            { "employee_id", employeeId },
+            { "password_hash", passwordHash },
+            { "salt", salt },
+            { "isAdmin", "False" },
+            { "created_at", DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt") }
+        };
+
+                // Save to Firebase
+                await firebase
+                    .Child("Users")
+                    .Child(newUserId)
+                    .PutAsync(userData);
+
+                System.Diagnostics.Debug.WriteLine($"Granted user access to {employeeId}");
+
+                // Refresh data to show correct profile
+                RefreshData();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error granting user access: {ex.Message}");
+                throw;
+            }
+        }
+        public async Task RevokeUserAccess(string employeeId)
+        {
+            try
+            {
+                // Find and remove the user record for this employee
+                var users = await firebase
+                    .Child("Users")
+                    .OnceAsync<Dictionary<string, object>>();
+
+                foreach (var user in users)
+                {
+                    var userData = user.Object as Dictionary<string, object>;
+                    if (userData != null)
+                    {
+                        string userEmployeeId = GetValue(userData, "employee_id");
+                        if (userEmployeeId == employeeId)
+                        {
+                            // Remove the user record
+                            await firebase
+                                .Child("Users")
+                                .Child(user.Key)
+                                .DeleteAsync();
+
+                            System.Diagnostics.Debug.WriteLine($"Revoked user access for {employeeId}");
+
+                            // Refresh data to show correct profile
+                            RefreshData();
+                            return;
+                        }
+                    }
+                }
+
+                System.Diagnostics.Debug.WriteLine($"No user account found to revoke for {employeeId}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error revoking user access: {ex.Message}");
+                throw;
+            }
+        }
+        private string HashPassword(string password, string salt)
+        {
+            // Simple hashing - you should use proper cryptographic hashing
+            using (var sha256 = System.Security.Cryptography.SHA256.Create())
+            {
+                var bytes = System.Text.Encoding.UTF8.GetBytes(password + salt);
+                var hash = sha256.ComputeHash(bytes);
+                return BitConverter.ToString(hash).Replace("-", "");
+            }
+        }
+        private async Task<string> GetCurrentDepartment(string employeeId)
+        {
+            try
+            {
+                var employmentInfo = await firebase
+                    .Child("EmploymentInfo")
+                    .OnceAsync<Dictionary<string, object>>();
+
+                foreach (var employment in employmentInfo)
+                {
+                    var data = employment.Object as Dictionary<string, object>;
+                    if (data != null)
+                    {
+                        string empId = GetValue(data, "employee_id");
+                        if (empId == employeeId)
+                        {
+                            return GetValue(data, "department") ?? "";
+                        }
+                    }
+                }
+                return "";
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting current department: {ex.Message}");
+                return "";
+            }
+        }
+
 
         // FIXED: Handle corrupted EmploymentInfo data with multiple fallback methods
         private async void LoadFirebaseData()
@@ -599,6 +736,60 @@ namespace HRIS_JAP_ATTPAY
                                MessageBoxIcon.Error);
             }
         }
+        public async Task UpdateEmployeeDepartment(string employeeId, string newDepartment, string newPosition = "")
+        {
+            try
+            {
+                // Get current department
+                string currentDepartment = await GetCurrentDepartment(employeeId);
+                bool wasHR = await CheckIfEmployeeHasUserAccount(employeeId); // Check if they currently have user access
+                bool isNowHR = newDepartment.ToLower().Contains("human resource");
+
+                // Update employment info
+                await UpdateEmploymentInfo(employeeId, newDepartment, newPosition);
+
+                // Handle user access based on HR status
+                if (wasHR && !isNowHR)
+                {
+                    // Was HR, now not HR - REVOKE access
+                    await RevokeUserAccess(employeeId);
+                }
+                else if (!wasHR && isNowHR)
+                {
+                    // Was not HR, now HR - GRANT access
+                    await GrantUserAccess(employeeId);
+                }
+
+                System.Diagnostics.Debug.WriteLine($"Updated department for {employeeId} to {newDepartment}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating department: {ex.Message}");
+                throw;
+            }
+        }
+        private async Task<string> GenerateNewUserId()
+        {
+            var users = await firebase
+                .Child("Users")
+                .OnceAsync<Dictionary<string, object>>();
+
+            int maxId = 0;
+            foreach (var user in users)
+            {
+                if (int.TryParse(user.Key, out int userId) && userId > maxId)
+                {
+                    maxId = userId;
+                }
+            }
+
+            return (maxId + 1).ToString();
+        }
+
+        private string GenerateRandomSalt()
+        {
+            return $"RANDOMSALT_{Guid.NewGuid().ToString("N").Substring(0, 16)}";
+        }
 
         // Approach 1: Get individual records by index to avoid corrupted array
         private async Task<Dictionary<string, (string Department, string Position, string Status, string ContractType, DateTime? DateHired)>> TryGetEmploymentInfoByIndex()
@@ -650,6 +841,59 @@ namespace HRIS_JAP_ATTPAY
             }
 
             return employmentDict;
+        }
+        private async Task UpdateEmploymentInfo(string employeeId, string newDepartment, string newPosition)
+        {
+            try
+            {
+                // Find the employment record
+                var employmentInfo = await firebase
+                    .Child("EmploymentInfo")
+                    .OnceAsync<Dictionary<string, object>>();
+
+                string employmentKey = null;
+                Dictionary<string, object> employmentData = null;
+
+                foreach (var employment in employmentInfo)
+                {
+                    var data = employment.Object as Dictionary<string, object>;
+                    if (data != null)
+                    {
+                        string empId = GetValue(data, "employee_id");
+                        if (empId == employeeId)
+                        {
+                            employmentKey = employment.Key;
+                            employmentData = data;
+                            break;
+                        }
+                    }
+                }
+
+                if (employmentKey != null && employmentData != null)
+                {
+                    // Update department and position
+                    employmentData["department"] = newDepartment;
+                    if (!string.IsNullOrEmpty(newPosition))
+                    {
+                        employmentData["position"] = newPosition;
+                    }
+
+                    // Save back to Firebase
+                    await firebase
+                        .Child("EmploymentInfo")
+                        .Child(employmentKey)
+                        .PutAsync(employmentData);
+                }
+                else
+                {
+                    throw new Exception($"Employment info not found for employee {employeeId}");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating employment info: {ex.Message}");
+                throw;
+            }
         }
 
         // Approach 2: Manual parsing of corrupted JSON response
@@ -782,6 +1026,7 @@ namespace HRIS_JAP_ATTPAY
         {
             _instance?.RefreshData();
         }
+
     }
 
     public class FilterCriteria

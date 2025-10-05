@@ -100,6 +100,7 @@ namespace HRIS_JAP_ATTPAY
                     labelFailed.Visible = true;
                     return;
                 }
+
                 if (AttributesScanner.IsScannerConnected())
                 {
                     Console.WriteLine("Scanner detected. Starting monitor...");
@@ -108,12 +109,14 @@ namespace HRIS_JAP_ATTPAY
                 {
                     Console.WriteLine("No scanner detected. Monitor not started.");
                 }
+
                 string computedHash = ComputeHash(enteredPassword + user.salt);
                 if (computedHash.Equals(user.password_hash, StringComparison.OrdinalIgnoreCase))
-
-
                 {
                     labelFailed.Visible = false;
+
+                    // ✅ NEW CODE: Fetch employee details and store session info
+                    await SetCurrentUserSessionAsync(user);
 
                     // Move to correct form based on role
                     if (user.isAdmin)
@@ -132,6 +135,31 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
+        // ✅ NEW METHOD: Fills SessionClass with the logged-in user's data
+        private async Task SetCurrentUserSessionAsync(UserFirebase user)
+        {
+            try
+            {
+                var empDetails = await firebase
+                    .Child("EmployeeDetails")
+                    .Child(user.employee_id)
+                    .OnceSingleAsync<EmployeeFirebase>();
+
+                string fullName = $"{empDetails.first_name} {empDetails.middle_name} {empDetails.last_name}".Trim();
+
+                SessionClass.CurrentUserId = user.user_id;
+                SessionClass.CurrentEmployeeId = user.employee_id;
+                SessionClass.CurrentEmployeeName = fullName;
+                SessionClass.IsAdmin = user.isAdmin;
+
+                Console.WriteLine($"Logged in: {SessionClass.CurrentEmployeeName} ({SessionClass.CurrentEmployeeId})");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to set session: " + ex.Message);
+            }
+        }
+
         // Firebase User model
         private class UserFirebase
         {
@@ -141,6 +169,17 @@ namespace HRIS_JAP_ATTPAY
             public string salt { get; set; }
             public bool isAdmin { get; set; }
             public string created_at { get; set; }
+        }
+
+        // ✅ NEW MODEL: Employee details fetched from Firebase
+        private class EmployeeFirebase
+        {
+            public string first_name { get; set; }
+            public string middle_name { get; set; }
+            public string last_name { get; set; }
+            public string email { get; set; }
+            public string contact { get; set; }
+            public string employee_id { get; set; }
         }
 
         private void textBoxID_KeyDown(object sender, KeyEventArgs e)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Threading.Tasks;
+using System.Linq; // ✅ Added for OrderByDescending
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -21,8 +22,13 @@ namespace HRIS_JAP_ATTPAY
         {
             flowLayoutPanel1.Controls.Clear();
 
-            // 🔹 Fetch leave notifications from Firebase
+            // 🔹 Fetch notifications
             var notifications = await LeaveNotificationItems.GetAllLeaveNotificationsAsync();
+
+            // ✅ Sort notifications by CreatedAt (most recent first)
+            notifications = notifications
+                .OrderByDescending(n => DateTime.Parse(n.CreatedAt))
+                .ToList();
 
             foreach (var notif in notifications)
             {
@@ -57,6 +63,7 @@ namespace HRIS_JAP_ATTPAY
                     flowLayoutPanel1.Controls.Remove(leaveNotif);
                 };
 
+                // ✅ Add controls in order (since we already sorted)
                 flowLayoutPanel1.Controls.Add(leaveNotif);
             }
         }

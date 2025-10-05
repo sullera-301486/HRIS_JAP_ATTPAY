@@ -82,6 +82,8 @@ namespace HRIS_JAP_ATTPAY
                 labelMiddleNameInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelNationality.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelNationalityInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelPassword.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelPasswordInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelPersonalInformation.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
                 labelPersonalAndEmploymentRecord.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
@@ -181,6 +183,7 @@ namespace HRIS_JAP_ATTPAY
 
                 await LoadEmploymentInfoDirect();
                 await LoadWorkScheduleManual();
+                await LoadPasswordInfo(); // Add this line to load password info
             }
             catch (Exception ex)
             {
@@ -562,6 +565,42 @@ namespace HRIS_JAP_ATTPAY
                     return deeper;
             }
             return null;
+        }
+        private async Task LoadPasswordInfo()
+        {
+            try
+            {
+                var credentialsData = await firebase
+                    .Child("EmployeeCredentials")
+                    .OnceAsync<object>();
+
+                if (credentialsData != null)
+                {
+                    foreach (var item in credentialsData)
+                    {
+                        if (item?.Object != null)
+                        {
+                            var credObj = JObject.FromObject(item.Object);
+                            var empId = credObj["employee_id"]?.ToString();
+
+                            if (empId == employeeId)
+                            {
+                                // Always display as asterisks regardless of actual password
+                                SafeSetLabelText(labelPasswordInput, "*******");
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                // If no password found, still show asterisks or "N/A"
+                SafeSetLabelText(labelPasswordInput, "*******");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading password info: {ex.Message}");
+                SafeSetLabelText(labelPasswordInput, "*******");
+            }
         }
     }
 }

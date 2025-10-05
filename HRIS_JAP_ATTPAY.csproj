@@ -538,6 +538,7 @@
     <Compile Include="ScanRFID.Designer.cs">
       <DependentUpon>ScanRFID.cs</DependentUpon>
     </Compile>
+    <Compile Include="SessionClass.cs" />
     <Compile Include="SummaryNotificationItem.cs">
       <SubType>UserControl</SubType>
     </Compile>
