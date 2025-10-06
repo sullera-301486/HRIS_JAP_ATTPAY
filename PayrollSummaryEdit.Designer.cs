@@ -122,29 +122,29 @@
             this.textBoxCommunicationAmountBaseInput = new System.Windows.Forms.TextBox();
             this.textBoxGondolaAmountBaseInput = new System.Windows.Forms.TextBox();
             this.textBoxCashAdvanceAmountDebitInput = new System.Windows.Forms.TextBox();
-            this.textBoxHousingLoanAmountDebitInput = new System.Windows.Forms.TextBox();
-            this.textBoxCarLoanAmountDebitInput = new System.Windows.Forms.TextBox();
-            this.textBoxPagIbigLoanAmountDebitInput = new System.Windows.Forms.TextBox();
-            this.textBoxSSSLoanAmountDebitInput = new System.Windows.Forms.TextBox();
             this.textBoxOthersAmountDebitInput = new System.Windows.Forms.TextBox();
             this.textBoxCoopContriAmountDebitInput = new System.Windows.Forms.TextBox();
-            this.textBoxCoopLoanAmountDebitInput = new System.Windows.Forms.TextBox();
-            this.textBoxHousingLoanDetails = new System.Windows.Forms.TextBox();
-            this.textBoxCarLoanDetails = new System.Windows.Forms.TextBox();
-            this.textBoxPagIbigLoanDetails = new System.Windows.Forms.TextBox();
-            this.textBoxSSSLoanDetails = new System.Windows.Forms.TextBox();
-            this.textBoxPhilhealthDetails = new System.Windows.Forms.TextBox();
-            this.textBoxPagIbigDetails = new System.Windows.Forms.TextBox();
-            this.textBoxSSSDetails = new System.Windows.Forms.TextBox();
-            this.textBoxWithTaxDetails = new System.Windows.Forms.TextBox();
             this.textBoxOthersDetails = new System.Windows.Forms.TextBox();
             this.textBoxCoopContriDetails = new System.Windows.Forms.TextBox();
-            this.textBoxCoopLoanDetails = new System.Windows.Forms.TextBox();
             this.textBoxCashAdvanceDetails = new System.Windows.Forms.TextBox();
             this.textBoxVacationLeaveCredit = new System.Windows.Forms.TextBox();
             this.textBoxSickLeaveCredit = new System.Windows.Forms.TextBox();
             this.textBoxDailyRateInput = new System.Windows.Forms.TextBox();
             this.labelOvertimePerMinuteCredit = new System.Windows.Forms.Label();
+            this.labelSSSLoanAmountDebitInput = new System.Windows.Forms.Label();
+            this.labelPagIbigLoanAmountDebitInput = new System.Windows.Forms.Label();
+            this.labelCarLoanAmountDebitInput = new System.Windows.Forms.Label();
+            this.labelHousingLoanAmountDebitInput = new System.Windows.Forms.Label();
+            this.labelCoopLoanAmountDebitInput = new System.Windows.Forms.Label();
+            this.labelWithTaxDetails = new System.Windows.Forms.Label();
+            this.labelSSSDetails = new System.Windows.Forms.Label();
+            this.labelPagIbigDetails = new System.Windows.Forms.Label();
+            this.labelPhilhealthDetails = new System.Windows.Forms.Label();
+            this.labelSSSLoanDetails = new System.Windows.Forms.Label();
+            this.labelPagIbigLoanDetails = new System.Windows.Forms.Label();
+            this.labelCarLoanDetails = new System.Windows.Forms.Label();
+            this.labelHousingLoanDetails = new System.Windows.Forms.Label();
+            this.labelCoopLoanDetails = new System.Windows.Forms.Label();
             this.panel3.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -484,7 +484,7 @@
             // 
             this.labelPhilhealthAmountDebitInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.labelPhilhealthAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelPhilhealthAmountDebitInput.Location = new System.Drawing.Point(892, 409);
+            this.labelPhilhealthAmountDebitInput.Location = new System.Drawing.Point(892, 411);
             this.labelPhilhealthAmountDebitInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelPhilhealthAmountDebitInput.Name = "labelPhilhealthAmountDebitInput";
             this.labelPhilhealthAmountDebitInput.Size = new System.Drawing.Size(129, 31);
@@ -729,7 +729,7 @@
             this.labelBasicPayCredit.Name = "labelBasicPayCredit";
             this.labelBasicPayCredit.Size = new System.Drawing.Size(133, 31);
             this.labelBasicPayCredit.TabIndex = 188;
-            this.labelBasicPayCredit.Text = "12.50";
+            this.labelBasicPayCredit.Text = "0";
             this.labelBasicPayCredit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelOvertimePerHourCredit
@@ -1028,7 +1028,7 @@
             this.labelNameInput.Name = "labelNameInput";
             this.labelNameInput.Size = new System.Drawing.Size(221, 31);
             this.labelNameInput.TabIndex = 162;
-            this.labelNameInput.Text = "Charles Andrei Macaraig";
+            this.labelNameInput.Text = "[name]";
             this.labelNameInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelSalary
@@ -1088,7 +1088,7 @@
             this.labelDepartmentInput.Name = "labelDepartmentInput";
             this.labelDepartmentInput.Size = new System.Drawing.Size(221, 31);
             this.labelDepartmentInput.TabIndex = 157;
-            this.labelDepartmentInput.Text = "Human Resource";
+            this.labelDepartmentInput.Text = "[department]";
             this.labelDepartmentInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelPositionInput
@@ -1100,7 +1100,7 @@
             this.labelPositionInput.Name = "labelPositionInput";
             this.labelPositionInput.Size = new System.Drawing.Size(221, 31);
             this.labelPositionInput.TabIndex = 156;
-            this.labelPositionInput.Text = "Manager";
+            this.labelPositionInput.Text = "[position]";
             this.labelPositionInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelIDInput
@@ -1289,58 +1289,6 @@
             this.textBoxCashAdvanceAmountDebitInput.TabIndex = 261;
             this.textBoxCashAdvanceAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBoxHousingLoanAmountDebitInput
-            // 
-            this.textBoxHousingLoanAmountDebitInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxHousingLoanAmountDebitInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxHousingLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxHousingLoanAmountDebitInput.ForeColor = System.Drawing.Color.White;
-            this.textBoxHousingLoanAmountDebitInput.Location = new System.Drawing.Point(896, 544);
-            this.textBoxHousingLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxHousingLoanAmountDebitInput.Name = "textBoxHousingLoanAmountDebitInput";
-            this.textBoxHousingLoanAmountDebitInput.Size = new System.Drawing.Size(125, 26);
-            this.textBoxHousingLoanAmountDebitInput.TabIndex = 260;
-            this.textBoxHousingLoanAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxCarLoanAmountDebitInput
-            // 
-            this.textBoxCarLoanAmountDebitInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxCarLoanAmountDebitInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxCarLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxCarLoanAmountDebitInput.ForeColor = System.Drawing.Color.White;
-            this.textBoxCarLoanAmountDebitInput.Location = new System.Drawing.Point(896, 511);
-            this.textBoxCarLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxCarLoanAmountDebitInput.Name = "textBoxCarLoanAmountDebitInput";
-            this.textBoxCarLoanAmountDebitInput.Size = new System.Drawing.Size(125, 26);
-            this.textBoxCarLoanAmountDebitInput.TabIndex = 259;
-            this.textBoxCarLoanAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxPagIbigLoanAmountDebitInput
-            // 
-            this.textBoxPagIbigLoanAmountDebitInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxPagIbigLoanAmountDebitInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxPagIbigLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxPagIbigLoanAmountDebitInput.ForeColor = System.Drawing.Color.White;
-            this.textBoxPagIbigLoanAmountDebitInput.Location = new System.Drawing.Point(896, 478);
-            this.textBoxPagIbigLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxPagIbigLoanAmountDebitInput.Name = "textBoxPagIbigLoanAmountDebitInput";
-            this.textBoxPagIbigLoanAmountDebitInput.Size = new System.Drawing.Size(125, 26);
-            this.textBoxPagIbigLoanAmountDebitInput.TabIndex = 258;
-            this.textBoxPagIbigLoanAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxSSSLoanAmountDebitInput
-            // 
-            this.textBoxSSSLoanAmountDebitInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxSSSLoanAmountDebitInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxSSSLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxSSSLoanAmountDebitInput.ForeColor = System.Drawing.Color.White;
-            this.textBoxSSSLoanAmountDebitInput.Location = new System.Drawing.Point(896, 444);
-            this.textBoxSSSLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxSSSLoanAmountDebitInput.Name = "textBoxSSSLoanAmountDebitInput";
-            this.textBoxSSSLoanAmountDebitInput.Size = new System.Drawing.Size(125, 26);
-            this.textBoxSSSLoanAmountDebitInput.TabIndex = 257;
-            this.textBoxSSSLoanAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
             // textBoxOthersAmountDebitInput
             // 
             this.textBoxOthersAmountDebitInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
@@ -1367,123 +1315,6 @@
             this.textBoxCoopContriAmountDebitInput.TabIndex = 263;
             this.textBoxCoopContriAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBoxCoopLoanAmountDebitInput
-            // 
-            this.textBoxCoopLoanAmountDebitInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxCoopLoanAmountDebitInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxCoopLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxCoopLoanAmountDebitInput.ForeColor = System.Drawing.Color.White;
-            this.textBoxCoopLoanAmountDebitInput.Location = new System.Drawing.Point(896, 610);
-            this.textBoxCoopLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxCoopLoanAmountDebitInput.Name = "textBoxCoopLoanAmountDebitInput";
-            this.textBoxCoopLoanAmountDebitInput.Size = new System.Drawing.Size(125, 26);
-            this.textBoxCoopLoanAmountDebitInput.TabIndex = 262;
-            this.textBoxCoopLoanAmountDebitInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxHousingLoanDetails
-            // 
-            this.textBoxHousingLoanDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxHousingLoanDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxHousingLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxHousingLoanDetails.ForeColor = System.Drawing.Color.White;
-            this.textBoxHousingLoanDetails.Location = new System.Drawing.Point(1055, 544);
-            this.textBoxHousingLoanDetails.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxHousingLoanDetails.Name = "textBoxHousingLoanDetails";
-            this.textBoxHousingLoanDetails.Size = new System.Drawing.Size(125, 26);
-            this.textBoxHousingLoanDetails.TabIndex = 272;
-            this.textBoxHousingLoanDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxCarLoanDetails
-            // 
-            this.textBoxCarLoanDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxCarLoanDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxCarLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxCarLoanDetails.ForeColor = System.Drawing.Color.White;
-            this.textBoxCarLoanDetails.Location = new System.Drawing.Point(1055, 511);
-            this.textBoxCarLoanDetails.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxCarLoanDetails.Name = "textBoxCarLoanDetails";
-            this.textBoxCarLoanDetails.Size = new System.Drawing.Size(125, 26);
-            this.textBoxCarLoanDetails.TabIndex = 271;
-            this.textBoxCarLoanDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxPagIbigLoanDetails
-            // 
-            this.textBoxPagIbigLoanDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxPagIbigLoanDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxPagIbigLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxPagIbigLoanDetails.ForeColor = System.Drawing.Color.White;
-            this.textBoxPagIbigLoanDetails.Location = new System.Drawing.Point(1055, 478);
-            this.textBoxPagIbigLoanDetails.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxPagIbigLoanDetails.Name = "textBoxPagIbigLoanDetails";
-            this.textBoxPagIbigLoanDetails.Size = new System.Drawing.Size(125, 26);
-            this.textBoxPagIbigLoanDetails.TabIndex = 270;
-            this.textBoxPagIbigLoanDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxSSSLoanDetails
-            // 
-            this.textBoxSSSLoanDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxSSSLoanDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxSSSLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxSSSLoanDetails.ForeColor = System.Drawing.Color.White;
-            this.textBoxSSSLoanDetails.Location = new System.Drawing.Point(1055, 444);
-            this.textBoxSSSLoanDetails.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxSSSLoanDetails.Name = "textBoxSSSLoanDetails";
-            this.textBoxSSSLoanDetails.Size = new System.Drawing.Size(125, 26);
-            this.textBoxSSSLoanDetails.TabIndex = 269;
-            this.textBoxSSSLoanDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxPhilhealthDetails
-            // 
-            this.textBoxPhilhealthDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxPhilhealthDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxPhilhealthDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxPhilhealthDetails.ForeColor = System.Drawing.Color.White;
-            this.textBoxPhilhealthDetails.Location = new System.Drawing.Point(1055, 411);
-            this.textBoxPhilhealthDetails.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxPhilhealthDetails.Name = "textBoxPhilhealthDetails";
-            this.textBoxPhilhealthDetails.Size = new System.Drawing.Size(125, 26);
-            this.textBoxPhilhealthDetails.TabIndex = 268;
-            this.textBoxPhilhealthDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxPagIbigDetails
-            // 
-            this.textBoxPagIbigDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxPagIbigDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxPagIbigDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxPagIbigDetails.ForeColor = System.Drawing.Color.White;
-            this.textBoxPagIbigDetails.Location = new System.Drawing.Point(1055, 378);
-            this.textBoxPagIbigDetails.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxPagIbigDetails.Name = "textBoxPagIbigDetails";
-            this.textBoxPagIbigDetails.Size = new System.Drawing.Size(125, 26);
-            this.textBoxPagIbigDetails.TabIndex = 267;
-            this.textBoxPagIbigDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxSSSDetails
-            // 
-            this.textBoxSSSDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxSSSDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxSSSDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxSSSDetails.ForeColor = System.Drawing.Color.White;
-            this.textBoxSSSDetails.Location = new System.Drawing.Point(1055, 345);
-            this.textBoxSSSDetails.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxSSSDetails.Name = "textBoxSSSDetails";
-            this.textBoxSSSDetails.Size = new System.Drawing.Size(125, 26);
-            this.textBoxSSSDetails.TabIndex = 266;
-            this.textBoxSSSDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxWithTaxDetails
-            // 
-            this.textBoxWithTaxDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxWithTaxDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxWithTaxDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxWithTaxDetails.ForeColor = System.Drawing.Color.White;
-            this.textBoxWithTaxDetails.Location = new System.Drawing.Point(1055, 311);
-            this.textBoxWithTaxDetails.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxWithTaxDetails.Name = "textBoxWithTaxDetails";
-            this.textBoxWithTaxDetails.Size = new System.Drawing.Size(125, 26);
-            this.textBoxWithTaxDetails.TabIndex = 265;
-            this.textBoxWithTaxDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
             // textBoxOthersDetails
             // 
             this.textBoxOthersDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
@@ -1509,19 +1340,6 @@
             this.textBoxCoopContriDetails.Size = new System.Drawing.Size(125, 26);
             this.textBoxCoopContriDetails.TabIndex = 275;
             this.textBoxCoopContriDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxCoopLoanDetails
-            // 
-            this.textBoxCoopLoanDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxCoopLoanDetails.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxCoopLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxCoopLoanDetails.ForeColor = System.Drawing.Color.White;
-            this.textBoxCoopLoanDetails.Location = new System.Drawing.Point(1055, 612);
-            this.textBoxCoopLoanDetails.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxCoopLoanDetails.Name = "textBoxCoopLoanDetails";
-            this.textBoxCoopLoanDetails.Size = new System.Drawing.Size(125, 26);
-            this.textBoxCoopLoanDetails.TabIndex = 274;
-            this.textBoxCoopLoanDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // textBoxCashAdvanceDetails
             // 
@@ -1587,36 +1405,204 @@
             this.labelOvertimePerMinuteCredit.Text = "0";
             this.labelOvertimePerMinuteCredit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // labelSSSLoanAmountDebitInput
+            // 
+            this.labelSSSLoanAmountDebitInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelSSSLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSSSLoanAmountDebitInput.Location = new System.Drawing.Point(892, 444);
+            this.labelSSSLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSSSLoanAmountDebitInput.Name = "labelSSSLoanAmountDebitInput";
+            this.labelSSSLoanAmountDebitInput.Size = new System.Drawing.Size(129, 31);
+            this.labelSSSLoanAmountDebitInput.TabIndex = 281;
+            this.labelSSSLoanAmountDebitInput.Text = "₱0.00";
+            this.labelSSSLoanAmountDebitInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelPagIbigLoanAmountDebitInput
+            // 
+            this.labelPagIbigLoanAmountDebitInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelPagIbigLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPagIbigLoanAmountDebitInput.Location = new System.Drawing.Point(892, 478);
+            this.labelPagIbigLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPagIbigLoanAmountDebitInput.Name = "labelPagIbigLoanAmountDebitInput";
+            this.labelPagIbigLoanAmountDebitInput.Size = new System.Drawing.Size(129, 31);
+            this.labelPagIbigLoanAmountDebitInput.TabIndex = 282;
+            this.labelPagIbigLoanAmountDebitInput.Text = "₱0.00";
+            this.labelPagIbigLoanAmountDebitInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelCarLoanAmountDebitInput
+            // 
+            this.labelCarLoanAmountDebitInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelCarLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCarLoanAmountDebitInput.Location = new System.Drawing.Point(892, 511);
+            this.labelCarLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCarLoanAmountDebitInput.Name = "labelCarLoanAmountDebitInput";
+            this.labelCarLoanAmountDebitInput.Size = new System.Drawing.Size(129, 31);
+            this.labelCarLoanAmountDebitInput.TabIndex = 283;
+            this.labelCarLoanAmountDebitInput.Text = "₱0.00";
+            this.labelCarLoanAmountDebitInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelHousingLoanAmountDebitInput
+            // 
+            this.labelHousingLoanAmountDebitInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelHousingLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelHousingLoanAmountDebitInput.Location = new System.Drawing.Point(892, 542);
+            this.labelHousingLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelHousingLoanAmountDebitInput.Name = "labelHousingLoanAmountDebitInput";
+            this.labelHousingLoanAmountDebitInput.Size = new System.Drawing.Size(129, 31);
+            this.labelHousingLoanAmountDebitInput.TabIndex = 284;
+            this.labelHousingLoanAmountDebitInput.Text = "₱0.00";
+            this.labelHousingLoanAmountDebitInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelCoopLoanAmountDebitInput
+            // 
+            this.labelCoopLoanAmountDebitInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelCoopLoanAmountDebitInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCoopLoanAmountDebitInput.Location = new System.Drawing.Point(892, 607);
+            this.labelCoopLoanAmountDebitInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCoopLoanAmountDebitInput.Name = "labelCoopLoanAmountDebitInput";
+            this.labelCoopLoanAmountDebitInput.Size = new System.Drawing.Size(129, 31);
+            this.labelCoopLoanAmountDebitInput.TabIndex = 285;
+            this.labelCoopLoanAmountDebitInput.Text = "₱0.00";
+            this.labelCoopLoanAmountDebitInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelWithTaxDetails
+            // 
+            this.labelWithTaxDetails.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelWithTaxDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelWithTaxDetails.Location = new System.Drawing.Point(1051, 314);
+            this.labelWithTaxDetails.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelWithTaxDetails.Name = "labelWithTaxDetails";
+            this.labelWithTaxDetails.Size = new System.Drawing.Size(129, 31);
+            this.labelWithTaxDetails.TabIndex = 286;
+            this.labelWithTaxDetails.Text = "₱0.00";
+            this.labelWithTaxDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelSSSDetails
+            // 
+            this.labelSSSDetails.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelSSSDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSSSDetails.Location = new System.Drawing.Point(1051, 348);
+            this.labelSSSDetails.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSSSDetails.Name = "labelSSSDetails";
+            this.labelSSSDetails.Size = new System.Drawing.Size(129, 31);
+            this.labelSSSDetails.TabIndex = 287;
+            this.labelSSSDetails.Text = "₱0.00";
+            this.labelSSSDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelPagIbigDetails
+            // 
+            this.labelPagIbigDetails.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelPagIbigDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPagIbigDetails.Location = new System.Drawing.Point(1051, 375);
+            this.labelPagIbigDetails.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPagIbigDetails.Name = "labelPagIbigDetails";
+            this.labelPagIbigDetails.Size = new System.Drawing.Size(129, 31);
+            this.labelPagIbigDetails.TabIndex = 288;
+            this.labelPagIbigDetails.Text = "₱0.00";
+            this.labelPagIbigDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelPhilhealthDetails
+            // 
+            this.labelPhilhealthDetails.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelPhilhealthDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPhilhealthDetails.Location = new System.Drawing.Point(1051, 411);
+            this.labelPhilhealthDetails.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPhilhealthDetails.Name = "labelPhilhealthDetails";
+            this.labelPhilhealthDetails.Size = new System.Drawing.Size(129, 31);
+            this.labelPhilhealthDetails.TabIndex = 289;
+            this.labelPhilhealthDetails.Text = "₱0.00";
+            this.labelPhilhealthDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelSSSLoanDetails
+            // 
+            this.labelSSSLoanDetails.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelSSSLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSSSLoanDetails.Location = new System.Drawing.Point(1051, 444);
+            this.labelSSSLoanDetails.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSSSLoanDetails.Name = "labelSSSLoanDetails";
+            this.labelSSSLoanDetails.Size = new System.Drawing.Size(129, 31);
+            this.labelSSSLoanDetails.TabIndex = 290;
+            this.labelSSSLoanDetails.Text = "₱0.00";
+            this.labelSSSLoanDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelPagIbigLoanDetails
+            // 
+            this.labelPagIbigLoanDetails.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelPagIbigLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPagIbigLoanDetails.Location = new System.Drawing.Point(1051, 478);
+            this.labelPagIbigLoanDetails.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelPagIbigLoanDetails.Name = "labelPagIbigLoanDetails";
+            this.labelPagIbigLoanDetails.Size = new System.Drawing.Size(129, 31);
+            this.labelPagIbigLoanDetails.TabIndex = 291;
+            this.labelPagIbigLoanDetails.Text = "₱0.00";
+            this.labelPagIbigLoanDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelCarLoanDetails
+            // 
+            this.labelCarLoanDetails.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelCarLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCarLoanDetails.Location = new System.Drawing.Point(1051, 511);
+            this.labelCarLoanDetails.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCarLoanDetails.Name = "labelCarLoanDetails";
+            this.labelCarLoanDetails.Size = new System.Drawing.Size(129, 31);
+            this.labelCarLoanDetails.TabIndex = 292;
+            this.labelCarLoanDetails.Text = "₱0.00";
+            this.labelCarLoanDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelHousingLoanDetails
+            // 
+            this.labelHousingLoanDetails.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelHousingLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelHousingLoanDetails.Location = new System.Drawing.Point(1051, 542);
+            this.labelHousingLoanDetails.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelHousingLoanDetails.Name = "labelHousingLoanDetails";
+            this.labelHousingLoanDetails.Size = new System.Drawing.Size(129, 31);
+            this.labelHousingLoanDetails.TabIndex = 293;
+            this.labelHousingLoanDetails.Text = "₱0.00";
+            this.labelHousingLoanDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelCoopLoanDetails
+            // 
+            this.labelCoopLoanDetails.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelCoopLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCoopLoanDetails.Location = new System.Drawing.Point(1051, 607);
+            this.labelCoopLoanDetails.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCoopLoanDetails.Name = "labelCoopLoanDetails";
+            this.labelCoopLoanDetails.Size = new System.Drawing.Size(129, 31);
+            this.labelCoopLoanDetails.TabIndex = 294;
+            this.labelCoopLoanDetails.Text = "₱0.00";
+            this.labelCoopLoanDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // PayrollSummaryEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1219, 844);
+            this.Controls.Add(this.labelCoopLoanDetails);
+            this.Controls.Add(this.labelHousingLoanDetails);
+            this.Controls.Add(this.labelCarLoanDetails);
+            this.Controls.Add(this.labelPagIbigLoanDetails);
+            this.Controls.Add(this.labelSSSLoanDetails);
+            this.Controls.Add(this.labelPhilhealthDetails);
+            this.Controls.Add(this.labelPagIbigDetails);
+            this.Controls.Add(this.labelSSSDetails);
+            this.Controls.Add(this.labelWithTaxDetails);
+            this.Controls.Add(this.labelCoopLoanAmountDebitInput);
+            this.Controls.Add(this.labelHousingLoanAmountDebitInput);
+            this.Controls.Add(this.labelCarLoanAmountDebitInput);
+            this.Controls.Add(this.labelPagIbigLoanAmountDebitInput);
+            this.Controls.Add(this.labelSSSLoanAmountDebitInput);
             this.Controls.Add(this.labelOvertimePerMinuteCredit);
             this.Controls.Add(this.textBoxDailyRateInput);
             this.Controls.Add(this.textBoxSickLeaveCredit);
             this.Controls.Add(this.textBoxVacationLeaveCredit);
             this.Controls.Add(this.textBoxOthersDetails);
             this.Controls.Add(this.textBoxCoopContriDetails);
-            this.Controls.Add(this.textBoxCoopLoanDetails);
             this.Controls.Add(this.textBoxCashAdvanceDetails);
-            this.Controls.Add(this.textBoxHousingLoanDetails);
-            this.Controls.Add(this.textBoxCarLoanDetails);
-            this.Controls.Add(this.textBoxPagIbigLoanDetails);
-            this.Controls.Add(this.textBoxSSSLoanDetails);
-            this.Controls.Add(this.textBoxPhilhealthDetails);
-            this.Controls.Add(this.textBoxPagIbigDetails);
-            this.Controls.Add(this.textBoxSSSDetails);
-            this.Controls.Add(this.textBoxWithTaxDetails);
             this.Controls.Add(this.textBoxOthersAmountDebitInput);
             this.Controls.Add(this.textBoxCoopContriAmountDebitInput);
-            this.Controls.Add(this.textBoxCoopLoanAmountDebitInput);
             this.Controls.Add(this.textBoxCashAdvanceAmountDebitInput);
-            this.Controls.Add(this.textBoxHousingLoanAmountDebitInput);
-            this.Controls.Add(this.textBoxCarLoanAmountDebitInput);
-            this.Controls.Add(this.textBoxPagIbigLoanAmountDebitInput);
-            this.Controls.Add(this.textBoxSSSLoanAmountDebitInput);
             this.Controls.Add(this.textBoxGondolaAmountBaseInput);
             this.Controls.Add(this.textBoxCommunicationAmountBaseInput);
             this.Controls.Add(this.textBoxFoodAllowanceAmountBaseInput);
@@ -1816,28 +1802,28 @@
         private System.Windows.Forms.TextBox textBoxCommunicationAmountBaseInput;
         private System.Windows.Forms.TextBox textBoxGondolaAmountBaseInput;
         private System.Windows.Forms.TextBox textBoxCashAdvanceAmountDebitInput;
-        private System.Windows.Forms.TextBox textBoxHousingLoanAmountDebitInput;
-        private System.Windows.Forms.TextBox textBoxCarLoanAmountDebitInput;
-        private System.Windows.Forms.TextBox textBoxPagIbigLoanAmountDebitInput;
-        private System.Windows.Forms.TextBox textBoxSSSLoanAmountDebitInput;
         private System.Windows.Forms.TextBox textBoxOthersAmountDebitInput;
         private System.Windows.Forms.TextBox textBoxCoopContriAmountDebitInput;
-        private System.Windows.Forms.TextBox textBoxCoopLoanAmountDebitInput;
-        private System.Windows.Forms.TextBox textBoxHousingLoanDetails;
-        private System.Windows.Forms.TextBox textBoxCarLoanDetails;
-        private System.Windows.Forms.TextBox textBoxPagIbigLoanDetails;
-        private System.Windows.Forms.TextBox textBoxSSSLoanDetails;
-        private System.Windows.Forms.TextBox textBoxPhilhealthDetails;
-        private System.Windows.Forms.TextBox textBoxPagIbigDetails;
-        private System.Windows.Forms.TextBox textBoxSSSDetails;
-        private System.Windows.Forms.TextBox textBoxWithTaxDetails;
         private System.Windows.Forms.TextBox textBoxOthersDetails;
         private System.Windows.Forms.TextBox textBoxCoopContriDetails;
-        private System.Windows.Forms.TextBox textBoxCoopLoanDetails;
         private System.Windows.Forms.TextBox textBoxCashAdvanceDetails;
         private System.Windows.Forms.TextBox textBoxVacationLeaveCredit;
         private System.Windows.Forms.TextBox textBoxSickLeaveCredit;
         private System.Windows.Forms.TextBox textBoxDailyRateInput;
         private System.Windows.Forms.Label labelOvertimePerMinuteCredit;
+        private System.Windows.Forms.Label labelSSSLoanAmountDebitInput;
+        private System.Windows.Forms.Label labelPagIbigLoanAmountDebitInput;
+        private System.Windows.Forms.Label labelCarLoanAmountDebitInput;
+        private System.Windows.Forms.Label labelHousingLoanAmountDebitInput;
+        private System.Windows.Forms.Label labelCoopLoanAmountDebitInput;
+        private System.Windows.Forms.Label labelWithTaxDetails;
+        private System.Windows.Forms.Label labelSSSDetails;
+        private System.Windows.Forms.Label labelPagIbigDetails;
+        private System.Windows.Forms.Label labelPhilhealthDetails;
+        private System.Windows.Forms.Label labelSSSLoanDetails;
+        private System.Windows.Forms.Label labelPagIbigLoanDetails;
+        private System.Windows.Forms.Label labelCarLoanDetails;
+        private System.Windows.Forms.Label labelHousingLoanDetails;
+        private System.Windows.Forms.Label labelCoopLoanDetails;
     }
 }

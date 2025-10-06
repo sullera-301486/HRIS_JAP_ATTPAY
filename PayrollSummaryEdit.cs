@@ -198,12 +198,12 @@ namespace HRIS_JAP_ATTPAY
                     // Loans and Other Deductions
                     if (loanDeduction != null)
                     {
-                        textBoxSSSLoanAmountDebitInput.Text = loanDeduction.ContainsKey("sss_loan") ? loanDeduction["sss_loan"] : "0.00";
-                        textBoxPagIbigLoanAmountDebitInput.Text = loanDeduction.ContainsKey("pagibig_loan") ? loanDeduction["pagibig_loan"] : "0.00";
-                        textBoxCarLoanAmountDebitInput.Text = loanDeduction.ContainsKey("car_loan") ? loanDeduction["car_loan"] : "0.00";
-                        textBoxHousingLoanAmountDebitInput.Text = loanDeduction.ContainsKey("housing_loan") ? loanDeduction["housing_loan"] : "0.00";
+                        labelSSSLoanAmountDebitInput.Text = loanDeduction.ContainsKey("sss_loan") ? loanDeduction["sss_loan"] : "0.00";
+                        labelPagIbigLoanAmountDebitInput.Text = loanDeduction.ContainsKey("pagibig_loan") ? loanDeduction["pagibig_loan"] : "0.00";
+                        labelCarLoanAmountDebitInput.Text = loanDeduction.ContainsKey("car_loan") ? loanDeduction["car_loan"] : "0.00";
+                        labelHousingLoanAmountDebitInput.Text = loanDeduction.ContainsKey("housing_loan") ? loanDeduction["housing_loan"] : "0.00";
                         textBoxCashAdvanceAmountDebitInput.Text = loanDeduction.ContainsKey("cash_advance") ? loanDeduction["cash_advance"] : "0.00";
-                        textBoxCoopLoanAmountDebitInput.Text = loanDeduction.ContainsKey("coop_loan") ? loanDeduction["coop_loan"] : "0.00";
+                        labelCoopLoanAmountDebitInput.Text = loanDeduction.ContainsKey("coop_loan") ? loanDeduction["coop_loan"] : "0.00";
                         textBoxCoopContriAmountDebitInput.Text = loanDeduction.ContainsKey("coop_contribution") ? loanDeduction["coop_contribution"] : "0.00";
                         textBoxOthersAmountDebitInput.Text = loanDeduction.ContainsKey("other_deduction") ? loanDeduction["other_deduction"] : "0.00";
                     }
@@ -342,12 +342,12 @@ namespace HRIS_JAP_ATTPAY
                 if (loanDeductions.ContainsKey(payrollId))
                 {
                     var loansUpdate = loanDeductions[payrollId];
-                    loansUpdate["sss_loan"] = textBoxSSSLoanAmountDebitInput.Text;
-                    loansUpdate["pagibig_loan"] = textBoxPagIbigLoanAmountDebitInput.Text;
-                    loansUpdate["car_loan"] = textBoxCarLoanAmountDebitInput.Text;
-                    loansUpdate["housing_loan"] = textBoxHousingLoanAmountDebitInput.Text;
+                    loansUpdate["sss_loan"] = labelSSSLoanAmountDebitInput.Text;
+                    loansUpdate["pagibig_loan"] = labelPagIbigLoanAmountDebitInput.Text;
+                    loansUpdate["car_loan"] = labelCarLoanAmountDebitInput.Text;
+                    loansUpdate["housing_loan"] = labelHousingLoanAmountDebitInput.Text;
                     loansUpdate["cash_advance"] = textBoxCashAdvanceAmountDebitInput.Text;
-                    loansUpdate["coop_loan"] = textBoxCoopLoanAmountDebitInput.Text;
+                    loansUpdate["coop_loan"] = labelCoopLoanAmountDebitInput.Text;
                     loansUpdate["coop_contribution"] = textBoxCoopContriAmountDebitInput.Text;
                     loansUpdate["other_deduction"] = textBoxOthersAmountDebitInput.Text;
 
@@ -492,8 +492,8 @@ namespace HRIS_JAP_ATTPAY
                 labelBasicPayAmountCreditInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelBasicPayCredit.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelCarLoan.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
-                textBoxCarLoanAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
-                textBoxCarLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelCarLoanAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelCarLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelCashAdvance.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 textBoxCashAdvanceAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 textBoxCashAdvanceDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
@@ -507,8 +507,8 @@ namespace HRIS_JAP_ATTPAY
                 textBoxCoopContriAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 textBoxCoopContriDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelCoopLoan.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
-                textBoxCoopLoanAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
-                textBoxCoopLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelCoopLoanAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelCoopLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelCredit.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelDailyRate.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 textBoxDailyRateInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
@@ -537,8 +537,8 @@ namespace HRIS_JAP_ATTPAY
                 labelGrossPay.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelGrossPayInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelHousingLoan.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
-                textBoxHousingLoanAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
-                textBoxHousingLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelHousingLoanAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelHousingLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelID.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelIDInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelIncentives.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
@@ -566,15 +566,15 @@ namespace HRIS_JAP_ATTPAY
                 labelOvertimePerMinuteAmountCreditInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelPagIbig.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelPagIbigAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
-                textBoxPagIbigDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelPagIbigDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelPagIbigLoan.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
-                textBoxPagIbigLoanAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
-                textBoxPagIbigLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelPagIbigLoanAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelPagIbigLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelPayAndAllowances.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelPayrollSummary.Font = AttributesClass.GetFont("Roboto-Regular", 18f);
                 labelPhilhealth.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelPhilhealthAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
-                textBoxPhilhealthDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelPhilhealthDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelPositionInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelSalary.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
@@ -585,17 +585,17 @@ namespace HRIS_JAP_ATTPAY
                 labelSickLeaveDebit.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelSSS.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelSSSAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
-                textBoxSSSDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelSSSDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelSSSLoan.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
-                textBoxSSSLoanAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
-                textBoxSSSLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelSSSLoanAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelSSSLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelVacationLeave.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelVacationLeaveBalance.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 textBoxVacationLeaveCredit.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelVacationLeaveDebit.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelWithTax.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelWithTaxAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
-                textBoxWithTaxDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelWithTaxDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 buttonUpdate.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
                 buttonCancel.Font = AttributesClass.GetFont("Roboto-Light", 14f);
             }
