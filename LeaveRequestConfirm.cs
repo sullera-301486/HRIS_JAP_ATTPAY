@@ -10,9 +10,8 @@ namespace HRIS_JAP_ATTPAY
         public LeaveRequestConfirm(LeaveRequestData req)
         {
             InitializeComponent();
-            setFont();
             request = req;
-            LoadPreview();
+            setFont();
         }
 
         private void setFont()
@@ -28,11 +27,6 @@ namespace HRIS_JAP_ATTPAY
             {
                 MessageBox.Show("Font load failed: " + ex.Message);
             }
-        }
-
-        private void LoadPreview()
-        {
-
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)

@@ -108,12 +108,13 @@ namespace HRIS_JAP_ATTPAY
                 CreatedAt = DateTime.Now
             };
 
-            using (var confirm = new LeaveRequestConfirm(preview))
+            Form parentForm = this.FindForm();
+            LeaveRequestConfirm confirmForm = new LeaveRequestConfirm(preview);
+
+            confirmForm.FormClosed += async (s, args) => // ✅ rename 'e' → 'args'
             {
-                var result = confirm.ShowDialog();
-                if (result == DialogResult.OK)
+                if (confirmForm.DialogResult == DialogResult.OK)
                 {
-                    // 🔹 Save to Firebase
                     await FirebaseSave(request);
 
                     MessageBox.Show(
@@ -125,7 +126,9 @@ namespace HRIS_JAP_ATTPAY
 
                     this.Close();
                 }
-            }
+            };
+
+            AttributesClass.ShowWithOverlay(parentForm, confirmForm);
         }
 
         // 🔹 Save to Firebase
