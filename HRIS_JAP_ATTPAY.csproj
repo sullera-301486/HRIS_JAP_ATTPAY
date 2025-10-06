@@ -819,6 +819,7 @@
     <None Include="Resources\icon_check.png" />
     <None Include="Resources\icon_cross.png" />
     <None Include="Resources\icon_pending.png" />
+    <None Include="Resources\AltMenuLogo.png" />
     <Content Include="Resources\MenuLogoAlt.png" />
     <None Include="Resources\User1.png" />
     <None Include="Resources\TrashBin.png" />
