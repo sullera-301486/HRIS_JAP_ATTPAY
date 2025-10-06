@@ -22,9 +22,7 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                labelAgreeIntro1.Font = AttributesClass.GetFont("Roboto-Light", 9.5f);
-                labelAgreeIntro2.Font = AttributesClass.GetFont("Roboto-Bold", 9.5f, FontStyle.Italic);
-                labelAgreeIntro3.Font = AttributesClass.GetFont("Roboto-Light", 9.5f);
+                labelAgreeIntro.Font = AttributesClass.GetFont("Roboto-Light", 9.5f);
                 labelDesc1.Font = AttributesClass.GetFont("Roboto-Light", 9.5f);
                 labelDesc2.Font = AttributesClass.GetFont("Roboto-Light", 9.5f);
                 labelDesc3.Font = AttributesClass.GetFont("Roboto-Light", 9.5f);

@@ -28,9 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.labelAgreeIntro1 = new System.Windows.Forms.Label();
-            this.labelAgreeIntro2 = new System.Windows.Forms.Label();
-            this.labelAgreeIntro3 = new System.Windows.Forms.Label();
+            this.labelAgreeIntro = new System.Windows.Forms.Label();
             this.labelMain1 = new System.Windows.Forms.Label();
             this.labelDesc1 = new System.Windows.Forms.Label();
             this.labelMain2 = new System.Windows.Forms.Label();
@@ -49,41 +47,17 @@
             this.labelDesc8 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // labelAgreeIntro1
+            // labelAgreeIntro
             // 
-            this.labelAgreeIntro1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelAgreeIntro1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(62)))), ((int)(((byte)(62)))));
-            this.labelAgreeIntro1.Location = new System.Drawing.Point(24, 23);
-            this.labelAgreeIntro1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelAgreeIntro1.Name = "labelAgreeIntro1";
-            this.labelAgreeIntro1.Size = new System.Drawing.Size(75, 28);
-            this.labelAgreeIntro1.TabIndex = 2;
-            this.labelAgreeIntro1.Text = "By using ";
-            this.labelAgreeIntro1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // labelAgreeIntro2
-            // 
-            this.labelAgreeIntro2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelAgreeIntro2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(62)))), ((int)(((byte)(62)))));
-            this.labelAgreeIntro2.Location = new System.Drawing.Point(95, 25);
-            this.labelAgreeIntro2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelAgreeIntro2.Name = "labelAgreeIntro2";
-            this.labelAgreeIntro2.Size = new System.Drawing.Size(89, 27);
-            this.labelAgreeIntro2.TabIndex = 3;
-            this.labelAgreeIntro2.Text = "JAP HRIS,";
-            this.labelAgreeIntro2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // labelAgreeIntro3
-            // 
-            this.labelAgreeIntro3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelAgreeIntro3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(62)))), ((int)(((byte)(62)))));
-            this.labelAgreeIntro3.Location = new System.Drawing.Point(179, 23);
-            this.labelAgreeIntro3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelAgreeIntro3.Name = "labelAgreeIntro3";
-            this.labelAgreeIntro3.Size = new System.Drawing.Size(206, 27);
-            this.labelAgreeIntro3.TabIndex = 4;
-            this.labelAgreeIntro3.Text = "you agree to the following:";
-            this.labelAgreeIntro3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.labelAgreeIntro.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelAgreeIntro.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(62)))), ((int)(((byte)(62)))));
+            this.labelAgreeIntro.Location = new System.Drawing.Point(24, 23);
+            this.labelAgreeIntro.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelAgreeIntro.Name = "labelAgreeIntro";
+            this.labelAgreeIntro.Size = new System.Drawing.Size(409, 28);
+            this.labelAgreeIntro.TabIndex = 2;
+            this.labelAgreeIntro.Text = "By using JAP HRIS, you agree to the following:";
+            this.labelAgreeIntro.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // labelMain1
             // 
@@ -306,9 +280,7 @@
             this.Controls.Add(this.labelMain2);
             this.Controls.Add(this.labelDesc1);
             this.Controls.Add(this.labelMain1);
-            this.Controls.Add(this.labelAgreeIntro3);
-            this.Controls.Add(this.labelAgreeIntro2);
-            this.Controls.Add(this.labelAgreeIntro1);
+            this.Controls.Add(this.labelAgreeIntro);
             this.Name = "TermsAndConditionsRectangle";
             this.Size = new System.Drawing.Size(605, 730);
             this.ResumeLayout(false);
@@ -316,9 +288,7 @@
         }
 
         #endregion
-        private System.Windows.Forms.Label labelAgreeIntro1;
-        private System.Windows.Forms.Label labelAgreeIntro2;
-        private System.Windows.Forms.Label labelAgreeIntro3;
+        private System.Windows.Forms.Label labelAgreeIntro;
         private System.Windows.Forms.Label labelMain1;
         private System.Windows.Forms.Label labelDesc1;
         private System.Windows.Forms.Label labelMain2;

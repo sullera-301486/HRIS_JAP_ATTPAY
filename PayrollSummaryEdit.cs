@@ -561,6 +561,7 @@ namespace HRIS_JAP_ATTPAY
                 labelOvertimePerHourAmountBaseInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelOvertimePerHourAmountCreditInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelOvertimePerMinute.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
+                labelOvertimePerMinuteCredit.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelOvertimePerMinuteAmountBaseInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelOvertimePerMinuteAmountCreditInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelPagIbig.Font = AttributesClass.GetFont("Roboto-Regular", 10f);

@@ -1579,7 +1579,7 @@
             // 
             this.labelOvertimePerMinuteCredit.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.labelOvertimePerMinuteCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelOvertimePerMinuteCredit.Location = new System.Drawing.Point(411, 377);
+            this.labelOvertimePerMinuteCredit.Location = new System.Drawing.Point(411, 380);
             this.labelOvertimePerMinuteCredit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelOvertimePerMinuteCredit.Name = "labelOvertimePerMinuteCredit";
             this.labelOvertimePerMinuteCredit.Size = new System.Drawing.Size(133, 31);

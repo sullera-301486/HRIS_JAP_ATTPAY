@@ -33,13 +33,15 @@
             this.buttonEmployee = new System.Windows.Forms.Button();
             this.buttonOverview = new System.Windows.Forms.Button();
             this.HRMiscTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.labelLogOut = new System.Windows.Forms.Label();
             this.pictureBoxNotification = new System.Windows.Forms.PictureBox();
             this.pictureBoxUserProfile = new System.Windows.Forms.PictureBox();
+            this.labelLogOut = new System.Windows.Forms.Label();
+            this.pictureBoxMenuLogo = new System.Windows.Forms.PictureBox();
             this.HROptionsTableLayoutPanel.SuspendLayout();
             this.HRMiscTableLayoutPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxNotification)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxUserProfile)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMenuLogo)).BeginInit();
             this.SuspendLayout();
             // 
             // HROptionsTableLayoutPanel
@@ -122,6 +124,7 @@
             this.HRMiscTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 1.5F));
             this.HRMiscTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8F));
             this.HRMiscTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.HRMiscTableLayoutPanel.Controls.Add(this.pictureBoxMenuLogo, 0, 0);
             this.HRMiscTableLayoutPanel.Controls.Add(this.pictureBoxNotification, 2, 0);
             this.HRMiscTableLayoutPanel.Controls.Add(this.pictureBoxUserProfile, 4, 0);
             this.HRMiscTableLayoutPanel.Controls.Add(this.labelLogOut, 6, 0);
@@ -132,20 +135,6 @@
             this.HRMiscTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.HRMiscTableLayoutPanel.Size = new System.Drawing.Size(1440, 90);
             this.HRMiscTableLayoutPanel.TabIndex = 3;
-            // 
-            // labelLogOut
-            // 
-            this.labelLogOut.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelLogOut.AutoSize = true;
-            this.labelLogOut.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.labelLogOut.ForeColor = System.Drawing.Color.White;
-            this.labelLogOut.Location = new System.Drawing.Point(1325, 37);
-            this.labelLogOut.Name = "labelLogOut";
-            this.labelLogOut.Size = new System.Drawing.Size(112, 16);
-            this.labelLogOut.TabIndex = 1;
-            this.labelLogOut.Text = "Log Out";
-            this.labelLogOut.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.labelLogOut.Click += new System.EventHandler(this.labelLogOut_Click);
             // 
             // pictureBoxNotification
             // 
@@ -171,6 +160,31 @@
             this.pictureBoxUserProfile.TabStop = false;
             this.pictureBoxUserProfile.Click += new System.EventHandler(this.pictureBoxUserProfile_Click);
             // 
+            // labelLogOut
+            // 
+            this.labelLogOut.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelLogOut.AutoSize = true;
+            this.labelLogOut.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.labelLogOut.ForeColor = System.Drawing.Color.White;
+            this.labelLogOut.Location = new System.Drawing.Point(1325, 37);
+            this.labelLogOut.Name = "labelLogOut";
+            this.labelLogOut.Size = new System.Drawing.Size(112, 16);
+            this.labelLogOut.TabIndex = 1;
+            this.labelLogOut.Text = "Log Out";
+            this.labelLogOut.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelLogOut.Click += new System.EventHandler(this.labelLogOut_Click);
+            // 
+            // pictureBoxMenuLogo
+            // 
+            this.pictureBoxMenuLogo.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pictureBoxMenuLogo.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.AltMenuLogo;
+            this.pictureBoxMenuLogo.Location = new System.Drawing.Point(3, 3);
+            this.pictureBoxMenuLogo.Name = "pictureBoxMenuLogo";
+            this.pictureBoxMenuLogo.Size = new System.Drawing.Size(540, 84);
+            this.pictureBoxMenuLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxMenuLogo.TabIndex = 5;
+            this.pictureBoxMenuLogo.TabStop = false;
+            // 
             // HRMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -186,6 +200,7 @@
             this.HRMiscTableLayoutPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxNotification)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxUserProfile)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMenuLogo)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -200,5 +215,6 @@
         private System.Windows.Forms.Label labelLogOut;
         private System.Windows.Forms.PictureBox pictureBoxNotification;
         private System.Windows.Forms.PictureBox pictureBoxUserProfile;
+        private System.Windows.Forms.PictureBox pictureBoxMenuLogo;
     }
 }
