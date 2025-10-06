@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using Firebase.Database;
 using Firebase.Database.Query;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -14,23 +15,25 @@ namespace HRIS_JAP_ATTPAY
     {
         public PayrollExportData ExportData { get; private set; }
 
-        //  Firebase client
+        // Firebase client
         private FirebaseClient firebase = new FirebaseClient(
             "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
+
         private string payrollPeriod;
 
-        //  Data dictionaries
+        // Data dictionaries
         private Dictionary<string, dynamic> employeeDetails = new Dictionary<string, dynamic>();
         private Dictionary<string, Dictionary<string, string>> workSchedules = new Dictionary<string, Dictionary<string, string>>();
         private Dictionary<string, Dictionary<string, string>> employmentInfo = new Dictionary<string, Dictionary<string, string>>();
         private Dictionary<string, Dictionary<string, string>> payrollData = new Dictionary<string, Dictionary<string, string>>();
         private Dictionary<string, Dictionary<string, string>> payrollSummaryData = new Dictionary<string, Dictionary<string, string>>();
         private Dictionary<string, Dictionary<string, string>> govDeductions = new Dictionary<string, Dictionary<string, string>>();
-        private Dictionary<string, Dictionary<string, string>> loanDeductions = new Dictionary<string, Dictionary<string, string>>();
+        private Dictionary<string, Dictionary<string, string>> employeeDeductions = new Dictionary<string, Dictionary<string, string>>();
         private Dictionary<string, Dictionary<string, string>> payrollEarnings = new Dictionary<string, Dictionary<string, string>>();
         private List<Dictionary<string, string>> attendanceRecords = new List<Dictionary<string, string>>();
+        private List<Dictionary<string, string>> employeeLoans = new List<Dictionary<string, string>>();
 
-        //  Store current employee ID to track selection
+        // Store current employee ID to track selection
         private string currentEmployeeId = "";
 
         public PayrollSummary(string employeeId, string period = null)
@@ -40,7 +43,7 @@ namespace HRIS_JAP_ATTPAY
             InitializeComponent();
             setFont();
 
-            // Add this to load data when form loads
+            // Load data when form loads
             this.Load += async (sender, e) => await LoadPayrollDataAsync();
         }
 
@@ -50,40 +53,84 @@ namespace HRIS_JAP_ATTPAY
             await LoadPayrollDataAsync();
         }
 
+        // Improved JSON parsing method
         private List<Dictionary<string, string>> ParseMalformedJson(string rawJson)
         {
             var records = new List<Dictionary<string, string>>();
             try
             {
+                if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null")
+                    return records;
+
+                // Handle array with null first element
+                if (rawJson.StartsWith("[null,"))
+                {
+                    rawJson = rawJson.Replace("[null,", "[");
+                }
+                if (rawJson.StartsWith("[null]"))
+                {
+                    return records;
+                }
+
+                // Try to parse as JObject first (for object structures)
+                try
+                {
+                    var jObject = JObject.Parse(rawJson);
+                    foreach (var property in jObject.Properties())
+                    {
+                        if (property.Value.Type == JTokenType.Object)
+                        {
+                            var record = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                            foreach (JProperty prop in property.Value.Children<JProperty>())
+                            {
+                                record[prop.Name] = prop.Value?.ToString() ?? "";
+                            }
+                            records.Add(record);
+                        }
+                    }
+                    return records;
+                }
+                catch
+                {
+                    // Continue with regex parsing if JObject fails
+                }
+
+                // Normalization for regex parsing
                 string cleanedJson = rawJson.Replace("\n", "").Replace("\r", "").Replace("\t", "")
-                    .Replace("'", "\"").Replace("(", "[").Replace(")", "]")
-                    .Replace("[null,", "[").Replace("], [", ",").Replace("}, {", "},{")
+                    .Replace("'", "\"").Replace("], [", ",").Replace("}, {", "},{")
                     .Replace("},(", "},{").Replace("),{", "},{");
 
+                // Find all {...} blocks
                 var matches = Regex.Matches(cleanedJson, @"\{[^{}]*\}");
 
                 foreach (Match match in matches)
                 {
                     try
                     {
-                        var record = new Dictionary<string, string>();
                         string objectStr = match.Value;
-                        var kvpMatches = Regex.Matches(objectStr, @"""([^""]+)""\s*:\s*(""[^""]*""|\d+\.?\d*|true|false|null)");
+                        var record = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+                        // Improved regex to handle various value types
+                        var kvpMatches = Regex.Matches(objectStr, @"""([^""]+)""\s*:\s*(?:""([^""]*)"")?",
+                            RegexOptions.IgnoreCase);
 
                         foreach (Match kvpMatch in kvpMatches)
                         {
                             if (kvpMatch.Groups.Count >= 3)
                             {
                                 string key = kvpMatch.Groups[1].Value;
-                                string value = kvpMatch.Groups[2].Value.Trim('"');
+                                string value = kvpMatch.Groups[2].Success ? kvpMatch.Groups[2].Value : "";
+
+                                // Handle null values
+                                if (string.Equals(value, "null", StringComparison.OrdinalIgnoreCase))
+                                    value = "";
+
                                 record[key] = value;
                             }
                         }
 
                         if (record.Count > 0)
-                        {
                             records.Add(record);
-                        }
                     }
                     catch
                     {
@@ -93,8 +140,9 @@ namespace HRIS_JAP_ATTPAY
             }
             catch (Exception ex)
             {
-                MessageBox.Show("JSON parsing error: " + ex.Message);
+                Console.WriteLine("JSON parsing error: " + ex.Message);
             }
+
             return records;
         }
 
@@ -103,21 +151,28 @@ namespace HRIS_JAP_ATTPAY
             try
             {
                 var jsonResponse = await firebase.Child(childPath).OnceAsJsonAsync();
-                string rawJson = jsonResponse.ToString();
+                string rawJson = jsonResponse?.ToString() ?? "";
+
+                if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null")
+                    return;
+
                 var records = ParseMalformedJson(rawJson);
 
                 foreach (var record in records)
                 {
-                    processItem(record);
+                    if (record != null && record.Count > 0)
+                    {
+                        processItem(record);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading {childPath}: " + ex.Message);
+                Console.WriteLine($"Error loading {childPath}: {ex.Message}");
             }
         }
 
-        //  New: Calculate work days based on real calendar (2 weeks: Mon-Fri full day, Sat half day)
+        // Calculate work days based on real calendar (Mon-Fri full day, Sat half day)
         private (int fullDays, int halfDays) CalculateWorkDaysInPeriod(DateTime startDate, DateTime endDate)
         {
             int fullDays = 0;
@@ -138,47 +193,96 @@ namespace HRIS_JAP_ATTPAY
             return (fullDays, halfDays);
         }
 
-        // New: Government contributions & tax calculations (BI-MONTHLY)
         #region Government Contributions & Tax Calculations
 
         private decimal CalculateSSSContribution(decimal monthlySalary)
         {
-            if (monthlySalary <= 4249.99m) return 157.50m / 2; // Half for bi-monthly
-            if (monthlySalary <= 4749.99m) return 180m / 2;
-            if (monthlySalary <= 5249.99m) return 202.50m / 2;
-            if (monthlySalary <= 5749.99m) return 225m / 2;
-            if (monthlySalary <= 6249.99m) return 247.50m / 2;
-            if (monthlySalary <= 6749.99m) return 270m / 2;
-            return 292.50m / 2;
+            // SSS contribution table (2024 rates)
+            if (monthlySalary <= 4249.99m) return 180.00m / 2; // Bi-monthly
+            if (monthlySalary <= 4749.99m) return 202.50m / 2;
+            if (monthlySalary <= 5249.99m) return 225.00m / 2;
+            if (monthlySalary <= 5749.99m) return 247.50m / 2;
+            if (monthlySalary <= 6249.99m) return 270.00m / 2;
+            if (monthlySalary <= 6749.99m) return 292.50m / 2;
+            if (monthlySalary <= 7249.99m) return 315.00m / 2;
+            if (monthlySalary <= 7749.99m) return 337.50m / 2;
+            if (monthlySalary <= 8249.99m) return 360.00m / 2;
+            if (monthlySalary <= 8749.99m) return 382.50m / 2;
+            if (monthlySalary <= 9249.99m) return 405.00m / 2;
+            if (monthlySalary <= 9749.99m) return 427.50m / 2;
+            if (monthlySalary <= 10249.99m) return 450.00m / 2;
+            if (monthlySalary <= 10749.99m) return 472.50m / 2;
+            if (monthlySalary <= 11249.99m) return 495.00m / 2;
+            if (monthlySalary <= 11749.99m) return 517.50m / 2;
+            if (monthlySalary <= 12249.99m) return 540.00m / 2;
+            if (monthlySalary <= 12749.99m) return 562.50m / 2;
+            if (monthlySalary <= 13249.99m) return 585.00m / 2;
+            if (monthlySalary <= 13749.99m) return 607.50m / 2;
+            if (monthlySalary <= 14249.99m) return 630.00m / 2;
+            if (monthlySalary <= 14749.99m) return 652.50m / 2;
+            if (monthlySalary <= 15249.99m) return 675.00m / 2;
+            if (monthlySalary <= 15749.99m) return 697.50m / 2;
+            if (monthlySalary <= 16249.99m) return 720.00m / 2;
+            if (monthlySalary <= 16749.99m) return 742.50m / 2;
+            if (monthlySalary <= 17249.99m) return 765.00m / 2;
+            if (monthlySalary <= 17749.99m) return 787.50m / 2;
+            if (monthlySalary <= 18249.99m) return 810.00m / 2;
+            if (monthlySalary <= 18749.99m) return 832.50m / 2;
+            if (monthlySalary <= 19249.99m) return 855.00m / 2;
+            if (monthlySalary <= 19749.99m) return 877.50m / 2;
+            if (monthlySalary <= 20249.99m) return 900.00m / 2;
+            if (monthlySalary <= 20749.99m) return 922.50m / 2;
+            if (monthlySalary <= 21249.99m) return 945.00m / 2;
+            if (monthlySalary <= 21749.99m) return 967.50m / 2;
+            if (monthlySalary <= 22249.99m) return 990.00m / 2;
+            if (monthlySalary <= 22749.99m) return 1012.50m / 2;
+            if (monthlySalary <= 23249.99m) return 1035.00m / 2;
+            if (monthlySalary <= 23749.99m) return 1057.50m / 2;
+            if (monthlySalary <= 24249.99m) return 1080.00m / 2;
+            if (monthlySalary <= 24749.99m) return 1102.50m / 2;
+            return 1125.00m / 2; // Maximum contribution
         }
 
         private decimal CalculatePhilHealthContribution(decimal monthlySalary)
         {
-            decimal rate = 0.04m;
-            return Math.Round((monthlySalary * rate) / 2, 2); // Half for bi-monthly
+            // PhilHealth rate 4% split between employer and employee (2.75% employee share)
+            decimal employeeShareRate = 0.0275m;
+            decimal contribution = monthlySalary * employeeShareRate;
+
+            // Minimum and maximum limits
+            if (contribution < 200m) contribution = 200m;
+            if (contribution > 400m) contribution = 400m;
+
+            return Math.Round(contribution / 2, 2); // Half for bi-monthly
         }
 
         private decimal CalculatePagibigContribution(decimal monthlySalary)
         {
-            decimal contrib = (monthlySalary * 0.01m) / 2; // Half for bi-monthly
-            return contrib > 100 ? 100 : contrib;
+            // Pag-IBIG: 2% if monthly salary > 1500, otherwise 1%
+            decimal rate = monthlySalary > 1500m ? 0.02m : 0.01m;
+            decimal contribution = monthlySalary * rate;
+
+            // Maximum contribution of 100
+            return Math.Round(Math.Min(contribution, 100m) / 2, 2); // Half for bi-monthly
         }
 
         private decimal CalculateWithholdingTax(decimal monthlySalary)
         {
-            // Calculate tax based on semi-monthly income (monthly salary divided by 2)
+            // Calculate tax based on semi-monthly income
             decimal semiMonthlySalary = monthlySalary / 2;
-            if (semiMonthlySalary <= 10416.50m) return 0;
-            if (semiMonthlySalary <= 16666.00m) return (semiMonthlySalary - 10416.50m) * 0.20m;
-            if (semiMonthlySalary <= 33333.00m) return 1250 + (semiMonthlySalary - 16666.00m) * 0.25m;
-            if (semiMonthlySalary <= 83333.00m) return 5416.67m + (semiMonthlySalary - 33333.00m) * 0.30m;
-            return 20416.67m + (semiMonthlySalary - 83333.00m) * 0.32m;
+
+            if (semiMonthlySalary <= 10417m) return 0;
+            if (semiMonthlySalary <= 16666m) return (semiMonthlySalary - 10417m) * 0.15m;
+            if (semiMonthlySalary <= 33332m) return 937.50m + (semiMonthlySalary - 16666m) * 0.20m;
+            if (semiMonthlySalary <= 83332m) return 4270.50m + (semiMonthlySalary - 33332m) * 0.25m;
+            if (semiMonthlySalary <= 333332m) return 16770.50m + (semiMonthlySalary - 83332m) * 0.30m;
+            return 91770.50m + (semiMonthlySalary - 333332m) * 0.35m;
         }
 
         private decimal CalculateOvertimePay(decimal dailyRate, decimal overtimeHours)
         {
             decimal hourlyRate = dailyRate / 8m;
-            decimal overtimeRate = hourlyRate * 1.25m;
+            decimal overtimeRate = hourlyRate * 1.25m; // 25% premium for overtime
             return Math.Round(overtimeHours * overtimeRate, 2);
         }
 
@@ -201,289 +305,355 @@ namespace HRIS_JAP_ATTPAY
                 payrollData.Clear();
                 payrollSummaryData.Clear();
                 govDeductions.Clear();
-                loanDeductions.Clear();
+                employeeDeductions.Clear();
                 payrollEarnings.Clear();
                 attendanceRecords.Clear();
+                employeeLoans.Clear();
 
+                // Load EmployeeDetails
                 var empDetails = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
-                foreach (var emp in empDetails)
-                    employeeDetails[emp.Key] = emp.Object;
-
-                await LoadArrayBasedData("EmploymentInfo", (item) =>
+                foreach (var e in empDetails)
                 {
-                    var employeeId = item.ContainsKey("employee_id") ? item["employee_id"] : null;
-                    if (!string.IsNullOrEmpty(employeeId))
-                        employmentInfo[employeeId] = item;
-                });
+                    if (e.Object != null)
+                    {
+                        employeeDetails[e.Key] = e.Object;
+                    }
+                }
 
-                await LoadArrayBasedData("Work_Schedule", (item) =>
+                // Load EmploymentInfo - handle mixed key formats
+                var employmentData = await firebase.Child("EmploymentInfo").OnceAsync<dynamic>();
+                foreach (var e in employmentData)
                 {
-                    var scheduleId = item.ContainsKey("schedule_id") ? item["schedule_id"] : null;
-                    if (!string.IsNullOrEmpty(scheduleId))
-                        workSchedules[scheduleId] = item;
-                });
+                    if (e.Object != null)
+                    {
+                        var empDict = new Dictionary<string, string>();
+                        foreach (var prop in e.Object)
+                        {
+                            empDict[prop.Key] = prop.Value?.ToString() ?? "";
+                        }
 
+                        if (empDict.ContainsKey("employee_id"))
+                        {
+                            employmentInfo[empDict["employee_id"]] = empDict;
+                        }
+                    }
+                }
+
+                // Load other data using array-based method
                 await LoadArrayBasedData("Payroll", (item) =>
                 {
-                    var employeeId = item.ContainsKey("employee_id") ? item["employee_id"] : null;
-                    if (!string.IsNullOrEmpty(employeeId))
-                        payrollData[employeeId] = item;
+                    if (item.ContainsKey("employee_id"))
+                    {
+                        payrollData[item["employee_id"]] = item;
+                    }
                 });
 
                 await LoadArrayBasedData("PayrollSummary", (item) =>
                 {
-                    var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
-                    if (!string.IsNullOrEmpty(payrollId))
-                        payrollSummaryData[payrollId] = item;
+                    if (item.ContainsKey("payroll_id"))
+                    {
+                        payrollSummaryData[item["payroll_id"]] = item;
+                    }
                 });
 
-                await LoadArrayBasedData("LoansAndOtherDeductions", (item) =>
+                await LoadArrayBasedData("EmployeeDeductions", (item) =>
                 {
-                    var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
-                    if (!string.IsNullOrEmpty(payrollId))
-                        loanDeductions[payrollId] = item;
+                    if (item.ContainsKey("payroll_id"))
+                    {
+                        employeeDeductions[item["payroll_id"]] = item;
+                    }
+                });
+
+                await LoadArrayBasedData("GovernmentDeductions", (item) =>
+                {
+                    if (item.ContainsKey("payroll_id"))
+                    {
+                        govDeductions[item["payroll_id"]] = item;
+                    }
                 });
 
                 await LoadArrayBasedData("PayrollEarnings", (item) =>
                 {
-                    var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
-                    if (!string.IsNullOrEmpty(payrollId))
-                        payrollEarnings[payrollId] = item;
+                    if (item.ContainsKey("payroll_id"))
+                    {
+                        payrollEarnings[item["payroll_id"]] = item;
+                    }
+                });
+
+                await LoadArrayBasedData("EmployeeLoans", (item) =>
+                {
+                    if (item != null && item.Count > 0)
+                    {
+                        employeeLoans.Add(item);
+                    }
                 });
 
                 await LoadArrayBasedData("Attendance", (item) =>
                 {
-                    var employeeId = item.ContainsKey("employee_id") ? item["employee_id"] : null;
-                    if (!string.IsNullOrEmpty(employeeId))
+                    if (item != null && item.Count > 0)
+                    {
                         attendanceRecords.Add(item);
+                    }
                 });
 
-                if (!string.IsNullOrEmpty(currentEmployeeId) && payrollData.ContainsKey(currentEmployeeId))
+                // Validate employee data
+                if (string.IsNullOrEmpty(currentEmployeeId))
                 {
-                    var emp = employeeDetails.ContainsKey(currentEmployeeId) ? employeeDetails[currentEmployeeId] : null;
-                    var payroll = payrollData[currentEmployeeId];
-                    var payrollId = payroll["payroll_id"];
-                    var summary = payrollSummaryData.ContainsKey(payrollId) ? payrollSummaryData[payrollId] : null;
-                    var loan = loanDeductions.ContainsKey(payrollId) ? loanDeductions[payrollId] : null;
-                    var earnings = payrollEarnings.ContainsKey(payrollId) ? payrollEarnings[payrollId] : null;
+                    MessageBox.Show("No employee selected.");
+                    return;
+                }
 
-                    // FIX: Find employment info by searching for the employee ID in all records
-                    Dictionary<string, string> employment = null;
-                    foreach (var empInfo in employmentInfo.Values)
+                if (!employeeDetails.ContainsKey(currentEmployeeId))
+                {
+                    MessageBox.Show($"Employee details not found for {currentEmployeeId}");
+                    return;
+                }
+
+                // Get employee and employment data
+                var emp = employeeDetails[currentEmployeeId];
+                Dictionary<string, string> employment = employmentInfo.ContainsKey(currentEmployeeId) ?
+                    employmentInfo[currentEmployeeId] : null;
+
+                // Find payroll data for this employee
+                Dictionary<string, string> payroll = null;
+                if (payrollData.ContainsKey(currentEmployeeId))
+                {
+                    payroll = payrollData[currentEmployeeId];
+                }
+                else
+                {
+                    // Search through all payroll records
+                    foreach (var p in payrollData.Values)
                     {
-                        if (empInfo.ContainsKey("employee_id") && empInfo["employee_id"] == currentEmployeeId)
+                        if (p.ContainsKey("employee_id") && p["employee_id"] == currentEmployeeId)
                         {
-                            employment = empInfo;
+                            payroll = p;
                             break;
                         }
                     }
+                }
 
-                    if (emp != null)
+                // Set basic employee information
+                labelIDInput.Text = currentEmployeeId;
+                labelNameInput.Text = $"{emp["last_name"] ?? ""}, {emp["first_name"] ?? ""} {emp["middle_name"] ?? ""}".Trim();
+                labelDepartmentInput.Text = employment != null && employment.ContainsKey("department") ? employment["department"] : "";
+                labelPositionInput.Text = employment != null && employment.ContainsKey("position") ? employment["position"] : "";
+
+                // Handle payroll period
+                string cutoffStart = "";
+                string cutoffEnd = "";
+
+                if (payroll != null)
+                {
+                    cutoffStart = payroll.ContainsKey("cutoff_start") ? payroll["cutoff_start"] : "";
+                    cutoffEnd = payroll.ContainsKey("cutoff_end") ? payroll["cutoff_end"] : "";
+                }
+
+                if (string.IsNullOrEmpty(cutoffStart) && !string.IsNullOrEmpty(payrollPeriod))
+                {
+                    cutoffStart = payrollPeriod;
+                    cutoffEnd = payrollPeriod;
+                }
+
+                labelDateCoveredInput.Text = (!string.IsNullOrEmpty(cutoffStart) && !string.IsNullOrEmpty(cutoffEnd)) ?
+                    $"{cutoffStart} to {cutoffEnd}" : "Not specified";
+
+                // Calculate daily rate
+                decimal dailyRate = 0m;
+                if (employment != null && employment.ContainsKey("daily_rate") && !string.IsNullOrEmpty(employment["daily_rate"]))
+                {
+                    decimal.TryParse(employment["daily_rate"], out dailyRate);
+                }
+
+                // Fallback: Check payroll earnings for daily rate
+                string payrollId = payroll != null && payroll.ContainsKey("payroll_id") ? payroll["payroll_id"] : "";
+                if (dailyRate == 0m && !string.IsNullOrEmpty(payrollId) && payrollEarnings.ContainsKey(payrollId) &&
+                    payrollEarnings[payrollId].ContainsKey("daily_rate"))
+                {
+                    decimal.TryParse(payrollEarnings[payrollId]["daily_rate"], out dailyRate);
+                }
+
+                labelDailyRateInput.Text = dailyRate.ToString("0.00");
+
+                // Calculate required work days
+                int requiredDays = 0;
+                if (!string.IsNullOrEmpty(cutoffStart) && !string.IsNullOrEmpty(cutoffEnd) &&
+                    DateTime.TryParse(cutoffStart, out DateTime startDate) && DateTime.TryParse(cutoffEnd, out DateTime endDate))
+                {
+                    var (fullDays, halfDays) = CalculateWorkDaysInPeriod(startDate, endDate);
+                    requiredDays = fullDays + halfDays;
+                }
+                labelDaysInput.Text = requiredDays.ToString();
+
+                // Calculate actual days worked
+                int daysWorked = CalculateDaysWorked(currentEmployeeId, cutoffStart, cutoffEnd);
+                labelDaysPresentInput.Text = daysWorked.ToString();
+
+                // Calculate basic salary components
+                decimal totalSalary = dailyRate * requiredDays;
+                labelSalaryInput.Text = totalSalary.ToString("0.00");
+
+                decimal basicPay = dailyRate * daysWorked;
+                labelBasicPayAmountBaseInput.Text = basicPay.ToString("0.00");
+                labelBasicPayAmountCreditInput.Text = basicPay.ToString("0.00");
+
+                // Calculate overtime
+                decimal totalOvertimeHours = CalculateOvertimeForEmployee(currentEmployeeId, cutoffStart, cutoffEnd);
+                labelOvertimeInput.Text = totalOvertimeHours.ToString("0.00");
+
+                decimal overtimePay = CalculateOvertimePay(dailyRate, totalOvertimeHours);
+                labelOvertimePerHourAmountCreditInput.Text = overtimePay.ToString("0.00");
+
+                decimal overtimePerHourRate = dailyRate / 8m;
+                decimal overtimePerMinuteRate = overtimePerHourRate / 60m;
+                labelOvertimePerHourAmountBaseInput.Text = overtimePerHourRate.ToString("0.00");
+                labelOvertimePerMinuteAmountBaseInput.Text = overtimePerMinuteRate.ToString("0.00");
+                labelOvertimePerMinuteAmountCreditInput.Text = CalculateOvertimeMinutesPay(dailyRate, 1).ToString("0.00");
+
+                // Load earnings data
+                Dictionary<string, string> earnings = !string.IsNullOrEmpty(payrollId) && payrollEarnings.ContainsKey(payrollId) ?
+                    payrollEarnings[payrollId] : null;
+
+                decimal commission = earnings != null && earnings.ContainsKey("commission") && decimal.TryParse(earnings["commission"], out decimal cVal) ? cVal : 0m;
+                decimal communication = earnings != null && earnings.ContainsKey("communication") && decimal.TryParse(earnings["communication"], out decimal comVal) ? comVal : 0m;
+                decimal foodAllowance = earnings != null && earnings.ContainsKey("food_allowance") && decimal.TryParse(earnings["food_allowance"], out decimal faVal) ? faVal : 0m;
+                decimal gasAllowance = earnings != null && earnings.ContainsKey("gas_allowance") && decimal.TryParse(earnings["gas_allowance"], out decimal gaVal) ? gaVal : 0m;
+                decimal gondola = earnings != null && earnings.ContainsKey("gondola") && decimal.TryParse(earnings["gondola"], out decimal gVal) ? gVal : 0m;
+                decimal incentives = earnings != null && earnings.ContainsKey("incentives") && decimal.TryParse(earnings["incentives"], out decimal inVal) ? inVal : 0m;
+
+                labelCommissionAmountBaseInput.Text = commission.ToString("0.00");
+                labelCommissionAmountCreditInput.Text = commission.ToString("0.00");
+                labelCommunicationAmountBaseInput.Text = communication.ToString("0.00");
+                labelCommunicationAmountCreditInput.Text = communication.ToString("0.00");
+                labelFoodAllowanceAmountBaseInput.Text = foodAllowance.ToString("0.00");
+                labelFoodAllowanceAmountCreditInput.Text = foodAllowance.ToString("0.00");
+                labelGasAllowanceAmountBaseInput.Text = gasAllowance.ToString("0.00");
+                labelGasAllowanceAmountCreditInput.Text = gasAllowance.ToString("0.00");
+                labelGondolaAmountBaseInput.Text = gondola.ToString("0.00");
+                labelGondolaAmountCreditInput.Text = gondola.ToString("0.00");
+                labelIncentivesAmountBaseInput.Text = incentives.ToString("0.00");
+                labelIncentivesAmountCreditInput.Text = incentives.ToString("0.00");
+
+                // Calculate government contributions (bi-monthly)
+                decimal monthlySalary = dailyRate * requiredDays * 2; // Approximate monthly salary
+                decimal sss = CalculateSSSContribution(monthlySalary);
+                decimal philhealth = CalculatePhilHealthContribution(monthlySalary);
+                decimal pagibig = CalculatePagibigContribution(monthlySalary);
+                decimal withholdingTax = CalculateWithholdingTax(monthlySalary);
+
+                labelSSSAmountDebitInput.Text = sss.ToString("0.00");
+                labelPhilhealthAmountDebitInput.Text = philhealth.ToString("0.00");
+                labelPagIbigAmountDebitInput.Text = pagibig.ToString("0.00");
+                labelWithTaxAmountDebitInput.Text = withholdingTax.ToString("0.00");
+
+                // Load employee deductions
+                decimal cashAdvance = 0m, coopContribution = 0m, otherDeductions = 0m;
+                if (!string.IsNullOrEmpty(payrollId) && employeeDeductions.ContainsKey(payrollId))
+                {
+                    var deductions = employeeDeductions[payrollId];
+                    if (deductions.ContainsKey("cash_advance")) decimal.TryParse(deductions["cash_advance"], out cashAdvance);
+                    if (deductions.ContainsKey("coop_contribution")) decimal.TryParse(deductions["coop_contribution"], out coopContribution);
+                    if (deductions.ContainsKey("other_deductions")) decimal.TryParse(deductions["other_deductions"], out otherDeductions);
+                }
+
+                // Calculate loan deductions (bi-monthly payments)
+                decimal sssLoan = 0m, pagibigLoan = 0m, carLoan = 0m, housingLoan = 0m, coopLoan = 0m;
+                foreach (var loan in employeeLoans)
+                {
+                    if (loan.ContainsKey("employee_id") && loan["employee_id"] == currentEmployeeId &&
+                        loan.ContainsKey("status") && loan["status"] == "Active")
                     {
-                        // Basic employee info
-                        labelIDInput.Text = currentEmployeeId;
-                        labelNameInput.Text = $"{emp["last_name"]}, {emp["first_name"]} {emp["middle_name"]}";
-                        labelDepartmentInput.Text = employment != null && employment.ContainsKey("department") ? employment["department"] : "";
-                        labelPositionInput.Text = employment != null && employment.ContainsKey("position") ? employment["position"] : "";
-                        labelDateCoveredInput.Text = $"{payroll["cutoff_start"]} to {payroll["cutoff_end"]}";
+                        decimal loanAmount = loan.ContainsKey("loan_amount") && decimal.TryParse(loan["loan_amount"], out decimal amt) ? amt : 0m;
+                        int totalTerms = loan.ContainsKey("total_payment_terms") && int.TryParse(loan["total_payment_terms"], out int terms) ? terms : 0;
 
-                        // Parse rates safely
-                        decimal dailyRate = 0m;
-                        if (employment != null && employment.ContainsKey("daily_rate") && !string.IsNullOrEmpty(employment["daily_rate"]))
+                        if (totalTerms > 0)
                         {
-                            decimal.TryParse(employment["daily_rate"], out dailyRate);
+                            decimal monthlyPayment = loanAmount / totalTerms;
+                            decimal biMonthlyPayment = monthlyPayment / 2; // Split monthly payment into two
+
+                            string loanType = loan.ContainsKey("loan_type") ? loan["loan_type"].ToLower() : "";
+
+                            if (loanType.Contains("sss")) sssLoan += biMonthlyPayment;
+                            else if (loanType.Contains("pagibig") || loanType.Contains("pag-ibig")) pagibigLoan += biMonthlyPayment;
+                            else if (loanType.Contains("car")) carLoan += biMonthlyPayment;
+                            else if (loanType.Contains("housing")) housingLoan += biMonthlyPayment;
+                            else if (loanType.Contains("coop")) coopLoan += biMonthlyPayment;
                         }
-                        labelDailyRateInput.Text = dailyRate.ToString("0.00");
-
-                        // Determine required days (Mon-Fri full, Sat half)
-                        DateTime startDate, endDate;
-                        int requiredDays = 0;
-                        if (payroll.ContainsKey("cutoff_start") && payroll.ContainsKey("cutoff_end") &&
-                            DateTime.TryParse(payroll["cutoff_start"], out startDate) &&
-                            DateTime.TryParse(payroll["cutoff_end"], out endDate) &&
-                            startDate <= endDate)
-                        {
-                            var (fullDays, halfDays) = CalculateWorkDaysInPeriod(startDate, endDate);
-                            requiredDays = fullDays + halfDays;
-                        }
-                        labelDaysInput.Text = requiredDays.ToString();
-
-                        // Actual days worked (attendance)
-                        int daysWorked = CalculateDaysWorked(currentEmployeeId, payroll["cutoff_start"], payroll["cutoff_end"]);
-                        labelDaysPresentInput.Text = daysWorked.ToString();
-
-                        // TOTAL SALARY (expected if attend all required days): dailyRate * requiredDays
-                        decimal totalSalary = dailyRate * requiredDays;
-                        labelSalaryInput.Text = totalSalary.ToString("0.00");
-
-                        // BASIC PAY (attendance-based): dailyRate * daysWorked
-                        decimal basicPay = dailyRate * daysWorked;
-                        labelBasicPayAmountBaseInput.Text = basicPay.ToString("0.00");
-                        labelBasicPayAmountCreditInput.Text = basicPay.ToString("0.00");
-
-                        // OVERTIME
-                        decimal totalOvertime = CalculateOvertimeForEmployee(currentEmployeeId, payroll["cutoff_start"], payroll["cutoff_end"]);
-                        labelOvertimeInput.Text = totalOvertime.ToString("0.00");
-
-                        decimal overtimePay = CalculateOvertimePay(dailyRate, totalOvertime);
-                        labelOvertimePerHourAmountCreditInput.Text = overtimePay.ToString("0.00");
-
-                        // OVERTIME RATE breakdown
-                        decimal overtimePerHourRate = (dailyRate / 8m);
-                        decimal overtimePerMinuteRate = (overtimePerHourRate / 60m);
-                        labelOvertimePerHourAmountBaseInput.Text = overtimePerHourRate.ToString("0.00");
-                        labelOvertimePerMinuteAmountBaseInput.Text = overtimePerMinuteRate.ToString("0.00");
-
-                        // Earnings (period-based allowances)
-                        if (earnings != null)
-                        {
-                            decimal commission = earnings.ContainsKey("commission") ? decimal.Parse(earnings["commission"]) : 0;
-                            labelCommissionAmountBaseInput.Text = commission.ToString("0.00");
-                            labelCommissionAmountCreditInput.Text = commission.ToString("0.00");
-
-                            decimal communication = earnings.ContainsKey("communication") ? decimal.Parse(earnings["communication"]) : 0;
-                            labelCommunicationAmountBaseInput.Text = communication.ToString("0.00");
-                            labelCommunicationAmountCreditInput.Text = communication.ToString("0.00");
-
-                            decimal foodAllowance = earnings.ContainsKey("food_allowance") ? decimal.Parse(earnings["food_allowance"]) : 0;
-                            labelFoodAllowanceAmountBaseInput.Text = foodAllowance.ToString("0.00");
-                            labelFoodAllowanceAmountCreditInput.Text = foodAllowance.ToString("0.00");
-
-                            decimal gasAllowance = earnings.ContainsKey("gas_allowance") ? decimal.Parse(earnings["gas_allowance"]) : 0;
-                            labelGasAllowanceAmountBaseInput.Text = gasAllowance.ToString("0.00");
-                            labelGasAllowanceAmountCreditInput.Text = gasAllowance.ToString("0.00");
-
-                            decimal gondola = earnings.ContainsKey("gondola") ? decimal.Parse(earnings["gondola"]) : 0;
-                            labelGondolaAmountBaseInput.Text = gondola.ToString("0.00");
-                            labelGondolaAmountCreditInput.Text = gondola.ToString("0.00");
-
-                            decimal incentives = earnings.ContainsKey("incentives") ? decimal.Parse(earnings["incentives"]) : 0;
-                            labelIncentivesAmountBaseInput.Text = incentives.ToString("0.00");
-                            labelIncentivesAmountCreditInput.Text = incentives.ToString("0.00");
-                        }
-
-                        // GOVERNMENT DEDUCTIONS — based on salary he will accumulate in a month
-                        decimal computedMonthlySalary = dailyRate * requiredDays * 2;
-                        decimal sss = CalculateSSSContribution(computedMonthlySalary);
-                        decimal philhealth = CalculatePhilHealthContribution(computedMonthlySalary);
-                        decimal pagibig = CalculatePagibigContribution(computedMonthlySalary);
-                        decimal withholdingTax = CalculateWithholdingTax(computedMonthlySalary);
-
-                        labelSSSAmountDebitInput.Text = sss.ToString("0.00");
-                        labelPhilhealthAmountDebitInput.Text = philhealth.ToString("0.00");
-                        labelPagIbigAmountDebitInput.Text = pagibig.ToString("0.00");
-                        labelWithTaxAmountDebitInput.Text = withholdingTax.ToString("0.00");
-
-                        // Loan deductions (divided by 2 for bi-monthly)
-                        if (loan != null)
-                        {
-                            decimal carLoan = loan.ContainsKey("car_loan") ? decimal.Parse(loan["car_loan"]) / 2 : 0;
-                            labelCarLoanAmountDebitInput.Text = carLoan.ToString("0.00");
-
-                            decimal cashAdvance = loan.ContainsKey("cash_advance") ? decimal.Parse(loan["cash_advance"]) / 2 : 0;
-                            labelCashAdvanceAmountDebitInput.Text = cashAdvance.ToString("0.00");
-
-                            decimal coopLoan = loan.ContainsKey("coop_loan") ? decimal.Parse(loan["coop_loan"]) / 2 : 0;
-                            labelCoopLoanAmountDebitInput.Text = coopLoan.ToString("0.00");
-
-                            decimal housingLoan = loan.ContainsKey("housing_loan") ? decimal.Parse(loan["housing_loan"]) / 2 : 0;
-                            labelHousingLoanAmountDebitInput.Text = housingLoan.ToString("0.00");
-
-                            decimal sssLoan = loan.ContainsKey("sss_loan") ? decimal.Parse(loan["sss_loan"]) / 2 : 0;
-                            labelSSSLoanAmountDebitInput.Text = sssLoan.ToString("0.00");
-
-                            decimal pagibigLoan = loan.ContainsKey("pagibig_loan") ? decimal.Parse(loan["pagibig_loan"]) / 2 : 0;
-                            labelPagIbigLoanAmountDebitInput.Text = pagibigLoan.ToString("0.00");
-
-                            decimal coopContribution = loan.ContainsKey("coop_contribution") ? decimal.Parse(loan["coop_contribution"]) / 2 : 0;
-                            labelCoopContriAmountDebitInput.Text = coopContribution.ToString("0.00");
-
-                            decimal otherDeduction = loan.ContainsKey("other_deduction") ? decimal.Parse(loan["other_deduction"]) / 2 : 0;
-                            labelOthersAmountDebitInput.Text = otherDeduction.ToString("0.00");
-                        }
-
-                        // GROSS PAY (for this period)
-                        decimal grossPay = basicPay + overtimePay;
-                        if (earnings != null)
-                        {
-                            grossPay += earnings.ContainsKey("commission") ? decimal.Parse(earnings["commission"]) : 0;
-                            grossPay += earnings.ContainsKey("communication") ? decimal.Parse(earnings["communication"]) : 0;
-                            grossPay += earnings.ContainsKey("food_allowance") ? decimal.Parse(earnings["food_allowance"]) : 0;
-                            grossPay += earnings.ContainsKey("gas_allowance") ? decimal.Parse(earnings["gas_allowance"]) : 0;
-                            grossPay += earnings.ContainsKey("gondola") ? decimal.Parse(earnings["gondola"]) : 0;
-                            grossPay += earnings.ContainsKey("incentives") ? decimal.Parse(earnings["incentives"]) : 0;
-                        }
-                        labelGrossPayInput.Text = grossPay.ToString("0.00");
-
-                        // TOTAL DEDUCTIONS (gov + loans)
-                        decimal totalDeductions = sss + philhealth + pagibig + withholdingTax;
-                        if (loan != null)
-                        {
-                            totalDeductions += loan.ContainsKey("car_loan") ? decimal.Parse(loan["car_loan"]) / 2 : 0;
-                            totalDeductions += loan.ContainsKey("cash_advance") ? decimal.Parse(loan["cash_advance"]) / 2 : 0;
-                            totalDeductions += loan.ContainsKey("coop_loan") ? decimal.Parse(loan["coop_loan"]) / 2 : 0;
-                            totalDeductions += loan.ContainsKey("housing_loan") ? decimal.Parse(loan["housing_loan"]) / 2 : 0;
-                            totalDeductions += loan.ContainsKey("sss_loan") ? decimal.Parse(loan["sss_loan"]) / 2 : 0;
-                            totalDeductions += loan.ContainsKey("pagibig_loan") ? decimal.Parse(loan["pagibig_loan"]) / 2 : 0;
-                            totalDeductions += loan.ContainsKey("coop_contribution") ? decimal.Parse(loan["coop_contribution"]) / 2 : 0;
-                            totalDeductions += loan.ContainsKey("other_deduction") ? decimal.Parse(loan["other_deduction"]) / 2 : 0;
-                        }
-                        labelDeductionsInput.Text = totalDeductions.ToString("0.00");
-
-                        // NET PAY (for this period)
-                        decimal netPay = grossPay - totalDeductions;
-                        labelOverallTotalInput.Text = netPay.ToString("0.00");
-
-                        ExportData = new PayrollExportData
-                        {
-                            EmployeeId = currentEmployeeId,
-                            EmployeeName = $"{emp["last_name"]}, {emp["first_name"]} {emp["middle_name"]}",
-                            Department = employment != null && employment.ContainsKey("department") ? employment["department"] : "",
-                            Position = employment != null && employment.ContainsKey("position") ? employment["position"] : "",
-                            DateCovered = $"{payroll["cutoff_start"]} to {payroll["cutoff_end"]}",
-                            Days = requiredDays.ToString(),
-                            DaysPresent = daysWorked.ToString(),
-                            DailyRate = dailyRate.ToString("0.00"),
-                            Salary = totalSalary.ToString("0.00"),
-                            Overtime = totalOvertime.ToString("0.00"),
-                            BasicPay = basicPay.ToString("0.00"),
-                            OvertimePerHour = overtimePay.ToString("0.00"),
-                            OvertimePerMinute = CalculateOvertimeMinutesPay(dailyRate, 1).ToString("0.00"), // Rate per minute
-                            Incentives = earnings != null && earnings.ContainsKey("incentives") ? decimal.Parse(earnings["incentives"]).ToString("0.00") : "0.00",
-                            Commission = earnings != null && earnings.ContainsKey("commission") ? decimal.Parse(earnings["commission"]).ToString("0.00") : "0.00",
-                            FoodAllowance = earnings != null && earnings.ContainsKey("food_allowance") ? decimal.Parse(earnings["food_allowance"]).ToString("0.00") : "0.00",
-                            Communication = earnings != null && earnings.ContainsKey("communication") ? decimal.Parse(earnings["communication"]).ToString("0.00") : "0.00",
-                            GasAllowance = earnings != null && earnings.ContainsKey("gas_allowance") ? decimal.Parse(earnings["gas_allowance"]).ToString("0.00") : "0.00",
-                            Gondola = earnings != null && earnings.ContainsKey("gondola") ? decimal.Parse(earnings["gondola"]).ToString("0.00") : "0.00",
-                            GrossPay = grossPay.ToString("0.00"),
-                            WithholdingTax = withholdingTax.ToString("0.00"),
-                            SSS = sss.ToString("0.00"),
-                            PagIbig = pagibig.ToString("0.00"),
-                            Philhealth = philhealth.ToString("0.00"),
-                            SSSLoan = loan != null && loan.ContainsKey("sss_loan") ? (decimal.Parse(loan["sss_loan"]) / 2).ToString("0.00") : "0.00",
-                            PagIbigLoan = loan != null && loan.ContainsKey("pagibig_loan") ? (decimal.Parse(loan["pagibig_loan"]) / 2).ToString("0.00") : "0.00",
-                            CarLoan = loan != null && loan.ContainsKey("car_loan") ? (decimal.Parse(loan["car_loan"]) / 2).ToString("0.00") : "0.00",
-                            HousingLoan = loan != null && loan.ContainsKey("housing_loan") ? (decimal.Parse(loan["housing_loan"]) / 2).ToString("0.00") : "0.00",
-                            CashAdvance = loan != null && loan.ContainsKey("cash_advance") ? (decimal.Parse(loan["cash_advance"]) / 2).ToString("0.00") : "0.00",
-                            CoopLoan = loan != null && loan.ContainsKey("coop_loan") ? (decimal.Parse(loan["coop_loan"]) / 2).ToString("0.00") : "0.00",
-                            CoopContribution = loan != null && loan.ContainsKey("coop_contribution") ? (decimal.Parse(loan["coop_contribution"]) / 2).ToString("0.00") : "0.00",
-                            Others = loan != null && loan.ContainsKey("other_deduction") ? (decimal.Parse(loan["other_deduction"]) / 2).ToString("0.00") : "0.00",
-                            TotalDeductions = totalDeductions.ToString("0.00"),
-                            NetPay = netPay.ToString("0.00"),
-                            // Leave balances - test value; needs to be replaced with data from Firebase if available
-                            VacationLeaveCredit = "6.00",
-                            VacationLeaveDebit = "2.00",
-                            VacationLeaveBalance = "4.00",
-                            SickLeaveCredit = "6.00",
-                            SickLeaveDebit = "6.00",
-                            SickLeaveBalance = "0.00"
-                        };
                     }
                 }
+
+                labelSSSLoanAmountDebitInput.Text = sssLoan.ToString("0.00");
+                labelPagIbigLoanAmountDebitInput.Text = pagibigLoan.ToString("0.00");
+                labelCarLoanAmountDebitInput.Text = carLoan.ToString("0.00");
+                labelHousingLoanAmountDebitInput.Text = housingLoan.ToString("0.00");
+                labelCoopLoanAmountDebitInput.Text = coopLoan.ToString("0.00");
+                labelCashAdvanceAmountDebitInput.Text = cashAdvance.ToString("0.00");
+                labelCoopContriAmountDebitInput.Text = coopContribution.ToString("0.00");
+                labelOthersAmountDebitInput.Text = otherDeductions.ToString("0.00");
+
+                // Calculate gross pay
+                decimal grossPay = basicPay + overtimePay + commission + communication + foodAllowance + gasAllowance + gondola + incentives;
+                labelGrossPayInput.Text = grossPay.ToString("0.00");
+
+                // Calculate total deductions
+                decimal totalDeductions = sss + philhealth + pagibig + withholdingTax +
+                                         sssLoan + pagibigLoan + carLoan + housingLoan + coopLoan +
+                                         cashAdvance + coopContribution + otherDeductions;
+                labelDeductionsInput.Text = totalDeductions.ToString("0.00");
+
+                // Calculate net pay
+                decimal netPay = grossPay - totalDeductions;
+                labelOverallTotalInput.Text = netPay.ToString("0.00");
+
+                // Populate export data
+                ExportData = new PayrollExportData
+                {
+                    EmployeeId = currentEmployeeId,
+                    EmployeeName = labelNameInput.Text,
+                    Department = labelDepartmentInput.Text,
+                    Position = labelPositionInput.Text,
+                    DateCovered = labelDateCoveredInput.Text,
+                    Days = requiredDays.ToString(),
+                    DaysPresent = daysWorked.ToString(),
+                    DailyRate = dailyRate.ToString("0.00"),
+                    Salary = totalSalary.ToString("0.00"),
+                    Overtime = totalOvertimeHours.ToString("0.00"),
+                    BasicPay = basicPay.ToString("0.00"),
+                    OvertimePerHour = overtimePay.ToString("0.00"),
+                    OvertimePerMinute = CalculateOvertimeMinutesPay(dailyRate, 1).ToString("0.00"),
+                    Incentives = incentives.ToString("0.00"),
+                    Commission = commission.ToString("0.00"),
+                    FoodAllowance = foodAllowance.ToString("0.00"),
+                    Communication = communication.ToString("0.00"),
+                    GasAllowance = gasAllowance.ToString("0.00"),
+                    Gondola = gondola.ToString("0.00"),
+                    GrossPay = grossPay.ToString("0.00"),
+                    WithholdingTax = withholdingTax.ToString("0.00"),
+                    SSS = sss.ToString("0.00"),
+                    PagIbig = pagibig.ToString("0.00"),
+                    Philhealth = philhealth.ToString("0.00"),
+                    SSSLoan = sssLoan.ToString("0.00"),
+                    PagIbigLoan = pagibigLoan.ToString("0.00"),
+                    CarLoan = carLoan.ToString("0.00"),
+                    HousingLoan = housingLoan.ToString("0.00"),
+                    CashAdvance = cashAdvance.ToString("0.00"),
+                    CoopLoan = coopLoan.ToString("0.00"),
+                    CoopContribution = coopContribution.ToString("0.00"),
+                    Others = otherDeductions.ToString("0.00"),
+                    TotalDeductions = totalDeductions.ToString("0.00"),
+                    NetPay = netPay.ToString("0.00"),
+                    VacationLeaveCredit = "0.00",
+                    VacationLeaveDebit = "0.00",
+                    VacationLeaveBalance = "0.00",
+                    SickLeaveCredit = "0.00",
+                    SickLeaveDebit = "0.00",
+                    SickLeaveBalance = "0.00"
+                };
+
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading payroll data: " + ex.Message);
+                MessageBox.Show($"Error loading payroll data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -511,8 +681,9 @@ namespace HRIS_JAP_ATTPAY
             {
                 if (attendance.ContainsKey("employee_id") && attendance["employee_id"] == employeeId &&
                     attendance.ContainsKey("attendance_date") && IsDateInRange(attendance["attendance_date"], cutoffStart, cutoffEnd) &&
-                    attendance.ContainsKey("status") && attendance["status"] != "Absent" &&
-                    attendance.ContainsKey("time_in") && !string.IsNullOrEmpty(attendance["time_in"]))
+                    attendance.ContainsKey("status") && !string.Equals(attendance["status"], "Absent", StringComparison.OrdinalIgnoreCase) &&
+                    attendance.ContainsKey("time_in") && !string.IsNullOrEmpty(attendance["time_in"]) &&
+                    !string.Equals(attendance["time_in"], "N/A", StringComparison.OrdinalIgnoreCase))
                 {
                     daysWorked++;
                 }
@@ -520,34 +691,13 @@ namespace HRIS_JAP_ATTPAY
             return daysWorked;
         }
 
-        private decimal CalculateBasicPay(string employeeId, string cutoffStart, string cutoffEnd)
-        {
-            decimal dailyRate = 0;
-            if (employmentInfo.ContainsKey(employeeId) && employmentInfo[employeeId].ContainsKey("daily_rate"))
-            {
-                decimal.TryParse(employmentInfo[employeeId]["daily_rate"], out dailyRate);
-            }
-            int daysWorked = CalculateDaysWorked(employeeId, cutoffStart, cutoffEnd);
-            return dailyRate * daysWorked;
-        }
-
-        private decimal CalculateOvertimePay(string employeeId, string cutoffStart, string cutoffEnd)
-        {
-            decimal dailyRate = 0;
-            if (employmentInfo.ContainsKey(employeeId) && employmentInfo[employeeId].ContainsKey("daily_rate"))
-            {
-                decimal.TryParse(employmentInfo[employeeId]["daily_rate"], out dailyRate);
-            }
-            decimal hourlyRate = dailyRate / 8;
-            decimal overtimeRate = hourlyRate * 1.25m;
-            decimal totalOvertimeHours = CalculateOvertimeForEmployee(employeeId, cutoffStart, cutoffEnd);
-            return totalOvertimeHours * overtimeRate;
-        }
-
         private bool IsDateInRange(string date, string startDate, string endDate)
         {
             try
             {
+                if (string.IsNullOrEmpty(date) || string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate))
+                    return false;
+
                 DateTime checkDate = DateTime.Parse(date);
                 DateTime start = DateTime.Parse(startDate);
                 DateTime end = DateTime.Parse(endDate);
@@ -588,6 +738,7 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
+                // Your existing font setting code remains the same
                 labelAmountBase.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelAmountCredit.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelAmountDebit.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
