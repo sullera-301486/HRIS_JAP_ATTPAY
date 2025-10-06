@@ -4,9 +4,10 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Net.Http; // 🆕 for downloading the image
+using System.Net.Http;
 using Firebase.Database;
 using Firebase.Database.Query;
+using Newtonsoft.Json.Linq;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -80,7 +81,6 @@ namespace HRIS_JAP_ATTPAY
             }
             else
             {
-                // 🆕 Try to load employee image automatically
                 await LoadEmployeeImageAsync(submitted);
             }
 
@@ -97,7 +97,7 @@ namespace HRIS_JAP_ATTPAY
 
             this.Tag = firebaseKey;
 
-            // 🔹 Validate employee name before saving (only if new)
+            // 🔹 Validate employee before saving new data
             if (saveToFirebase)
             {
                 bool isValid = await IsEmployeeValidAsync(employee);
@@ -136,14 +136,13 @@ namespace HRIS_JAP_ATTPAY
 
                 foreach (var emp in employees)
                 {
-                    string fullName = $"{emp.Object.first_name} {emp.Object.middle_name} {emp.Object.last_name}".Trim();
+                    string fullName = $"{emp.Object.first_name} {emp.Object.middle_name} {emp.Object.last_name}".Replace("  ", " ").Trim();
                     string firstName = emp.Object.first_name?.ToString();
                     string imageUrl = emp.Object.image_url?.ToString();
 
                     if (string.IsNullOrEmpty(imageUrl))
                         continue;
 
-                    // Match by full name or first name
                     if (string.Equals(fullName, submittedBy, StringComparison.OrdinalIgnoreCase) ||
                         string.Equals(firstName, submittedBy, StringComparison.OrdinalIgnoreCase))
                     {
@@ -180,21 +179,16 @@ namespace HRIS_JAP_ATTPAY
                 lblTimeAgo.Text = $"{(int)diff.TotalDays}d ago";
         }
 
-        // 🔹 Save to Firebase
+        // 🔹 Save notification to Firebase
         private static async Task SaveLeaveNotificationAsync(LeaveNotificationModel leaveNotif)
         {
-            await firebase
-                .Child("LeaveNotifications")
-                .PostAsync(leaveNotif);
+            await firebase.Child("LeaveNotifications").PostAsync(leaveNotif);
         }
 
-        // 🔹 Load all notifications from Firebase (sorted by newest)
+        // 🔹 Load all notifications from Firebase (newest first)
         public static async Task<List<LeaveNotificationModelWithKey>> GetAllLeaveNotificationsAsync()
         {
-            var notifications = await firebase
-                .Child("LeaveNotifications")
-                .OnceAsync<LeaveNotificationModel>();
-
+            var notifications = await firebase.Child("LeaveNotifications").OnceAsync<LeaveNotificationModel>();
             List<LeaveNotificationModelWithKey> list = new List<LeaveNotificationModelWithKey>();
 
             foreach (var item in notifications)
@@ -212,41 +206,143 @@ namespace HRIS_JAP_ATTPAY
                 });
             }
 
-            // ✅ Sort by actual DateTime newest → oldest
             list.Sort((a, b) =>
             {
-                DateTime aDate, bDate;
-                DateTime.TryParse(a.CreatedAt, out aDate);
-                DateTime.TryParse(b.CreatedAt, out bDate);
+                DateTime.TryParse(a.CreatedAt, out DateTime aDate);
+                DateTime.TryParse(b.CreatedAt, out DateTime bDate);
                 return bDate.CompareTo(aDate);
             });
 
             return list;
         }
 
-        // 🔹 Delete from Firebase
+        // 🔹 Delete notification
         public static async Task DeleteNotificationAsync(string key)
         {
-            await firebase
-                .Child("LeaveNotifications")
-                .Child(key)
-                .DeleteAsync();
+            await firebase.Child("LeaveNotifications").Child(key).DeleteAsync();
         }
 
-        // 🔹 Validate if employee name exists
+        // 🔹 Validate employee
         private static async Task<bool> IsEmployeeValidAsync(string employeeName)
         {
-            var employees = await firebase
-                .Child("EmployeeDetails")
-                .OnceAsync<dynamic>();
-
+            var employees = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
             foreach (var emp in employees)
             {
-                string fullName = $"{emp.Object.first_name} {emp.Object.middle_name} {emp.Object.last_name}".Trim();
-                if (string.Equals(fullName, employeeName, StringComparison.OrdinalIgnoreCase))
+                string firstName = (emp.Object.first_name ?? "").ToString().Trim();
+                string middleName = (emp.Object.middle_name ?? "").ToString().Trim();
+                string lastName = (emp.Object.last_name ?? "").ToString().Trim();
+
+                string fullNameWithMiddle = $"{firstName} {middleName} {lastName}".Replace("  ", " ").Trim();
+                string fullNameNoMiddle = $"{firstName} {lastName}".Trim();
+
+                if (string.Equals(fullNameWithMiddle, employeeName, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(fullNameNoMiddle, employeeName, StringComparison.OrdinalIgnoreCase))
                     return true;
             }
             return false;
+        }
+
+        // 🆕 Deduct leave & handle yearly reset (only January 1)
+        private static async Task DeductLeaveBalanceAsync(string employeeName, string leaveType)
+        {
+            try
+            {
+                var employees = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
+
+                // 🧠 Find employee ID by flexible name matching
+                string employeeId = null;
+                string fullName = null;
+
+                foreach (var emp in employees)
+                {
+                    string firstName = (emp.Object.first_name ?? "").ToString().Trim();
+                    string middleName = (emp.Object.middle_name ?? "").ToString().Trim();
+                    string lastName = (emp.Object.last_name ?? "").ToString().Trim();
+
+                    string fullNameWithMiddle = $"{firstName} {middleName} {lastName}".Replace("  ", " ").Trim();
+                    string fullNameNoMiddle = $"{firstName} {lastName}".Trim();
+
+                    if (string.Equals(fullNameWithMiddle, employeeName, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(fullNameNoMiddle, employeeName, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(firstName, employeeName, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(lastName, employeeName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        employeeId = emp.Key;
+                        fullName = fullNameWithMiddle;
+                        break;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(employeeId))
+                {
+                    MessageBox.Show($"Employee '{employeeName}' not found.", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // 🟢 Get or create leave credit
+                var currentLeave = await firebase
+                    .Child("Leave Credits")
+                    .Child(employeeId)
+                    .OnceSingleAsync<dynamic>();
+
+                int sickLeave = 6;
+                int vacationLeave = 6;
+                int lastUpdatedYear = DateTime.Now.Year;
+
+                if (currentLeave != null)
+                {
+                    sickLeave = currentLeave.sick_leave != null ? (int)currentLeave.sick_leave : 6;
+                    vacationLeave = currentLeave.vacation_leave != null ? (int)currentLeave.vacation_leave : 6;
+
+                    if (currentLeave.updated_at != null)
+                    {
+                        DateTime.TryParse(currentLeave.updated_at.ToString(), out DateTime parsedDate);
+                        if (parsedDate != default)
+                            lastUpdatedYear = parsedDate.Year;
+                    }
+                }
+
+                // 🧠 Reset on January 1 of new year
+                if (lastUpdatedYear < DateTime.Now.Year)
+                {
+                    sickLeave = 6;
+                    vacationLeave = 6;
+                }
+
+                // Deduct depending on leave type
+                if (leaveType.ToLower().Contains("sick"))
+                    sickLeave = Math.Max(0, sickLeave - 1);
+                else if (leaveType.ToLower().Contains("vacation"))
+                    vacationLeave = Math.Max(0, vacationLeave - 1);
+
+                var updatedCredits = new
+                {
+                    employee_id = employeeId,
+                    full_name = fullName,
+                    sick_leave = sickLeave,
+                    vacation_leave = vacationLeave,
+                    updated_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                };
+
+                await firebase
+                    .Child("Leave Credits")
+                    .Child(employeeId)
+                    .PutAsync(updatedCredits);
+
+                MessageBox.Show(
+                    $"{employeeName}'s {leaveType} leave deducted successfully.\n" +
+                    $"Sick Leave: {sickLeave}\nVacation Leave: {vacationLeave}",
+                    "Leave Deducted",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error deducting leave balance: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         // 🔹 Models
@@ -266,13 +362,20 @@ namespace HRIS_JAP_ATTPAY
             public string Key { get; set; }
         }
 
-        // 🔹 Button Events
+        // 🔹 Events
         public event EventHandler ApproveClicked;
         public event EventHandler DeclineClicked;
 
-        private void btnApprove_Click(object sender, EventArgs e)
+        private async void btnApprove_Click(object sender, EventArgs e)
         {
+            await DeductLeaveBalanceAsync(lblEmployeeLeave.Text, lblLeave.Text);
             ApproveClicked?.Invoke(this, EventArgs.Empty);
+
+            if (Tag is string firebaseKey && !string.IsNullOrEmpty(firebaseKey))
+            {
+                await DeleteNotificationAsync(firebaseKey);
+                this.Parent?.Controls.Remove(this);
+            }
         }
 
         private async void btnDecline_Click(object sender, EventArgs e)

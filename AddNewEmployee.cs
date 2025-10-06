@@ -14,41 +14,31 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class AddNewEmployee : Form
     {
-        // Firebase client using your given URL
         private readonly FirebaseClient firebase;
-        private string localImagePath; // Store the selected image path
+        private string localImagePath;
 
-        // ---- Firebase Configuration for v7.3 ----
         private static readonly string FirebaseStorageBucket = "thesis151515.firebasestorage.app";
-        // ------------------------------------------
-
 
         public AddNewEmployee()
         {
             InitializeComponent();
             setFont();
-            // initialize firestore client here
             firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
             InitializeDepartmentComboBox();
-            // Initialize alternate textbox state
             UpdateAlternateTextboxAccessibility();
-
-            // Initialize password field accessibility
             UpdatePasswordFieldAccessibility();
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            if (pictureBoxEmployee.Image == null) // Only draw text if no image
+            if (pictureBoxEmployee.Image == null)
             {
                 string text = "ADD PHOTO";
                 using (Font font = new Font("Roboto-Regular", 14f))
                 {
                     SizeF textSize = e.Graphics.MeasureString(text, font);
-
                     float x = (pictureBoxEmployee.Width - textSize.Width) / 2;
                     float y = (pictureBoxEmployee.Height - textSize.Height) / 2;
-
                     e.Graphics.DrawString(text, font, Brushes.Black, x, y);
                 }
             }
@@ -63,23 +53,112 @@ namespace HRIS_JAP_ATTPAY
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    localImagePath = ofd.FileName; // Store the file path
+                    localImagePath = ofd.FileName;
                     pictureBoxEmployee.Image = Image.FromFile(localImagePath);
                     pictureBoxEmployee.SizeMode = PictureBoxSizeMode.Zoom;
-
-                    // remove the "Add Photo" text after image is loaded
                     pictureBoxEmployee.Paint -= pictureBox1_Paint;
                     pictureBoxEmployee.Invalidate();
                 }
             }
         }
+        private async Task SyncAllEmployeesToLeaveCredits()
+        {
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    // 🔹 1. Get all employees from EmployeeDetails
+                    string employeeUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/EmployeeDetails.json";
+                    var employeeResponse = await httpClient.GetAsync(employeeUrl);
 
-        private void AddNewEmployee_Load(object sender, EventArgs e)
+                    if (!employeeResponse.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Failed to fetch EmployeeDetails data from Firebase.",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    string employeeJson = await employeeResponse.Content.ReadAsStringAsync();
+                    if (string.IsNullOrWhiteSpace(employeeJson) || employeeJson == "null")
+                    {
+                        MessageBox.Show("No employees found in EmployeeDetails.",
+                            "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+
+                    JObject employeeData = JObject.Parse(employeeJson);
+
+                    // 🔹 2. Get existing Leave Credits
+                    string leaveCreditsUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits.json";
+                    var leaveResponse = await httpClient.GetAsync(leaveCreditsUrl);
+                    string leaveJson = await leaveResponse.Content.ReadAsStringAsync();
+                    JObject existingLeaveData = null;
+                    if (!string.IsNullOrWhiteSpace(leaveJson) && leaveJson != "null")
+                        existingLeaveData = JObject.Parse(leaveJson);
+
+                    int createdCount = 0;
+
+                    // 🔹 3. Loop through employees and only create missing leave credit records
+                    foreach (var emp in employeeData)
+                    {
+                        string employeeId = emp.Key;
+                        JObject empObj = (JObject)emp.Value;
+
+                        string firstName = empObj["first_name"]?.ToString() ?? "";
+                        string middleName = empObj["middle_name"]?.ToString() ?? "";
+                        string lastName = empObj["last_name"]?.ToString() ?? "";
+                        string fullName = $"{firstName} {middleName} {lastName}".Trim();
+
+                        bool alreadyExists = existingLeaveData != null && existingLeaveData[employeeId] != null;
+                        if (alreadyExists)
+                            continue; // 🟢 Skip existing records
+
+                        var leaveCredits = new
+                        {
+                            employee_id = employeeId,
+                            full_name = fullName,
+                            sick_leave = 6,
+                            vacation_leave = 6,
+                            created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
+                        };
+
+                        string leaveCreditsChildUrl =
+                            $"https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits/{employeeId}.json";
+
+                        string jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(leaveCredits);
+                        var stringContent = new StringContent(jsonBody, System.Text.Encoding.UTF8, "application/json");
+                        var putResponse = await httpClient.PutAsync(leaveCreditsChildUrl, stringContent);
+
+                        if (putResponse.IsSuccessStatusCode)
+                            createdCount++;
+                    }
+
+                    // 🔹 4. Summary
+                    MessageBox.Show(
+                        $"Leave Credits sync completed.\n" +
+                        $"New Leave Credits created for {createdCount} missing employees.\n" +
+                        $"(Existing records were left unchanged.)",
+                        "Sync Completed",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error syncing Leave Credits: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+
+        private async void AddNewEmployee_Load(object sender, EventArgs e)
         {
             System.Windows.Forms.CheckBox[] dayBoxes = {
-        checkBoxM, checkBoxT, checkBoxW, checkBoxTh, checkBoxF, checkBoxS,
-        checkBoxAltM, checkBoxAltT, checkBoxAltW, checkBoxAltTh, checkBoxAltF, checkBoxAltS
-    };
+                checkBoxM, checkBoxT, checkBoxW, checkBoxTh, checkBoxF, checkBoxS,
+                checkBoxAltM, checkBoxAltT, checkBoxAltW, checkBoxAltTh, checkBoxAltF, checkBoxAltS
+            };
 
             foreach (var cb in dayBoxes)
             {
@@ -97,43 +176,35 @@ namespace HRIS_JAP_ATTPAY
                     var box = s as CheckBox;
                     if (box.Checked)
                     {
-                        box.BackColor = Color.FromArgb(96, 81, 148);  // Selected
+                        box.BackColor = Color.FromArgb(96, 81, 148);
                         box.ForeColor = Color.White;
-
-                        // Disable the corresponding checkbox in the other schedule
                         DisableCorrespondingDay(box);
                     }
                     else
                     {
-                        box.BackColor = Color.FromArgb(217, 217, 217); // Unselected
+                        box.BackColor = Color.FromArgb(217, 217, 217);
                         box.ForeColor = Color.Black;
-
-                        // Enable the corresponding checkbox in the other schedule
                         EnableCorrespondingDay(box);
                     }
-
-                    // Update alternate textbox accessibility whenever any alternate checkbox changes
                     UpdateAlternateTextboxAccessibility();
                 };
 
                 cb.Checked = false;
             }
-
-            // Initialize alternate textbox state
             UpdateAlternateTextboxAccessibility();
+
+            await SyncAllEmployeesToLeaveCredits();
         }
+
         private void UpdateAlternateTextboxAccessibility()
         {
-            // Check if any alternate workday is checked
             bool anyAltDayChecked = checkBoxAltM.Checked || checkBoxAltT.Checked ||
                                    checkBoxAltW.Checked || checkBoxAltTh.Checked ||
                                    checkBoxAltF.Checked || checkBoxAltS.Checked;
 
-            // Enable/disable alternate work hours textboxes based on alternate day selection
             textBoxAltWorkHoursA.Enabled = anyAltDayChecked;
             textBoxAltWorkHoursB.Enabled = anyAltDayChecked;
 
-            // Optional: Change appearance to visually indicate disabled state
             if (anyAltDayChecked)
             {
                 textBoxAltWorkHoursA.BackColor = SystemColors.Window;
@@ -147,13 +218,10 @@ namespace HRIS_JAP_ATTPAY
                 textBoxAltWorkHoursB.BackColor = SystemColors.Control;
                 textBoxAltWorkHoursA.ForeColor = SystemColors.GrayText;
                 textBoxAltWorkHoursB.ForeColor = SystemColors.GrayText;
-
-                // Optional: Clear the text when disabled
                 textBoxAltWorkHoursA.Text = "";
                 textBoxAltWorkHoursB.Text = "";
             }
         }
-
 
         private void DisableCorrespondingDay(CheckBox checkedBox)
         {
@@ -175,26 +243,13 @@ namespace HRIS_JAP_ATTPAY
 
         private CheckBox GetCorrespondingCheckbox(CheckBox sourceBox)
         {
-            // Map regular days to alternate days and vice versa
             Dictionary<CheckBox, CheckBox> dayMapping = new Dictionary<CheckBox, CheckBox>
-    {
-        // Regular to Alternate mapping
-        { checkBoxM, checkBoxAltM },
-        { checkBoxT, checkBoxAltT },
-        { checkBoxW, checkBoxAltW },
-        { checkBoxTh, checkBoxAltTh },
-        { checkBoxF, checkBoxAltF },
-        { checkBoxS, checkBoxAltS },
-        
-        // Alternate to Regular mapping
-        { checkBoxAltM, checkBoxM },
-        { checkBoxAltT, checkBoxT },
-        { checkBoxAltW, checkBoxW },
-        { checkBoxAltTh, checkBoxTh },
-        { checkBoxAltF, checkBoxF },
-        { checkBoxAltS, checkBoxS }
-    };
-
+            {
+                { checkBoxM, checkBoxAltM }, { checkBoxT, checkBoxAltT }, { checkBoxW, checkBoxAltW },
+                { checkBoxTh, checkBoxAltTh }, { checkBoxF, checkBoxAltF }, { checkBoxS, checkBoxAltS },
+                { checkBoxAltM, checkBoxM }, { checkBoxAltT, checkBoxT }, { checkBoxAltW, checkBoxW },
+                { checkBoxAltTh, checkBoxTh }, { checkBoxAltF, checkBoxF }, { checkBoxAltS, checkBoxS }
+            };
             return dayMapping.ContainsKey(sourceBox) ? dayMapping[sourceBox] : null;
         }
 
@@ -205,20 +260,14 @@ namespace HRIS_JAP_ATTPAY
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            // Show confirmation dialog first
             using (ConfirmAddEmployee confirmForm = new ConfirmAddEmployee())
             {
                 confirmForm.StartPosition = FormStartPosition.CenterParent;
                 var result = confirmForm.ShowDialog(this);
 
-                if (result == DialogResult.OK || confirmForm.UserConfirmed) // Check both for safety
+                if (result == DialogResult.OK || confirmForm.UserConfirmed)
                 {
-                    // Validate work schedule before proceeding
-                    if (!ValidateWorkSchedule())
-                    {
-                        return;
-                    }
-
+                    if (!ValidateWorkSchedule()) return;
                     await AddEmployeeToFirebaseAsync();
                 }
                 else
@@ -232,6 +281,7 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
+                // [⚠ All original font assignments kept here exactly as before]
                 buttonScanRFID.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 buttonAdd.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
                 buttonCancel.Font = AttributesClass.GetFont("Roboto-Light", 14f);
@@ -259,7 +309,6 @@ namespace HRIS_JAP_ATTPAY
                 labelMaritalStatus.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelMiddleName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelNationality.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                // labelPassword etc., if there is
                 labelPassword.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelPersonalInformation.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
                 labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
@@ -305,29 +354,24 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // === VALIDATION CHECK ===
                 string employeeId = textBoxEmployeeID.Text.Trim();
 
-                // Check if employee ID already exists
                 bool idExists = await IsEmployeeIdExists(employeeId);
                 if (idExists)
                 {
-                    MessageBox.Show($"Employee ID '{employeeId}' already exists. Please use a different ID.", "Duplicate ID", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return; // Stop the process
+                    MessageBox.Show($"Employee ID '{employeeId}' already exists.", "Duplicate ID", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
-                // === END OF VALIDATION CHECK ===
 
-                // 1. Handle image upload first (if new image was selected)
                 string imageUrl = null;
                 if (!string.IsNullOrEmpty(localImagePath))
-                {
                     imageUrl = await UploadImageToFirebase(localImagePath, employeeId);
-                }
 
-                // 2. Collect all UI values
                 string firstName = textBoxFirstName.Text.Trim();
                 string middleName = textBoxMiddleName.Text.Trim();
                 string lastName = textBoxLastName.Text.Trim();
+                string fullName = $"{firstName} {middleName} {lastName}".Trim();
+
                 string gender = textBoxGender.Text.Trim();
                 string dateOfBirth = textBoxDateOfBirth.Text.Trim();
                 string maritalStatus = textBoxMaritalStatus.Text.Trim();
@@ -339,22 +383,21 @@ namespace HRIS_JAP_ATTPAY
                 string department = comboBoxDepartment.Text.Trim();
                 string contractType = textBoxContractType.Text.Trim();
                 string dateOfJoining = textBoxDateOfJoining.Text.Trim();
-                string dateOfExit = textBoxDateOfExit.Text.Trim(); // can be blank
+                string dateOfExit = textBoxDateOfExit.Text.Trim();
                 string managerName = textBoxManager.Text.Trim();
-                string password = textBoxPassword.Text.Trim(); // Get the password
+                string password = textBoxPassword.Text.Trim();
 
-                // RFID TAG HANDLING - Use scanned RFID if available, otherwise use employee ID
                 string rfidTag = !string.IsNullOrEmpty(labelRFIDTagInput.Text) && labelRFIDTagInput.Text != "Scan RFID Tag"
                     ? labelRFIDTagInput.Text
                     : employeeId;
 
-                // Create EmployeeDetails object matching your JSON structure
                 var employeeDetailsObj = new
                 {
                     employee_id = employeeId,
                     first_name = firstName,
                     middle_name = middleName,
                     last_name = lastName,
+                    full_name = fullName,
                     gender = gender,
                     date_of_birth = dateOfBirth,
                     marital_status = maritalStatus,
@@ -362,16 +405,14 @@ namespace HRIS_JAP_ATTPAY
                     contact = contact,
                     email = email,
                     address = address,
-                    rfid_tag = rfidTag, // Now using scanned RFID if available, otherwise employee ID
-                    image_url = imageUrl, // Add the image URL here
+                    rfid_tag = rfidTag,
+                    image_url = imageUrl,
                     created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
                 };
 
-                // Generate employment_id following your pattern (1, 2, 3, etc.)
-                string numericPart = employeeId.Split('-')[1]; // Extract "001" from "JAP-001"
-                string employmentId = numericPart; // This will be "001", "002", etc.
+                string numericPart = employeeId.Split('-')[1];
+                string employmentId = numericPart;
 
-                // Create EmploymentInfo object matching your JSON structure
                 var employmentInfoObj = new
                 {
                     employment_id = employmentId,
@@ -385,29 +426,18 @@ namespace HRIS_JAP_ATTPAY
                     created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
                 };
 
-                // Push to EmployeeDetails
-                await firebase
-                    .Child("EmployeeDetails")
-                    .Child(employeeId)
-                    .PutAsync(employeeDetailsObj);
+                await firebase.Child("EmployeeDetails").Child(employeeId).PutAsync(employeeDetailsObj);
+                await firebase.Child("EmploymentInfo").Child(employmentId).PutAsync(employmentInfoObj);
 
-                // Push to EmploymentInfo using the generated employment_id
-                await firebase
-                    .Child("EmploymentInfo")
-                    .Child(employmentId)
-                    .PutAsync(employmentInfoObj);
-
-                // 3. Add work schedules based on checkbox selections (NEW CORRECTED VERSION)
                 await AddWorkSchedulesAsync(employeeId);
 
-                // 4. DETERMINE IF EMPLOYEE SHOULD BE A USER BASED ON PASSWORD
+                // ✅ ADD LEAVE CREDITS SECTION
+                await CreateDefaultLeaveCredits(employeeId, fullName);
+
                 if (!string.IsNullOrEmpty(password))
                 {
-                    // Create user account with password (like JAP-001 and JAP-002)
-                    string userId = (100 + int.Parse(numericPart)).ToString(); // 101, 102, 103, etc.
-
-                    // Generate salt and hash the password - matching JAP-002 format
-                    string salt = "RANDOMSALT" + numericPart; // Format like "RANDOMSALT2" for JAP-002
+                    string userId = (100 + int.Parse(numericPart)).ToString();
+                    string salt = "RANDOMSALT" + numericPart;
                     string passwordHash = HashPassword(password, salt);
 
                     var userObj = new
@@ -420,12 +450,8 @@ namespace HRIS_JAP_ATTPAY
                         created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
                     };
 
-                    await firebase
-                        .Child("Users")
-                        .Child(userObj.user_id)
-                        .PutAsync(userObj);
+                    await firebase.Child("Users").Child(userObj.user_id).PutAsync(userObj);
                 }
-                // If password is null or empty, DO NOT create user account (no else block)
 
                 MessageBox.Show("Employee successfully added to Firebase.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.Close();
@@ -436,7 +462,29 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private string HashPassword(string password, string salt)
+        // ✅ NEW FUNCTION: Create Leave Credits
+        private async Task CreateDefaultLeaveCredits(string employeeId, string fullName)
+        {
+            try
+            {
+                var leaveCreditsObj = new
+                {
+                    employee_id = employeeId,
+                    full_name = fullName,
+                    sick_leave = 6,
+                    vacation_leave = 6,
+                    created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
+                };
+
+                await firebase.Child("Leave Credits").Child(employeeId).PutAsync(leaveCreditsObj);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error creating default leave credits: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+private string HashPassword(string password, string salt)
         {
             using (var sha256 = System.Security.Cryptography.SHA256.Create())
             {
@@ -634,6 +682,7 @@ namespace HRIS_JAP_ATTPAY
                 return 1;
             }
         }
+
 
         private bool ValidateWorkSchedule()
         {
