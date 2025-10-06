@@ -172,7 +172,7 @@
             this.labelDepartmentInput.Name = "labelDepartmentInput";
             this.labelDepartmentInput.Size = new System.Drawing.Size(221, 31);
             this.labelDepartmentInput.TabIndex = 36;
-            this.labelDepartmentInput.Text = "Human Resource";
+            this.labelDepartmentInput.Text = "[department]";
             this.labelDepartmentInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelPositionInput
@@ -184,7 +184,7 @@
             this.labelPositionInput.Name = "labelPositionInput";
             this.labelPositionInput.Size = new System.Drawing.Size(221, 31);
             this.labelPositionInput.TabIndex = 35;
-            this.labelPositionInput.Text = "Manager";
+            this.labelPositionInput.Text = "[position]";
             this.labelPositionInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelIDInput
@@ -290,7 +290,7 @@
             this.labelNameInput.Name = "labelNameInput";
             this.labelNameInput.Size = new System.Drawing.Size(221, 31);
             this.labelNameInput.TabIndex = 41;
-            this.labelNameInput.Text = "Charles Andrei Macaraig";
+            this.labelNameInput.Text = "[name]";
             this.labelNameInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelSalaryInput
@@ -602,7 +602,7 @@
             this.labelBasicPayCredit.Name = "labelBasicPayCredit";
             this.labelBasicPayCredit.Size = new System.Drawing.Size(133, 31);
             this.labelBasicPayCredit.TabIndex = 70;
-            this.labelBasicPayCredit.Text = "12.50";
+            this.labelBasicPayCredit.Text = "0";
             this.labelBasicPayCredit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelCommunicationAmountBaseInput
