@@ -181,7 +181,7 @@
             this.buttonScanRFID.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonScanRFID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonScanRFID.ForeColor = System.Drawing.Color.White;
-            this.buttonScanRFID.Location = new System.Drawing.Point(1009, 73);
+            this.buttonScanRFID.Location = new System.Drawing.Point(990, 75);
             this.buttonScanRFID.Margin = new System.Windows.Forms.Padding(4);
             this.buttonScanRFID.Name = "buttonScanRFID";
             this.buttonScanRFID.Size = new System.Drawing.Size(161, 42);
@@ -207,7 +207,7 @@
             this.labelEditEmployeeDesc.AutoSize = true;
             this.labelEditEmployeeDesc.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelEditEmployeeDesc.ForeColor = System.Drawing.Color.Black;
-            this.labelEditEmployeeDesc.Location = new System.Drawing.Point(424, 79);
+            this.labelEditEmployeeDesc.Location = new System.Drawing.Point(430, 79);
             this.labelEditEmployeeDesc.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelEditEmployeeDesc.Name = "labelEditEmployeeDesc";
             this.labelEditEmployeeDesc.Size = new System.Drawing.Size(345, 25);

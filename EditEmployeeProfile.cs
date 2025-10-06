@@ -400,6 +400,7 @@ namespace HRIS_JAP_ATTPAY
                 buttonChangePhoto.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 buttonUpdate.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
                 buttonCancel.Font = AttributesClass.GetFont("Roboto-Light", 14f);
+                buttonScanRFID.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 comboBoxDepartment.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelAddress.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelAltWorkDays.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
