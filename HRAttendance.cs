@@ -711,7 +711,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🔹 LOAD ATTENDANCE DATA
         private async void PopulateDateComboBox()
         {
             try
@@ -719,108 +718,206 @@ namespace HRIS_JAP_ATTPAY
                 comboBoxSelectDate.Items.Clear();
                 comboBoxSelectDate.Items.Add("All Dates");
 
-                var attendanceArray = await firebase.Child("Attendance").OnceSingleAsync<JArray>();
-                if (attendanceArray != null)
-                {
-                    var uniqueDates = new HashSet<string>();
+                // Get all attendance records
+                var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
+                var uniqueDates = new HashSet<string>();
 
-                    foreach (var attendanceItem in attendanceArray)
+                foreach (var record in attendanceRecords)
+                {
+                    if (record?.Object != null)
                     {
-                        if (attendanceItem != null && attendanceItem.Type != JTokenType.Null)
+                        try
                         {
-                            string dateStr = attendanceItem["attendance_date"]?.ToString();
-                            if (!string.IsNullOrEmpty(dateStr) && DateTime.TryParse(dateStr, out DateTime date))
-                                uniqueDates.Add(date.ToString("yyyy-MM-dd"));
+                            string dateStr = "";
+
+                            // Convert to dictionary for easier access
+                            var recordDict = record.Object as IDictionary<string, object>;
+                            if (recordDict != null)
+                            {
+                                // Try different date field names
+                                if (recordDict.ContainsKey("attendance_date") && recordDict["attendance_date"] != null)
+                                {
+                                    dateStr = recordDict["attendance_date"].ToString();
+                                }
+                                else if (recordDict.ContainsKey("date") && recordDict["date"] != null)
+                                {
+                                    dateStr = recordDict["date"].ToString();
+                                }
+                                else if (recordDict.ContainsKey("time_in") && recordDict["time_in"] != null)
+                                {
+                                    string timeInStr = recordDict["time_in"].ToString();
+                                    if (!string.IsNullOrEmpty(timeInStr) && timeInStr != "N/A")
+                                    {
+                                        if (DateTime.TryParse(timeInStr, out DateTime timeInDate))
+                                        {
+                                            dateStr = timeInDate.ToString("yyyy-MM-dd");
+                                        }
+                                    }
+                                }
+
+                                // Try to parse the date string
+                                if (!string.IsNullOrEmpty(dateStr))
+                                {
+                                    // Handle different date formats
+                                    DateTime parsedDate;
+                                    if (DateTime.TryParse(dateStr, out parsedDate))
+                                    {
+                                        uniqueDates.Add(parsedDate.ToString("yyyy-MM-dd"));
+                                    }
+                                    else if (DateTime.TryParseExact(dateStr, "yyyy-MM-dd",
+                                             System.Globalization.CultureInfo.InvariantCulture,
+                                             System.Globalization.DateTimeStyles.None, out parsedDate))
+                                    {
+                                        uniqueDates.Add(parsedDate.ToString("yyyy-MM-dd"));
+                                    }
+                                    else
+                                    {
+                                        // DEBUG: Log unparseable dates
+                                        System.Diagnostics.Debug.WriteLine($"Could not parse date: {dateStr}");
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Error processing record {record.Key}: {ex.Message}");
                         }
                     }
+                }
 
-                    var sortedDates = uniqueDates.Select(d => DateTime.Parse(d))
-                                                .OrderByDescending(d => d)
-                                                .Select(d => d.ToString("yyyy-MM-dd"))
-                                                .ToList();
+                // DEBUG: Show what dates were found
+                System.Diagnostics.Debug.WriteLine($"Found {uniqueDates.Count} unique dates:");
+                foreach (var date in uniqueDates)
+                {
+                    System.Diagnostics.Debug.WriteLine($"  - {date}");
+                }
 
-                    foreach (var date in sortedDates)
-                        comboBoxSelectDate.Items.Add(date);
+                // Add today's date for testing if no dates found
+                if (uniqueDates.Count == 0)
+                {
+                    System.Diagnostics.Debug.WriteLine("No dates found in attendance records, adding today's date for testing");
+                    uniqueDates.Add(DateTime.Today.ToString("yyyy-MM-dd"));
+                    uniqueDates.Add(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
+                }
+
+                // Add dates to combo box in descending order
+                var sortedDates = uniqueDates.Select(d => DateTime.Parse(d))
+                                            .OrderByDescending(d => d)
+                                            .Select(d => d.ToString("yyyy-MM-dd"))
+                                            .ToList();
+
+                foreach (var date in sortedDates)
+                {
+                    comboBoxSelectDate.Items.Add(date);
                 }
 
                 comboBoxSelectDate.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error populating date combo box: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("Error populating date combo box: " + ex.Message);
+
+                // Add fallback dates for testing
+                comboBoxSelectDate.Items.Clear();
+                comboBoxSelectDate.Items.Add("All Dates");
+                for (int i = 0; i < 7; i++)
+                {
+                    string testDate = DateTime.Today.AddDays(-i).ToString("yyyy-MM-dd");
+                    comboBoxSelectDate.Items.Add(testDate);
+                    System.Diagnostics.Debug.WriteLine($"Added fallback date: {testDate}");
+                }
+                comboBoxSelectDate.SelectedIndex = 0;
             }
         }
 
         private async void LoadFirebaseAttendanceData(DateTime? selectedDate = null)
         {
             if (isLoading) return;
-
             isLoading = true;
 
             try
             {
-                dataGridViewAttendance.Rows.Clear();
-                dataGridViewAttendance.Refresh();
+                // Clear UI
+                if (dataGridViewAttendance.InvokeRequired)
+                {
+                    dataGridViewAttendance.Invoke((MethodInvoker)delegate
+                    {
+                        dataGridViewAttendance.Rows.Clear();
+                        attendanceKeyMap.Clear();
+                    });
+                }
+                else
+                {
+                    dataGridViewAttendance.Rows.Clear();
+                    attendanceKeyMap.Clear();
+                }
+
                 Cursor.Current = Cursors.WaitCursor;
 
+                // DEBUG: Show what we're loading
+                System.Diagnostics.Debug.WriteLine($"HR: Loading attendance data. Selected date: {selectedDate}");
+
+                // Load employee data
                 var firebaseEmployees = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
                 var employeeDict = new Dictionary<string, dynamic>();
                 foreach (var emp in firebaseEmployees)
                     employeeDict[emp.Key] = emp.Object;
 
-                try
+                System.Diagnostics.Debug.WriteLine($"HR: Loaded {employeeDict.Count} employees");
+
+                // FIX: Handle Attendance as dictionary instead of JArray
+                var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
+
+                // DEBUG: Check what we got from Firebase
+                System.Diagnostics.Debug.WriteLine($"HR: Found {attendanceRecords?.Count()} attendance records");
+
+                if (attendanceRecords == null || !attendanceRecords.Any())
                 {
-                    var attendanceData = await firebase.Child("Attendance").OnceSingleAsync<JArray>();
-
-                    if (attendanceData == null || attendanceData.Count == 0)
+                    System.Diagnostics.Debug.WriteLine("HR: No attendance records found in Firebase");
+                    if (this.InvokeRequired)
                     {
-                        MessageBox.Show("No attendance records found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return;
-                    }
-
-                    int counter = 1;
-                    int rowIndex = 0;
-
-                    foreach (var attendanceItem in attendanceData)
-                    {
-                        if (attendanceItem != null && attendanceItem.Type != JTokenType.Null)
+                        this.Invoke((MethodInvoker)delegate
                         {
-                            string firebaseKey = (counter - 1).ToString();
-                            bool recordAdded = ProcessAttendanceRecord(attendanceItem, employeeDict, selectedDate, counter, rowIndex, firebaseKey);
-                            if (recordAdded)
-                            {
-                                counter++;
-                                rowIndex++;
-                            }
+                            MessageBox.Show("No attendance records found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        });
+                    }
+                    return;
+                }
+
+                int counter = 1;
+                int rowIndex = 0;
+                int processedCount = 0;
+
+                // FIX: Iterate through dictionary instead of JArray
+                foreach (var attendanceRecord in attendanceRecords)
+                {
+                    if (attendanceRecord?.Object != null)
+                    {
+                        string firebaseKey = attendanceRecord.Key; // Use the actual Firebase key ("29", "30", etc.)
+
+                        // DEBUG: Show each record being processed
+                        System.Diagnostics.Debug.WriteLine($"HR: Processing record {firebaseKey}");
+
+                        bool recordAdded = ProcessAttendanceRecord(attendanceRecord.Object, employeeDict, selectedDate, counter, rowIndex, firebaseKey);
+                        if (recordAdded)
+                        {
+                            counter++;
+                            rowIndex++;
+                            processedCount++;
                         }
                     }
+                }
 
-                    if (selectedDate.HasValue)
-                        labelAttendanceDate.Text = $"Attendance for {selectedDate.Value:yyyy-MM-dd}";
-                    else
-                        labelAttendanceDate.Text = "All Attendance Records";
+                // DEBUG: Show final count
+                System.Diagnostics.Debug.WriteLine($"HR: Successfully processed {processedCount} records");
 
-                    ApplyAllAttendanceFilters();
-                }
-                catch (FirebaseException fex)
-                {
-                    if (fex.ResponseData.Contains("404") || fex.ResponseData.Contains("null"))
-                    {
-                        MessageBox.Show("Attendance database is empty or doesn't exist yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
-                        MessageBox.Show($"Firebase error: {fex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error loading attendance data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                UpdateStatusLabel(selectedDate);
+                ApplyAllAttendanceFilters();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to load data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                System.Diagnostics.Debug.WriteLine($"HR: Error in LoadFirebaseAttendanceData: {ex.Message}");
+                MessageBox.Show($"Error loading attendance data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -829,101 +926,155 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private bool ProcessAttendanceRecord(JToken attendance, Dictionary<string, dynamic> employeeDict, DateTime? selectedDate, int counter, int rowIndex, string firebaseKey)
+        private bool ProcessAttendanceRecord(dynamic attendance, Dictionary<string, dynamic> employeeDict, DateTime? selectedDate, int counter, int rowIndex, string firebaseKey)
         {
             try
             {
-                string timeInStr = attendance["time_in"]?.ToString() ?? "";
-                string timeOutStr = attendance["time_out"]?.ToString() ?? "";
-                string overtimeStr = attendance["overtime_hours"]?.ToString() ?? "";
-                string attendanceDateStr = attendance["attendance_date"]?.ToString() ?? "";
-                string hoursWorkedStr = attendance["hours_worked"]?.ToString() ?? "0.00";
-                string existingStatus = attendance["status"]?.ToString() ?? "";
+                System.Diagnostics.Debug.WriteLine($"HR: === Processing record {firebaseKey} ===");
 
-                // Apply date filter if a date is selected - STRICT FILTERING
+                // Handle the dynamic data more carefully
+                Dictionary<string, object> attendanceDict = new Dictionary<string, object>();
+
+                if (attendance == null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"HR: Record {firebaseKey} is NULL");
+                    return false;
+                }
+
+                // Try multiple approaches to extract the data
+                try
+                {
+                    // Approach 1: Direct cast to dictionary
+                    if (attendance is IDictionary<string, object> directDict)
+                    {
+                        attendanceDict = new Dictionary<string, object>(directDict);
+                        System.Diagnostics.Debug.WriteLine("HR: Used direct dictionary cast");
+                    }
+                    // Approach 2: Use Newtonsoft.Json to convert
+                    else
+                    {
+                        string json = Newtonsoft.Json.JsonConvert.SerializeObject(attendance);
+                        attendanceDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                        System.Diagnostics.Debug.WriteLine("HR: Used JSON serialization approach");
+                    }
+                }
+                catch (Exception serializationEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"HR: Serialization failed: {serializationEx.Message}");
+                    return false;
+                }
+
+                if (attendanceDict == null || !attendanceDict.Any())
+                {
+                    System.Diagnostics.Debug.WriteLine($"HR: Record {firebaseKey} resulted in empty dictionary");
+                    return false;
+                }
+
+                // Extract values with safe fallbacks
+                string timeInStr = GetSafeString(attendanceDict, "time_in");
+                string timeOutStr = GetSafeString(attendanceDict, "time_out");
+                string attendanceDateStr = GetSafeString(attendanceDict, "attendance_date");
+                string existingStatus = GetSafeString(attendanceDict, "status");
+                string employeeId = GetSafeString(attendanceDict, "employee_id", "N/A");
+                string hoursWorked = GetSafeString(attendanceDict, "hours_worked", "0.00");
+                string verification = GetSafeString(attendanceDict, "verification_method", "Manual");
+                string overtimeHoursStr = GetSafeString(attendanceDict, "overtime_hours", "0.00");
+
+                System.Diagnostics.Debug.WriteLine($"HR: Extracted - Employee: {employeeId}, Date: {attendanceDateStr}, TimeIn: {timeInStr}, TimeOut: {timeOutStr}, Status: {existingStatus}");
+
+                // Apply date filter if a date is selected
                 if (selectedDate.HasValue)
                 {
                     bool shouldInclude = false;
 
-                    // Only use attendance_date field for filtering - no fallbacks
                     if (!string.IsNullOrEmpty(attendanceDateStr) && DateTime.TryParse(attendanceDateStr, out DateTime attendanceDate))
                     {
                         if (attendanceDate.Date == selectedDate.Value.Date)
                             shouldInclude = true;
+
+                        System.Diagnostics.Debug.WriteLine($"HR: Date filter: {attendanceDate.Date} == {selectedDate.Value.Date} = {shouldInclude}");
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"HR: Could not parse attendance date: {attendanceDateStr}");
                     }
 
-                    // If no attendance_date or it doesn't match, exclude the record
                     if (!shouldInclude)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"HR: Record {firebaseKey} filtered out by date selection");
                         return false;
+                    }
                 }
 
-                string employeeId = attendance["employee_id"]?.ToString() ?? "N/A";
+                // Process the data
                 string timeIn = FormatFirebaseTime(timeInStr);
                 string timeOut = FormatFirebaseTime(timeOutStr);
-                string hoursWorked = hoursWorkedStr;
-                string overtime = CalculateOvertimeHours(overtimeStr, hoursWorkedStr);
-
-                // USE THE NEW STATUS CALCULATION METHOD - SAME AS ADMINATTENDANCE
                 string status = CalculateStatus(timeInStr, timeOutStr, existingStatus);
+                string overtime = CalculateOvertimeHours(overtimeHoursStr, hoursWorked);
 
-                string verification = attendance["verification_method"]?.ToString() ?? "Manual";
-
-                // Adjust hours worked if needed - SAME AS ADMINATTENDANCE
+                // Adjust hours worked by subtracting overtime
                 if (double.TryParse(hoursWorked, out double hw) && double.TryParse(overtime, out double ot))
+                {
                     hoursWorked = Math.Round(hw - ot, 2).ToString("0.00");
+                }
 
                 string fullName = "N/A";
                 if (employeeDict.ContainsKey(employeeId))
                 {
                     var employee = employeeDict[employeeId];
-                    fullName = $"{employee.first_name} {employee.middle_name} {employee.last_name}".Trim();
+                    // Safely access employee properties
+                    string firstName = GetEmployeeProperty(employee, "first_name");
+                    string middleName = GetEmployeeProperty(employee, "middle_name");
+                    string lastName = GetEmployeeProperty(employee, "last_name");
+
+                    // Build name carefully, handling empty parts
+                    List<string> nameParts = new List<string>();
+                    if (!string.IsNullOrWhiteSpace(firstName)) nameParts.Add(firstName.Trim());
+                    if (!string.IsNullOrWhiteSpace(middleName)) nameParts.Add(middleName.Trim());
+                    if (!string.IsNullOrWhiteSpace(lastName)) nameParts.Add(lastName.Trim());
+
+                    fullName = string.Join(" ", nameParts);
+
+                    // If still empty, use a fallback
+                    if (string.IsNullOrWhiteSpace(fullName))
+                    {
+                        fullName = "Unknown Employee";
+                        System.Diagnostics.Debug.WriteLine($"HR: Employee {employeeId} has no name data");
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"HR: Found employee: '{fullName}'");
+                    }
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"HR: Employee {employeeId} not found in employee dictionary");
+                    fullName = $"Unknown ({employeeId})";
                 }
 
+                // DEBUG: Show final data that will be added to grid
+                System.Diagnostics.Debug.WriteLine($"HR: Final data - ID: {employeeId}, Name: {fullName}, Status: {status}, Hours: {hoursWorked}, Overtime: {overtime}");
+
+                // Add to DataGridView
                 if (dataGridViewAttendance.InvokeRequired)
                 {
                     dataGridViewAttendance.Invoke((MethodInvoker)delegate
                     {
-                        // ADD ROW WITH ALL COLUMNS INCLUDING HIDDEN ATTENDANCE DATE
-                        int newRowIndex = dataGridViewAttendance.Rows.Add(
-                            counter,
-                            employeeId,
-                            fullName,
-                            timeIn,
-                            timeOut,
-                            hoursWorked,
-                            status,
-                            overtime,
-                            verification,
-                            attendanceDateStr, // STORE IN HIDDEN COLUMN
-                            Properties.Resources.VerticalThreeDots
-                        );
-                        attendanceKeyMap[newRowIndex] = firebaseKey;
+                        AddRowToDataGridView(counter, employeeId, fullName, timeIn, timeOut, hoursWorked, status, overtime, verification, attendanceDateStr, firebaseKey);
                     });
                 }
                 else
                 {
-                    // ADD ROW WITH ALL COLUMNS INCLUDING HIDDEN ATTENDANCE DATE
-                    int newRowIndex = dataGridViewAttendance.Rows.Add(
-                        counter,
-                        employeeId,
-                        fullName,
-                        timeIn,
-                        timeOut,
-                        hoursWorked,
-                        status,
-                        overtime,
-                        verification,
-                        attendanceDateStr, // STORE IN HIDDEN COLUMN
-                        Properties.Resources.VerticalThreeDots
-                    );
-                    attendanceKeyMap[newRowIndex] = firebaseKey;
+                    AddRowToDataGridView(counter, employeeId, fullName, timeIn, timeOut, hoursWorked, status, overtime, verification, attendanceDateStr, firebaseKey);
                 }
 
+                System.Diagnostics.Debug.WriteLine($"HR: === Successfully processed record {firebaseKey} ===\n");
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error processing attendance record: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"HR: === ERROR processing record {firebaseKey}: {ex.Message} ===");
+                System.Diagnostics.Debug.WriteLine($"HR: Stack trace: {ex.StackTrace}");
                 return false;
             }
         }
@@ -942,7 +1093,129 @@ namespace HRIS_JAP_ATTPAY
             catch { return dateTimeStr; }
         }
 
-        // 🔹 FONTS & UI
+        // Helper method to safely extract string values
+        private string GetSafeString(Dictionary<string, object> dict, string key, string defaultValue = "")
+        {
+            try
+            {
+                if (dict.ContainsKey(key) && dict[key] != null)
+                {
+                    return dict[key].ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"HR: Error getting {key}: {ex.Message}");
+            }
+            return defaultValue;
+        }
+
+        // Helper method to add row to DataGridView
+        private void AddRowToDataGridView(int counter, string employeeId, string fullName, string timeIn, string timeOut, string hoursWorked, string status, string overtime, string verification, string attendanceDateStr, string firebaseKey)
+        {
+            try
+            {
+                int newRowIndex = dataGridViewAttendance.Rows.Add(
+                    counter,
+                    employeeId,
+                    fullName,
+                    timeIn,
+                    timeOut,
+                    hoursWorked,
+                    status,
+                    overtime,
+                    verification,
+                    attendanceDateStr,
+                    Properties.Resources.VerticalThreeDots
+                );
+                attendanceKeyMap[newRowIndex] = firebaseKey;
+                System.Diagnostics.Debug.WriteLine($"HR: ✓ Added row at index {newRowIndex} for employee {employeeId}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"HR: ✗ Failed to add row to DataGridView: {ex.Message}");
+            }
+        }
+
+        // Helper method to safely get employee properties
+        private string GetEmployeeProperty(dynamic employee, string propertyName)
+        {
+            try
+            {
+                // DEBUG: Check what type we're dealing with
+                System.Diagnostics.Debug.WriteLine($"HR: GetEmployeeProperty: Looking for {propertyName}, Employee type: {employee?.GetType()}");
+
+                // Try multiple approaches to access the property
+
+                // Approach 1: Direct dictionary access
+                if (employee is IDictionary<string, object> employeeDict)
+                {
+                    if (employeeDict.ContainsKey(propertyName) && employeeDict[propertyName] != null)
+                    {
+                        string value = employeeDict[propertyName].ToString();
+                        System.Diagnostics.Debug.WriteLine($"HR: Found {propertyName} in dictionary: '{value}'");
+                        return value;
+                    }
+                }
+                // Approach 2: Use JSON conversion
+                else
+                {
+                    try
+                    {
+                        string json = Newtonsoft.Json.JsonConvert.SerializeObject(employee);
+                        var dict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                        if (dict != null && dict.ContainsKey(propertyName) && dict[propertyName] != null)
+                        {
+                            string value = dict[propertyName].ToString();
+                            System.Diagnostics.Debug.WriteLine($"HR: Found {propertyName} via JSON: '{value}'");
+                            return value;
+                        }
+                    }
+                    catch (Exception jsonEx)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"HR: JSON approach failed for {propertyName}: {jsonEx.Message}");
+                    }
+                }
+
+                System.Diagnostics.Debug.WriteLine($"HR: Property {propertyName} not found");
+                return "";
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"HR: Error in GetEmployeeProperty for {propertyName}: {ex.Message}");
+                return "";
+            }
+        }
+
+        private void UpdateStatusLabel(DateTime? selectedDate)
+        {
+            if (labelAttendanceDate.InvokeRequired)
+            {
+                labelAttendanceDate.Invoke((MethodInvoker)delegate
+                {
+                    if (selectedDate.HasValue)
+                    {
+                        labelAttendanceDate.Text = $"Attendance for {selectedDate.Value.ToString("yyyy-MM-dd")}";
+                    }
+                    else
+                    {
+                        labelAttendanceDate.Text = "All Attendance Records";
+                    }
+                });
+            }
+            else
+            {
+                if (selectedDate.HasValue)
+                {
+                    labelAttendanceDate.Text = $"Attendance for {selectedDate.Value.ToString("yyyy-MM-dd")}";
+                }
+                else
+                {
+                    labelAttendanceDate.Text = "All Attendance Records";
+                }
+            }
+        }
+
         private void setFont()
         {
             labelHREmployee.Font = AttributesClass.GetFont("Roboto-Light", 20f);

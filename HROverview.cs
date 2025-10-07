@@ -31,6 +31,7 @@ namespace HRIS_JAP_ATTPAY
             LoadTodoList();
             LoadTodaysAbsentEmployees();
             LoadTodaysLateEmployees();
+            comboBoxSelectDate.SelectedIndexChanged += comboBoxSelectDate_SelectedIndexChanged;
         }
         private void setFont()
         {
@@ -100,38 +101,45 @@ namespace HRIS_JAP_ATTPAY
 
             try
             {
-                // Load ALL attendance data from Firebase
-                var allAttendanceData = await firebase.Child("Attendance").OnceSingleAsync<JArray>();
+                // FIX: Load attendance as dictionary instead of JArray
+                var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
 
-                if (allAttendanceData != null)
+                if (attendanceRecords != null)
                 {
-                    foreach (var attendanceItem in allAttendanceData)
+                    foreach (var attendanceRecord in attendanceRecords)
                     {
-                        if (attendanceItem != null && attendanceItem.Type != JTokenType.Null)
+                        if (attendanceRecord?.Object != null)
                         {
-                            // Extract date from both possible fields
-                            string attendanceDateStr = attendanceItem["attendance_date"]?.ToString() ?? "";
-                            string timeInStr = attendanceItem["time_in"]?.ToString() ?? "";
-
-                            DateTime? recordDate = null;
-
-                            // Try to get date from attendance_date field first
-                            if (!string.IsNullOrEmpty(attendanceDateStr) &&
-                                DateTime.TryParse(attendanceDateStr, out DateTime parsedDate))
+                            // Convert dynamic to dictionary for safe access
+                            var attendanceDict = attendanceRecord.Object as IDictionary<string, object>;
+                            if (attendanceDict != null)
                             {
-                                recordDate = parsedDate;
-                            }
-                            // If not available, try to extract from time_in field
-                            else if (!string.IsNullOrEmpty(timeInStr) &&
-                                     DateTime.TryParse(timeInStr, out DateTime timeInDate))
-                            {
-                                recordDate = timeInDate.Date;
-                            }
+                                // Extract date from both possible fields
+                                string attendanceDateStr = attendanceDict.ContainsKey("attendance_date") ?
+                                    attendanceDict["attendance_date"]?.ToString() ?? "" : "";
+                                string timeInStr = attendanceDict.ContainsKey("time_in") ?
+                                    attendanceDict["time_in"]?.ToString() ?? "" : "";
 
-                            if (recordDate.HasValue)
-                            {
-                                // Add date in consistent format
-                                uniqueDates.Add(recordDate.Value.ToString("yyyy-MM-dd"));
+                                DateTime? recordDate = null;
+
+                                // Try to get date from attendance_date field first
+                                if (!string.IsNullOrEmpty(attendanceDateStr) &&
+                                    DateTime.TryParse(attendanceDateStr, out DateTime parsedDate))
+                                {
+                                    recordDate = parsedDate;
+                                }
+                                // If not available, try to extract from time_in field
+                                else if (!string.IsNullOrEmpty(timeInStr) &&
+                                         DateTime.TryParse(timeInStr, out DateTime timeInDate))
+                                {
+                                    recordDate = timeInDate.Date;
+                                }
+
+                                if (recordDate.HasValue)
+                                {
+                                    // Add date in consistent format
+                                    uniqueDates.Add(recordDate.Value.ToString("yyyy-MM-dd"));
+                                }
                             }
                         }
                     }
@@ -145,35 +153,6 @@ namespace HRIS_JAP_ATTPAY
                 MessageBox.Show($"Error retrieving attendance dates: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return new List<string>();
-            }
-        }
-        private void comboBoxSelectDate_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (comboBoxSelectDate.SelectedItem == null)
-                return;
-
-            string selectedText = comboBoxSelectDate.SelectedItem.ToString();
-            DateTime selectedDate;
-
-            if (selectedText == "Today")
-            {
-                selectedDate = DateTime.Today;
-            }
-            else if (selectedText == "Yesterday")
-            {
-                selectedDate = DateTime.Today.AddDays(-1);
-            }
-            else if (DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
-                System.Globalization.CultureInfo.InvariantCulture,
-                System.Globalization.DateTimeStyles.None,
-                out DateTime parsedDate))
-            {
-                selectedDate = parsedDate;
-            }
-            else
-            {
-                selectedDate = DateTime.Today;
-
             }
         }
         private async void LoadAttendanceSummary(DateTime date)
@@ -206,59 +185,68 @@ namespace HRIS_JAP_ATTPAY
                 int lateCount = 0;
                 int absentCount = 0;
 
-                // Load ALL attendance data and filter locally
-                var allAttendanceData = await firebase.Child("Attendance").OnceSingleAsync<JArray>();
+                // FIX: Load attendance as dictionary instead of JArray
+                var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
 
                 // Create a set of active employees who attended on the selected date
                 var attendedEmployees = new HashSet<string>();
                 string targetDate = date.ToString("yyyy-MM-dd");
 
-                if (allAttendanceData != null)
+                if (attendanceRecords != null)
                 {
-                    foreach (var attendanceItem in allAttendanceData)
+                    foreach (var attendanceRecord in attendanceRecords)
                     {
-                        if (attendanceItem != null && attendanceItem.Type != JTokenType.Null)
+                        if (attendanceRecord?.Object != null)
                         {
-                            // Extract values from JToken
-                            string attendanceDateStr = attendanceItem["attendance_date"]?.ToString() ?? "";
-                            string timeInStr = attendanceItem["time_in"]?.ToString() ?? "";
-                            string status = attendanceItem["status"]?.ToString() ?? "Absent";
-                            string employeeId = attendanceItem["employee_id"]?.ToString() ?? "";
-
-                            // Check if this record matches the selected date
-                            bool matchesDate = false;
-
-                            // Check attendance_date first
-                            if (!string.IsNullOrEmpty(attendanceDateStr) && attendanceDateStr == targetDate)
+                            // Convert dynamic to dictionary for safe access
+                            var attendanceDict = attendanceRecord.Object as IDictionary<string, object>;
+                            if (attendanceDict != null)
                             {
-                                matchesDate = true;
-                            }
+                                // Extract values safely
+                                string attendanceDateStr = attendanceDict.ContainsKey("attendance_date") ?
+                                    attendanceDict["attendance_date"]?.ToString() ?? "" : "";
+                                string timeInStr = attendanceDict.ContainsKey("time_in") ?
+                                    attendanceDict["time_in"]?.ToString() ?? "" : "";
+                                string status = attendanceDict.ContainsKey("status") ?
+                                    attendanceDict["status"]?.ToString() ?? "Absent" : "Absent";
+                                string employeeId = attendanceDict.ContainsKey("employee_id") ?
+                                    attendanceDict["employee_id"]?.ToString() ?? "" : "";
 
-                            // Check time_in date if not already matched
-                            if (!matchesDate && !string.IsNullOrEmpty(timeInStr) &&
-                                DateTime.TryParse(timeInStr, out DateTime timeInDate))
-                            {
-                                matchesDate = timeInDate.ToString("yyyy-MM-dd") == targetDate;
-                            }
+                                // Check if this record matches the selected date
+                                bool matchesDate = false;
 
-                            // Only count if employee is active (not archived) and matches date
-                            if (matchesDate && !string.IsNullOrEmpty(employeeId) && allEmployees.Contains(employeeId))
-                            {
-                                attendedEmployees.Add(employeeId);
-
-                                switch (status.ToLower())
+                                // Check attendance_date first
+                                if (!string.IsNullOrEmpty(attendanceDateStr) && attendanceDateStr == targetDate)
                                 {
-                                    case "on time":
-                                        onTimeCount++;
-                                        break;
-                                    case "late":
-                                    case "early out":
-                                    case "late & early out":
-                                        lateCount++;
-                                        break;
-                                    default:
-                                        // Employee attended but with different status
-                                        break;
+                                    matchesDate = true;
+                                }
+
+                                // Check time_in date if not already matched
+                                if (!matchesDate && !string.IsNullOrEmpty(timeInStr) &&
+                                    DateTime.TryParse(timeInStr, out DateTime timeInDate))
+                                {
+                                    matchesDate = timeInDate.ToString("yyyy-MM-dd") == targetDate;
+                                }
+
+                                // Only count if employee is active (not archived) and matches date
+                                if (matchesDate && !string.IsNullOrEmpty(employeeId) && allEmployees.Contains(employeeId))
+                                {
+                                    attendedEmployees.Add(employeeId);
+
+                                    switch (status.ToLower())
+                                    {
+                                        case "on time":
+                                            onTimeCount++;
+                                            break;
+                                        case "late":
+                                        case "early out":
+                                        case "late & early out":
+                                            lateCount++;
+                                            break;
+                                        default:
+                                            // Employee attended but with different status
+                                            break;
+                                    }
                                 }
                             }
                         }
@@ -335,34 +323,41 @@ namespace HRIS_JAP_ATTPAY
                 var today = DateTime.Today.ToString("yyyy-MM-dd");
                 var activeEmployees = await GetAllActiveEmployeesAsync();
 
-                // Get today's attendance records
-                var allAttendanceData = await firebase.Child("Attendance").OnceSingleAsync<JArray>();
+                // FIX: Get attendance as dictionary
+                var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
                 var attendedToday = new HashSet<string>();
 
-                if (allAttendanceData != null)
+                if (attendanceRecords != null)
                 {
-                    foreach (var attendanceItem in allAttendanceData)
+                    foreach (var attendanceRecord in attendanceRecords)
                     {
-                        if (attendanceItem != null && attendanceItem.Type != JTokenType.Null)
+                        if (attendanceRecord?.Object != null)
                         {
-                            string attendanceDateStr = attendanceItem["attendance_date"]?.ToString() ?? "";
-                            string timeInStr = attendanceItem["time_in"]?.ToString() ?? "";
-                            string employeeId = attendanceItem["employee_id"]?.ToString() ?? "";
+                            var attendanceDict = attendanceRecord.Object as IDictionary<string, object>;
+                            if (attendanceDict != null)
+                            {
+                                string attendanceDateStr = attendanceDict.ContainsKey("attendance_date") ?
+                                    attendanceDict["attendance_date"]?.ToString() ?? "" : "";
+                                string timeInStr = attendanceDict.ContainsKey("time_in") ?
+                                    attendanceDict["time_in"]?.ToString() ?? "" : "";
+                                string employeeId = attendanceDict.ContainsKey("employee_id") ?
+                                    attendanceDict["employee_id"]?.ToString() ?? "" : "";
 
-                            bool matchesDate = false;
-                            if (!string.IsNullOrEmpty(attendanceDateStr) && attendanceDateStr == today)
-                            {
-                                matchesDate = true;
-                            }
-                            else if (!matchesDate && !string.IsNullOrEmpty(timeInStr) &&
-                                     DateTime.TryParse(timeInStr, out DateTime timeInDate))
-                            {
-                                matchesDate = timeInDate.ToString("yyyy-MM-dd") == today;
-                            }
+                                bool matchesDate = false;
+                                if (!string.IsNullOrEmpty(attendanceDateStr) && attendanceDateStr == today)
+                                {
+                                    matchesDate = true;
+                                }
+                                else if (!matchesDate && !string.IsNullOrEmpty(timeInStr) &&
+                                         DateTime.TryParse(timeInStr, out DateTime timeInDate))
+                                {
+                                    matchesDate = timeInDate.ToString("yyyy-MM-dd") == today;
+                                }
 
-                            if (matchesDate && !string.IsNullOrEmpty(employeeId))
-                            {
-                                attendedToday.Add(employeeId);
+                                if (matchesDate && !string.IsNullOrEmpty(employeeId))
+                                {
+                                    attendedToday.Add(employeeId);
+                                }
                             }
                         }
                     }
@@ -422,42 +417,50 @@ namespace HRIS_JAP_ATTPAY
                 dataGridViewAlertLate.Rows.Clear();
                 var today = DateTime.Today.ToString("yyyy-MM-dd");
 
-                // Get today's attendance records with late/early out status
-                var allAttendanceData = await firebase.Child("Attendance").OnceSingleAsync<JArray>();
+                // FIX: Get attendance as dictionary
+                var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
                 var lateEmployees = new Dictionary<string, int>();
 
-                if (allAttendanceData != null)
+                if (attendanceRecords != null)
                 {
-                    foreach (var attendanceItem in allAttendanceData)
+                    foreach (var attendanceRecord in attendanceRecords)
                     {
-                        if (attendanceItem != null && attendanceItem.Type != JTokenType.Null)
+                        if (attendanceRecord?.Object != null)
                         {
-                            string attendanceDateStr = attendanceItem["attendance_date"]?.ToString() ?? "";
-                            string timeInStr = attendanceItem["time_in"]?.ToString() ?? "";
-                            string status = attendanceItem["status"]?.ToString() ?? "";
-                            string employeeId = attendanceItem["employee_id"]?.ToString() ?? "";
+                            var attendanceDict = attendanceRecord.Object as IDictionary<string, object>;
+                            if (attendanceDict != null)
+                            {
+                                string attendanceDateStr = attendanceDict.ContainsKey("attendance_date") ?
+                                    attendanceDict["attendance_date"]?.ToString() ?? "" : "";
+                                string timeInStr = attendanceDict.ContainsKey("time_in") ?
+                                    attendanceDict["time_in"]?.ToString() ?? "" : "";
+                                string status = attendanceDict.ContainsKey("status") ?
+                                    attendanceDict["status"]?.ToString() ?? "" : "";
+                                string employeeId = attendanceDict.ContainsKey("employee_id") ?
+                                    attendanceDict["employee_id"]?.ToString() ?? "" : "";
 
-                            bool matchesDate = false;
-                            if (!string.IsNullOrEmpty(attendanceDateStr) && attendanceDateStr == today)
-                            {
-                                matchesDate = true;
-                            }
-                            else if (!matchesDate && !string.IsNullOrEmpty(timeInStr) &&
-                                     DateTime.TryParse(timeInStr, out DateTime timeInDate))
-                            {
-                                matchesDate = timeInDate.ToString("yyyy-MM-dd") == today;
-                            }
-
-                            if (matchesDate && !string.IsNullOrEmpty(employeeId) &&
-                                (status.ToLower() == "late" || status.ToLower() == "early out" || status.ToLower() == "late & early out"))
-                            {
-                                if (lateEmployees.ContainsKey(employeeId))
+                                bool matchesDate = false;
+                                if (!string.IsNullOrEmpty(attendanceDateStr) && attendanceDateStr == today)
                                 {
-                                    lateEmployees[employeeId]++;
+                                    matchesDate = true;
                                 }
-                                else
+                                else if (!matchesDate && !string.IsNullOrEmpty(timeInStr) &&
+                                         DateTime.TryParse(timeInStr, out DateTime timeInDate))
                                 {
-                                    lateEmployees[employeeId] = 1;
+                                    matchesDate = timeInDate.ToString("yyyy-MM-dd") == today;
+                                }
+
+                                if (matchesDate && !string.IsNullOrEmpty(employeeId) &&
+                                    (status.ToLower() == "late" || status.ToLower() == "early out" || status.ToLower() == "late & early out"))
+                                {
+                                    if (lateEmployees.ContainsKey(employeeId))
+                                    {
+                                        lateEmployees[employeeId]++;
+                                    }
+                                    else
+                                    {
+                                        lateEmployees[employeeId] = 1;
+                                    }
                                 }
                             }
                         }
@@ -798,6 +801,36 @@ namespace HRIS_JAP_ATTPAY
                 dataGridViewTodo.Rows.Add("Error loading tasks", "");
             }
         }
+        private void comboBoxSelectDate_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBoxSelectDate.SelectedItem == null)
+                return;
 
+            string selectedText = comboBoxSelectDate.SelectedItem.ToString();
+            DateTime selectedDate;
+
+            if (selectedText == "Today")
+            {
+                selectedDate = DateTime.Today;
+            }
+            else if (selectedText == "Yesterday")
+            {
+                selectedDate = DateTime.Today.AddDays(-1);
+            }
+            else if (DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None,
+                out DateTime parsedDate))
+            {
+                selectedDate = parsedDate;
+            }
+            else
+            {
+                selectedDate = DateTime.Today;
+            }
+
+            // Load the attendance summary for the selected date
+            LoadAttendanceSummary(selectedDate);
+        }
     }
 }
