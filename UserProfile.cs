@@ -16,7 +16,7 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class UserProfile : Form
     {
-        // 🔹 Firebase client
+        // Firebase client
         private FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
 
         private string identifier; // can be user_id or employee_id
@@ -25,7 +25,7 @@ namespace HRIS_JAP_ATTPAY
         {
             InitializeComponent();
             SetFont();
-            identifier = null; // no identifier passed
+            identifier = SessionClass.CurrentUserId; // no identifier passed          
             LoadUserData();
         }
 
@@ -64,7 +64,7 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // 🔹 Step 1: Load all Users as dictionary
+                // Step 1: Load all Users as dictionary
                 var usersJson = await firebase.Child("Users").OnceAsJsonAsync();
                 var usersDict = ParseJsonAsDictionary(usersJson);
 
@@ -99,7 +99,7 @@ namespace HRIS_JAP_ATTPAY
                 string employeeId = userEntry.ContainsKey("employee_id") ? userEntry["employee_id"] : null;
                 bool isAdmin = userEntry.ContainsKey("isAdmin") && userEntry["isAdmin"] == "True";
 
-                // 🔹 Step 2: Load EmployeeDetails as dictionary
+                //  Step 2: Load EmployeeDetails as dictionary
                 var empDetailsJson = await firebase.Child("EmployeeDetails").OnceAsJsonAsync();
                 var empDetailsDict = ParseJsonAsDictionary(empDetailsJson);
 
@@ -115,7 +115,7 @@ namespace HRIS_JAP_ATTPAY
                 string contact = empDetails != null && empDetails.ContainsKey("contact") ? empDetails["contact"] : null;
                 string email = empDetails != null && empDetails.ContainsKey("email") ? empDetails["email"] : null;
 
-                // 🔹 Step 3: Load EmploymentInfo as list
+                // Step 3: Load EmploymentInfo as list
                 var employmentJson = await firebase.Child("EmploymentInfo").OnceAsJsonAsync();
                 var employmentList = ParseMalformedJson(employmentJson);
 
@@ -125,7 +125,7 @@ namespace HRIS_JAP_ATTPAY
                 string department = employment != null && employment.ContainsKey("department") ? employment["department"] : "N/A";
                 string position = employment != null && employment.ContainsKey("position") ? employment["position"] : "N/A";
 
-                // 🔹 Step 4: Update UI
+                // Step 4: Update UI
                 labelNameInput.Text = !string.IsNullOrEmpty(fullName) ? fullName : "Unknown";
                 labelIDInput.Text = (employeeId ?? "N/A") + (isAdmin ? " (Admin)" : "");
                 labelDepartmentInput.Text = department;
@@ -198,7 +198,7 @@ namespace HRIS_JAP_ATTPAY
             return records;
         }
 
-        // 🔹 Parse JSON as dictionary keyed by top-level key (used for Users & EmployeeDetails)
+        // Parse JSON as dictionary keyed by top-level key (used for Users & EmployeeDetails)
         private Dictionary<string, Dictionary<string, string>> ParseJsonAsDictionary(string rawJson)
         {
             var dict = new Dictionary<string, Dictionary<string, string>>();

@@ -50,7 +50,7 @@
             // 
             this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
-            this.XpictureBox.Location = new System.Drawing.Point(423, 12);
+            this.XpictureBox.Location = new System.Drawing.Point(481, 11);
             this.XpictureBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.XpictureBox.Name = "XpictureBox";
             this.XpictureBox.Size = new System.Drawing.Size(51, 50);
@@ -130,9 +130,9 @@
             this.labelNameInput.Location = new System.Drawing.Point(183, 76);
             this.labelNameInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelNameInput.Name = "labelNameInput";
-            this.labelNameInput.Size = new System.Drawing.Size(181, 31);
+            this.labelNameInput.Size = new System.Drawing.Size(102, 31);
             this.labelNameInput.TabIndex = 11;
-            this.labelNameInput.Text = "Marcus Verzo";
+            this.labelNameInput.Text = "[Name]";
             this.labelNameInput.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // labelProfile
@@ -212,7 +212,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(485, 345);
+            this.ClientSize = new System.Drawing.Size(544, 345);
             this.Controls.Add(this.labelEmailInput);
             this.Controls.Add(this.labelContactInput);
             this.Controls.Add(this.labelPositionInput);

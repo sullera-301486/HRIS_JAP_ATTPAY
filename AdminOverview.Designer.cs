@@ -178,9 +178,9 @@
             this.labelOverviewDesc.Location = new System.Drawing.Point(42, 98);
             this.labelOverviewDesc.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.labelOverviewDesc.Name = "labelOverviewDesc";
-            this.labelOverviewDesc.Size = new System.Drawing.Size(537, 25);
+            this.labelOverviewDesc.Size = new System.Drawing.Size(476, 25);
             this.labelOverviewDesc.TabIndex = 13;
-            this.labelOverviewDesc.Text = "Welcome back [admin name]. View key updates and activity.";
+            this.labelOverviewDesc.Text = "Welcome back, admin. View key updates and activity.";
             // 
             // labelAdminOverview
             // 

@@ -43,7 +43,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private void MoveToAdmin()
+        private void MoveToAdmin(string userID)
         {
             Form parentForm = AttributesClass.GetRealOwnerForm(this.FindForm());
             if (parentForm != null)
@@ -53,7 +53,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private void MoveToHR()
+        private void MoveToHR(string userID)
         {
             Form parentForm = AttributesClass.GetRealOwnerForm(this.FindForm());
             if (parentForm != null)
@@ -115,14 +115,14 @@ namespace HRIS_JAP_ATTPAY
                 {
                     labelFailed.Visible = false;
 
-                    // ✅ NEW CODE: Fetch employee details and store session info
+                    //  NEW CODE: Fetch employee details and store session info
                     await SetCurrentUserSessionAsync(user);
 
                     // Move to correct form based on role
                     if (user.isAdmin)
-                        MoveToAdmin();
+                        MoveToAdmin(user.user_id);
                     else
-                        MoveToHR();
+                        MoveToHR(user.user_id);
                 }
                 else
                 {
@@ -135,7 +135,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // ✅ NEW METHOD: Fills SessionClass with the logged-in user's data
+        //  NEW METHOD: Fills SessionClass with the logged-in user's data
         private async Task SetCurrentUserSessionAsync(UserFirebase user)
         {
             try
@@ -171,7 +171,7 @@ namespace HRIS_JAP_ATTPAY
             public string created_at { get; set; }
         }
 
-        // ✅ NEW MODEL: Employee details fetched from Firebase
+        // NEW MODEL: Employee details fetched from Firebase
         private class EmployeeFirebase
         {
             public string first_name { get; set; }

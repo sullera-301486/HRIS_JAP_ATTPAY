@@ -162,9 +162,9 @@
             this.labelOverviewDesc.Location = new System.Drawing.Point(43, 104);
             this.labelOverviewDesc.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.labelOverviewDesc.Name = "labelOverviewDesc";
-            this.labelOverviewDesc.Size = new System.Drawing.Size(548, 25);
+            this.labelOverviewDesc.Size = new System.Drawing.Size(532, 25);
             this.labelOverviewDesc.TabIndex = 13;
-            this.labelOverviewDesc.Text = "Welcome back [HR name]. View attendance and work activity.";
+            this.labelOverviewDesc.Text = "Welcome back, HR Staff. View attendance and work activity.";
             // 
             // labelHROverview
             // 

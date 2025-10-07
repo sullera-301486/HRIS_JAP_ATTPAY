@@ -19,12 +19,10 @@ namespace HRIS_JAP_ATTPAY
         {
             currentUserId = userId;
             InitializeComponent();
-
             AttributesClass.SetMinSize(this, 1440, 1024);
             this.Size = new Size(1240, 824);
             panelLoaderMenu = new AttributesClassAlt(HRMenuPanel);
             panelLoaderView = new AttributesClassAlt(HRViewPanel);
-
         }
         private void HRPage_Load(object sender, EventArgs e)
         {

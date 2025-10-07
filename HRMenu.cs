@@ -23,7 +23,7 @@ namespace HRIS_JAP_ATTPAY
             currentUserId = userId;
             HRViewPanel = targetPanel;
             panelLoaderHR = new AttributesClassAlt(HRViewPanel);
-            
+
         }
 
         private void HRMenu_Load(object sender, EventArgs e)
