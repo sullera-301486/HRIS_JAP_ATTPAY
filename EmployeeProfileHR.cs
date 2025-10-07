@@ -252,69 +252,133 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                var employmentData = await firebase
-                .Child("EmploymentInfo")
-                .OnceAsync<object>();
-
-                if (employmentData != null)
+                // Method 1: Try reading as JArray first (handles the array structure with null element)
+                try
                 {
-                    foreach (var item in employmentData)
+                    var employmentArray = await firebase
+                        .Child("EmploymentInfo")
+                        .OnceSingleAsync<JArray>();
+
+                    if (employmentArray != null)
                     {
-                        if (item?.Object != null)
+                        foreach (var item in employmentArray)
                         {
-                            var empObj = JObject.FromObject(item.Object);
-                            var empId = empObj["employee_id"]?.ToString();
+                            // Skip null elements
+                            if (item?.Type == JTokenType.Null)
+                                continue;
 
-                            if (empId == employeeId)
+                            if (item?.Type == JTokenType.Object)
                             {
-                                SafeSetLabelText(labelDepartmentInput, empObj["department"]?.ToString());
-                                SafeSetLabelText(labelPositionInput, empObj["position"]?.ToString());
-                                SafeSetLabelText(labelContractTypeInput, empObj["contract_type"]?.ToString());
-                                SafeSetLabelText(labelManagerInput, empObj["manager_name"]?.ToString());
+                                var empObj = (JObject)item;
+                                var empId = empObj["employee_id"]?.ToString();
 
-                                // Date of joining
-                                if (!string.IsNullOrEmpty(empObj["date_of_joining"]?.ToString()))
+                                if (empId == employeeId)
                                 {
-                                    if (DateTime.TryParse(empObj["date_of_joining"].ToString(), out DateTime doj))
-                                        SafeSetLabelText(labelDateOfJoiningInput, doj.ToString("yyyy-MM-dd"));
-                                    else
-                                        SafeSetLabelText(labelDateOfJoiningInput, empObj["date_of_joining"].ToString());
+                                    SetEmploymentData(empObj);
+                                    return;
                                 }
-                                else
-                                {
-                                    SafeSetLabelText(labelDateOfJoiningInput, "N/A");
-                                }
-
-                                // Date of exit
-                                if (!string.IsNullOrEmpty(empObj["date_of_exit"]?.ToString()))
-                                {
-                                    if (DateTime.TryParse(empObj["date_of_exit"].ToString(), out DateTime doe))
-                                        SafeSetLabelText(labelDateOfExitInput, doe.ToString("yyyy-MM-dd"));
-                                    else
-                                        SafeSetLabelText(labelDateOfExitInput, empObj["date_of_exit"].ToString());
-                                }
-                                else
-                                {
-                                    SafeSetLabelText(labelDateOfExitInput, "N/A");
-                                }
-                                return;
                             }
                         }
                     }
                 }
+                catch
+                {
+                    // Fall through to method 2 if array approach fails
+                }
+
+                // Method 2: Try as keyed collection (backward compatibility)
+                try
+                {
+                    var employmentData = await firebase
+                        .Child("EmploymentInfo")
+                        .OnceAsync<object>();
+
+                    if (employmentData != null)
+                    {
+                        foreach (var item in employmentData)
+                        {
+                            // Skip null items
+                            if (item?.Object == null)
+                                continue;
+
+                            try
+                            {
+                                var empObj = JObject.FromObject(item.Object);
+                                var empId = empObj["employee_id"]?.ToString();
+
+                                if (empId == employeeId)
+                                {
+                                    SetEmploymentData(empObj);
+                                    return;
+                                }
+                            }
+                            catch
+                            {
+                                // Skip items that can't be converted to JObject
+                                continue;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in keyed collection method: {ex.Message}");
+                }
 
                 // Set defaults if no data found
-                SafeSetLabelText(labelDepartmentInput, "N/A");
-                SafeSetLabelText(labelPositionInput, "N/A");
-                SafeSetLabelText(labelContractTypeInput, "N/A");
-                SafeSetLabelText(labelManagerInput, "N/A");
-                SafeSetLabelText(labelDateOfJoiningInput, "N/A");
-                SafeSetLabelText(labelDateOfExitInput, "N/A");
+                SetDefaultEmploymentData();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading employment info: {ex.Message}");
+                SetDefaultEmploymentData();
             }
+        }
+
+        // Helper method to set employment data
+        private void SetEmploymentData(JObject empObj)
+        {
+            SafeSetLabelText(labelDepartmentInput, empObj["department"]?.ToString() ?? "N/A");
+            SafeSetLabelText(labelPositionInput, empObj["position"]?.ToString() ?? "N/A");
+            SafeSetLabelText(labelContractTypeInput, empObj["contract_type"]?.ToString() ?? "N/A");
+            SafeSetLabelText(labelManagerInput, empObj["manager_name"]?.ToString() ?? "N/A");
+
+            // Date of joining
+            if (!string.IsNullOrEmpty(empObj["date_of_joining"]?.ToString()))
+            {
+                if (DateTime.TryParse(empObj["date_of_joining"].ToString(), out DateTime doj))
+                    SafeSetLabelText(labelDateOfJoiningInput, doj.ToString("yyyy-MM-dd"));
+                else
+                    SafeSetLabelText(labelDateOfJoiningInput, empObj["date_of_joining"].ToString());
+            }
+            else
+            {
+                SafeSetLabelText(labelDateOfJoiningInput, "N/A");
+            }
+
+            // Date of exit
+            if (!string.IsNullOrEmpty(empObj["date_of_exit"]?.ToString()))
+            {
+                if (DateTime.TryParse(empObj["date_of_exit"].ToString(), out DateTime doe))
+                    SafeSetLabelText(labelDateOfExitInput, doe.ToString("yyyy-MM-dd"));
+                else
+                    SafeSetLabelText(labelDateOfExitInput, empObj["date_of_exit"].ToString());
+            }
+            else
+            {
+                SafeSetLabelText(labelDateOfExitInput, "N/A");
+            }
+        }
+
+        // Helper method to set default values
+        private void SetDefaultEmploymentData()
+        {
+            SafeSetLabelText(labelDepartmentInput, "N/A");
+            SafeSetLabelText(labelPositionInput, "N/A");
+            SafeSetLabelText(labelContractTypeInput, "N/A");
+            SafeSetLabelText(labelManagerInput, "N/A");
+            SafeSetLabelText(labelDateOfJoiningInput, "N/A");
+            SafeSetLabelText(labelDateOfExitInput, "N/A");
         }
 
         private async Task LoadWorkScheduleManual()
