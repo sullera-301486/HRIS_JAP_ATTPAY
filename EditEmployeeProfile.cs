@@ -135,33 +135,7 @@ namespace HRIS_JAP_ATTPAY
                 }
 
                 // ✅ Load EmploymentInfo from Firebase - FIXED VERSION
-                var allEmploymentInfo = await firebase
-                    .Child("EmploymentInfo")
-                    .OnceAsync<EmploymentInfoModel>();
-
-                // Find the employment info that matches this employee ID
-                var empInfo = allEmploymentInfo?
-                    .FirstOrDefault(e => e.Object?.employee_id == employeeId)?.Object;
-
-                if (empInfo != null)
-                {
-                    comboBoxDepartment.Text = empInfo.department ?? "";
-                    labelPositionInput.Text = empInfo.position ?? "";
-                    textBoxContractType.Text = empInfo.contract_type ?? "";
-                    textBoxDateOfJoining.Text = empInfo.date_of_joining ?? "";
-                    textBoxDateOfExit.Text = empInfo.date_of_exit ?? "";
-                    textBoxManager.Text = empInfo.manager_name ?? "";
-                }
-                else
-                {
-                    // If no employment info found, clear the fields
-                    comboBoxDepartment.Text = "";
-                    labelPositionInput.Text = "";
-                    textBoxContractType.Text = "";
-                    textBoxDateOfJoining.Text = "";
-                    textBoxDateOfExit.Text = "";
-                    textBoxManager.Text = "";
-                }
+                await LoadEmploymentInfoFixed(employeeId);
 
                 // ✅ Load User data for password
                 await LoadUserData(employeeId);
@@ -174,6 +148,223 @@ namespace HRIS_JAP_ATTPAY
                 MessageBox.Show("Error loading employee data: " + ex.Message,
                                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        // NEW METHOD: Fixed EmploymentInfo loading that handles null elements
+        private async Task LoadEmploymentInfoFixed(string employeeId)
+        {
+            try
+            {
+                // Method 1: Try reading as JArray first (handles the array structure with null element)
+                try
+                {
+                    var employmentArray = await firebase
+                        .Child("EmploymentInfo")
+                        .OnceSingleAsync<JArray>();
+
+                    if (employmentArray != null)
+                    {
+                        foreach (var item in employmentArray)
+                        {
+                            // Skip null elements
+                            if (item?.Type == JTokenType.Null)
+                                continue;
+
+                            if (item?.Type == JTokenType.Object)
+                            {
+                                var empObj = (JObject)item;
+                                var empId = empObj["employee_id"]?.ToString();
+
+                                if (empId == employeeId)
+                                {
+                                    SetEmploymentInfoUI(empObj);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    // Fall through to method 2 if array approach fails
+                }
+
+                // Method 2: Try as keyed collection (backward compatibility)
+                try
+                {
+                    var employmentData = await firebase
+                        .Child("EmploymentInfo")
+                        .OnceAsync<object>();
+
+                    if (employmentData != null)
+                    {
+                        foreach (var item in employmentData)
+                        {
+                            // Skip null items
+                            if (item?.Object == null)
+                                continue;
+
+                            try
+                            {
+                                var empObj = JObject.FromObject(item.Object);
+                                var empId = empObj["employee_id"]?.ToString();
+
+                                if (empId == employeeId)
+                                {
+                                    SetEmploymentInfoUI(empObj);
+                                    return;
+                                }
+                            }
+                            catch
+                            {
+                                // Skip items that can't be converted to JObject
+                                continue;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in keyed collection method: {ex.Message}");
+                }
+
+                // Set defaults if no data found
+                SetDefaultEmploymentInfoUI();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading employment info: {ex.Message}");
+                SetDefaultEmploymentInfoUI();
+            }
+        }
+
+        // NEW METHOD: Set employment info to UI controls
+        private void SetEmploymentInfoUI(JObject empObj)
+        {
+            // Use Invoke to ensure thread-safe UI updates
+            if (comboBoxDepartment.InvokeRequired)
+            {
+                comboBoxDepartment.Invoke(new Action(() =>
+                    comboBoxDepartment.Text = empObj["department"]?.ToString() ?? ""));
+            }
+            else
+            {
+                comboBoxDepartment.Text = empObj["department"]?.ToString() ?? "";
+            }
+
+            if (labelPositionInput.InvokeRequired)
+            {
+                labelPositionInput.Invoke(new Action(() =>
+                    labelPositionInput.Text = empObj["position"]?.ToString() ?? ""));
+            }
+            else
+            {
+                labelPositionInput.Text = empObj["position"]?.ToString() ?? "";
+            }
+
+            if (textBoxContractType.InvokeRequired)
+            {
+                textBoxContractType.Invoke(new Action(() =>
+                    textBoxContractType.Text = empObj["contract_type"]?.ToString() ?? ""));
+            }
+            else
+            {
+                textBoxContractType.Text = empObj["contract_type"]?.ToString() ?? "";
+            }
+
+            if (textBoxDateOfJoining.InvokeRequired)
+            {
+                textBoxDateOfJoining.Invoke(new Action(() =>
+                    textBoxDateOfJoining.Text = empObj["date_of_joining"]?.ToString() ?? ""));
+            }
+            else
+            {
+                textBoxDateOfJoining.Text = empObj["date_of_joining"]?.ToString() ?? "";
+            }
+
+            if (textBoxDateOfExit.InvokeRequired)
+            {
+                textBoxDateOfExit.Invoke(new Action(() =>
+                    textBoxDateOfExit.Text = empObj["date_of_exit"]?.ToString() ?? ""));
+            }
+            else
+            {
+                textBoxDateOfExit.Text = empObj["date_of_exit"]?.ToString() ?? "";
+            }
+
+            if (textBoxManager.InvokeRequired)
+            {
+                textBoxManager.Invoke(new Action(() =>
+                    textBoxManager.Text = empObj["manager_name"]?.ToString() ?? ""));
+            }
+            else
+            {
+                textBoxManager.Text = empObj["manager_name"]?.ToString() ?? "";
+            }
+
+            // Update password field accessibility after setting department
+            UpdatePasswordFieldAccessibility();
+        }
+
+        // NEW METHOD: Set default employment info to UI
+        private void SetDefaultEmploymentInfoUI()
+        {
+            if (comboBoxDepartment.InvokeRequired)
+            {
+                comboBoxDepartment.Invoke(new Action(() => comboBoxDepartment.Text = ""));
+            }
+            else
+            {
+                comboBoxDepartment.Text = "";
+            }
+
+            if (labelPositionInput.InvokeRequired)
+            {
+                labelPositionInput.Invoke(new Action(() => labelPositionInput.Text = ""));
+            }
+            else
+            {
+                labelPositionInput.Text = "";
+            }
+
+            if (textBoxContractType.InvokeRequired)
+            {
+                textBoxContractType.Invoke(new Action(() => textBoxContractType.Text = ""));
+            }
+            else
+            {
+                textBoxContractType.Text = "";
+            }
+
+            if (textBoxDateOfJoining.InvokeRequired)
+            {
+                textBoxDateOfJoining.Invoke(new Action(() => textBoxDateOfJoining.Text = ""));
+            }
+            else
+            {
+                textBoxDateOfJoining.Text = "";
+            }
+
+            if (textBoxDateOfExit.InvokeRequired)
+            {
+                textBoxDateOfExit.Invoke(new Action(() => textBoxDateOfExit.Text = ""));
+            }
+            else
+            {
+                textBoxDateOfExit.Text = "";
+            }
+
+            if (textBoxManager.InvokeRequired)
+            {
+                textBoxManager.Invoke(new Action(() => textBoxManager.Text = ""));
+            }
+            else
+            {
+                textBoxManager.Text = "";
+            }
+
+            // Update password field accessibility
+            UpdatePasswordFieldAccessibility();
         }
         private async Task LoadWorkScheduleData(string employeeId)
         {
@@ -614,10 +805,22 @@ namespace HRIS_JAP_ATTPAY
                 // First, get the existing employment info to preserve the employment_id and existing values
                 var allEmploymentInfo = await firebase
                     .Child("EmploymentInfo")
-                    .OnceAsync<EmploymentInfoModel>();
+                    .OnceAsync<object>();
 
                 var existingEmpInfo = allEmploymentInfo?
-                    .FirstOrDefault(e => e.Object?.employee_id == selectedEmployeeId);
+                    .FirstOrDefault(e =>
+                    {
+                        if (e?.Object == null) return false;
+                        try
+                        {
+                            var empObj = JObject.FromObject(e.Object);
+                            return empObj["employee_id"]?.ToString() == selectedEmployeeId;
+                        }
+                        catch
+                        {
+                            return false;
+                        }
+                    });
 
                 string employmentId;
 
@@ -632,16 +835,44 @@ namespace HRIS_JAP_ATTPAY
                     employmentId = selectedEmployeeId.Split('-')[1]; // Gets "001" from "JAP-001"
                 }
 
+                // Get existing values from the found record
+                string existingPosition = "";
+                string existingDepartment = "";
+                string existingContractType = "";
+                string existingDateOfJoining = "";
+                string existingDateOfExit = "";
+                string existingManagerName = "";
+                string existingCreatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                if (existingEmpInfo?.Object != null)
+                {
+                    try
+                    {
+                        var empObj = JObject.FromObject(existingEmpInfo.Object);
+                        existingPosition = empObj["position"]?.ToString() ?? "";
+                        existingDepartment = empObj["department"]?.ToString() ?? "";
+                        existingContractType = empObj["contract_type"]?.ToString() ?? "";
+                        existingDateOfJoining = empObj["date_of_joining"]?.ToString() ?? "";
+                        existingDateOfExit = empObj["date_of_exit"]?.ToString() ?? "";
+                        existingManagerName = empObj["manager_name"]?.ToString() ?? "";
+                        existingCreatedAt = empObj["created_at"]?.ToString() ?? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    }
+                    catch
+                    {
+                        // If parsing fails, use defaults
+                    }
+                }
+
                 var employmentInfo = new EmploymentInfoModel
                 {
                     employee_id = selectedEmployeeId,
-                    position = string.IsNullOrWhiteSpace(labelPositionInput.Text) ? existingEmpInfo?.Object?.position ?? "" : labelPositionInput.Text,
-                    department = string.IsNullOrWhiteSpace(comboBoxDepartment.Text) ? existingEmpInfo?.Object?.department ?? "" : comboBoxDepartment.Text,
-                    contract_type = string.IsNullOrWhiteSpace(textBoxContractType.Text) ? existingEmpInfo?.Object?.contract_type ?? "" : textBoxContractType.Text,
-                    date_of_joining = string.IsNullOrWhiteSpace(textBoxDateOfJoining.Text) ? existingEmpInfo?.Object?.date_of_joining ?? "" : textBoxDateOfJoining.Text,
-                    date_of_exit = string.IsNullOrWhiteSpace(textBoxDateOfExit.Text) ? existingEmpInfo?.Object?.date_of_exit ?? "" : textBoxDateOfExit.Text,
-                    manager_name = string.IsNullOrWhiteSpace(textBoxManager.Text) ? existingEmpInfo?.Object?.manager_name ?? "" : textBoxManager.Text,
-                    created_at = existingEmpInfo?.Object?.created_at ?? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                    position = string.IsNullOrWhiteSpace(labelPositionInput.Text) ? existingPosition : labelPositionInput.Text,
+                    department = string.IsNullOrWhiteSpace(comboBoxDepartment.Text) ? existingDepartment : comboBoxDepartment.Text,
+                    contract_type = string.IsNullOrWhiteSpace(textBoxContractType.Text) ? existingContractType : textBoxContractType.Text,
+                    date_of_joining = string.IsNullOrWhiteSpace(textBoxDateOfJoining.Text) ? existingDateOfJoining : textBoxDateOfJoining.Text,
+                    date_of_exit = string.IsNullOrWhiteSpace(textBoxDateOfExit.Text) ? existingDateOfExit : textBoxDateOfExit.Text,
+                    manager_name = string.IsNullOrWhiteSpace(textBoxManager.Text) ? existingManagerName : textBoxManager.Text,
+                    created_at = existingCreatedAt
                 };
 
                 await firebase
