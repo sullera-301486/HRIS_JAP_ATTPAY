@@ -15,11 +15,9 @@ namespace HRIS_JAP_ATTPAY
     {
         public PayrollExportData ExportData { get; private set; }
 
-        //UPDATED
         // Firebase client
         private FirebaseClient firebase = new FirebaseClient(
             "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
-
         private string payrollPeriod;
 
         // Data dictionaries
@@ -44,26 +42,38 @@ namespace HRIS_JAP_ATTPAY
             InitializeComponent();
             setFont();
 
-            // Load data when form loads
-            this.Load += async (sender, e) => await LoadPayrollDataAsync();
+            // Load data when form loads and auto-save to Firebase
+            this.Load += async (sender, e) => await LoadAndUpdatePayrollDataAsync();
         }
 
         public async void SetEmployeeId(string employeeId)
         {
             currentEmployeeId = employeeId;
-            await LoadPayrollDataAsync();
+            await LoadAndUpdatePayrollDataAsync();
         }
 
-        // Improved JSON parsing method
+        // Combined method to load data, compute, and auto-update Firebase
+        private async Task LoadAndUpdatePayrollDataAsync()
+        {
+            await LoadPayrollDataAsync();
+
+            // Auto-save to Firebase after computation
+            if (ExportData != null)
+            {
+                await UpdatePayrollDataAsync(currentEmployeeId, ExportData);
+            }
+        }
+
+        // FIXED: Improved JSON parsing method with better array handling
         private List<Dictionary<string, string>> ParseMalformedJson(string rawJson)
         {
             var records = new List<Dictionary<string, string>>();
+
             try
             {
-                if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null")
-                    return records;
+                if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null") return records;
 
-                // Handle array with null first element
+                // Handle array with null first element - FIXED
                 if (rawJson.StartsWith("[null,"))
                 {
                     rawJson = rawJson.Replace("[null,", "[");
@@ -73,37 +83,59 @@ namespace HRIS_JAP_ATTPAY
                     return records;
                 }
 
-                // Try to parse as JObject first (for object structures)
+                // Try to parse as JArray first
                 try
                 {
-                    var jObject = JObject.Parse(rawJson);
-                    foreach (var property in jObject.Properties())
+                    var jArray = JArray.Parse(rawJson);
+                    foreach (var item in jArray)
                     {
-                        if (property.Value.Type == JTokenType.Object)
+                        if (item.Type == JTokenType.Null) continue; // Skip null elements
+
+                        if (item.Type == JTokenType.Object)
                         {
                             var record = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                            foreach (JProperty prop in property.Value.Children<JProperty>())
+                            foreach (var prop in item.Children<JProperty>())
                             {
                                 record[prop.Name] = prop.Value?.ToString() ?? "";
                             }
-                            records.Add(record);
+                            if (record.Count > 0) records.Add(record);
                         }
                     }
                     return records;
                 }
                 catch
                 {
-                    // Continue with regex parsing if JObject fails
+                    // If JArray fails, try JObject
+                    try
+                    {
+                        var jObject = JObject.Parse(rawJson);
+                        foreach (var property in jObject.Properties())
+                        {
+                            if (property.Value.Type == JTokenType.Object)
+                            {
+                                var record = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                                foreach (var prop in property.Value.Children<JProperty>())
+                                {
+                                    record[prop.Name] = prop.Value?.ToString() ?? "";
+                                }
+                                records.Add(record);
+                            }
+                        }
+                        return records;
+                    }
+                    catch
+                    {
+                        // Continue with regex parsing if both fail
+                    }
                 }
 
-                // Normalization for regex parsing
+                // Fallback: regex parsing for malformed JSON
                 string cleanedJson = rawJson.Replace("\n", "").Replace("\r", "").Replace("\t", "")
                     .Replace("'", "\"").Replace("], [", ",").Replace("}, {", "},{")
                     .Replace("},(", "},{").Replace("),{", "},{");
 
                 // Find all {...} blocks
                 var matches = Regex.Matches(cleanedJson, @"\{[^{}]*\}");
-
                 foreach (Match match in matches)
                 {
                     try
@@ -111,16 +143,18 @@ namespace HRIS_JAP_ATTPAY
                         string objectStr = match.Value;
                         var record = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-                        // Improved regex to handle various value types
-                        var kvpMatches = Regex.Matches(objectStr, @"""([^""]+)""\s*:\s*(?:""([^""]*)"")?",
-                            RegexOptions.IgnoreCase);
-
+                        // Improved regex to handle key-value pairs
+                        var kvpMatches = Regex.Matches(objectStr, @"""([^""]+)""\s*:\s*(""[^""]*""|[^,}]+)");
                         foreach (Match kvpMatch in kvpMatches)
                         {
                             if (kvpMatch.Groups.Count >= 3)
                             {
                                 string key = kvpMatch.Groups[1].Value;
-                                string value = kvpMatch.Groups[2].Success ? kvpMatch.Groups[2].Value : "";
+                                string value = kvpMatch.Groups[2].Value.Trim();
+
+                                // Remove quotes from value if present
+                                if (value.StartsWith("\"") && value.EndsWith("\""))
+                                    value = value.Substring(1, value.Length - 2);
 
                                 // Handle null values
                                 if (string.Equals(value, "null", StringComparison.OrdinalIgnoreCase))
@@ -129,14 +163,9 @@ namespace HRIS_JAP_ATTPAY
                                 record[key] = value;
                             }
                         }
-
-                        if (record.Count > 0)
-                            records.Add(record);
+                        if (record.Count > 0) records.Add(record);
                     }
-                    catch
-                    {
-                        continue;
-                    }
+                    catch { continue; }
                 }
             }
             catch (Exception ex)
@@ -147,6 +176,7 @@ namespace HRIS_JAP_ATTPAY
             return records;
         }
 
+        // FIXED: Improved array data loading with better null handling
         private async Task LoadArrayBasedData(string childPath, Action<Dictionary<string, string>> processItem)
         {
             try
@@ -154,8 +184,7 @@ namespace HRIS_JAP_ATTPAY
                 var jsonResponse = await firebase.Child(childPath).OnceAsJsonAsync();
                 string rawJson = jsonResponse?.ToString() ?? "";
 
-                if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null")
-                    return;
+                if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null") return;
 
                 var records = ParseMalformedJson(rawJson);
 
@@ -170,6 +199,99 @@ namespace HRIS_JAP_ATTPAY
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading {childPath}: {ex.Message}");
+            }
+        }
+
+        // FIXED: Direct Firebase query for EmployeeLoans to handle the [null, {...}] structure
+        private async Task LoadEmployeeLoansDirectly()
+        {
+            try
+            {
+                employeeLoans.Clear();
+
+                var loansData = await firebase.Child("EmployeeLoans").OnceAsJsonAsync();
+                string rawJson = loansData?.ToString() ?? "";
+
+                if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null") return;
+
+                // Handle the specific [null, {...}] structure
+                if (rawJson.StartsWith("[null,") || rawJson.StartsWith("[null]"))
+                {
+                    var jArray = JArray.Parse(rawJson);
+                    foreach (var item in jArray)
+                    {
+                        if (item.Type == JTokenType.Null) continue;
+
+                        if (item.Type == JTokenType.Object)
+                        {
+                            var record = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                            foreach (var prop in item.Children<JProperty>())
+                            {
+                                record[prop.Name] = prop.Value?.ToString() ?? "";
+                            }
+                            if (record.Count > 0)
+                            {
+                                employeeLoans.Add(record);
+                                Console.WriteLine($"Loaded loan for employee: {record.GetValueOrDefault("employee_id", "Unknown")}");
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Fallback to regular parsing
+                    await LoadArrayBasedData("EmployeeLoans", (item) => {
+                        if (item != null && item.Count > 0)
+                        {
+                            employeeLoans.Add(item);
+                        }
+                    });
+                }
+
+                Console.WriteLine($"Total loans loaded: {employeeLoans.Count}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading EmployeeLoans directly: {ex.Message}");
+            }
+        }
+
+        // FIXED: Improved attendance data loading with mixed format handling
+        private async Task LoadAttendanceDataWithMixedFormats()
+        {
+            try
+            {
+                attendanceRecords.Clear();
+
+                var attendanceData = await firebase.Child("Attendance").OnceAsJsonAsync();
+                string rawJson = attendanceData?.ToString() ?? "";
+
+                if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null") return;
+
+                var records = ParseMalformedJson(rawJson);
+
+                foreach (var record in records)
+                {
+                    if (record != null && record.Count > 0)
+                    {
+                        // Normalize field names for consistent access
+                        var normalizedRecord = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+                        foreach (var kvp in record)
+                        {
+                            string normalizedKey = kvp.Key.ToLower();
+                            normalizedRecord[normalizedKey] = kvp.Value;
+                        }
+
+                        attendanceRecords.Add(normalizedRecord);
+                    }
+                }
+
+                Console.WriteLine($"Total attendance records loaded: {attendanceRecords.Count}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading attendance data: {ex.Message}");
             }
         }
 
@@ -195,55 +317,6 @@ namespace HRIS_JAP_ATTPAY
         }
 
         #region Government Contributions & Tax Calculations
-
-        private decimal CalculateSSSContribution(decimal monthlySalary)
-        {
-            // SSS contribution table (2024 rates)
-            if (monthlySalary <= 4249.99m) return 180.00m / 2; // Bi-monthly
-            if (monthlySalary <= 4749.99m) return 202.50m / 2;
-            if (monthlySalary <= 5249.99m) return 225.00m / 2;
-            if (monthlySalary <= 5749.99m) return 247.50m / 2;
-            if (monthlySalary <= 6249.99m) return 270.00m / 2;
-            if (monthlySalary <= 6749.99m) return 292.50m / 2;
-            if (monthlySalary <= 7249.99m) return 315.00m / 2;
-            if (monthlySalary <= 7749.99m) return 337.50m / 2;
-            if (monthlySalary <= 8249.99m) return 360.00m / 2;
-            if (monthlySalary <= 8749.99m) return 382.50m / 2;
-            if (monthlySalary <= 9249.99m) return 405.00m / 2;
-            if (monthlySalary <= 9749.99m) return 427.50m / 2;
-            if (monthlySalary <= 10249.99m) return 450.00m / 2;
-            if (monthlySalary <= 10749.99m) return 472.50m / 2;
-            if (monthlySalary <= 11249.99m) return 495.00m / 2;
-            if (monthlySalary <= 11749.99m) return 517.50m / 2;
-            if (monthlySalary <= 12249.99m) return 540.00m / 2;
-            if (monthlySalary <= 12749.99m) return 562.50m / 2;
-            if (monthlySalary <= 13249.99m) return 585.00m / 2;
-            if (monthlySalary <= 13749.99m) return 607.50m / 2;
-            if (monthlySalary <= 14249.99m) return 630.00m / 2;
-            if (monthlySalary <= 14749.99m) return 652.50m / 2;
-            if (monthlySalary <= 15249.99m) return 675.00m / 2;
-            if (monthlySalary <= 15749.99m) return 697.50m / 2;
-            if (monthlySalary <= 16249.99m) return 720.00m / 2;
-            if (monthlySalary <= 16749.99m) return 742.50m / 2;
-            if (monthlySalary <= 17249.99m) return 765.00m / 2;
-            if (monthlySalary <= 17749.99m) return 787.50m / 2;
-            if (monthlySalary <= 18249.99m) return 810.00m / 2;
-            if (monthlySalary <= 18749.99m) return 832.50m / 2;
-            if (monthlySalary <= 19249.99m) return 855.00m / 2;
-            if (monthlySalary <= 19749.99m) return 877.50m / 2;
-            if (monthlySalary <= 20249.99m) return 900.00m / 2;
-            if (monthlySalary <= 20749.99m) return 922.50m / 2;
-            if (monthlySalary <= 21249.99m) return 945.00m / 2;
-            if (monthlySalary <= 21749.99m) return 967.50m / 2;
-            if (monthlySalary <= 22249.99m) return 990.00m / 2;
-            if (monthlySalary <= 22749.99m) return 1012.50m / 2;
-            if (monthlySalary <= 23249.99m) return 1035.00m / 2;
-            if (monthlySalary <= 23749.99m) return 1057.50m / 2;
-            if (monthlySalary <= 24249.99m) return 1080.00m / 2;
-            if (monthlySalary <= 24749.99m) return 1102.50m / 2;
-            return 1125.00m / 2; // Maximum contribution
-        }
-
         private decimal CalculatePhilHealthContribution(decimal monthlySalary)
         {
             // PhilHealth rate 4% split between employer and employee (2.75% employee share)
@@ -293,7 +366,6 @@ namespace HRIS_JAP_ATTPAY
             decimal minuteRate = (hourlyRate / 60m) * 1.25m;
             return Math.Round(overtimeMinutes * minuteRate, 2);
         }
-
         #endregion
 
         private async Task LoadPayrollDataAsync()
@@ -311,7 +383,7 @@ namespace HRIS_JAP_ATTPAY
                 attendanceRecords.Clear();
                 employeeLoans.Clear();
 
-                // Load EmployeeDetails
+                // Load EmployeeDetails with null checking
                 var empDetails = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
                 foreach (var e in empDetails)
                 {
@@ -321,133 +393,121 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                // Load EmploymentInfo - handle mixed key formats
+                // FIXED: Improved EmploymentInfo loading with mixed key formats
                 var employmentData = await firebase.Child("EmploymentInfo").OnceAsync<dynamic>();
                 foreach (var e in employmentData)
                 {
                     if (e.Object != null)
                     {
-                        var empDict = new Dictionary<string, string>();
-                        foreach (var prop in e.Object)
+                        try
                         {
-                            empDict[prop.Key] = prop.Value?.ToString() ?? "";
-                        }
+                            var empDict = new Dictionary<string, string>();
+                            foreach (var prop in e.Object)
+                            {
+                                empDict[prop.Key] = prop.Value?.ToString() ?? "";
+                            }
 
-                        if (empDict.ContainsKey("employee_id"))
+                            // Handle mixed key formats - FIXED
+                            string employeeId = "";
+                            if (empDict.ContainsKey("employee_id"))
+                            {
+                                employeeId = empDict["employee_id"];
+                            }
+                            else if (e.Key.StartsWith("JAP-"))
+                            {
+                                employeeId = e.Key; // Use the key as employee ID
+                            }
+
+                            if (!string.IsNullOrEmpty(employeeId))
+                            {
+                                employmentInfo[employeeId] = empDict;
+                                Console.WriteLine($"Loaded employment info for: {employeeId}");
+                            }
+                        }
+                        catch (Exception ex)
                         {
-                            employmentInfo[empDict["employee_id"]] = empDict;
+                            Console.WriteLine($"Error processing employment info for key {e.Key}: {ex.Message}");
                         }
                     }
                 }
 
                 // Load other data using array-based method
-                await LoadArrayBasedData("Payroll", (item) =>
-                {
+                await LoadArrayBasedData("Payroll", (item) => {
                     if (item.ContainsKey("employee_id"))
                     {
                         payrollData[item["employee_id"]] = item;
                     }
                 });
 
-                await LoadArrayBasedData("PayrollSummary", (item) =>
-                {
+                await LoadArrayBasedData("PayrollSummary", (item) => {
                     if (item.ContainsKey("payroll_id"))
                     {
                         payrollSummaryData[item["payroll_id"]] = item;
                     }
                 });
 
-                await LoadArrayBasedData("EmployeeDeductions", (item) =>
-                {
+                await LoadArrayBasedData("EmployeeDeductions", (item) => {
                     if (item.ContainsKey("payroll_id"))
                     {
                         employeeDeductions[item["payroll_id"]] = item;
                     }
                 });
 
-                await LoadArrayBasedData("GovernmentDeductions", (item) =>
-                {
+                await LoadArrayBasedData("GovernmentDeductions", (item) => {
                     if (item.ContainsKey("payroll_id"))
                     {
                         govDeductions[item["payroll_id"]] = item;
                     }
                 });
 
-                await LoadArrayBasedData("PayrollEarnings", (item) =>
-                {
+                await LoadArrayBasedData("PayrollEarnings", (item) => {
                     if (item.ContainsKey("payroll_id"))
                     {
                         payrollEarnings[item["payroll_id"]] = item;
                     }
                 });
 
-                await LoadArrayBasedData("EmployeeLoans", (item) =>
-                {
-                    if (item != null && item.Count > 0)
-                    {
-                        employeeLoans.Add(item);
-                    }
-                });
+                // FIXED: Use direct loading for EmployeeLoans and Attendance
+                await LoadEmployeeLoansDirectly();
+                await LoadAttendanceDataWithMixedFormats();
 
-                await LoadArrayBasedData("Attendance", (item) =>
-                {
-                    if (item != null && item.Count > 0)
-                    {
-                        attendanceRecords.Add(item);
-                    }
-                });
-
-                // Validate employee data
+                // Validate employee data with improved error handling
                 if (string.IsNullOrEmpty(currentEmployeeId))
                 {
-                    MessageBox.Show("No employee selected.");
+                    MessageBox.Show("No employee selected.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 if (!employeeDetails.ContainsKey(currentEmployeeId))
                 {
-                    MessageBox.Show($"Employee details not found for {currentEmployeeId}");
+                    MessageBox.Show($"Employee details not found for {currentEmployeeId}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                // Get employee and employment data
+                // Get employee and employment data with null safety
                 var emp = employeeDetails[currentEmployeeId];
-                Dictionary<string, string> employment = employmentInfo.ContainsKey(currentEmployeeId) ?
-                    employmentInfo[currentEmployeeId] : null;
+                Dictionary<string, string> employment = employmentInfo.ContainsKey(currentEmployeeId)
+                    ? employmentInfo[currentEmployeeId]
+                    : new Dictionary<string, string>();
 
                 // Find payroll data for this employee
-                Dictionary<string, string> payroll = null;
-                if (payrollData.ContainsKey(currentEmployeeId))
-                {
-                    payroll = payrollData[currentEmployeeId];
-                }
-                else
-                {
-                    // Search through all payroll records
-                    foreach (var p in payrollData.Values)
-                    {
-                        if (p.ContainsKey("employee_id") && p["employee_id"] == currentEmployeeId)
-                        {
-                            payroll = p;
-                            break;
-                        }
-                    }
-                }
+                Dictionary<string, string> payroll = FindPayrollData(currentEmployeeId);
 
-                // Set basic employee information
+                // Set basic employee information with safe property access
                 labelIDInput.Text = currentEmployeeId;
-                labelNameInput.Text = $"{emp["last_name"] ?? ""}, {emp["first_name"] ?? ""} {emp["middle_name"] ?? ""}".Trim();
-                labelDepartmentInput.Text = employment != null && employment.ContainsKey("department") ? employment["department"] : "";
-                labelPositionInput.Text = employment != null && employment.ContainsKey("position") ? employment["position"] : "";
+                labelNameInput.Text = FormatEmployeeName(emp);
 
-                // Handle payroll period
+                // FIXED: Department and position lookup with fallback
+                labelDepartmentInput.Text = GetDepartmentWithFallback(employment, currentEmployeeId);
+                labelPositionInput.Text = GetPositionWithFallback(employment, currentEmployeeId);
+
+                // Handle payroll period with improved date handling
                 string cutoffStart = "";
                 string cutoffEnd = "";
-
                 if (payroll != null)
                 {
-                    cutoffStart = payroll.ContainsKey("cutoff_start") ? payroll["cutoff_start"] : "";
-                    cutoffEnd = payroll.ContainsKey("cutoff_end") ? payroll["cutoff_end"] : "";
+                    cutoffStart = GetSafeValue(payroll, "cutoff_start");
+                    cutoffEnd = GetSafeValue(payroll, "cutoff_end");
                 }
 
                 if (string.IsNullOrEmpty(cutoffStart) && !string.IsNullOrEmpty(payrollPeriod))
@@ -456,37 +516,17 @@ namespace HRIS_JAP_ATTPAY
                     cutoffEnd = payrollPeriod;
                 }
 
-                labelDateCoveredInput.Text = (!string.IsNullOrEmpty(cutoffStart) && !string.IsNullOrEmpty(cutoffEnd)) ?
-                    $"{cutoffStart} to {cutoffEnd}" : "Not specified";
+                labelDateCoveredInput.Text = FormatDateCovered(cutoffStart, cutoffEnd);
 
-                // Calculate daily rate
-                decimal dailyRate = 0m;
-                if (employment != null && employment.ContainsKey("daily_rate") && !string.IsNullOrEmpty(employment["daily_rate"]))
-                {
-                    decimal.TryParse(employment["daily_rate"], out dailyRate);
-                }
-
-                // Fallback: Check payroll earnings for daily rate
-                string payrollId = payroll != null && payroll.ContainsKey("payroll_id") ? payroll["payroll_id"] : "";
-                if (dailyRate == 0m && !string.IsNullOrEmpty(payrollId) && payrollEarnings.ContainsKey(payrollId) &&
-                    payrollEarnings[payrollId].ContainsKey("daily_rate"))
-                {
-                    decimal.TryParse(payrollEarnings[payrollId]["daily_rate"], out dailyRate);
-                }
-
+                // Calculate daily rate with fallback mechanisms
+                decimal dailyRate = CalculateDailyRate(employment, payroll);
                 labelDailyRateInput.Text = dailyRate.ToString("0.00");
 
                 // Calculate required work days
-                int requiredDays = 0;
-                if (!string.IsNullOrEmpty(cutoffStart) && !string.IsNullOrEmpty(cutoffEnd) &&
-                    DateTime.TryParse(cutoffStart, out DateTime startDate) && DateTime.TryParse(cutoffEnd, out DateTime endDate))
-                {
-                    var (fullDays, halfDays) = CalculateWorkDaysInPeriod(startDate, endDate);
-                    requiredDays = fullDays + halfDays;
-                }
+                int requiredDays = CalculateRequiredWorkDays(cutoffStart, cutoffEnd);
                 labelDaysInput.Text = requiredDays.ToString();
 
-                // Calculate actual days worked
+                // FIXED: Calculate actual days worked with improved attendance parsing
                 int daysWorked = CalculateDaysWorked(currentEmployeeId, cutoffStart, cutoffEnd);
                 labelDaysPresentInput.Text = daysWorked.ToString();
 
@@ -494,14 +534,14 @@ namespace HRIS_JAP_ATTPAY
                 decimal totalSalary = dailyRate * requiredDays;
                 labelSalaryInput.Text = totalSalary.ToString("0.00");
 
+                // FIXED: Basic pay should be based on actual days worked, not required days
                 decimal basicPay = dailyRate * daysWorked;
                 labelBasicPayAmountBaseInput.Text = basicPay.ToString("0.00");
                 labelBasicPayAmountCreditInput.Text = basicPay.ToString("0.00");
 
-                // Calculate overtime
+                // Calculate overtime - FIXED: Use actual overtime data from attendance
                 decimal totalOvertimeHours = CalculateOvertimeForEmployee(currentEmployeeId, cutoffStart, cutoffEnd);
                 labelOvertimeInput.Text = totalOvertimeHours.ToString("0.00");
-
                 decimal overtimePay = CalculateOvertimePay(dailyRate, totalOvertimeHours);
                 labelOvertimePerHourAmountCreditInput.Text = overtimePay.ToString("0.00");
 
@@ -512,15 +552,18 @@ namespace HRIS_JAP_ATTPAY
                 labelOvertimePerMinuteAmountCreditInput.Text = CalculateOvertimeMinutesPay(dailyRate, 1).ToString("0.00");
 
                 // Load earnings data
-                Dictionary<string, string> earnings = !string.IsNullOrEmpty(payrollId) && payrollEarnings.ContainsKey(payrollId) ?
-                    payrollEarnings[payrollId] : null;
+                string payrollId = payroll != null && payroll.ContainsKey("payroll_id") ? payroll["payroll_id"] : "";
+                Dictionary<string, string> earnings = !string.IsNullOrEmpty(payrollId) && payrollEarnings.ContainsKey(payrollId)
+                    ? payrollEarnings[payrollId]
+                    : null;
 
-                decimal commission = earnings != null && earnings.ContainsKey("commission") && decimal.TryParse(earnings["commission"], out decimal cVal) ? cVal : 0m;
-                decimal communication = earnings != null && earnings.ContainsKey("communication") && decimal.TryParse(earnings["communication"], out decimal comVal) ? comVal : 0m;
-                decimal foodAllowance = earnings != null && earnings.ContainsKey("food_allowance") && decimal.TryParse(earnings["food_allowance"], out decimal faVal) ? faVal : 0m;
-                decimal gasAllowance = earnings != null && earnings.ContainsKey("gas_allowance") && decimal.TryParse(earnings["gas_allowance"], out decimal gaVal) ? gaVal : 0m;
-                decimal gondola = earnings != null && earnings.ContainsKey("gondola") && decimal.TryParse(earnings["gondola"], out decimal gVal) ? gVal : 0m;
-                decimal incentives = earnings != null && earnings.ContainsKey("incentives") && decimal.TryParse(earnings["incentives"], out decimal inVal) ? inVal : 0m;
+                // Parse earnings with safe parsing
+                decimal commission = ParseDecimalSafe(earnings, "commission");
+                decimal communication = ParseDecimalSafe(earnings, "communication");
+                decimal foodAllowance = ParseDecimalSafe(earnings, "food_allowance");
+                decimal gasAllowance = ParseDecimalSafe(earnings, "gas_allowance");
+                decimal gondola = ParseDecimalSafe(earnings, "gondola");
+                decimal incentives = ParseDecimalSafe(earnings, "incentives");
 
                 labelCommissionAmountBaseInput.Text = commission.ToString("0.00");
                 labelCommissionAmountCreditInput.Text = commission.ToString("0.00");
@@ -537,7 +580,10 @@ namespace HRIS_JAP_ATTPAY
 
                 // Calculate government contributions (bi-monthly)
                 decimal monthlySalary = dailyRate * requiredDays * 2; // Approximate monthly salary
-                decimal sss = CalculateSSSContribution(monthlySalary);
+
+                // Use the new SSS computation
+                var sssContribution = SssCalculator.Compute(monthlySalary);
+                decimal sss = sssContribution.EmployeeTotal / 2; // Half for bi-monthly
                 decimal philhealth = CalculatePhilHealthContribution(monthlySalary);
                 decimal pagibig = CalculatePagibigContribution(monthlySalary);
                 decimal withholdingTax = CalculateWithholdingTax(monthlySalary);
@@ -552,58 +598,39 @@ namespace HRIS_JAP_ATTPAY
                 if (!string.IsNullOrEmpty(payrollId) && employeeDeductions.ContainsKey(payrollId))
                 {
                     var deductions = employeeDeductions[payrollId];
-                    if (deductions.ContainsKey("cash_advance")) decimal.TryParse(deductions["cash_advance"], out cashAdvance);
-                    if (deductions.ContainsKey("coop_contribution")) decimal.TryParse(deductions["coop_contribution"], out coopContribution);
-                    if (deductions.ContainsKey("other_deductions")) decimal.TryParse(deductions["other_deductions"], out otherDeductions);
+                    cashAdvance = ParseDecimalSafe(deductions, "cash_advance");
+                    coopContribution = ParseDecimalSafe(deductions, "coop_contribution");
+                    otherDeductions = ParseDecimalSafe(deductions, "other_deductions");
                 }
 
-                // Calculate loan deductions (bi-monthly payments)
-                decimal sssLoan = 0m, pagibigLoan = 0m, carLoan = 0m, housingLoan = 0m, coopLoan = 0m;
-                foreach (var loan in employeeLoans)
-                {
-                    if (loan.ContainsKey("employee_id") && loan["employee_id"] == currentEmployeeId &&
-                        loan.ContainsKey("status") && loan["status"] == "Active")
-                    {
-                        decimal loanAmount = loan.ContainsKey("loan_amount") && decimal.TryParse(loan["loan_amount"], out decimal amt) ? amt : 0m;
-                        int totalTerms = loan.ContainsKey("total_payment_terms") && int.TryParse(loan["total_payment_terms"], out int terms) ? terms : 0;
-
-                        if (totalTerms > 0)
-                        {
-                            decimal monthlyPayment = loanAmount / totalTerms;
-                            decimal biMonthlyPayment = monthlyPayment / 2; // Split monthly payment into two
-
-                            string loanType = loan.ContainsKey("loan_type") ? loan["loan_type"].ToLower() : "";
-
-                            if (loanType.Contains("sss")) sssLoan += biMonthlyPayment;
-                            else if (loanType.Contains("pagibig") || loanType.Contains("pag-ibig")) pagibigLoan += biMonthlyPayment;
-                            else if (loanType.Contains("car")) carLoan += biMonthlyPayment;
-                            else if (loanType.Contains("housing")) housingLoan += biMonthlyPayment;
-                            else if (loanType.Contains("coop")) coopLoan += biMonthlyPayment;
-                        }
-                    }
-                }
-
-                labelSSSLoanAmountDebitInput.Text = sssLoan.ToString("0.00");
-                labelPagIbigLoanAmountDebitInput.Text = pagibigLoan.ToString("0.00");
-                labelCarLoanAmountDebitInput.Text = carLoan.ToString("0.00");
-                labelHousingLoanAmountDebitInput.Text = housingLoan.ToString("0.00");
-                labelCoopLoanAmountDebitInput.Text = coopLoan.ToString("0.00");
+                // FIXED: Calculate loan deductions using bi_monthly_amortization values from Firebase
+                var loanDeductions = CalculateLoanDeductionsFromExistingValues(currentEmployeeId);
+                labelSSSLoanAmountDebitInput.Text = loanDeductions.sssLoan.ToString("0.00");
+                labelPagIbigLoanAmountDebitInput.Text = loanDeductions.pagibigLoan.ToString("0.00");
+                labelCarLoanAmountDebitInput.Text = loanDeductions.carLoan.ToString("0.00");
+                labelHousingLoanAmountDebitInput.Text = loanDeductions.housingLoan.ToString("0.00");
+                labelCoopLoanAmountDebitInput.Text = loanDeductions.coopLoan.ToString("0.00");
                 labelCashAdvanceAmountDebitInput.Text = cashAdvance.ToString("0.00");
                 labelCoopContriAmountDebitInput.Text = coopContribution.ToString("0.00");
                 labelOthersAmountDebitInput.Text = otherDeductions.ToString("0.00");
 
-                // Calculate gross pay
+                // Calculate gross pay - FIXED: Include all earnings components
                 decimal grossPay = basicPay + overtimePay + commission + communication + foodAllowance + gasAllowance + gondola + incentives;
                 labelGrossPayInput.Text = grossPay.ToString("0.00");
 
                 // Calculate total deductions
                 decimal totalDeductions = sss + philhealth + pagibig + withholdingTax +
-                                         sssLoan + pagibigLoan + carLoan + housingLoan + coopLoan +
-                                         cashAdvance + coopContribution + otherDeductions;
+                                         loanDeductions.sssLoan + loanDeductions.pagibigLoan + loanDeductions.carLoan +
+                                         loanDeductions.housingLoan + loanDeductions.coopLoan + cashAdvance +
+                                         coopContribution + otherDeductions;
                 labelDeductionsInput.Text = totalDeductions.ToString("0.00");
 
-                // Calculate net pay
+                // Calculate net pay - FIXED: Ensure positive net pay
                 decimal netPay = grossPay - totalDeductions;
+
+                // Ensure net pay is not negative (minimum zero)
+                if (netPay < 0) netPay = 0;
+
                 labelOverallTotalInput.Text = netPay.ToString("0.00");
 
                 // Populate export data
@@ -633,12 +660,12 @@ namespace HRIS_JAP_ATTPAY
                     SSS = sss.ToString("0.00"),
                     PagIbig = pagibig.ToString("0.00"),
                     Philhealth = philhealth.ToString("0.00"),
-                    SSSLoan = sssLoan.ToString("0.00"),
-                    PagIbigLoan = pagibigLoan.ToString("0.00"),
-                    CarLoan = carLoan.ToString("0.00"),
-                    HousingLoan = housingLoan.ToString("0.00"),
+                    SSSLoan = loanDeductions.sssLoan.ToString("0.00"),
+                    PagIbigLoan = loanDeductions.pagibigLoan.ToString("0.00"),
+                    CarLoan = loanDeductions.carLoan.ToString("0.00"),
+                    HousingLoan = loanDeductions.housingLoan.ToString("0.00"),
                     CashAdvance = cashAdvance.ToString("0.00"),
-                    CoopLoan = coopLoan.ToString("0.00"),
+                    CoopLoan = loanDeductions.coopLoan.ToString("0.00"),
                     CoopContribution = coopContribution.ToString("0.00"),
                     Others = otherDeductions.ToString("0.00"),
                     TotalDeductions = totalDeductions.ToString("0.00"),
@@ -658,37 +685,300 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
+        #region Helper Methods
+
+        private Dictionary<string, string> FindPayrollData(string employeeId)
+        {
+            // Try direct lookup first
+            if (payrollData.ContainsKey(employeeId))
+            {
+                return payrollData[employeeId];
+            }
+
+            // Search through all payroll records
+            foreach (var payroll in payrollData.Values)
+            {
+                if (payroll.ContainsKey("employee_id") && payroll["employee_id"] == employeeId)
+                {
+                    return payroll;
+                }
+            }
+
+            return null;
+        }
+
+        private string FormatEmployeeName(dynamic emp)
+        {
+            string lastName = GetDynamicValue(emp, "last_name") ?? "";
+            string firstName = GetDynamicValue(emp, "first_name") ?? "";
+            string middleName = GetDynamicValue(emp, "middle_name") ?? "";
+
+            return $"{lastName}, {firstName} {middleName}".Trim().Replace("  ", " ");
+        }
+
+        // FIXED: Improved department lookup with fallback
+        private string GetDepartmentWithFallback(Dictionary<string, string> employment, string employeeId)
+        {
+            string department = GetSafeValue(employment, "department");
+
+            if (string.IsNullOrEmpty(department))
+            {
+                // Search through all employment records for this employee
+                foreach (var empInfo in employmentInfo.Values)
+                {
+                    if (empInfo.ContainsKey("employee_id") && empInfo["employee_id"] == employeeId)
+                    {
+                        department = GetSafeValue(empInfo, "department");
+                        if (!string.IsNullOrEmpty(department)) break;
+                    }
+                }
+            }
+
+            return string.IsNullOrEmpty(department) ? "Not Specified" : department;
+        }
+
+        // FIXED: Improved position lookup with fallback
+        private string GetPositionWithFallback(Dictionary<string, string> employment, string employeeId)
+        {
+            string position = GetSafeValue(employment, "position");
+
+            if (string.IsNullOrEmpty(position))
+            {
+                // Search through all employment records for this employee
+                foreach (var empInfo in employmentInfo.Values)
+                {
+                    if (empInfo.ContainsKey("employee_id") && empInfo["employee_id"] == employeeId)
+                    {
+                        position = GetSafeValue(empInfo, "position");
+                        if (!string.IsNullOrEmpty(position)) break;
+                    }
+                }
+            }
+
+            return string.IsNullOrEmpty(position) ? "Not Specified" : position;
+        }
+
+        private string GetDynamicValue(dynamic obj, string propertyName)
+        {
+            try
+            {
+                if (obj is IDictionary<string, object> dict)
+                {
+                    return dict.ContainsKey(propertyName) ? dict[propertyName]?.ToString() : "";
+                }
+                return obj[propertyName]?.ToString() ?? "";
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        private string GetSafeValue(Dictionary<string, string> dict, string key)
+        {
+            return dict != null && dict.ContainsKey(key) ? dict[key] : "";
+        }
+
+        // Helper method for dictionary safe access (replaces DictionaryExtensions)
+        private string GetDictionaryValue(Dictionary<string, string> dict, string key, string defaultValue = "")
+        {
+            return dict != null && dict.ContainsKey(key) ? dict[key] : defaultValue;
+        }
+
+        private string FormatDateCovered(string start, string end)
+        {
+            if (string.IsNullOrEmpty(start) && string.IsNullOrEmpty(end)) return "Not specified";
+            if (start == end) return start;
+            return $"{start} to {end}";
+        }
+
+        private decimal CalculateDailyRate(Dictionary<string, string> employment, Dictionary<string, string> payroll)
+        {
+            decimal dailyRate = 0m;
+
+            // Try employment info first
+            if (employment != null && employment.ContainsKey("daily_rate") && !string.IsNullOrEmpty(employment["daily_rate"]))
+            {
+                decimal.TryParse(employment["daily_rate"], out dailyRate);
+            }
+
+            // Fallback: Check employee details for daily rate
+            if (dailyRate == 0m && employeeDetails.ContainsKey(currentEmployeeId))
+            {
+                var emp = employeeDetails[currentEmployeeId];
+                string dailyRateStr = GetDynamicValue(emp, "daily_rate");
+                if (!string.IsNullOrEmpty(dailyRateStr))
+                {
+                    decimal.TryParse(dailyRateStr, out dailyRate);
+                }
+            }
+
+            // Fallback: Check payroll earnings for daily rate
+            string payrollId = payroll != null && payroll.ContainsKey("payroll_id") ? payroll["payroll_id"] : "";
+            if (dailyRate == 0m && !string.IsNullOrEmpty(payrollId) && payrollEarnings.ContainsKey(payrollId) && payrollEarnings[payrollId].ContainsKey("daily_rate"))
+            {
+                decimal.TryParse(payrollEarnings[payrollId]["daily_rate"], out dailyRate);
+            }
+
+            // Default minimum rate if still zero
+            if (dailyRate == 0m)
+            {
+                dailyRate = 500m; // Minimum daily rate
+            }
+
+            return dailyRate;
+        }
+
+        private int CalculateRequiredWorkDays(string cutoffStart, string cutoffEnd)
+        {
+            int requiredDays = 0;
+
+            if (!string.IsNullOrEmpty(cutoffStart) && !string.IsNullOrEmpty(cutoffEnd) &&
+                DateTime.TryParse(cutoffStart, out DateTime startDate) && DateTime.TryParse(cutoffEnd, out DateTime endDate))
+            {
+                var (fullDays, halfDays) = CalculateWorkDaysInPeriod(startDate, endDate);
+                requiredDays = fullDays + halfDays;
+            }
+            else
+            {
+                // Default to 22 days if no cutoff dates provided
+                requiredDays = 22;
+            }
+
+            return requiredDays;
+        }
+
+        private decimal ParseDecimalSafe(Dictionary<string, string> dict, string key)
+        {
+            if (dict != null && dict.ContainsKey(key) && decimal.TryParse(dict[key], out decimal result))
+            {
+                return result;
+            }
+            return 0m;
+        }
+
+        // FIXED: Directly use bi_monthly_amortization values from Firebase for loan deductions
+        private (decimal sssLoan, decimal pagibigLoan, decimal carLoan, decimal housingLoan, decimal coopLoan) CalculateLoanDeductionsFromExistingValues(string employeeId)
+        {
+            decimal sssLoan = 0m, pagibigLoan = 0m, carLoan = 0m, housingLoan = 0m, coopLoan = 0m;
+
+            Console.WriteLine($"=== CALCULATING LOANS FOR {employeeId} ===");
+            Console.WriteLine($"Total loans available: {employeeLoans.Count}");
+
+            foreach (var loan in employeeLoans)
+            {
+                string loanEmployeeId = GetDictionaryValue(loan, "employee_id", "");
+                string loanStatus = GetDictionaryValue(loan, "status", "");
+                string loanType = GetDictionaryValue(loan, "loan_type", "Unknown");
+
+                if (loanEmployeeId == employeeId && loanStatus == "Active")
+                {
+                    // DIRECTLY USE bi_monthly_amortization from Firebase
+                    decimal biMonthlyAmortization = 0m;
+                    if (loan.ContainsKey("bi_monthly_amortization"))
+                    {
+                        biMonthlyAmortization = ParseDecimalSafe(loan, "bi_monthly_amortization");
+                        Console.WriteLine($"Active Loan: {loanType}, Bi-Monthly Amort: {biMonthlyAmortization}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Active Loan: {loanType}, NO BI-MONTHLY AMORTIZATION FOUND");
+                        continue;
+                    }
+
+                    if (loanType.ToLower().Contains("sss"))
+                        sssLoan += biMonthlyAmortization;
+                    else if (loanType.ToLower().Contains("pagibig") || loanType.ToLower().Contains("pag-ibig"))
+                        pagibigLoan += biMonthlyAmortization;
+                    else if (loanType.ToLower().Contains("car"))
+                        carLoan += biMonthlyAmortization;
+                    else if (loanType.ToLower().Contains("housing"))
+                        housingLoan += biMonthlyAmortization;
+                    else if (loanType.ToLower().Contains("coop"))
+                        coopLoan += biMonthlyAmortization;
+                }
+            }
+
+            Console.WriteLine($"TOTALS - SSS: {sssLoan}, Pag-IBIG: {pagibigLoan}, Car: {carLoan}, Housing: {housingLoan}, Coop: {coopLoan}");
+            Console.WriteLine("=============================");
+
+            return (sssLoan, pagibigLoan, carLoan, housingLoan, coopLoan);
+        }
+
+        #endregion
+
+        // FIXED: Improved overtime calculation with mixed format handling
         private decimal CalculateOvertimeForEmployee(string employeeId, string cutoffStart, string cutoffEnd)
         {
             decimal totalOvertime = 0;
+
             foreach (var attendance in attendanceRecords)
             {
-                if (attendance.ContainsKey("employee_id") && attendance["employee_id"] == employeeId &&
-                    attendance.ContainsKey("attendance_date") && IsDateInRange(attendance["attendance_date"], cutoffStart, cutoffEnd))
+                string attEmployeeId = GetDictionaryValue(attendance, "employeeid", "") ??
+                                      GetDictionaryValue(attendance, "employee_id", "");
+
+                string attendanceDate = GetDictionaryValue(attendance, "attendancedate", "") ??
+                                       GetDictionaryValue(attendance, "attendance_date", "");
+
+                if (attEmployeeId == employeeId && IsDateInRange(attendanceDate, cutoffStart, cutoffEnd))
                 {
+                    // Check overtime_hours field
                     if (attendance.ContainsKey("overtime_hours") && decimal.TryParse(attendance["overtime_hours"], out decimal overtime))
                     {
                         totalOvertime += overtime;
                     }
+                    // Also check for HoursWorked as potential overtime
+                    else if (attendance.ContainsKey("hoursworked") && decimal.TryParse(attendance["hoursworked"], out decimal hoursWorked))
+                    {
+                        // If hours worked exceed 8, count excess as overtime
+                        if (hoursWorked > 8)
+                        {
+                            totalOvertime += (hoursWorked - 8);
+                        }
+                    }
                 }
             }
+
+            Console.WriteLine($"Total overtime for {employeeId}: {totalOvertime} hours");
             return totalOvertime;
         }
 
+        // FIXED: Improved days worked calculation with mixed format handling
         private int CalculateDaysWorked(string employeeId, string cutoffStart, string cutoffEnd)
         {
             int daysWorked = 0;
+            HashSet<string> uniqueDates = new HashSet<string>();
+
             foreach (var attendance in attendanceRecords)
             {
-                if (attendance.ContainsKey("employee_id") && attendance["employee_id"] == employeeId &&
-                    attendance.ContainsKey("attendance_date") && IsDateInRange(attendance["attendance_date"], cutoffStart, cutoffEnd) &&
-                    attendance.ContainsKey("status") && !string.Equals(attendance["status"], "Absent", StringComparison.OrdinalIgnoreCase) &&
-                    attendance.ContainsKey("time_in") && !string.IsNullOrEmpty(attendance["time_in"]) &&
-                    !string.Equals(attendance["time_in"], "N/A", StringComparison.OrdinalIgnoreCase))
+                string attEmployeeId = GetDictionaryValue(attendance, "employeeid", "") ??
+                                      GetDictionaryValue(attendance, "employee_id", "");
+
+                string attendanceDate = GetDictionaryValue(attendance, "attendancedate", "") ??
+                                       GetDictionaryValue(attendance, "attendance_date", "");
+
+                if (attEmployeeId == employeeId && IsDateInRange(attendanceDate, cutoffStart, cutoffEnd))
                 {
-                    daysWorked++;
+                    // Check if employee actually worked (has time in/out and not absent)
+                    string timeIn = GetDictionaryValue(attendance, "timein", "") ??
+                                   GetDictionaryValue(attendance, "time_in", "");
+                    string timeOut = GetDictionaryValue(attendance, "timeout", "") ??
+                                    GetDictionaryValue(attendance, "time_out", "");
+                    string status = GetDictionaryValue(attendance, "status", "");
+
+                    bool hasTimeIn = !string.IsNullOrEmpty(timeIn) && !string.Equals(timeIn, "N/A", StringComparison.OrdinalIgnoreCase);
+                    bool hasTimeOut = !string.IsNullOrEmpty(timeOut) && !string.Equals(timeOut, "N/A", StringComparison.OrdinalIgnoreCase);
+                    bool isAbsent = string.Equals(status, "Absent", StringComparison.OrdinalIgnoreCase);
+
+                    if ((hasTimeIn || hasTimeOut) && !isAbsent && !uniqueDates.Contains(attendanceDate))
+                    {
+                        uniqueDates.Add(attendanceDate);
+                        daysWorked++;
+                    }
                 }
             }
+
+            Console.WriteLine($"Days worked for {employeeId}: {daysWorked}");
             return daysWorked;
         }
 
@@ -699,14 +989,126 @@ namespace HRIS_JAP_ATTPAY
                 if (string.IsNullOrEmpty(date) || string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate))
                     return false;
 
-                DateTime checkDate = DateTime.Parse(date);
+                // Handle different date formats
+                DateTime checkDate = DateTime.Parse(date.Split('T')[0]); // Handle ISO format
                 DateTime start = DateTime.Parse(startDate);
                 DateTime end = DateTime.Parse(endDate);
+
                 return checkDate >= start && checkDate <= end;
             }
             catch
             {
                 return false;
+            }
+        }
+
+        // Get or create payroll ID for employee
+        private string GetPayrollId(string employeeId)
+        {
+            // Try to find existing payroll ID
+            foreach (var payroll in payrollData.Values)
+            {
+                if (payroll.ContainsKey("employee_id") && payroll["employee_id"] == employeeId)
+                {
+                    return payroll.ContainsKey("payroll_id") ? payroll["payroll_id"] : "";
+                }
+            }
+
+            // Create new payroll ID if none exists
+            return $"payroll_{employeeId}_{DateTime.Now:yyyyMMddHHmmss}";
+        }
+
+        // Write computed data back to Firebase - FIXED: Ensure all data is properly saved
+        private async Task UpdatePayrollDataAsync(string employeeId, PayrollExportData computedData)
+        {
+            try
+            {
+                string payrollId = GetPayrollId(employeeId);
+
+                // Update EmployeeDetails with computed values
+                await firebase
+                    .Child("EmployeeDetails")
+                    .Child(employeeId)
+                    .PatchAsync(new
+                    {
+                        daily_rate = decimal.Parse(computedData.DailyRate),
+                        gross_pay = decimal.Parse(computedData.GrossPay),
+                        net_pay = decimal.Parse(computedData.NetPay),
+                        total_deductions = decimal.Parse(computedData.TotalDeductions),
+                        salary_frequency = "Semi-Monthly"
+                    });
+
+                // Update PayrollEarnings
+                await firebase
+                    .Child("PayrollEarnings")
+                    .Child(payrollId)
+                    .PatchAsync(new
+                    {
+                        basic_pay = decimal.Parse(computedData.BasicPay),
+                        overtime_pay = decimal.Parse(computedData.OvertimePerHour),
+                        total_earnings = decimal.Parse(computedData.GrossPay),
+                        commission = decimal.Parse(computedData.Commission),
+                        communication = decimal.Parse(computedData.Communication),
+                        food_allowance = decimal.Parse(computedData.FoodAllowance),
+                        gas_allowance = decimal.Parse(computedData.GasAllowance),
+                        gondola = decimal.Parse(computedData.Gondola),
+                        incentives = decimal.Parse(computedData.Incentives),
+                        daily_rate = decimal.Parse(computedData.DailyRate),
+                        days_present = int.Parse(computedData.DaysPresent)
+                    });
+
+                // Update PayrollSummary
+                await firebase
+                    .Child("PayrollSummary")
+                    .Child(payrollId)
+                    .PatchAsync(new
+                    {
+                        gross_pay = decimal.Parse(computedData.GrossPay),
+                        net_pay = decimal.Parse(computedData.NetPay),
+                        total_deductions = decimal.Parse(computedData.TotalDeductions)
+                    });
+
+                // Update GovernmentDeductions
+                await firebase
+                    .Child("GovernmentDeductions")
+                    .Child(payrollId)
+                    .PatchAsync(new
+                    {
+                        sss = decimal.Parse(computedData.SSS),
+                        philhealth = decimal.Parse(computedData.Philhealth),
+                        pagibig = decimal.Parse(computedData.PagIbig),
+                        withholding_tax = decimal.Parse(computedData.WithholdingTax),
+                        total_gov_deductions = decimal.Parse(computedData.TotalDeductions)
+                    });
+
+                // Update EmployeeDeductions
+                await firebase
+                    .Child("EmployeeDeductions")
+                    .Child(payrollId)
+                    .PatchAsync(new
+                    {
+                        cash_advance = decimal.Parse(computedData.CashAdvance),
+                        coop_contribution = decimal.Parse(computedData.CoopContribution),
+                        other_deductions = decimal.Parse(computedData.Others)
+                    });
+
+                // Update main Payroll record
+                await firebase
+                    .Child("Payroll")
+                    .Child(payrollId)
+                    .PatchAsync(new
+                    {
+                        employee_id = employeeId,
+                        net_pay = decimal.Parse(computedData.NetPay),
+                        created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
+                    });
+
+                // Show success message
+                Console.WriteLine("Payroll data automatically saved to Firebase!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating payroll data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -858,6 +1260,49 @@ namespace HRIS_JAP_ATTPAY
             {
                 MessageBox.Show("Font load failed: " + ex.Message);
             }
+        }
+    }
+
+    // SSS Computation Classes
+    public class SssContribution
+    {
+        public decimal MSC { get; set; }
+        public decimal EmployerSS { get; set; }
+        public decimal EmployerMPF { get; set; }
+        public decimal EmployerEC { get; set; }
+        public decimal EmployerTotal => EmployerSS + EmployerMPF + EmployerEC;
+        public decimal EmployeeSS { get; set; }
+        public decimal EmployeeMPF { get; set; }
+        public decimal EmployeeTotal => EmployeeSS + EmployeeMPF;
+        public decimal GrandTotal => EmployerTotal + EmployeeTotal;
+    }
+
+    public static class SssCalculator
+    {
+        public static SssContribution Compute(decimal salary)
+        {
+            // Determine MSC (monthly salary credit)
+            decimal msc;
+            if (salary < 5250) msc = 5000;
+            else if (salary >= 34750) msc = 35000;
+            else msc = Math.Ceiling((salary + 250) / 500) * 500;
+
+            // Compute contributions based on MSC
+            var result = new SssContribution { MSC = msc };
+            result.EmployerSS = msc * 0.09m;     // 9% employer share
+            result.EmployeeSS = msc * 0.045m;    // 4.5% employee share
+
+            // MPF applies only for MSC >= 20,250
+            if (msc >= 20250)
+            {
+                result.EmployerMPF = msc * 0.01m;  // 1% employer
+                result.EmployeeMPF = msc * 0.005m; // 0.5% employee
+            }
+
+            // EC is 10 for MSC <= 14999, otherwise 30 (caps at 30)
+            result.EmployerEC = (msc <= 14999) ? 10 : 30;
+
+            return result;
         }
     }
 }

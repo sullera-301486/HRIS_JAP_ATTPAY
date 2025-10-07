@@ -186,17 +186,17 @@ namespace HRIS_JAP_ATTPAY
         {
             if (e.RowIndex >= 0 && dataGridViewEmployee.Columns[e.ColumnIndex].Name == "Action")
             {
-                // Get the selected employee ID from the grid
                 string selectedEmployeeId = dataGridViewEmployee.Rows[e.RowIndex].Cells["EmployeeId"].Value?.ToString();
+                string selectedLoanType = dataGridViewEmployee.Rows[e.RowIndex].Cells["LoanType"].Value?.ToString();
 
                 if (!string.IsNullOrEmpty(selectedEmployeeId))
                 {
-                    Console.WriteLine($"DEBUG: Opening LoanDetails for employee: '{selectedEmployeeId}'");
+                    Console.WriteLine($"DEBUG: Opening LoanDetails for employee: '{selectedEmployeeId}' | LoanType: '{selectedLoanType}'");
 
                     Form parentForm = this.FindForm();
 
-                    // ✅ CORRECT: Pass the SELECTED employee ID, not the current (admin) ID
-                    LoanDetails loanDetails = new LoanDetails(selectedEmployeeId);
+                    // ✅ Pass both employee ID and loan type
+                    LoanDetails loanDetails = new LoanDetails(selectedEmployeeId, selectedLoanType);
 
                     AttributesClass.ShowWithOverlay(parentForm, loanDetails);
                 }
