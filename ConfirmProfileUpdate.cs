@@ -26,9 +26,6 @@ namespace HRIS_JAP_ATTPAY
             {
                 // Example async call (replace with Firebase if needed)
                 await Task.Delay(200); // simulate async loading
-
-                // Update UI once async work finishes
-                labelMessage.Text = "Please confirm if you want to update this profile.";
             }
             catch (Exception ex)
             {

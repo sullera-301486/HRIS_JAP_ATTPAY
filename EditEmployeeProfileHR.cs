@@ -613,40 +613,34 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // First, get the existing employment info to preserve the employment_id and existing values
-                var allEmploymentInfo = await firebase
+                // Get the current EmploymentInfo array
+                var employmentArray = await firebase
                     .Child("EmploymentInfo")
-                    .OnceAsync<object>();
+                    .OnceSingleAsync<JArray>();
 
-                var existingEmpInfo = allEmploymentInfo?
-                    .FirstOrDefault(e =>
+                JArray updatedArray = employmentArray ?? new JArray();
+                int targetIndex = -1;
+
+                // Find the employee's record in the array (skip null elements)
+                for (int i = 0; i < updatedArray.Count; i++)
+                {
+                    if (updatedArray[i]?.Type == JTokenType.Null)
+                        continue;
+
+                    if (updatedArray[i]?.Type == JTokenType.Object)
                     {
-                        if (e?.Object == null) return false;
-                        try
-                        {
-                            var empObj = JObject.FromObject(e.Object);
-                            return empObj["employee_id"]?.ToString() == selectedEmployeeId;
-                        }
-                        catch
-                        {
-                            return false;
-                        }
-                    });
+                        var empObj = (JObject)updatedArray[i];
+                        var empId = empObj["employee_id"]?.ToString();
 
-                string employmentId;
-
-                if (existingEmpInfo != null)
-                {
-                    // Use existing employment_id
-                    employmentId = existingEmpInfo.Key;
-                }
-                else
-                {
-                    // Generate new employment_id (extract number from employee_id)
-                    employmentId = selectedEmployeeId.Split('-')[1]; // Gets "001" from "JAP-001"
+                        if (empId == selectedEmployeeId)
+                        {
+                            targetIndex = i;
+                            break;
+                        }
+                    }
                 }
 
-                // Get existing values from the found record
+                // Get existing values or defaults
                 string existingPosition = "";
                 string existingDepartment = "";
                 string existingContractType = "";
@@ -655,25 +649,19 @@ namespace HRIS_JAP_ATTPAY
                 string existingManagerName = "";
                 string existingCreatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                if (existingEmpInfo?.Object != null)
+                if (targetIndex >= 0 && updatedArray[targetIndex]?.Type == JTokenType.Object)
                 {
-                    try
-                    {
-                        var empObj = JObject.FromObject(existingEmpInfo.Object);
-                        existingPosition = empObj["position"]?.ToString() ?? "";
-                        existingDepartment = empObj["department"]?.ToString() ?? "";
-                        existingContractType = empObj["contract_type"]?.ToString() ?? "";
-                        existingDateOfJoining = empObj["date_of_joining"]?.ToString() ?? "";
-                        existingDateOfExit = empObj["date_of_exit"]?.ToString() ?? "";
-                        existingManagerName = empObj["manager_name"]?.ToString() ?? "";
-                        existingCreatedAt = empObj["created_at"]?.ToString() ?? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    }
-                    catch
-                    {
-                        // If parsing fails, use defaults
-                    }
+                    var existingObj = (JObject)updatedArray[targetIndex];
+                    existingPosition = existingObj["position"]?.ToString() ?? "";
+                    existingDepartment = existingObj["department"]?.ToString() ?? "";
+                    existingContractType = existingObj["contract_type"]?.ToString() ?? "";
+                    existingDateOfJoining = existingObj["date_of_joining"]?.ToString() ?? "";
+                    existingDateOfExit = existingObj["date_of_exit"]?.ToString() ?? "";
+                    existingManagerName = existingObj["manager_name"]?.ToString() ?? "";
+                    existingCreatedAt = existingObj["created_at"]?.ToString() ?? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 }
 
+                // Create updated employment info
                 var employmentInfo = new EmploymentInfoModel
                 {
                     employee_id = selectedEmployeeId,
@@ -686,10 +674,41 @@ namespace HRIS_JAP_ATTPAY
                     created_at = existingCreatedAt
                 };
 
+                // Convert to JObject for Firebase
+                var employmentJObject = JObject.FromObject(employmentInfo);
+
+                if (targetIndex >= 0)
+                {
+                    // Update existing record
+                    updatedArray[targetIndex] = employmentJObject;
+                }
+                else
+                {
+                    // Add new record - find first available slot or append
+                    bool added = false;
+                    for (int i = 0; i < updatedArray.Count; i++)
+                    {
+                        if (updatedArray[i]?.Type == JTokenType.Null)
+                        {
+                            updatedArray[i] = employmentJObject;
+                            added = true;
+                            break;
+                        }
+                    }
+
+                    if (!added)
+                    {
+                        // Append to the end if no null slots found
+                        updatedArray.Add(employmentJObject);
+                    }
+                }
+
+                // Save the entire array back to Firebase
                 await firebase
                     .Child("EmploymentInfo")
-                    .Child(employmentId)
-                    .PutAsync(employmentInfo);
+                    .PutAsync(updatedArray);
+
+                Console.WriteLine("Employment info updated successfully in array format");
             }
             catch (Exception ex)
             {
