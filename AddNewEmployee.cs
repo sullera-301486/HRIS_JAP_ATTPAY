@@ -411,7 +411,8 @@ namespace HRIS_JAP_ATTPAY
                 };
 
                 string numericPart = employeeId.Split('-')[1];
-                string employmentId = numericPart;
+                // Convert to integer to remove leading zeros, then back to string
+                string employmentId = int.Parse(numericPart).ToString(); 
 
                 var employmentInfoObj = new
                 {
