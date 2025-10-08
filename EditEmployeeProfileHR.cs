@@ -262,14 +262,14 @@ namespace HRIS_JAP_ATTPAY
                 comboBoxDepartment.Text = empObj["department"]?.ToString() ?? "";
             }
 
-            if (labelPositionInput.InvokeRequired)
+            if (textBoxPositionInput.InvokeRequired)
             {
-                labelPositionInput.Invoke(new Action(() =>
-                    labelPositionInput.Text = empObj["position"]?.ToString() ?? ""));
+                textBoxPositionInput.Invoke(new Action(() =>
+                    textBoxPositionInput.Text = empObj["position"]?.ToString() ?? ""));
             }
             else
             {
-                labelPositionInput.Text = empObj["position"]?.ToString() ?? "";
+                textBoxPositionInput.Text = empObj["position"]?.ToString() ?? "";
             }
 
             if (textBoxContractType.InvokeRequired)
@@ -326,13 +326,13 @@ namespace HRIS_JAP_ATTPAY
                 comboBoxDepartment.Text = "";
             }
 
-            if (labelPositionInput.InvokeRequired)
+            if (textBoxPositionInput.InvokeRequired)
             {
-                labelPositionInput.Invoke(new Action(() => labelPositionInput.Text = ""));
+                textBoxPositionInput.Invoke(new Action(() => textBoxPositionInput.Text = ""));
             }
             else
             {
-                labelPositionInput.Text = "";
+                textBoxPositionInput.Text = "";
             }
 
             if (textBoxContractType.InvokeRequired)
@@ -407,7 +407,7 @@ namespace HRIS_JAP_ATTPAY
                 labelNationality.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelPersonalInformation.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
                 labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelPositionInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                textBoxPositionInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelRFIDTag.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelRFIDTagInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelShiftSchedule.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
@@ -665,7 +665,7 @@ namespace HRIS_JAP_ATTPAY
                 var employmentInfo = new EmploymentInfoModel
                 {
                     employee_id = selectedEmployeeId,
-                    position = string.IsNullOrWhiteSpace(labelPositionInput.Text) ? existingPosition : labelPositionInput.Text,
+                    position = string.IsNullOrWhiteSpace(textBoxPositionInput.Text) ? existingPosition : textBoxPositionInput.Text,
                     department = string.IsNullOrWhiteSpace(comboBoxDepartment.Text) ? existingDepartment : comboBoxDepartment.Text,
                     contract_type = string.IsNullOrWhiteSpace(textBoxContractType.Text) ? existingContractType : textBoxContractType.Text,
                     date_of_joining = string.IsNullOrWhiteSpace(textBoxDateOfJoining.Text) ? existingDateOfJoining : textBoxDateOfJoining.Text,
@@ -1418,6 +1418,7 @@ namespace HRIS_JAP_ATTPAY
                 throw;
             }
         }
+
     }
 
 

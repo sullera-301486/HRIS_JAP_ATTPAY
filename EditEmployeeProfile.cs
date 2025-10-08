@@ -252,14 +252,14 @@ namespace HRIS_JAP_ATTPAY
                 comboBoxDepartment.Text = empObj["department"]?.ToString() ?? "";
             }
 
-            if (labelPositionInput.InvokeRequired)
+            if (textBoxPositionInput.InvokeRequired)
             {
-                labelPositionInput.Invoke(new Action(() =>
-                    labelPositionInput.Text = empObj["position"]?.ToString() ?? ""));
+                textBoxPositionInput.Invoke(new Action(() =>
+                    textBoxPositionInput.Text = empObj["position"]?.ToString() ?? ""));
             }
             else
             {
-                labelPositionInput.Text = empObj["position"]?.ToString() ?? "";
+                textBoxPositionInput.Text = empObj["position"]?.ToString() ?? "";
             }
 
             if (textBoxContractType.InvokeRequired)
@@ -318,13 +318,13 @@ namespace HRIS_JAP_ATTPAY
                 comboBoxDepartment.Text = "";
             }
 
-            if (labelPositionInput.InvokeRequired)
+            if (textBoxPositionInput.InvokeRequired)
             {
-                labelPositionInput.Invoke(new Action(() => labelPositionInput.Text = ""));
+                textBoxPositionInput.Invoke(new Action(() => textBoxPositionInput.Text = ""));
             }
             else
             {
-                labelPositionInput.Text = "";
+                textBoxPositionInput.Text = "";
             }
 
             if (textBoxContractType.InvokeRequired)
@@ -461,55 +461,46 @@ namespace HRIS_JAP_ATTPAY
                     .OnceAsync<UserModel>();
 
                 var user = users.FirstOrDefault(u => u.Object?.employee_id == employeeId);
+                string currentDepartment = comboBoxDepartment.Text;
 
-                // Check if department is HR to determine password field behavior
-                bool isHRDepartment = comboBoxDepartment.Text == "Human Resource";
-
-                if (user != null)
+                if (currentDepartment == "Human Resource")
                 {
-                    if (isHRDepartment)
+                    // For HR department, show appropriate placeholder
+                    if (user != null)
                     {
-                        // For HR department, show placeholder but allow editing
                         textboxPassword.Text = "••••••••";
                         textboxPassword.ForeColor = Color.Gray;
                         textboxPassword.UseSystemPasswordChar = false;
-
-                        // Add event handlers to handle placeholder behavior
-                        textboxPassword.Enter += PasswordTextBox_Enter;
-                        textboxPassword.Leave += PasswordTextBox_Leave;
                     }
                     else
                     {
-                        // For non-HR departments, show disabled state
-                        textboxPassword.Text = "HR department only";
-                        textboxPassword.ForeColor = Color.Gray;
-                        textboxPassword.UseSystemPasswordChar = false;
-                        textboxPassword.Enabled = false;
-                        textboxPassword.BackColor = SystemColors.Control;
-                    }
-                }
-                else
-                {
-                    if (isHRDepartment)
-                    {
-                        // For HR department without password, show placeholder but allow editing
                         textboxPassword.Text = "No password set";
                         textboxPassword.ForeColor = Color.Gray;
                         textboxPassword.UseSystemPasswordChar = false;
+                    }
 
-                        // Add event handlers to handle placeholder behavior
-                        textboxPassword.Enter += PasswordTextBox_Enter;
-                        textboxPassword.Leave += PasswordTextBox_Leave;
+                    // Add event handlers for placeholder behavior
+                    textboxPassword.Enter += PasswordTextBox_Enter;
+                    textboxPassword.Leave += PasswordTextBox_Leave;
+                }
+                else
+                {
+                    // For non-HR departments
+                    if (user != null)
+                    {
+                        // User exists but department is not HR - this shouldn't normally happen
+                        textboxPassword.Text = "User access will be revoked";
+                        textboxPassword.ForeColor = Color.Orange;
                     }
                     else
                     {
-                        // For non-HR departments, show disabled state
                         textboxPassword.Text = "HR department only";
                         textboxPassword.ForeColor = Color.Gray;
-                        textboxPassword.UseSystemPasswordChar = false;
-                        textboxPassword.Enabled = false;
-                        textboxPassword.BackColor = SystemColors.Control;
                     }
+
+                    textboxPassword.UseSystemPasswordChar = false;
+                    textboxPassword.Enabled = false;
+                    textboxPassword.BackColor = SystemColors.Control;
                 }
             }
             catch (Exception ex)
@@ -620,7 +611,7 @@ namespace HRIS_JAP_ATTPAY
                 labelPassword.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelPersonalInformation.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
                 labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelPositionInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                textBoxPositionInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelRFIDTag.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelRFIDTagInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelShiftSchedule.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
@@ -681,32 +672,31 @@ namespace HRIS_JAP_ATTPAY
             {
                 Cursor.Current = Cursors.WaitCursor;
 
-                // Validate HR department password requirement
-                string department = comboBoxDepartment.Text.Trim();
+                // Get current department and password info
+                string newDepartment = comboBoxDepartment.Text.Trim();
                 string password = textboxPassword.Text.Trim();
 
-                // Check if password is actually a placeholder and should be preserved
+                // Check if password is actually a placeholder
                 bool isPasswordPlaceholder = password == "••••••••" ||
                                            password == "No password set" ||
                                            password == "HR department only";
 
-                if (department == "Human Resource")
+                // Validate HR department password requirement
+                if (newDepartment == "Human Resource")
                 {
                     if (string.IsNullOrEmpty(password) || isPasswordPlaceholder)
                     {
-                        // For HR department, we need to ensure password is preserved
-                        if (password == "••••••••")
+                        // Check if user already exists
+                        var users = await firebase.Child("Users").OnceAsync<UserModel>();
+                        var userExists = users.Any(u => u.Object?.employee_id == selectedEmployeeId);
+
+                        if (!userExists)
                         {
-                            // This means there's an existing password that should be preserved
-                            // We'll handle this in UpdateUserPassword by not changing the password
-                            password = null; // Special indicator to preserve existing password
-                        }
-                        else if (password == "No password set" || string.IsNullOrEmpty(password))
-                        {
-                            MessageBox.Show("Password is required for Human Resource department employees.",
+                            MessageBox.Show("Password is required when assigning employee to Human Resource department.",
                                           "Password Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             return;
                         }
+                        // If user exists and password is placeholder, preserve existing password
                     }
                 }
 
@@ -729,14 +719,16 @@ namespace HRIS_JAP_ATTPAY
                 // 3. Update EmploymentInfo
                 await UpdateEmploymentInfo();
 
-                // 4. Update Work Schedule
+                // 4. Handle User Management based on department change
+                await HandleUserManagement(selectedEmployeeId, newDepartment, password, isPasswordPlaceholder);
+
+                // 5. Update Work Schedule
                 await UpdateWorkSchedule(selectedEmployeeId);
 
-                // 5. Update Password handling - only for HR department
-                if (department == "Human Resource")
-                {
-                    await UpdateUserPassword(selectedEmployeeId, password, isPasswordPlaceholder);
-                }
+                // Add admin log for profile update
+                await AddAdminLog("Employee Updated", selectedEmployeeId,
+                                 $"Employee profile updated for {selectedEmployeeId}",
+                                 $"Department: {newDepartment}");
 
                 MessageBox.Show("Employee profile updated successfully!", "Success",
                                MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -854,7 +846,7 @@ namespace HRIS_JAP_ATTPAY
                 var employmentInfo = new EmploymentInfoModel
                 {
                     employee_id = selectedEmployeeId,
-                    position = string.IsNullOrWhiteSpace(labelPositionInput.Text) ? existingPosition : labelPositionInput.Text,
+                    position = string.IsNullOrWhiteSpace(textBoxPositionInput.Text) ? existingPosition : textBoxPositionInput.Text,
                     department = string.IsNullOrWhiteSpace(comboBoxDepartment.Text) ? existingDepartment : comboBoxDepartment.Text,
                     contract_type = string.IsNullOrWhiteSpace(textBoxContractType.Text) ? existingContractType : textBoxContractType.Text,
                     date_of_joining = string.IsNullOrWhiteSpace(textBoxDateOfJoining.Text) ? existingDateOfJoining : textBoxDateOfJoining.Text,
@@ -1789,6 +1781,204 @@ namespace HRIS_JAP_ATTPAY
             {
                 System.Diagnostics.Debug.WriteLine($"Error saving schedule to array: {ex.Message}");
                 throw;
+            }
+        }
+        // NEW METHOD: Handle user creation/revocation based on department
+        private async Task HandleUserManagement(string employeeId, string newDepartment, string password, bool isPasswordPlaceholder)
+        {
+            try
+            {
+                // Find existing user for this employee
+                var users = await firebase
+                    .Child("Users")
+                    .OnceAsync<UserModel>();
+
+                var existingUser = users.FirstOrDefault(u => u.Object?.employee_id == employeeId);
+
+                if (newDepartment == "Human Resource")
+                {
+                    // Department is HR - ensure user exists
+                    if (existingUser != null)
+                    {
+                        // User already exists, update password if provided
+                        if (!isPasswordPlaceholder && !string.IsNullOrEmpty(password))
+                        {
+                            await UpdateExistingUserPassword(existingUser, password);
+                        }
+                        // If password is placeholder, preserve existing password
+                    }
+                    else
+                    {
+                        // Create new user for HR department
+                        if (!isPasswordPlaceholder && !string.IsNullOrEmpty(password))
+                        {
+                            await CreateNewUserForHR(employeeId, password);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Password is required when assigning employee to Human Resource department.",
+                                          "Password Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                    }
+                }
+                else
+                {
+                    // Department is NOT HR - revoke user if exists
+                    if (existingUser != null)
+                    {
+                        await RevokeUserAccess(existingUser);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error managing user access: {ex.Message}", "Error",
+                               MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // NEW METHOD: Revoke user access when department changes from HR to non-HR
+        private async Task RevokeUserAccess(FirebaseObject<UserModel> user)
+        {
+            try
+            {
+                await firebase
+                    .Child("Users")
+                    .Child(user.Key)
+                    .DeleteAsync();
+
+                // Add admin log for user revocation
+                await AddAdminLog("User Revoked", user.Object.employee_id,
+                                 $"User access revoked due to department change from HR to non-HR",
+                                 $"User ID: {user.Object.user_id} was removed from Users");
+
+                System.Diagnostics.Debug.WriteLine($"User access revoked for employee: {user.Object.employee_id}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error revoking user access: {ex.Message}", "Error",
+                               MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw;
+            }
+        }
+
+        // NEW METHOD: Create new user for HR department
+        private async Task CreateNewUserForHR(string employeeId, string password)
+        {
+            try
+            {
+                // Generate a new user ID
+                var allUsers = await firebase.Child("Users").OnceAsync<UserModel>();
+                int maxUserId = 0;
+
+                foreach (var user in allUsers)
+                {
+                    if (int.TryParse(user.Object?.user_id, out int userId))
+                    {
+                        if (userId > maxUserId) maxUserId = userId;
+                    }
+                }
+
+                string newUserId = (maxUserId + 1).ToString();
+
+                // Generate salt and hash
+                string numericPart = employeeId.Split('-')[1];
+                string salt = "RANDOMSALT" + numericPart;
+                string passwordHash = HashPassword(password, salt);
+
+                var newUser = new UserModel
+                {
+                    user_id = newUserId,
+                    employee_id = employeeId,
+                    password_hash = passwordHash,
+                    salt = salt,
+                    isAdmin = "False",
+                    created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
+                };
+
+                await firebase
+                    .Child("Users")
+                    .Child(newUserId)
+                    .PutAsync(newUser);
+
+                // Add admin log for user creation
+                await AddAdminLog("User Created", employeeId,
+                                 $"User account created for HR department employee",
+                                 $"User ID: {newUserId} created for Employee ID: {employeeId}");
+
+                System.Diagnostics.Debug.WriteLine($"New user created for HR employee: {employeeId}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error creating user: {ex.Message}", "Error",
+                               MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw;
+            }
+        }
+
+        // NEW METHOD: Update existing user password
+        private async Task UpdateExistingUserPassword(FirebaseObject<UserModel> user, string newPassword)
+        {
+            try
+            {
+                string numericPart = user.Object.employee_id.Split('-')[1];
+                string salt = "RANDOMSALT" + numericPart;
+                string passwordHash = HashPassword(newPassword, salt);
+
+                var updatedUser = new UserModel
+                {
+                    user_id = user.Object.user_id,
+                    employee_id = user.Object.employee_id,
+                    password_hash = passwordHash,
+                    salt = salt,
+                    isAdmin = user.Object.isAdmin,
+                    created_at = user.Object.created_at
+                };
+
+                await firebase
+                    .Child("Users")
+                    .Child(user.Key)
+                    .PutAsync(updatedUser);
+
+                System.Diagnostics.Debug.WriteLine($"Password updated for user: {user.Object.user_id}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating password: {ex.Message}", "Error",
+                               MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw;
+            }
+        }
+
+        // NEW METHOD: Add admin log (similar to AddNewEmployee)
+        private async Task AddAdminLog(string actionType, string targetEmployeeId, string description, string details = "")
+        {
+            try
+            {
+                // Get current admin info - you might want to pass this from parent form
+                string adminEmployeeId = "JAP-001"; // Default admin from your JSON
+                string adminName = "Franz Louies Deloritos";
+                string adminUserId = "101";
+
+                var adminLog = new
+                {
+                    action_type = actionType,
+                    admin_employee_id = adminEmployeeId,
+                    admin_name = adminName,
+                    admin_user_id = adminUserId,
+                    description = description,
+                    details = string.IsNullOrEmpty(details) ?
+                             $"Employee ID: {targetEmployeeId}, Updated by: {adminName} (User ID: {adminUserId})" :
+                             details,
+                    target_employee_id = targetEmployeeId,
+                    timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                };
+
+                await firebase.Child("AdminLogs").PostAsync(adminLog);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error adding admin log: {ex.Message}");
             }
         }
     }

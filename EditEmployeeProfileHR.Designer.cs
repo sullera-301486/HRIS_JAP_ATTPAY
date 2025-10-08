@@ -67,7 +67,6 @@
             this.textBoxMiddleName = new System.Windows.Forms.TextBox();
             this.textBoxFirstName = new System.Windows.Forms.TextBox();
             this.labelEmployeeIDInput = new System.Windows.Forms.Label();
-            this.labelPositionInput = new System.Windows.Forms.Label();
             this.label34 = new System.Windows.Forms.Label();
             this.labelRFIDTagInput = new System.Windows.Forms.Label();
             this.labelPosition = new System.Windows.Forms.Label();
@@ -105,6 +104,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.buttonScanRFID = new System.Windows.Forms.Button();
             this.XpictureBox = new System.Windows.Forms.PictureBox();
+            this.textBoxPositionInput = new System.Windows.Forms.TextBox();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxEmployee)).BeginInit();
             this.panel1.SuspendLayout();
@@ -635,18 +635,6 @@
             this.labelEmployeeIDInput.Text = "N/A";
             this.labelEmployeeIDInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // labelPositionInput
-            // 
-            this.labelPositionInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.labelPositionInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelPositionInput.Location = new System.Drawing.Point(33, 386);
-            this.labelPositionInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelPositionInput.Name = "labelPositionInput";
-            this.labelPositionInput.Size = new System.Drawing.Size(223, 31);
-            this.labelPositionInput.TabIndex = 89;
-            this.labelPositionInput.Text = "N/A";
-            this.labelPositionInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // label34
             // 
             this.label34.Anchor = System.Windows.Forms.AnchorStyles.Top;
@@ -981,6 +969,7 @@
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.White;
+            this.panel2.Controls.Add(this.textBoxPositionInput);
             this.panel2.Controls.Add(this.comboBoxDepartment);
             this.panel2.Controls.Add(this.buttonChangePhoto);
             this.panel2.Controls.Add(this.labelDashB);
@@ -1021,7 +1010,6 @@
             this.panel2.Controls.Add(this.textBoxMiddleName);
             this.panel2.Controls.Add(this.textBoxFirstName);
             this.panel2.Controls.Add(this.labelEmployeeIDInput);
-            this.panel2.Controls.Add(this.labelPositionInput);
             this.panel2.Controls.Add(this.label34);
             this.panel2.Controls.Add(this.labelRFIDTagInput);
             this.panel2.Controls.Add(this.labelPosition);
@@ -1157,6 +1145,19 @@
             this.XpictureBox.TabStop = false;
             this.XpictureBox.Click += new System.EventHandler(this.XpictureBox_Click);
             // 
+            // textBoxPositionInput
+            // 
+            this.textBoxPositionInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.textBoxPositionInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxPositionInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxPositionInput.ForeColor = System.Drawing.Color.White;
+            this.textBoxPositionInput.Location = new System.Drawing.Point(37, 386);
+            this.textBoxPositionInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxPositionInput.Name = "textBoxPositionInput";
+            this.textBoxPositionInput.Size = new System.Drawing.Size(231, 30);
+            this.textBoxPositionInput.TabIndex = 132;
+            this.textBoxPositionInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
             // EditEmployeeProfileHR
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -1222,7 +1223,6 @@
         private System.Windows.Forms.TextBox textBoxMiddleName;
         private System.Windows.Forms.TextBox textBoxFirstName;
         private System.Windows.Forms.Label labelEmployeeIDInput;
-        private System.Windows.Forms.Label labelPositionInput;
         private System.Windows.Forms.Label label34;
         private System.Windows.Forms.Label labelRFIDTagInput;
         private System.Windows.Forms.Label labelPosition;
@@ -1260,5 +1260,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ComboBox comboBoxDepartment;
         private System.Windows.Forms.Button buttonScanRFID;
+        private System.Windows.Forms.TextBox textBoxPositionInput;
     }
 }

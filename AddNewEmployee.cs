@@ -483,6 +483,7 @@ namespace HRIS_JAP_ATTPAY
 
         private async void AddNewEmployee_Load(object sender, EventArgs e)
         {
+            await GenerateNextEmployeeId();
             System.Windows.Forms.CheckBox[] dayBoxes = {
                 checkBoxM, checkBoxT, checkBoxW, checkBoxTh, checkBoxF, checkBoxS,
                 checkBoxAltM, checkBoxAltT, checkBoxAltW, checkBoxAltTh, checkBoxAltF, checkBoxAltS
@@ -656,7 +657,7 @@ namespace HRIS_JAP_ATTPAY
                 textBoxDateOfExit.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxDateOfJoining.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxEmail.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxEmployeeID.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                lblempID.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxFirstName.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxGender.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxLastName.Font = AttributesClass.GetFont("Roboto-Light", 12f);
@@ -684,7 +685,7 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                string employeeId = textBoxEmployeeID.Text.Trim();
+                string employeeId = lblempID.Text.Trim();
 
                 bool idExists = await IsEmployeeIdExists(employeeId);
                 if (idExists)
@@ -742,7 +743,7 @@ namespace HRIS_JAP_ATTPAY
 
                 string numericPart = employeeId.Split('-')[1];
                 // Convert to integer to remove leading zeros, then back to string
-                string employmentId = int.Parse(numericPart).ToString(); 
+                string employmentId = int.Parse(numericPart).ToString();
 
                 var employmentInfoObj = new
                 {
@@ -765,7 +766,8 @@ namespace HRIS_JAP_ATTPAY
                 // ✅ ADD LEAVE CREDITS SECTION
                 await CreateDefaultLeaveCredits(employeeId, fullName);
 
-                if (!string.IsNullOrEmpty(password))
+                // ✅ ONLY CREATE USER IF DEPARTMENT IS HUMAN RESOURCE
+                if (department == "Human Resource" && !string.IsNullOrEmpty(password))
                 {
                     string userId = (100 + int.Parse(numericPart)).ToString();
                     string salt = "RANDOMSALT" + numericPart;
@@ -782,7 +784,13 @@ namespace HRIS_JAP_ATTPAY
                     };
 
                     await firebase.Child("Users").Child(userObj.user_id).PutAsync(userObj);
+
+                    // ✅ ADD ADMIN LOG FOR USER CREATION
+                    await AddAdminLog("User Created", employeeId, fullName, $"User account created for {fullName} in HR department");
                 }
+
+                // ✅ ADD ADMIN LOG FOR EMPLOYEE CREATION
+                await AddAdminLog("Employee Created", employeeId, fullName, $"{fullName} added new employee: {fullName}");
 
                 MessageBox.Show("Employee successfully added to Firebase.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.Close();
@@ -793,11 +801,35 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // ✅ NEW FUNCTION: Create Leave Credits
-        // ✅ FIXED VERSION - works with EmploymentInfo as Object or Array
-      
+        // ✅ ADD ADMIN LOG METHOD
+        private async Task AddAdminLog(string actionType, string targetEmployeeId, string targetEmployeeName, string description)
+        {
+            try
+            {
+                // Get the current admin user info (you might want to pass this from the parent form)
+                string adminEmployeeId = "JAP-001"; // Default admin
+                string adminName = "System Administrator";
+                string adminUserId = "101";
 
+                var adminLog = new
+                {
+                    action_type = actionType,
+                    admin_employee_id = adminEmployeeId,
+                    admin_name = adminName,
+                    admin_user_id = adminUserId,
+                    description = description,
+                    details = $"Employee ID: {targetEmployeeId}, Added by: {adminName} (User ID: {adminUserId})",
+                    target_employee_id = targetEmployeeId,
+                    timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                };
 
+                await firebase.Child("AdminLogs").PostAsync(adminLog);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error adding admin log: {ex.Message}");
+            }
+        }
 
         private string HashPassword(string password, string salt)
         {
@@ -918,6 +950,75 @@ namespace HRIS_JAP_ATTPAY
                     "Finance",
                     "Human Resource"
             });
+        }
+        private async Task<string> GetNextEmployeeId()
+        {
+            try
+            {
+                var allEmployeeIds = new List<int>();
+
+                // Method to extract numeric ID from employee ID string
+                int ExtractNumericId(string empId)
+                {
+                    if (empId.StartsWith("JAP-"))
+                    {
+                        if (int.TryParse(empId.Split('-')[1], out int idNum))
+                        {
+                            return idNum;
+                        }
+                    }
+                    return 0;
+                }
+
+                // Get all employee details (active employees)
+                var activeEmployees = await firebase
+                    .Child("EmployeeDetails")
+                    .OnceAsync<dynamic>();
+
+                foreach (var employee in activeEmployees)
+                {
+                    if (employee.Object != null)
+                    {
+                        string empId = employee.Object.employee_id;
+                        int numericId = ExtractNumericId(empId);
+                        if (numericId > 0)
+                        {
+                            allEmployeeIds.Add(numericId);
+                        }
+                    }
+                }
+
+                // Get all archived employees
+                var archivedEmployees = await firebase
+                    .Child("ArchivedEmployees")
+                    .OnceAsync<dynamic>();
+
+                foreach (var archived in archivedEmployees)
+                {
+                    if (archived.Object != null && archived.Object.employee_data != null)
+                    {
+                        string empId = archived.Object.employee_data.employee_id;
+                        int numericId = ExtractNumericId(empId);
+                        if (numericId > 0)
+                        {
+                            allEmployeeIds.Add(numericId);
+                        }
+                    }
+                }
+
+                // Find the highest ID number
+                int maxId = allEmployeeIds.Count > 0 ? allEmployeeIds.Max() : 0;
+
+                // Generate next ID - following your pattern JAP-001, JAP-002, etc.
+                int nextIdNum = maxId + 1;
+                return $"JAP-{nextIdNum:D3}"; // Format as 3-digit number with leading zeros
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in GetNextEmployeeId: {ex.Message}");
+                // Fallback: if error occurs, return next logical ID
+                return "JAP-010"; // Based on your data, JAP-009 is the highest
+            }
         }
 
         private void comboBoxDepartment_SelectedIndexChanged(object sender, EventArgs e)
@@ -1143,6 +1244,60 @@ namespace HRIS_JAP_ATTPAY
             {
                 System.Diagnostics.Debug.WriteLine($"Error getting next schedule array index: {ex.Message}");
                 return 0;
+            }
+        }
+        private async Task GenerateNextEmployeeId()
+        {
+            try
+            {
+                // Get all employee IDs from both active and archived employees
+                var activeEmployees = await firebase
+                    .Child("EmployeeDetails")
+                    .OnceAsync<dynamic>();
+
+                var archivedEmployees = await firebase
+                    .Child("ArchivedEmployees")
+                    .OnceAsync<dynamic>();
+
+                List<int> employeeNumbers = new List<int>();
+
+                // Extract numbers from active employees
+                foreach (var emp in activeEmployees)
+                {
+                    if (emp.Object != null && emp.Key.StartsWith("JAP-"))
+                    {
+                        string idPart = emp.Key.Substring(4); // Remove "JAP-" prefix
+                        if (int.TryParse(idPart, out int number))
+                        {
+                            employeeNumbers.Add(number);
+                        }
+                    }
+                }
+
+                // Extract numbers from archived employees
+                foreach (var emp in archivedEmployees)
+                {
+                    if (emp.Object != null && emp.Key.StartsWith("JAP-"))
+                    {
+                        string idPart = emp.Key.Substring(4); // Remove "JAP-" prefix
+                        if (int.TryParse(idPart, out int number))
+                        {
+                            employeeNumbers.Add(number);
+                        }
+                    }
+                }
+
+                // Find the highest number and increment
+                int nextNumber = employeeNumbers.Count > 0 ? employeeNumbers.Max() + 1 : 1;
+
+                // Format as three-digit number
+                lblempID.Text = $"JAP-{nextNumber:D3}";
+            }
+            catch (Exception ex)
+            {
+                // Fallback to simple increment if there's an error
+                MessageBox.Show("Error generating employee ID: " + ex.Message + "\nUsing default ID.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                lblempID.Text = "JAP-001";
             }
         }
 

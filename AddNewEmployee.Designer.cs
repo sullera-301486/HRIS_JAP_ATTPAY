@@ -37,7 +37,6 @@
             this.textBoxPassword = new System.Windows.Forms.TextBox();
             this.labelRFIDTagInput = new System.Windows.Forms.Label();
             this.textBoxPosition = new System.Windows.Forms.TextBox();
-            this.textBoxEmployeeID = new System.Windows.Forms.TextBox();
             this.labelPassword = new System.Windows.Forms.Label();
             this.labelPosition = new System.Windows.Forms.Label();
             this.labelEmployeeID = new System.Windows.Forms.Label();
@@ -100,6 +99,7 @@
             this.labelEmploymentInformation = new System.Windows.Forms.Label();
             this.labelPersonalInformation = new System.Windows.Forms.Label();
             this.pictureBoxEmployee = new System.Windows.Forms.PictureBox();
+            this.lblempID = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
             this.panel2.SuspendLayout();
@@ -175,10 +175,10 @@
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.White;
+            this.panel2.Controls.Add(this.lblempID);
             this.panel2.Controls.Add(this.textBoxPassword);
             this.panel2.Controls.Add(this.labelRFIDTagInput);
             this.panel2.Controls.Add(this.textBoxPosition);
-            this.panel2.Controls.Add(this.textBoxEmployeeID);
             this.panel2.Controls.Add(this.labelPassword);
             this.panel2.Controls.Add(this.labelPosition);
             this.panel2.Controls.Add(this.labelEmployeeID);
@@ -284,19 +284,6 @@
             this.textBoxPosition.Size = new System.Drawing.Size(217, 30);
             this.textBoxPosition.TabIndex = 64;
             this.textBoxPosition.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxEmployeeID
-            // 
-            this.textBoxEmployeeID.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxEmployeeID.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxEmployeeID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxEmployeeID.ForeColor = System.Drawing.Color.White;
-            this.textBoxEmployeeID.Location = new System.Drawing.Point(37, 261);
-            this.textBoxEmployeeID.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxEmployeeID.Name = "textBoxEmployeeID";
-            this.textBoxEmployeeID.Size = new System.Drawing.Size(217, 30);
-            this.textBoxEmployeeID.TabIndex = 63;
-            this.textBoxEmployeeID.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // labelPassword
             // 
@@ -1084,6 +1071,17 @@
             this.pictureBoxEmployee.Click += new System.EventHandler(this.pictureBox1_Click);
             this.pictureBoxEmployee.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
             // 
+            // lblempID
+            // 
+            this.lblempID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblempID.Location = new System.Drawing.Point(34, 264);
+            this.lblempID.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblempID.Name = "lblempID";
+            this.lblempID.Size = new System.Drawing.Size(217, 36);
+            this.lblempID.TabIndex = 67;
+            this.lblempID.Text = "N/A";
+            this.lblempID.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // AddNewEmployee
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -1175,12 +1173,12 @@
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.Button buttonAdd;
         private System.Windows.Forms.TextBox textBoxPosition;
-        private System.Windows.Forms.TextBox textBoxEmployeeID;
         private System.Windows.Forms.Label labelPassword;
         private System.Windows.Forms.Label labelPosition;
         private System.Windows.Forms.Label labelEmployeeID;
         private System.Windows.Forms.Label labelRFIDTag;
         private System.Windows.Forms.TextBox textBoxPassword;
         private System.Windows.Forms.Label labelRFIDTagInput;
+        private System.Windows.Forms.Label lblempID;
     }
 }
