@@ -16,7 +16,6 @@ namespace HRIS_JAP_ATTPAY
         private DateTime createdAt;
         private Timer refreshTimer;
 
-        // 🔹 Firebase client
         private static FirebaseClient firebase = new FirebaseClient(
             "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
         );
@@ -51,9 +50,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        /// <summary>
-        /// Bind data from LeaveRequestData. Saves to Firebase if saveToFirebase = true.
-        /// </summary>
         public async void SetData(
             string title,
             string submitted,
@@ -90,14 +86,13 @@ namespace HRIS_JAP_ATTPAY
             if (refreshTimer == null)
             {
                 refreshTimer = new Timer();
-                refreshTimer.Interval = 60000; // every minute
+                refreshTimer.Interval = 60000;
                 refreshTimer.Tick += (s, e) => UpdateTimeAgo();
                 refreshTimer.Start();
             }
 
-            this.Tag = firebaseKey;
+            this.Tag = firebaseKey; // ✅ holds Firebase record key
 
-            // 🔹 Validate employee before saving new data
             if (saveToFirebase)
             {
                 bool isValid = await IsEmployeeValidAsync(employee);
@@ -127,7 +122,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🆕 Load employee photo from Firebase Storage URL
         private async Task LoadEmployeeImageAsync(string submittedBy)
         {
             try
@@ -179,13 +173,11 @@ namespace HRIS_JAP_ATTPAY
                 lblTimeAgo.Text = $"{(int)diff.TotalDays}d ago";
         }
 
-        // 🔹 Save notification to Firebase
         private static async Task SaveLeaveNotificationAsync(LeaveNotificationModel leaveNotif)
         {
             await firebase.Child("LeaveNotifications").PostAsync(leaveNotif);
         }
 
-        // 🔹 Load all notifications from Firebase (newest first)
         public static async Task<List<LeaveNotificationModelWithKey>> GetAllLeaveNotificationsAsync()
         {
             var notifications = await firebase.Child("LeaveNotifications").OnceAsync<LeaveNotificationModel>();
@@ -216,13 +208,11 @@ namespace HRIS_JAP_ATTPAY
             return list;
         }
 
-        // 🔹 Delete notification
         public static async Task DeleteNotificationAsync(string key)
         {
             await firebase.Child("LeaveNotifications").Child(key).DeleteAsync();
         }
 
-        // 🔹 Validate employee
         private static async Task<bool> IsEmployeeValidAsync(string employeeName)
         {
             var employees = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
@@ -242,14 +232,12 @@ namespace HRIS_JAP_ATTPAY
             return false;
         }
 
-        // 🆕 Deduct leave & handle yearly reset (only January 1)
+        // 🟢 Deduct leave + yearly reset logic unchanged
         private static async Task DeductLeaveBalanceAsync(string employeeName, string leaveType)
         {
             try
             {
                 var employees = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
-
-                // 🧠 Find employee ID by flexible name matching
                 string employeeId = null;
                 string fullName = null;
 
@@ -280,7 +268,6 @@ namespace HRIS_JAP_ATTPAY
                     return;
                 }
 
-                // 🟢 Get or create leave credit
                 var currentLeave = await firebase
                     .Child("Leave Credits")
                     .Child(employeeId)
@@ -303,14 +290,12 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                // 🧠 Reset on January 1 of new year
                 if (lastUpdatedYear < DateTime.Now.Year)
                 {
                     sickLeave = 6;
                     vacationLeave = 6;
                 }
 
-                // Deduct depending on leave type
                 if (leaveType.ToLower().Contains("sick"))
                     sickLeave = Math.Max(0, sickLeave - 1);
                 else if (leaveType.ToLower().Contains("vacation"))
@@ -345,7 +330,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🔹 Models
         public class LeaveNotificationModel
         {
             public string Title { get; set; }
@@ -362,7 +346,6 @@ namespace HRIS_JAP_ATTPAY
             public string Key { get; set; }
         }
 
-        // 🔹 Events
         public event EventHandler ApproveClicked;
         public event EventHandler DeclineClicked;
 
@@ -371,10 +354,52 @@ namespace HRIS_JAP_ATTPAY
             await DeductLeaveBalanceAsync(lblEmployeeLeave.Text, lblLeave.Text);
             ApproveClicked?.Invoke(this, EventArgs.Empty);
 
-            if (Tag is string firebaseKey && !string.IsNullOrEmpty(firebaseKey))
+            if (!(Tag is string firebaseKey) || string.IsNullOrEmpty(firebaseKey))
             {
-                await DeleteNotificationAsync(firebaseKey);
+                MessageBox.Show("No Firebase key found — cannot move data.", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                var notif = await firebase
+                    .Child("LeaveNotifications")
+                    .Child(firebaseKey)
+                    .OnceSingleAsync<LeaveNotificationModel>();
+
+                if (notif == null)
+                {
+                    MessageBox.Show("Leave notification not found in Firebase.", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var manageLeaveData = new
+                {
+                    created_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    employee = notif.Employee,
+                    leave_type = notif.LeaveType,
+                    notes = notif.Notes,
+                    period = notif.Period,
+                    submitted_by = notif.SubmittedBy
+                };
+
+                await firebase.Child("ManageLeave").PostAsync(manageLeaveData);
+                await firebase.Child("LeaveNotifications").Child(firebaseKey).DeleteAsync();
                 this.Parent?.Controls.Remove(this);
+
+                MessageBox.Show(
+                    $"Leave request by {notif.Employee} moved successfully to Manage Leave.",
+                    "Leave Approved",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error moving data to ManageLeave: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

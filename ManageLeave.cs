@@ -7,16 +7,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Firebase.Database;
+using Firebase.Database.Query;
+using System.Net.Http;
 
 namespace HRIS_JAP_ATTPAY
 {
     public partial class ManageLeave : Form
     {
+        // 🔹 Firebase client
+        private static FirebaseClient firebase = new FirebaseClient(
+            "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        );
+
         public ManageLeave()
         {
             InitializeComponent();
             SetFont();
         }
+
         private void SetFont()
         {
             try
@@ -25,7 +34,6 @@ namespace HRIS_JAP_ATTPAY
                 labelAddLeave.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 label1.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
                 label2.Font = AttributesClass.GetFont("Roboto-Regular", 18f);
-
             }
             catch (Exception ex)
             {
@@ -44,9 +52,10 @@ namespace HRIS_JAP_ATTPAY
             NewLeave newLeaveForm = new NewLeave();
             AttributesClass.ShowWithOverlay(parentForm, newLeaveForm);
         }
+
         private void AddLeaveItem(string submittedBy, string employee, string date, string leaveType, string period, Image photo)
         {
-            var item = new LeaveList(); // <-- custom UserControl for each row
+            var item = new LeaveList();
             item.SetData(submittedBy, employee, date, leaveType, period, photo);
 
             // Hook up revoke event
@@ -59,18 +68,103 @@ namespace HRIS_JAP_ATTPAY
             flowLayoutPanel1.Controls.Add(item);
         }
 
-        private void ManageLeave_Load(object sender, EventArgs e)
+        // 🟢 NEW: Load ManageLeave data from Firebase with sorting by most recent
+        private async Task LoadManageLeaveDataAsync()
         {
-            flowLayoutPanel1.Controls.Clear();
+            try
+            {
+                flowLayoutPanel1.Controls.Clear();
 
-            // Sample data
-            AddLeaveItem("Marcus Verzo", "Ej Sullera", "June 6", "Sick Leave", "June 6", Properties.Resources.User1);
-            AddLeaveItem("Marcus Verzo", "Ej Sullera", "June 6", "Vacation Leave", "June 6 - 9", Properties.Resources.User1);
-            AddLeaveItem("Maria Hiwaga", "Elijah Siena", "June 10", "Emergency Leave", "June 10 - 12", Properties.Resources.User1);
-            AddLeaveItem("Franz Capuno", "Charles Macaraig", "June 12", "Sick Leave", "June 12", Properties.Resources.User1);
-            AddLeaveItem("Charles Macaraig", "Maria Hiwaga", "June 14", "Vacation Leave", "June 14 - 16", Properties.Resources.User1);
-            AddLeaveItem("Elijah Siena", "Franz Capuno", "June 18", "Paternity Leave", "June 18 - 21", Properties.Resources.User1);
+                var manageLeaveList = await firebase
+                    .Child("ManageLeave")
+                    .OnceAsync<dynamic>();
+
+                // 🟢 Create a list to hold leave items with their dates for sorting
+                var leaveItems = new List<(string submittedBy, string employee, string date, string leaveType, string period, DateTime sortDate)>();
+
+                // 🟢 First, collect all leave items and parse their dates
+                foreach (var leave in manageLeaveList)
+                {
+                    string submittedBy = leave.Object.submitted_by ?? "Unknown";
+                    string employee = leave.Object.employee ?? "Unknown";
+                    string date = leave.Object.created_at ?? "N/A";
+                    string leaveType = leave.Object.leave_type ?? "N/A";
+                    string period = leave.Object.period ?? "N/A";
+
+                    // 🟢 Parse the creation date for sorting
+                    DateTime sortDate = DateTime.MinValue;
+                    if (!string.IsNullOrEmpty(date) && DateTime.TryParse(date, out DateTime parsedDate))
+                    {
+                        sortDate = parsedDate;
+                    }
+                    else
+                    {
+                        // If parsing fails, use current time as fallback
+                        sortDate = DateTime.Now;
+                    }
+
+                    leaveItems.Add((submittedBy, employee, date, leaveType, period, sortDate));
+                }
+
+                // 🟢 Sort by most recent first (descending order)
+                var sortedLeaves = leaveItems.OrderByDescending(x => x.sortDate).ToList();
+
+                // 🟢 Now add items to flowLayoutPanel in sorted order
+                foreach (var leave in sortedLeaves)
+                {
+                    // 🖼 Try to load employee image from EmployeeDetails
+                    Image employeePhoto = await GetEmployeeImageAsync(leave.employee);
+                    AddLeaveItem(leave.submittedBy, leave.employee, leave.date, leave.leaveType, leave.period, employeePhoto);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading ManageLeave data: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // 🖼 Helper to get employee image from EmployeeDetails
+        private async Task<Image> GetEmployeeImageAsync(string employeeName)
+        {
+            try
+            {
+                var employees = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
+
+                foreach (var emp in employees)
+                {
+                    string fullName = $"{emp.Object.first_name} {emp.Object.middle_name} {emp.Object.last_name}"
+                        .Replace("  ", " ")
+                        .Trim();
+
+                    if (string.Equals(fullName, employeeName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        string imageUrl = emp.Object.image_url?.ToString();
+                        if (!string.IsNullOrEmpty(imageUrl))
+                        {
+                            using (HttpClient client = new HttpClient())
+                            {
+                                var bytes = await client.GetByteArrayAsync(imageUrl);
+                                using (var ms = new System.IO.MemoryStream(bytes))
+                                {
+                                    return Image.FromStream(ms);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // ignore errors, fallback to default
+            }
+
+            return Properties.Resources.User1; // fallback default avatar
+        }
+
+        private async void ManageLeave_Load(object sender, EventArgs e)
+        {
+            await LoadManageLeaveDataAsync(); // 🟢 Load real data from Firebase
         }
     }
-    }
-
+}

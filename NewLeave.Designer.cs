@@ -37,6 +37,7 @@
             this.labelAddLeaveRecord = new System.Windows.Forms.Label();
             this.labelNewLeave = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.comboBoxInputName = new System.Windows.Forms.ComboBox();
             this.labelDash = new System.Windows.Forms.Label();
             this.textBoxEndPeriod = new System.Windows.Forms.TextBox();
             this.textBoxStartPeriod = new System.Windows.Forms.TextBox();
@@ -50,7 +51,6 @@
             this.labelPeriod = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.XpictureBox = new System.Windows.Forms.PictureBox();
-            this.comboBoxInputName = new System.Windows.Forms.ComboBox();
             this.panel2.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
@@ -173,6 +173,20 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(543, 288);
             this.panel2.TabIndex = 4;
+            // 
+            // comboBoxInputName
+            // 
+            this.comboBoxInputName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.comboBoxInputName.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxInputName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxInputName.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBoxInputName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.comboBoxInputName.ForeColor = System.Drawing.Color.White;
+            this.comboBoxInputName.FormattingEnabled = true;
+            this.comboBoxInputName.Location = new System.Drawing.Point(146, 26);
+            this.comboBoxInputName.Name = "comboBoxInputName";
+            this.comboBoxInputName.Size = new System.Drawing.Size(366, 28);
+            this.comboBoxInputName.TabIndex = 160;
             // 
             // labelDash
             // 
@@ -311,25 +325,12 @@
             this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
             this.XpictureBox.Location = new System.Drawing.Point(502, 7);
-            this.XpictureBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.XpictureBox.Margin = new System.Windows.Forms.Padding(2);
             this.XpictureBox.Name = "XpictureBox";
             this.XpictureBox.Size = new System.Drawing.Size(38, 41);
             this.XpictureBox.TabIndex = 1;
             this.XpictureBox.TabStop = false;
             this.XpictureBox.Click += new System.EventHandler(this.XpictureBox_Click);
-            // 
-            // comboBoxInputName
-            // 
-            this.comboBoxInputName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.comboBoxInputName.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.comboBoxInputName.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBoxInputName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBoxInputName.ForeColor = System.Drawing.Color.White;
-            this.comboBoxInputName.FormattingEnabled = true;
-            this.comboBoxInputName.Location = new System.Drawing.Point(146, 26);
-            this.comboBoxInputName.Name = "comboBoxInputName";
-            this.comboBoxInputName.Size = new System.Drawing.Size(366, 28);
-            this.comboBoxInputName.TabIndex = 160;
             // 
             // NewLeave
             // 

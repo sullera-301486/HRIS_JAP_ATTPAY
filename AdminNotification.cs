@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Threading.Tasks;
-using System.Linq; // ✅ Added for OrderByDescending
+using System.Linq;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -22,10 +22,10 @@ namespace HRIS_JAP_ATTPAY
         {
             flowLayoutPanel1.Controls.Clear();
 
-            // 🔹 Fetch notifications
+            // 🔹 Fetch notifications from Firebase
             var notifications = await LeaveNotificationItems.GetAllLeaveNotificationsAsync();
 
-            // ✅ Sort notifications by CreatedAt (most recent first)
+            // ✅ Sort newest first
             notifications = notifications
                 .OrderByDescending(n => DateTime.Parse(n.CreatedAt))
                 .ToList();
@@ -34,7 +34,7 @@ namespace HRIS_JAP_ATTPAY
             {
                 var leaveNotif = new LeaveNotificationItems();
 
-                // Build UI but don’t save again
+                // ✅ Pass firebaseKey (notif.Key) so Approve button can move it
                 leaveNotif.SetData(
                     notif.Title ?? ("Leave Request - " + notif.LeaveType),
                     notif.SubmittedBy ?? ("Submitted by " + notif.Employee),
@@ -49,21 +49,19 @@ namespace HRIS_JAP_ATTPAY
                     firebaseKey: notif.Key
                 );
 
-                // Approve button → remove from Firebase + UI
+                // ✅ After approve or decline, just refresh the list (no manual delete)
                 leaveNotif.ApproveClicked += async (s, ev) =>
                 {
-                    await LeaveNotificationItems.DeleteNotificationAsync(notif.Key);
-                    flowLayoutPanel1.Controls.Remove(leaveNotif);
+                    await Task.Delay(500); // small delay to allow Firebase update
+                    await LoadNotifications();
                 };
 
-                // Decline button → remove from Firebase + UI
                 leaveNotif.DeclineClicked += async (s, ev) =>
                 {
-                    await LeaveNotificationItems.DeleteNotificationAsync(notif.Key);
-                    flowLayoutPanel1.Controls.Remove(leaveNotif);
+                    await Task.Delay(500);
+                    await LoadNotifications();
                 };
 
-                // ✅ Add controls in order (since we already sorted)
                 flowLayoutPanel1.Controls.Add(leaveNotif);
             }
         }
