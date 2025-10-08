@@ -54,7 +54,7 @@
             // lblLeaveType
             // 
             this.lblLeaveType.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLeaveType.Location = new System.Drawing.Point(449, 57);
+            this.lblLeaveType.Location = new System.Drawing.Point(455, 52);
             this.lblLeaveType.Name = "lblLeaveType";
             this.lblLeaveType.Size = new System.Drawing.Size(104, 27);
             this.lblLeaveType.TabIndex = 50;
@@ -64,7 +64,7 @@
             // lblDate
             // 
             this.lblDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDate.Location = new System.Drawing.Point(337, 57);
+            this.lblDate.Location = new System.Drawing.Point(341, 57);
             this.lblDate.Name = "lblDate";
             this.lblDate.Size = new System.Drawing.Size(104, 27);
             this.lblDate.TabIndex = 49;
@@ -94,7 +94,7 @@
             // lblEmployee
             // 
             this.lblEmployee.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblEmployee.Location = new System.Drawing.Point(225, 57);
+            this.lblEmployee.Location = new System.Drawing.Point(227, 57);
             this.lblEmployee.Name = "lblEmployee";
             this.lblEmployee.Size = new System.Drawing.Size(104, 27);
             this.lblEmployee.TabIndex = 46;
@@ -104,7 +104,7 @@
             // lblSubmittedBy
             // 
             this.lblSubmittedBy.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSubmittedBy.Location = new System.Drawing.Point(112, 57);
+            this.lblSubmittedBy.Location = new System.Drawing.Point(113, 57);
             this.lblSubmittedBy.Name = "lblSubmittedBy";
             this.lblSubmittedBy.Size = new System.Drawing.Size(104, 27);
             this.lblSubmittedBy.TabIndex = 45;
@@ -144,7 +144,7 @@
             // lblPeriod
             // 
             this.lblPeriod.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPeriod.Location = new System.Drawing.Point(561, 57);
+            this.lblPeriod.Location = new System.Drawing.Point(569, 57);
             this.lblPeriod.Name = "lblPeriod";
             this.lblPeriod.Size = new System.Drawing.Size(104, 27);
             this.lblPeriod.TabIndex = 52;

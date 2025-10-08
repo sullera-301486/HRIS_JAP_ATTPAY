@@ -40,11 +40,11 @@
             this.textBoxEndPeriod = new System.Windows.Forms.TextBox();
             this.textBoxStartPeriod = new System.Windows.Forms.TextBox();
             this.comboBoxLeaveTypeInput = new System.Windows.Forms.ComboBox();
-            this.textBoxNameInput = new System.Windows.Forms.TextBox();
             this.labelReason = new System.Windows.Forms.Label();
             this.labelPeriod = new System.Windows.Forms.Label();
             this.labelLeaveType = new System.Windows.Forms.Label();
             this.labelName = new System.Windows.Forms.Label();
+            this.comboBoxName = new System.Windows.Forms.ComboBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
             this.panel2.SuspendLayout();
@@ -66,7 +66,7 @@
             this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
             this.XpictureBox.Location = new System.Drawing.Point(398, 2);
-            this.XpictureBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.XpictureBox.Margin = new System.Windows.Forms.Padding(2);
             this.XpictureBox.Name = "XpictureBox";
             this.XpictureBox.Size = new System.Drawing.Size(38, 41);
             this.XpictureBox.TabIndex = 19;
@@ -98,6 +98,7 @@
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.White;
+            this.panel2.Controls.Add(this.comboBoxName);
             this.panel2.Controls.Add(this.labelDash);
             this.panel2.Controls.Add(this.buttonCancel);
             this.panel2.Controls.Add(this.buttonSendRequest);
@@ -105,7 +106,6 @@
             this.panel2.Controls.Add(this.textBoxEndPeriod);
             this.panel2.Controls.Add(this.textBoxStartPeriod);
             this.panel2.Controls.Add(this.comboBoxLeaveTypeInput);
-            this.panel2.Controls.Add(this.textBoxNameInput);
             this.panel2.Controls.Add(this.labelReason);
             this.panel2.Controls.Add(this.labelPeriod);
             this.panel2.Controls.Add(this.labelLeaveType);
@@ -206,18 +206,6 @@
             this.comboBoxLeaveTypeInput.Size = new System.Drawing.Size(260, 24);
             this.comboBoxLeaveTypeInput.TabIndex = 5;
             // 
-            // textBoxNameInput
-            // 
-            this.textBoxNameInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxNameInput.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBoxNameInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxNameInput.ForeColor = System.Drawing.Color.White;
-            this.textBoxNameInput.Location = new System.Drawing.Point(137, 16);
-            this.textBoxNameInput.Name = "textBoxNameInput";
-            this.textBoxNameInput.Size = new System.Drawing.Size(260, 19);
-            this.textBoxNameInput.TabIndex = 4;
-            this.textBoxNameInput.Tag = "";
-            // 
             // labelReason
             // 
             this.labelReason.AutoSize = true;
@@ -258,6 +246,23 @@
             this.labelName.TabIndex = 0;
             this.labelName.Text = "Name";
             // 
+            // comboBoxName
+            // 
+            this.comboBoxName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.comboBoxName.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxName.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBoxName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.comboBoxName.ForeColor = System.Drawing.Color.White;
+            this.comboBoxName.FormattingEnabled = true;
+            this.comboBoxName.Items.AddRange(new object[] {
+            "Vacation",
+            "Sick"});
+            this.comboBoxName.Location = new System.Drawing.Point(137, 15);
+            this.comboBoxName.Name = "comboBoxName";
+            this.comboBoxName.Size = new System.Drawing.Size(260, 24);
+            this.comboBoxName.TabIndex = 13;
+            // 
             // LeaveRequest
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -289,7 +294,6 @@
         private System.Windows.Forms.Label labelPeriod;
         private System.Windows.Forms.Label labelLeaveType;
         private System.Windows.Forms.Label labelName;
-        private System.Windows.Forms.TextBox textBoxNameInput;
         private System.Windows.Forms.ComboBox comboBoxLeaveTypeInput;
         private System.Windows.Forms.TextBox textBoxEndPeriod;
         private System.Windows.Forms.TextBox textBoxStartPeriod;
@@ -298,5 +302,6 @@
         private System.Windows.Forms.Button buttonSendRequest;
         private System.Windows.Forms.Label labelDash;
         private System.Windows.Forms.PictureBox XpictureBox;
+        private System.Windows.Forms.ComboBox comboBoxName;
     }
 }

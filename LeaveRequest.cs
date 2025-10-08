@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using Firebase.Database;
@@ -8,7 +9,7 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class LeaveRequest : Form
     {
-        // 🔹 Firebase client (use your real database URL)
+        // 🔹 Firebase client
         private static FirebaseClient firebase = new FirebaseClient(
             "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
         );
@@ -18,6 +19,39 @@ namespace HRIS_JAP_ATTPAY
             InitializeComponent();
             setFont();
             setTextBoxAttributes();
+
+            // 🟢 Load employee names from Firebase
+            _ = LoadEmployeeNamesAsync();
+        }
+
+        // 🟢 Load all names from "Leave Credits"
+        private async Task LoadEmployeeNamesAsync()
+        {
+            try
+            {
+                comboBoxName.Items.Clear();
+
+                var employees = await firebase.Child("Leave Credits").OnceAsync<dynamic>();
+                List<string> names = new List<string>();
+
+                foreach (var emp in employees)
+                {
+                    string fullName = emp.Object.full_name?.ToString()?.Trim();
+                    if (!string.IsNullOrEmpty(fullName) && !names.Contains(fullName))
+                        names.Add(fullName);
+                }
+
+                names.Sort();
+                comboBoxName.Items.AddRange(names.ToArray());
+
+                if (comboBoxName.Items.Count > 0)
+                    comboBoxName.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading employee names: " + ex.Message,
+                    "Firebase Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void setFont()
@@ -31,7 +65,7 @@ namespace HRIS_JAP_ATTPAY
                 labelLeaveType.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelPeriod.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelReason.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                textBoxNameInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                comboBoxName.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 comboBoxLeaveTypeInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxStartPeriod.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxEndPeriod.Font = AttributesClass.GetFont("Roboto-Light", 12f);
@@ -47,54 +81,64 @@ namespace HRIS_JAP_ATTPAY
 
         private async void buttonSendRequest_Click(object sender, EventArgs e)
         {
-            string employeeInput = textBoxNameInput.Text?.Trim();
+            string employeeInput = comboBoxName.Text?.Trim();
             string leaveType = comboBoxLeaveTypeInput.Text?.Trim();
             string start = textBoxStartPeriod.Text?.Trim();
             string end = textBoxEndPeriod.Text?.Trim();
             string notes = textBoxReasonInput.Text?.Trim();
 
-            // 🔹 Ensure all fields are filled
+            // 🔹 Validate required fields
             if (string.IsNullOrWhiteSpace(employeeInput) ||
                 string.IsNullOrWhiteSpace(leaveType) ||
                 string.IsNullOrWhiteSpace(start) ||
                 string.IsNullOrWhiteSpace(end))
             {
-                MessageBox.Show("Please fill in all required fields.", "Missing Information",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please fill in all required fields.",
+                    "Missing Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // 🔹 Validate if the employee exists in the database
+            // 🔹 Validate if the employee exists
             bool isValidEmployee = await IsEmployeeValidAsync(employeeInput);
             if (!isValidEmployee)
             {
+                MessageBox.Show($"Employee '{employeeInput}' does not exist in the database.",
+                    "Invalid Employee", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 🔹 Check leave credits before submitting
+            bool hasCredits = await HasAvailableLeaveCreditsAsync(employeeInput, leaveType);
+            if (!hasCredits)
+            {
                 MessageBox.Show(
-                    $"Employee '{employeeInput}' does not exist in the database.",
-                    "Invalid Employee",
+                    $"Employee '{employeeInput}' has no remaining {leaveType} credits.\n" +
+                    "Leave request cannot be submitted.",
+                    "Insufficient Leave Credits",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning
                 );
                 return;
             }
 
-            // 🔹 SubmittedBy = currently logged-in user
+            // 🔹 Get logged-in user name
             string submittedBy = !string.IsNullOrEmpty(SessionClass.CurrentEmployeeName)
                 ? SessionClass.CurrentEmployeeName
                 : "Unknown User";
 
-            // 🔹 Build the request object
+            // 🔹 Build leave request notification
             var request = new LeaveNotificationItems.LeaveNotificationModel
             {
                 Title = $"Leave Request - {leaveType}",
-                SubmittedBy = submittedBy,    // Logged-in user
-                Employee = employeeInput,     // Employee typed in textbox
+                SubmittedBy = submittedBy,
+                Employee = employeeInput,
                 LeaveType = leaveType,
                 Period = $"{start} - {end}",
                 Notes = notes,
                 CreatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
             };
 
-            // 🔹 Show confirm preview window
+            // 🔹 Preview confirmation window
             var preview = new LeaveRequestData
             {
                 Title = request.Title,
@@ -111,24 +155,50 @@ namespace HRIS_JAP_ATTPAY
             Form parentForm = this.FindForm();
             LeaveRequestConfirm confirmForm = new LeaveRequestConfirm(preview);
 
-            confirmForm.FormClosed += async (s, args) => // ✅ rename 'e' → 'args'
+            confirmForm.FormClosed += async (s, args) =>
             {
                 if (confirmForm.DialogResult == DialogResult.OK)
                 {
                     await FirebaseSave(request);
-
-                    MessageBox.Show(
-                        "Leave request submitted successfully!",
-                        "Success",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information
-                    );
-
+                    MessageBox.Show("Leave request submitted successfully!", "Success",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
                     this.Close();
                 }
             };
 
+            // 🟢 Show confirmation overlay
             AttributesClass.ShowWithOverlay(parentForm, confirmForm);
+        }
+
+        // 🔹 Check if employee has available leave credits
+        private static async Task<bool> HasAvailableLeaveCreditsAsync(string employeeName, string leaveType)
+        {
+            try
+            {
+                var leaves = await firebase.Child("Leave Credits").OnceAsync<dynamic>();
+                foreach (var emp in leaves)
+                {
+                    string fullName = emp.Object.full_name?.ToString()?.Trim();
+                    if (string.Equals(fullName, employeeName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        int sickLeave = emp.Object.sick_leave != null ? (int)emp.Object.sick_leave : 0;
+                        int vacationLeave = emp.Object.vacation_leave != null ? (int)emp.Object.vacation_leave : 0;
+
+                        if (leaveType.ToLower().Contains("sick") && sickLeave > 0)
+                            return true;
+                        if (leaveType.ToLower().Contains("vacation") && vacationLeave > 0)
+                            return true;
+
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error checking leave credits: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return false;
         }
 
         // 🔹 Save to Firebase
@@ -137,16 +207,13 @@ namespace HRIS_JAP_ATTPAY
             await firebase.Child("LeaveNotifications").PostAsync(notif);
         }
 
-        // 🔹 Validate if employee name exists in EmployeeDetails node
+        // 🔹 Validate employee name
         private static async Task<bool> IsEmployeeValidAsync(string employeeName)
         {
             if (string.IsNullOrWhiteSpace(employeeName))
                 return false;
 
-            var employees = await firebase
-                .Child("EmployeeDetails")
-                .OnceAsync<dynamic>();
-
+            var employees = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
             foreach (var emp in employees)
             {
                 try
@@ -164,10 +231,7 @@ namespace HRIS_JAP_ATTPAY
                         return true;
                     }
                 }
-                catch
-                {
-                    continue;
-                }
+                catch { continue; }
             }
             return false;
         }

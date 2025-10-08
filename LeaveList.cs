@@ -78,12 +78,9 @@ namespace HRIS_JAP_ATTPAY
             ApplyTooltipIfTruncated(lblSubmittedBy);
             ApplyTooltipIfTruncated(lblEmployee);
             ApplyTooltipIfTruncated(lblPeriod);
-            ApplyTooltipIfTruncated(lblDate); // ✅ Added tooltip for the date label
+            ApplyTooltipIfTruncated(lblDate);
         }
 
-        /// <summary>
-        /// 🟢 Fetches the date when the ManageLeave record was created
-        /// </summary>
         private async Task<string> GetManageLeaveDateAsync(string submittedBy, string employee, string leaveType, string period)
         {
             try
@@ -97,7 +94,6 @@ namespace HRIS_JAP_ATTPAY
                     string fbLeaveType = (leave.Object.leave_type ?? "").ToString().Trim();
                     string fbPeriod = (leave.Object.period ?? "").ToString().Trim();
 
-                    // Match based on submittedBy + employee + leaveType + period
                     if (string.Equals(fbSubmitted, submittedBy, StringComparison.OrdinalIgnoreCase) &&
                         string.Equals(fbEmployee, employee, StringComparison.OrdinalIgnoreCase) &&
                         string.Equals(fbLeaveType, leaveType, StringComparison.OrdinalIgnoreCase) &&
@@ -108,9 +104,9 @@ namespace HRIS_JAP_ATTPAY
                         {
                             DateTime parsedDate;
                             if (DateTime.TryParse(createdAt, out parsedDate))
-                                return parsedDate.ToString("MMMM dd, yyyy"); // e.g. "October 08, 2025"
+                                return parsedDate.ToString("MMMM dd, yyyy");
                             else
-                                return createdAt; // fallback raw string
+                                return createdAt;
                         }
                     }
                 }
@@ -123,9 +119,6 @@ namespace HRIS_JAP_ATTPAY
             return null;
         }
 
-        /// <summary>
-        /// 🟢 Get image from EmployeeDetails table based on the SubmittedBy name only.
-        /// </summary>
         private async Task<Image> GetImageBySubmittedByAsync(string submittedBy)
         {
             try
@@ -180,13 +173,15 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🟢 When revoke is clicked, add back 1 leave credit
+        // 🟢 When revoke is clicked, restore leave + delete record from Firebase
         private async void btnRevoke_Click(object sender, EventArgs e)
         {
             try
             {
                 string employeeName = lblEmployee.Text.Trim();
                 string leaveType = lblLeaveType.Text.Trim();
+                string submittedBy = lblSubmittedBy.Text.Trim();
+                string period = lblPeriod.Text.Trim();
 
                 if (string.IsNullOrEmpty(employeeName) || string.IsNullOrEmpty(leaveType))
                 {
@@ -195,6 +190,7 @@ namespace HRIS_JAP_ATTPAY
                     return;
                 }
 
+                // ✅ Step 1: Add back 1 leave credit
                 var employees = await firebase.Child("Leave Credits").OnceAsync<dynamic>();
                 string employeeId = null;
                 dynamic empData = null;
@@ -220,7 +216,6 @@ namespace HRIS_JAP_ATTPAY
                 int sickLeave = empData.sick_leave != null ? (int)empData.sick_leave : 6;
                 int vacationLeave = empData.vacation_leave != null ? (int)empData.vacation_leave : 6;
 
-                // 🟢 Add back the leave credit depending on leave type
                 if (leaveType.ToLower().Contains("sick"))
                     sickLeave += 1;
                 else if (leaveType.ToLower().Contains("vacation"))
@@ -239,10 +234,27 @@ namespace HRIS_JAP_ATTPAY
 
                 await firebase.Child("Leave Credits").Child(employeeId).PutAsync(updatedCredits);
 
-                MessageBox.Show($"{leaveType} leave for {employeeName} has been revoked and 1 leave credit restored.",
-                    "Leave Revoked", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // ✅ Step 2: Remove record from ManageLeave
+                var leaves = await firebase.Child("ManageLeave").OnceAsync<dynamic>();
+                foreach (var leave in leaves)
+                {
+                    string fbSubmitted = (leave.Object.submitted_by ?? "").ToString().Trim();
+                    string fbEmployee = (leave.Object.employee ?? "").ToString().Trim();
+                    string fbLeaveType = (leave.Object.leave_type ?? "").ToString().Trim();
+                    string fbPeriod = (leave.Object.period ?? "").ToString().Trim();
 
-                // 🔹 Trigger any subscribed revoke logic in the parent
+                    if (string.Equals(fbSubmitted, submittedBy, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(fbEmployee, employeeName, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(fbLeaveType, leaveType, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(fbPeriod, period, StringComparison.OrdinalIgnoreCase))
+                    {
+                        await firebase.Child("ManageLeave").Child(leave.Key).DeleteAsync();
+                        break;
+                    }
+                }
+
+                // ✅ Step 3: Remove from UI + trigger event
+                this.Parent?.Controls.Remove(this);
                 RevokeClicked?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)

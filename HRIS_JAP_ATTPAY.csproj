@@ -263,6 +263,7 @@
     <Compile Include="AttendanceNotificationItems.Designer.cs">
       <DependentUpon>AttendanceNotificationItems.cs</DependentUpon>
     </Compile>
+    <Compile Include="AttendanceNotificationModel.cs" />
     <Compile Include="AttributesClassAlt.cs" />
     <Compile Include="AttributesScanner.cs" />
     <Compile Include="AutoGenarateAttendance.cs" />
