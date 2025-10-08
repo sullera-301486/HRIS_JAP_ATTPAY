@@ -38,6 +38,7 @@ namespace HRIS_JAP_ATTPAY
             LoadAttendanceSummary(DateTime.Today);
             PopulateDateComboBox();
             LoadTodoList();
+
         }
 
         private void setFont()
@@ -899,7 +900,9 @@ namespace HRIS_JAP_ATTPAY
             try
             {
                 dataGridViewTodo.Rows.Clear();
-                todoItemKeys.Clear(); // Clear previous mappings
+                todoItemKeys.Clear();
+
+                Console.WriteLine($"Loading todos for user ID: {currentUserId}");
 
                 // Load todo items from Firebase
                 var todoItems = await firebase
@@ -908,25 +911,38 @@ namespace HRIS_JAP_ATTPAY
 
                 if (todoItems != null && todoItems.Any())
                 {
-                    int rowIndex = 0; // Track row index for mapping
+                    int rowIndex = 0;
+                    int totalTasks = 0;
+                    int userTasks = 0;
+
                     foreach (var todoItem in todoItems)
                     {
+                        totalTasks++;
                         var todoData = todoItem.Object;
 
                         if (todoData != null && todoData.ContainsKey("task"))
                         {
                             string task = todoData["task"]?.ToString() ?? "";
                             string dueDate = todoData.ContainsKey("dueDate") ? todoData["dueDate"].ToString() : "";
+                            string createdBy = todoData.ContainsKey("createdBy") ? todoData["createdBy"].ToString() : "";
                             string assignedTo = todoData.ContainsKey("assignedTo") ? todoData["assignedTo"].ToString() : "";
 
-                            // Only show tasks assigned to current user or general tasks
-                            if (string.IsNullOrEmpty(assignedTo) || assignedTo == currentUserId || assignedTo == "all")
+                            // Debug output for each task
+                            Console.WriteLine($"Task: {task}, CreatedBy: {createdBy}, AssignedTo: {assignedTo}, CurrentUser: {currentUserId}");
+
+                            // FIX: Only show tasks created by OR assigned to the current user
+                            bool isCreator = createdBy == currentUserId;
+                            bool isAssigned = assignedTo == currentUserId || assignedTo == "all";
+
+                            if (isCreator || isAssigned)
                             {
+                                userTasks++;
+
                                 // Format date if possible
                                 string formattedDate = dueDate;
                                 if (DateTime.TryParse(dueDate, out DateTime parsedDate))
                                 {
-                                    formattedDate = parsedDate.ToString("MM-dd-yyyy");
+                                    formattedDate = parsedDate.ToString("MM/dd/yyyy");
                                 }
                                 else if (string.IsNullOrEmpty(dueDate))
                                 {
@@ -942,12 +958,15 @@ namespace HRIS_JAP_ATTPAY
                             }
                         }
                     }
+
+                    Console.WriteLine($"Total tasks: {totalTasks}, User tasks: {userTasks}");
                 }
 
                 // If no tasks found, show a message
                 if (dataGridViewTodo.Rows.Count == 0)
                 {
                     dataGridViewTodo.Rows.Add("No tasks found", "");
+                    Console.WriteLine("No tasks found for current user");
                 }
             }
             catch (Exception ex)
@@ -955,6 +974,7 @@ namespace HRIS_JAP_ATTPAY
                 MessageBox.Show($"Error loading todo list: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 dataGridViewTodo.Rows.Add("Error loading tasks", "");
+                Console.WriteLine($"Error loading todos: {ex.Message}");
             }
         }
     }

@@ -17,31 +17,45 @@ namespace HRIS_JAP_ATTPAY
         private string currentUserId;
         private string currentEmployeeId;
         private string payrollPeriod;
+        private AdminOverview adminOverview; // Add reference to track the overview
 
         public AdminForm(string userId, string employeeId, string period = null)
         {
-
             InitializeComponent();
             currentUserId = userId;
-            AttributesClass.SetMinSize(this, 1440, 1024);
-            this.Size = new Size(1240, 824);
             currentEmployeeId = employeeId;
             payrollPeriod = period;
+
+            // Debug output to verify user context
+            Console.WriteLine($"=== AdminForm Initialized ===");
+            Console.WriteLine($"User ID: {currentUserId}");
+            Console.WriteLine($"Employee ID: {currentEmployeeId}");
+            Console.WriteLine($"Payroll Period: {payrollPeriod}");
+            Console.WriteLine($"Session User ID: {SessionClass.CurrentUserId}");
+            Console.WriteLine($"Session Employee ID: {SessionClass.CurrentEmployeeId}");
+            Console.WriteLine($"==============================");
+
+            AttributesClass.SetMinSize(this, 1440, 1024);
+            this.Size = new Size(1240, 824);
+
             panelLoaderMenu = new AttributesClassAlt(AdminMenuPanel);
             panelLoaderView = new AttributesClassAlt(AdminViewPanel);
         }
 
         private void AdminPage_Load(object sender, EventArgs e)
         {
+            // Pass currentUserId to both menu and overview
             panelLoaderMenu.LoadUserControl(new AdminMenu(AdminViewPanel, currentUserId, currentEmployeeId));
-            panelLoaderView.LoadUserControl(new AdminOverview(currentUserId));
+
+            // Create and store reference to overview
+            adminOverview = new AdminOverview(currentUserId);
+            panelLoaderView.LoadUserControl(adminOverview);
 
             if (AttributesScanner.IsScannerConnected())
             {
                 AttributesScanner.OnScannerInput += AttributesScanner_OnScannerInput;
                 AttributesScanner.StartScannerMonitor();
             }
-
         }
 
         private void AdminForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -52,7 +66,6 @@ namespace HRIS_JAP_ATTPAY
 
         private void AttributesScanner_OnScannerInput(object sender, string data)
         {
-
             if (ScanRFID.ActiveInstance != null)
             {
                 // special handling for ScanRFID
@@ -63,6 +76,12 @@ namespace HRIS_JAP_ATTPAY
                 Console.WriteLine("Scanned: " + data);
                 // normal scanner behavior; attendance logging, add database logic here
             }
+        }
+
+        // Add method to refresh todo list when needed
+        public void RefreshTodoList()
+        {
+            adminOverview?.RefreshTodoList();
         }
     }
 }

@@ -11,6 +11,8 @@ using System.Windows.Forms;
 using Firebase.Database;
 using Firebase.Database.Query;
 using Newtonsoft.Json.Linq;
+using System.Net.Http;
+using System.IO;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -18,7 +20,7 @@ namespace HRIS_JAP_ATTPAY
     {
         // Firebase client
         private FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
-
+        private HttpClient httpClient = new HttpClient();
         private string identifier; // can be user_id or employee_id
 
         public UserProfile()
@@ -99,7 +101,7 @@ namespace HRIS_JAP_ATTPAY
                 string employeeId = userEntry.ContainsKey("employee_id") ? userEntry["employee_id"] : null;
                 bool isAdmin = userEntry.ContainsKey("isAdmin") && userEntry["isAdmin"] == "True";
 
-                //  Step 2: Load EmployeeDetails as dictionary
+                // Step 2: Load EmployeeDetails as dictionary
                 var empDetailsJson = await firebase.Child("EmployeeDetails").OnceAsJsonAsync();
                 var empDetailsDict = ParseJsonAsDictionary(empDetailsJson);
 
@@ -114,6 +116,7 @@ namespace HRIS_JAP_ATTPAY
                 string fullName = $"{firstName} {lastName}".Trim();
                 string contact = empDetails != null && empDetails.ContainsKey("contact") ? empDetails["contact"] : null;
                 string email = empDetails != null && empDetails.ContainsKey("email") ? empDetails["email"] : null;
+                string imageUrl = empDetails != null && empDetails.ContainsKey("image_url") ? empDetails["image_url"] : null;
 
                 // Step 3: Load EmploymentInfo as list
                 var employmentJson = await firebase.Child("EmploymentInfo").OnceAsJsonAsync();
@@ -132,10 +135,81 @@ namespace HRIS_JAP_ATTPAY
                 labelPositionInput.Text = position;
                 labelContactInput.Text = contact ?? "N/A";
                 labelEmailInput.Text = email ?? "N/A";
+
+                // Step 5: Load and display user image
+                if (!string.IsNullOrEmpty(imageUrl))
+                {
+                    await LoadUserImage(imageUrl);
+                }
+                else
+                {
+                    // Set default image if no image URL
+                    SetDefaultImage();
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error loading user data: " + ex.Message);
+                SetDefaultImage();
+            }
+        }
+
+        private async Task LoadUserImage(string imageUrl)
+        {
+            try
+            {
+                // Download image from URL
+                byte[] imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
+
+                using (MemoryStream ms = new MemoryStream(imageBytes))
+                {
+                    Image image = Image.FromStream(ms);
+
+                    // Set PictureBox to Zoom mode (maintains aspect ratio within square)
+                    pictureBoxEmployee.SizeMode = PictureBoxSizeMode.Zoom;
+                    pictureBoxEmployee.Image = image;
+
+                    // Remove any circular region to keep it square
+                    pictureBoxEmployee.Region = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading image: {ex.Message}");
+                SetDefaultImage();
+            }
+        }
+
+        private void SetDefaultImage()
+        {
+            // Set a default user icon with square format
+            try
+            {
+                // If you have a default image in resources:
+                // pictureBoxEmployee.Image = Properties.Resources.DefaultUser;
+
+                // Or create a simple square placeholder
+                Bitmap defaultImage = new Bitmap(pictureBoxEmployee.Width, pictureBoxEmployee.Height);
+                using (Graphics g = Graphics.FromImage(defaultImage))
+                {
+                    g.Clear(Color.LightGray);
+                    using (Font font = new Font("Arial", 12))
+                    using (Brush brush = new SolidBrush(Color.DarkGray))
+                    {
+                        StringFormat sf = new StringFormat();
+                        sf.Alignment = StringAlignment.Center;
+                        sf.LineAlignment = StringAlignment.Center;
+                        g.DrawString("No Image", font, brush,
+                            new RectangleF(0, 0, defaultImage.Width, defaultImage.Height), sf);
+                    }
+                }
+                pictureBoxEmployee.Image = defaultImage;
+                pictureBoxEmployee.SizeMode = PictureBoxSizeMode.Zoom;
+                pictureBoxEmployee.Region = null; // Ensure square shape
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error setting default image: {ex.Message}");
             }
         }
 

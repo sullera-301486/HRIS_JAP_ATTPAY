@@ -45,6 +45,9 @@ namespace HRIS_JAP_ATTPAY
 
         private void MoveToAdmin(string userID)
         {
+            // Store in session before moving
+            // SessionClass is already set by SetCurrentUserSessionAsync
+
             Form parentForm = AttributesClass.GetRealOwnerForm(this.FindForm());
             if (parentForm != null)
             {
@@ -55,6 +58,9 @@ namespace HRIS_JAP_ATTPAY
 
         private void MoveToHR(string userID)
         {
+            // Store in session before moving
+            // SessionClass is already set by SetCurrentUserSessionAsync
+
             Form parentForm = AttributesClass.GetRealOwnerForm(this.FindForm());
             if (parentForm != null)
             {
@@ -115,14 +121,21 @@ namespace HRIS_JAP_ATTPAY
                 {
                     labelFailed.Visible = false;
 
-                    //  NEW CODE: Fetch employee details and store session info
+                    // Set current user session
                     await SetCurrentUserSessionAsync(user);
 
-                    // Move to correct form based on role
-                    if (user.isAdmin)
+                    // Route based on admin status
+                    bool isAdminUser = user.isAdmin.Equals("True", StringComparison.OrdinalIgnoreCase);
+
+                    // Route based on admin status
+                    if (isAdminUser)
+                    {
                         MoveToAdmin(user.user_id);
+                    }
                     else
+                    {
                         MoveToHR(user.user_id);
+                    }
                 }
                 else
                 {
@@ -150,15 +163,20 @@ namespace HRIS_JAP_ATTPAY
                 SessionClass.CurrentUserId = user.user_id;
                 SessionClass.CurrentEmployeeId = user.employee_id;
                 SessionClass.CurrentEmployeeName = fullName;
-                SessionClass.IsAdmin = user.isAdmin;
+                SessionClass.IsAdmin = user.isAdmin.Equals("True", StringComparison.OrdinalIgnoreCase);
 
                 Console.WriteLine($"Logged in: {SessionClass.CurrentEmployeeName} ({SessionClass.CurrentEmployeeId})");
+                Console.WriteLine($"User ID: {SessionClass.CurrentUserId}, IsAdmin: {SessionClass.IsAdmin}");
+
+                // Debug output to verify user data
+                Console.WriteLine($"Session set - UserID: {SessionClass.CurrentUserId}, EmployeeID: {SessionClass.CurrentEmployeeId}");
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to set session: " + ex.Message);
             }
         }
+
 
         // Firebase User model
         private class UserFirebase
@@ -167,7 +185,7 @@ namespace HRIS_JAP_ATTPAY
             public string employee_id { get; set; }
             public string password_hash { get; set; }
             public string salt { get; set; }
-            public bool isAdmin { get; set; }
+            public string isAdmin { get; set; }  // Changed from bool to string
             public string created_at { get; set; }
         }
 
@@ -208,3 +226,4 @@ namespace HRIS_JAP_ATTPAY
         }
     }
 }
+
