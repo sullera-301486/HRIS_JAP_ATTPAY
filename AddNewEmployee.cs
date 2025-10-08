@@ -1,14 +1,15 @@
-﻿using Firebase.Database;
-using Firebase.Database.Query;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Firebase.Database;
+using Firebase.Database.Query;
+using Newtonsoft.Json.Linq;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -61,47 +62,253 @@ namespace HRIS_JAP_ATTPAY
                 }
             }
         }
+        private async Task CreateDefaultLeaveCredits(string employeeId, string fullName)
+        {
+            try
+            {
+                string department = "Unknown";
+                string position = "Unknown";
+
+                // 🔹 STEP 1: Fetch EmploymentInfo
+                string employmentUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/EmploymentInfo.json";
+
+                using (var httpClient = new HttpClient())
+                {
+                    var response = await httpClient.GetAsync(employmentUrl);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string json = await response.Content.ReadAsStringAsync();
+
+                        if (!string.IsNullOrWhiteSpace(json) && json != "null")
+                        {
+                            var token = JToken.Parse(json);
+
+                            // ✅ Handle object or array
+                            if (token is JObject obj)
+                            {
+                                foreach (var prop in obj.Properties())
+                                {
+                                    var emp = prop.Value as JObject;
+                                    if (emp == null) continue;
+
+                                    if (emp["employee_id"]?.ToString() == employeeId)
+                                    {
+                                        department = emp["department"]?.ToString() ?? "Unknown";
+                                        position = emp["position"]?.ToString() ?? "Unknown";
+                                        break;
+                                    }
+                                }
+                            }
+                            else if (token is JArray arr)
+                            {
+                                foreach (var emp in arr.OfType<JObject>())
+                                {
+                                    if (emp["employee_id"]?.ToString() == employeeId)
+                                    {
+                                        department = emp["department"]?.ToString() ?? "Unknown";
+                                        position = emp["position"]?.ToString() ?? "Unknown";
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 🔹 STEP 2: Check if Leave Credits already exist
+                var existing = await firebase
+                    .Child("Leave Credits")
+                    .Child(employeeId)
+                    .OnceSingleAsync<JObject>();
+
+                if (existing != null)
+                {
+                    // ✅ Only update missing department/position — keep existing leave balances
+                    bool updated = false;
+
+                    if (existing["department"] == null || existing["department"].ToString() == "Unknown")
+                    {
+                        existing["department"] = department;
+                        updated = true;
+                    }
+
+                    if (existing["position"] == null || existing["position"].ToString() == "Unknown")
+                    {
+                        existing["position"] = position;
+                        updated = true;
+                    }
+
+                    if (existing["full_name"] == null || string.IsNullOrEmpty(existing["full_name"].ToString()))
+                    {
+                        existing["full_name"] = fullName;
+                        updated = true;
+                    }
+
+                    if (updated)
+                    {
+                        await firebase
+                            .Child("Leave Credits")
+                            .Child(employeeId)
+                            .PutAsync(existing);
+                        Console.WriteLine($"✅ Updated missing info for {employeeId}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"ℹ️ Leave Credits already complete for {employeeId}");
+                    }
+
+                    return; // stop here — do not overwrite
+                }
+
+                // 🔹 STEP 3: Create only if not existing
+                var leaveCreditsObj = new
+                {
+                    employee_id = employeeId,
+                    full_name = fullName,
+                    department = department,
+                    position = position,
+                    sick_leave = 6,
+                    vacation_leave = 6,
+                    created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
+                };
+
+                await firebase
+                    .Child("Leave Credits")
+                    .Child(employeeId)
+                    .PutAsync(leaveCreditsObj);
+
+                Console.WriteLine($"✅ Leave Credits created for {employeeId} ({department} - {position})");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error creating default leave credits: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        private async Task FixExistingLeaveCredits()
+        {
+            try
+            {
+                string leaveCreditsUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits.json";
+                string employmentUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/EmploymentInfo.json";
+
+                using (var httpClient = new HttpClient())
+                {
+                    string leaveJson = await httpClient.GetStringAsync(leaveCreditsUrl);
+                    string empJson = await httpClient.GetStringAsync(employmentUrl);
+
+                    if (leaveJson == "null" || string.IsNullOrWhiteSpace(leaveJson)) return;
+                    if (empJson == "null" || string.IsNullOrWhiteSpace(empJson)) return;
+
+                    JObject leaveData = JObject.Parse(leaveJson);
+                    JToken empToken = JToken.Parse(empJson);
+
+                    IEnumerable<JProperty> empProperties;
+
+                    if (empToken is JObject)
+                        empProperties = ((JObject)empToken).Properties();
+                    else if (empToken is JArray)
+                        empProperties = ((JArray)empToken)
+                            .OfType<JObject>()
+                            .Select((obj, index) => new JProperty(index.ToString(), obj));
+                    else
+                    {
+                        MessageBox.Show("EmploymentInfo JSON is not in a recognized format.",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    foreach (var item in leaveData)
+                    {
+                        string empId = item.Key;
+                        JObject leaveObj = (JObject)item.Value;
+
+                        string department = "Unknown";
+                        string position = "Unknown";
+
+                        foreach (var empProp in empProperties)
+                        {
+                            var emp = empProp.Value as JObject;
+                            if (emp == null) continue;
+
+                            if (emp["employee_id"]?.ToString() == empId)
+                            {
+                                department = emp["department"]?.ToString() ?? "Unknown";
+                                position = emp["position"]?.ToString() ?? "Unknown";
+                                break;
+                            }
+                        }
+
+                        leaveObj["department"] = department;
+                        leaveObj["position"] = position;
+
+                        string updateUrl =
+                            $"https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits/{empId}.json";
+
+                        var jsonBody = new StringContent(leaveObj.ToString(), System.Text.Encoding.UTF8, "application/json");
+                        await httpClient.PutAsync(updateUrl, jsonBody);
+                    }
+                }
+
+                MessageBox.Show("✅ Existing Leave Credits updated with department and position.",
+                    "Update Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error fixing existing Leave Credits: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
         private async Task SyncAllEmployeesToLeaveCredits()
         {
             try
             {
                 using (var httpClient = new HttpClient())
                 {
-                    // 🔹 1. Get all employees from EmployeeDetails
-                    string employeeUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/EmployeeDetails.json";
-                    var employeeResponse = await httpClient.GetAsync(employeeUrl);
+                    // 1️⃣ Get EmployeeDetails
+                    string empUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/EmployeeDetails.json";
+                    var empResponse = await httpClient.GetAsync(empUrl);
+                    if (!empResponse.IsSuccessStatusCode) return;
 
-                    if (!employeeResponse.IsSuccessStatusCode)
+                    string empJson = await empResponse.Content.ReadAsStringAsync();
+                    if (string.IsNullOrWhiteSpace(empJson) || empJson == "null") return;
+
+                    JObject empData = JObject.Parse(empJson);
+
+                    // 2️⃣ Get EmploymentInfo
+                    string empInfoUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/EmploymentInfo.json";
+                    var empInfoResponse = await httpClient.GetAsync(empInfoUrl);
+                    string empInfoJson = await empInfoResponse.Content.ReadAsStringAsync();
+
+                    // Handle both array and object formats
+                    List<JObject> empInfoList = new List<JObject>();
+                    if (!string.IsNullOrWhiteSpace(empInfoJson) && empInfoJson != "null")
                     {
-                        MessageBox.Show("Failed to fetch EmployeeDetails data from Firebase.",
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
+                        var token = JToken.Parse(empInfoJson);
+                        if (token is JArray arr)
+                            empInfoList.AddRange(arr.OfType<JObject>());
+                        else if (token is JObject obj)
+                            empInfoList.AddRange(obj.Properties().Select(p => (JObject)p.Value));
                     }
 
-                    string employeeJson = await employeeResponse.Content.ReadAsStringAsync();
-                    if (string.IsNullOrWhiteSpace(employeeJson) || employeeJson == "null")
-                    {
-                        MessageBox.Show("No employees found in EmployeeDetails.",
-                            "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return;
-                    }
-
-                    JObject employeeData = JObject.Parse(employeeJson);
-
-                    // 🔹 2. Get existing Leave Credits
-                    string leaveCreditsUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits.json";
-                    var leaveResponse = await httpClient.GetAsync(leaveCreditsUrl);
+                    // 3️⃣ Get existing Leave Credits
+                    string leaveUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits.json";
+                    var leaveResponse = await httpClient.GetAsync(leaveUrl);
                     string leaveJson = await leaveResponse.Content.ReadAsStringAsync();
-                    JObject existingLeaveData = null;
+
+                    JObject existingLeave = new JObject();
                     if (!string.IsNullOrWhiteSpace(leaveJson) && leaveJson != "null")
-                        existingLeaveData = JObject.Parse(leaveJson);
+                        existingLeave = JObject.Parse(leaveJson);
 
-                    int createdCount = 0;
+                    int created = 0;
+                    int skipped = 0;
 
-                    // 🔹 3. Loop through employees and only create missing leave credit records
-                    foreach (var emp in employeeData)
+                    // 4️⃣ Loop through EmployeeDetails
+                    foreach (var emp in empData)
                     {
-                        string employeeId = emp.Key;
+                        string empId = emp.Key;
                         JObject empObj = (JObject)emp.Value;
 
                         string firstName = empObj["first_name"]?.ToString() ?? "";
@@ -109,47 +316,168 @@ namespace HRIS_JAP_ATTPAY
                         string lastName = empObj["last_name"]?.ToString() ?? "";
                         string fullName = $"{firstName} {middleName} {lastName}".Trim();
 
-                        bool alreadyExists = existingLeaveData != null && existingLeaveData[employeeId] != null;
-                        if (alreadyExists)
-                            continue; // 🟢 Skip existing records
-
-                        var leaveCredits = new
+                        // ✅ If record already exists → skip it (don’t overwrite existing balances)
+                        if (existingLeave.ContainsKey(empId))
                         {
-                            employee_id = employeeId,
+                            skipped++;
+                            continue;
+                        }
+
+                        // 🔹 Find position and department from EmploymentInfo
+                        string position = "Unknown";
+                        string department = "Unknown";
+
+                        foreach (var info in empInfoList)
+                        {
+                            if (info?["employee_id"]?.ToString() == empId)
+                            {
+                                position = info["position"]?.ToString() ?? "Unknown";
+                                department = info["department"]?.ToString() ?? "Unknown";
+                                break;
+                            }
+                        }
+
+                        // 🔹 Create new leave record
+                        var leaveObj = new
+                        {
+                            employee_id = empId,
                             full_name = fullName,
+                            position = position,
+                            department = department,
                             sick_leave = 6,
                             vacation_leave = 6,
                             created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
                         };
 
-                        string leaveCreditsChildUrl =
-                            $"https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits/{employeeId}.json";
-
-                        string jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(leaveCredits);
-                        var stringContent = new StringContent(jsonBody, System.Text.Encoding.UTF8, "application/json");
-                        var putResponse = await httpClient.PutAsync(leaveCreditsChildUrl, stringContent);
-
-                        if (putResponse.IsSuccessStatusCode)
-                            createdCount++;
+                        string putUrl = $"https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits/{empId}.json";
+                        string jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(leaveObj);
+                        var response = await httpClient.PutAsync(putUrl, new StringContent(jsonBody, System.Text.Encoding.UTF8, "application/json"));
+                        if (response.IsSuccessStatusCode)
+                            created++;
                     }
 
-                    // 🔹 4. Summary
+                    Console.WriteLine($"✅ Leave Credits sync complete. Added {created}, skipped {skipped} existing.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error syncing Leave Credits: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async Task SyncMissingLeaveCredits()
+        {
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    // 🔹 Fetch EmployeeDetails
+                    string empUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/EmployeeDetails.json";
+                    string empJson = await httpClient.GetStringAsync(empUrl);
+                    if (string.IsNullOrWhiteSpace(empJson) || empJson == "null")
+                    {
+                        MessageBox.Show("❌ No EmployeeDetails found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    JObject employeeDetails = JObject.Parse(empJson);
+
+                    // 🔹 Fetch EmploymentInfo
+                    string empInfoUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/EmploymentInfo.json";
+                    string empInfoJson = await httpClient.GetStringAsync(empInfoUrl);
+                    List<JObject> employmentList = new List<JObject>();
+
+                    if (!string.IsNullOrWhiteSpace(empInfoJson) && empInfoJson != "null")
+                    {
+                        var empToken = JToken.Parse(empInfoJson);
+
+                        // Handle both array and object formats safely
+                        if (empToken is JArray arr)
+                        {
+                            foreach (var item in arr)
+                                if (item is JObject o) employmentList.Add(o);
+                        }
+                        else if (empToken is JObject obj)
+                        {
+                            foreach (var prop in obj.Properties())
+                                if (prop.Value is JObject o) employmentList.Add(o);
+                        }
+                    }
+
+                    // 🔹 Fetch existing Leave Credits
+                    string leaveUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits.json";
+                    string leaveJson = await httpClient.GetStringAsync(leaveUrl);
+                    JObject existingLeave = new JObject();
+                    if (!string.IsNullOrWhiteSpace(leaveJson) && leaveJson != "null")
+                        existingLeave = JObject.Parse(leaveJson);
+
+                    int added = 0;
+                    int skipped = 0;
+
+                    // 🔹 Loop through all employees
+                    foreach (var emp in employeeDetails)
+                    {
+                        string empId = emp.Key;
+                        JObject empObj = (JObject)emp.Value;
+
+                        // ✅ Skip employees who already have a leave record (don't reset their balance)
+                        if (existingLeave.ContainsKey(empId))
+                        {
+                            skipped++;
+                            continue;
+                        }
+
+                        string firstName = empObj["first_name"]?.ToString() ?? "";
+                        string middleName = empObj["middle_name"]?.ToString() ?? "";
+                        string lastName = empObj["last_name"]?.ToString() ?? "";
+                        string fullName = $"{firstName} {middleName} {lastName}".Trim();
+
+                        string position = "Unknown";
+                        string department = "Unknown";
+
+                        // Match in EmploymentInfo
+                        foreach (var empInfo in employmentList)
+                        {
+                            if (empInfo?["employee_id"]?.ToString() == empId)
+                            {
+                                position = empInfo["position"]?.ToString() ?? "Unknown";
+                                department = empInfo["department"]?.ToString() ?? "Unknown";
+                                break;
+                            }
+                        }
+
+                        // Build new Leave Credit record
+                        var leaveRecord = new
+                        {
+                            employee_id = empId,
+                            full_name = fullName,
+                            department = department,
+                            position = position,
+                            sick_leave = 6,
+                            vacation_leave = 6,
+                            created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
+                        };
+
+                        // Upload only for missing employees
+                        string putUrl = $"https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits/{empId}.json";
+                        string jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(leaveRecord);
+                        var response = await httpClient.PutAsync(putUrl, new StringContent(jsonBody, System.Text.Encoding.UTF8, "application/json"));
+
+                        if (response.IsSuccessStatusCode)
+                            added++;
+                    }
+
                     MessageBox.Show(
-                        $"Leave Credits sync completed.\n" +
-                        $"New Leave Credits created for {createdCount} missing employees.\n" +
-                        $"(Existing records were left unchanged.)",
-                        "Sync Completed",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information
+                        $"✅ Leave Credits sync complete!\n🆕 Added: {added}\n⏩ Skipped existing: {skipped}",
+                        "Success", MessageBoxButtons.OK, MessageBoxIcon.Information
                     );
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error syncing Leave Credits: " + ex.Message,
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("❌ Error syncing Leave Credits:\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
 
 
@@ -194,6 +522,8 @@ namespace HRIS_JAP_ATTPAY
             UpdateAlternateTextboxAccessibility();
 
             await SyncAllEmployeesToLeaveCredits();
+            await FixExistingLeaveCredits();
+            await SyncMissingLeaveCredits();
         }
 
         private void UpdateAlternateTextboxAccessibility()
@@ -464,28 +794,12 @@ namespace HRIS_JAP_ATTPAY
         }
 
         // ✅ NEW FUNCTION: Create Leave Credits
-        private async Task CreateDefaultLeaveCredits(string employeeId, string fullName)
-        {
-            try
-            {
-                var leaveCreditsObj = new
-                {
-                    employee_id = employeeId,
-                    full_name = fullName,
-                    sick_leave = 6,
-                    vacation_leave = 6,
-                    created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
-                };
+        // ✅ FIXED VERSION - works with EmploymentInfo as Object or Array
+      
 
-                await firebase.Child("Leave Credits").Child(employeeId).PutAsync(leaveCreditsObj);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error creating default leave credits: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
 
-private string HashPassword(string password, string salt)
+
+        private string HashPassword(string password, string salt)
         {
             using (var sha256 = System.Security.Cryptography.SHA256.Create())
             {
