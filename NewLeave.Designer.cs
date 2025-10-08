@@ -226,10 +226,14 @@
             // 
             this.comboBoxLeaveType.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
             this.comboBoxLeaveType.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comboBoxLeaveType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxLeaveType.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxLeaveType.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxLeaveType.ForeColor = System.Drawing.Color.White;
             this.comboBoxLeaveType.FormattingEnabled = true;
+            this.comboBoxLeaveType.Items.AddRange(new object[] {
+            "Vacation",
+            "Sick"});
             this.comboBoxLeaveType.Location = new System.Drawing.Point(146, 137);
             this.comboBoxLeaveType.Name = "comboBoxLeaveType";
             this.comboBoxLeaveType.Size = new System.Drawing.Size(366, 28);

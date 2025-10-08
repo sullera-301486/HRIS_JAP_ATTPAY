@@ -84,11 +84,157 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
+        // 🟢 Send Request → show confirmation form first
         private void buttonSendRequest_Click(object sender, EventArgs e)
         {
+            string employee = comboBoxInputName.SelectedItem?.ToString();
+            string leaveType = comboBoxLeaveType.SelectedItem?.ToString();
+            string start = textBoxStartPeriod.Text.Trim();
+            string end = textBoxEndPeriod.Text.Trim();
+
+            if (string.IsNullOrEmpty(employee) ||
+                string.IsNullOrEmpty(leaveType) ||
+                string.IsNullOrEmpty(start) ||
+                string.IsNullOrEmpty(end))
+            {
+                MessageBox.Show("Please complete all fields before sending the request.",
+                    "Incomplete Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 🔹 Show confirm dialog first
+            ConfirmLeaveEntry confirmForm = new ConfirmLeaveEntry();
+            confirmForm.FormClosed += async (s, ev) =>
+            {
+                // ✅ If user confirmed
+                if (confirmForm.DialogResult == DialogResult.OK)
+                {
+                    await ProcessLeaveRequest(employee, leaveType, start, end);
+                }
+            };
+
             Form parentForm = this.FindForm();
-            ConfirmLeaveEntry confirmLeaveEntryForm = new ConfirmLeaveEntry();
-            AttributesClass.ShowWithOverlay(parentForm, confirmLeaveEntryForm);
+            AttributesClass.ShowWithOverlay(parentForm, confirmForm);
+        }
+
+        // 🟢 Actual process to save and deduct leave
+        private async Task ProcessLeaveRequest(string employee, string leaveType, string start, string end)
+        {
+            try
+            {
+                // 🟢 Get current logged-in user
+                string submittedBy = !string.IsNullOrEmpty(SessionClass.CurrentEmployeeName)
+                    ? SessionClass.CurrentEmployeeName
+                    : "Unknown User";
+
+                // 🟢 Deduct leave first
+                bool deducted = await DeductLeaveBalanceAsync(employee, leaveType);
+                if (!deducted)
+                {
+                    MessageBox.Show("Unable to deduct leave. Please check leave credits.",
+                        "Leave Deduction Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // 🟢 Save leave request to ManageLeave
+                var manageLeaveData = new
+                {
+                    created_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    submitted_by = submittedBy,
+                    employee = employee,
+                    leave_type = leaveType,
+                    period = $"{start} - {end}"
+                };
+
+                await firebase.Child("ManageLeave").PostAsync(manageLeaveData);
+
+                MessageBox.Show("Leave request successfully sent and leave deducted.",
+                    "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error processing leave request: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // 🟢 Deduct leave credits from "Leave Credits" table
+        private async Task<bool> DeductLeaveBalanceAsync(string employeeName, string leaveType)
+        {
+            try
+            {
+                var employees = await firebase.Child("Leave Credits").OnceAsync<dynamic>();
+                string employeeId = null;
+                dynamic empData = null;
+
+                foreach (var emp in employees)
+                {
+                    string fullName = emp.Object.full_name?.ToString().Trim();
+                    if (string.Equals(fullName, employeeName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        employeeId = emp.Key;
+                        empData = emp.Object;
+                        break;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(employeeId))
+                {
+                    MessageBox.Show($"Employee '{employeeName}' not found in Leave Credits.", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
+                int sickLeave = empData.sick_leave != null ? (int)empData.sick_leave : 6;
+                int vacationLeave = empData.vacation_leave != null ? (int)empData.vacation_leave : 6;
+
+                // 🧮 Check and deduct based on leave type
+                if (leaveType.ToLower().Contains("sick"))
+                {
+                    if (sickLeave <= 0)
+                    {
+                        MessageBox.Show($"{employeeName} has no remaining Sick Leave.",
+                            "No Leave Left", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return false;
+                    }
+                    sickLeave = Math.Max(0, sickLeave - 1);
+                }
+                else if (leaveType.ToLower().Contains("vacation"))
+                {
+                    if (vacationLeave <= 0)
+                    {
+                        MessageBox.Show($"{employeeName} has no remaining Vacation Leave.",
+                            "No Leave Left", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return false;
+                    }
+                    vacationLeave = Math.Max(0, vacationLeave - 1);
+                }
+
+                var updatedCredits = new
+                {
+                    employee_id = empData.employee_id ?? employeeId,
+                    full_name = empData.full_name,
+                    department = empData.department ?? "",
+                    position = empData.position ?? "",
+                    sick_leave = sickLeave,
+                    vacation_leave = vacationLeave,
+                    updated_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                };
+
+                await firebase.Child("Leave Credits").Child(employeeId).PutAsync(updatedCredits);
+
+                // Update displayed values
+                labelSickLeaveInput.Text = sickLeave.ToString();
+                labelVacationLeaveInput.Text = vacationLeave.ToString();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error deducting leave: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)

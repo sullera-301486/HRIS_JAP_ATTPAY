@@ -180,9 +180,76 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private void btnRevoke_Click(object sender, EventArgs e)
+        // 🟢 When revoke is clicked, add back 1 leave credit
+        private async void btnRevoke_Click(object sender, EventArgs e)
         {
-            RevokeClicked?.Invoke(this, EventArgs.Empty);
+            try
+            {
+                string employeeName = lblEmployee.Text.Trim();
+                string leaveType = lblLeaveType.Text.Trim();
+
+                if (string.IsNullOrEmpty(employeeName) || string.IsNullOrEmpty(leaveType))
+                {
+                    MessageBox.Show("Invalid employee or leave type.", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var employees = await firebase.Child("Leave Credits").OnceAsync<dynamic>();
+                string employeeId = null;
+                dynamic empData = null;
+
+                foreach (var emp in employees)
+                {
+                    string fullName = emp.Object.full_name?.ToString().Trim();
+                    if (string.Equals(fullName, employeeName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        employeeId = emp.Key;
+                        empData = emp.Object;
+                        break;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(employeeId))
+                {
+                    MessageBox.Show($"Employee '{employeeName}' not found in Leave Credits.",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                int sickLeave = empData.sick_leave != null ? (int)empData.sick_leave : 6;
+                int vacationLeave = empData.vacation_leave != null ? (int)empData.vacation_leave : 6;
+
+                // 🟢 Add back the leave credit depending on leave type
+                if (leaveType.ToLower().Contains("sick"))
+                    sickLeave += 1;
+                else if (leaveType.ToLower().Contains("vacation"))
+                    vacationLeave += 1;
+
+                var updatedCredits = new
+                {
+                    employee_id = empData.employee_id ?? employeeId,
+                    full_name = empData.full_name,
+                    department = empData.department ?? "",
+                    position = empData.position ?? "",
+                    sick_leave = sickLeave,
+                    vacation_leave = vacationLeave,
+                    updated_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                };
+
+                await firebase.Child("Leave Credits").Child(employeeId).PutAsync(updatedCredits);
+
+                MessageBox.Show($"{leaveType} leave for {employeeName} has been revoked and 1 leave credit restored.",
+                    "Leave Revoked", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // 🔹 Trigger any subscribed revoke logic in the parent
+                RevokeClicked?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error revoking leave: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

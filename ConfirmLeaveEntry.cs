@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HRIS_JAP_ATTPAY
@@ -25,7 +18,15 @@ namespace HRIS_JAP_ATTPAY
 
         private void buttonConfirm_Click(object sender, EventArgs e)
         {
+            // ✅ Tell parent form the user confirmed
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
 
+        private void buttonCancel_Click(object sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.Cancel;
+            this.Close();
         }
 
         private void setFont()
@@ -41,11 +42,6 @@ namespace HRIS_JAP_ATTPAY
             {
                 MessageBox.Show("Font load failed: " + ex.Message);
             }
-        }
-
-        private void buttonCancel_Click(object sender, EventArgs e)
-        {
-            this.Close();
         }
     }
 }
