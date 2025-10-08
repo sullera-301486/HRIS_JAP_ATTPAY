@@ -27,22 +27,25 @@ namespace HRIS_JAP_ATTPAY
             _ = attendanceService.GenerateTodaysAttendanceOnceAsync();
             FormHost hostForm = new FormHost();
             Application.Run(hostForm); // Run app using persistent host
-
         }
 
         public static void OpenNextForm(string formName, string userId = null)
         {
-
-
             if (!string.IsNullOrEmpty(userId))
             {
                 currentUserId = userId;
+                // Also update session if needed
+                if (SessionClass.CurrentUserId != userId)
+                {
+                    Console.WriteLine($"Program: Updating currentUserId to {userId}");
+                }
             }
+
             Application.OpenForms
-                  .OfType<Form>()
-                  .Where(f => f != null && !f.IsDisposed && f != currentForm)
-                  .ToList()
-                  .ForEach(f => f.Hide());
+                .OfType<Form>()
+                .Where(f => f != null && !f.IsDisposed && f != currentForm)
+                .ToList()
+                .ForEach(f => f.Hide());
 
             Form nextForm = null;
 
@@ -52,10 +55,16 @@ namespace HRIS_JAP_ATTPAY
                     nextForm = new LoginForm();
                     break;
                 case "OpenNewForm1":
-                    nextForm = new AdminForm(currentUserId, currentEmployeeId, payrollPeriod);
+                    // Ensure we have the current user ID from session
+                    string adminUserId = SessionClass.CurrentUserId;
+                    string adminEmployeeId = SessionClass.CurrentEmployeeId;
+                    Console.WriteLine($"Opening AdminForm with User: {adminUserId}, Employee: {adminEmployeeId}");
+                    nextForm = new AdminForm(adminUserId, adminEmployeeId, payrollPeriod);
                     break;
                 case "OpenNewForm2":
-                    nextForm = new HRForm(currentUserId);
+                    string hrUserId = SessionClass.CurrentUserId;
+                    Console.WriteLine($"Opening HRForm with User: {hrUserId}");
+                    nextForm = new HRForm(hrUserId);
                     break;
                 default:
                     MessageBox.Show("Invalid form requested, exiting.");
@@ -82,11 +91,13 @@ namespace HRIS_JAP_ATTPAY
 
             nextForm.Show();
         }
+
         public static DailyAttendanceService GetAttendanceService()
         {
             return _attendanceService;
         }
     }
+
     public partial class FormHost : Form
     {
         public FormHost()
@@ -95,6 +106,7 @@ namespace HRIS_JAP_ATTPAY
             {
                 Program.OpenNextForm("LoginForm");
             };
+
             // Make it completely invisible
             this.Opacity = 0;
             this.ShowInTaskbar = false;
@@ -103,6 +115,7 @@ namespace HRIS_JAP_ATTPAY
             this.Location = new System.Drawing.Point(-2000, -2000);
             this.Size = new System.Drawing.Size(1, 1);
         }
+
         public void TransitionToLogin()
         {
             Timer delay = new Timer();
