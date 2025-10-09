@@ -243,8 +243,6 @@ namespace HRIS_JAP_ATTPAY
             {
                 Cursor.Current = Cursors.WaitCursor;
 
-                Console.WriteLine($"Updating attendance for key: {currentFirebaseKey}");
-
                 if (string.IsNullOrEmpty(currentFirebaseKey))
                 {
                     MessageBox.Show("Error: Cannot identify the attendance record to update.", "Error",
@@ -261,41 +259,76 @@ namespace HRIS_JAP_ATTPAY
                 string newOvertime = CalculateOvertime();
                 string newStatus = CalculateStatus();
 
-                // Create updated record - add overtime_in and overtime_out fields
-                var updatedRecord = new
+                // Check if current user is admin
+                bool isAdmin = SessionClass.CurrentEmployeeId == "JAP-001";
+
+                if (isAdmin)
                 {
-                    employee_id = currentEmployeeId,
-                    attendance_date = currentDate,
-                    time_in = newTimeIn,
-                    time_out = newTimeOut,
-                    overtime_in = newOvertimeIn,  // Add this
-                    overtime_out = newOvertimeOut, // Add this
-                    hours_worked = newHoursWorked,
-                    status = newStatus,
-                    overtime_hours = newOvertime,
-                    verification_method = "Manual Edit",
-                    schedule_id = ""
-                };
+                    // --- ADMIN: Directly update Attendance table ---
+                    var updatedRecord = new
+                    {
+                        employee_id = currentEmployeeId,
+                        attendance_date = currentDate,
+                        time_in = newTimeIn,
+                        time_out = newTimeOut,
+                        overtime_in = newOvertimeIn,
+                        overtime_out = newOvertimeOut,
+                        hours_worked = newHoursWorked,
+                        status = newStatus,
+                        overtime_hours = newOvertime,
+                        verification_method = "Manual Edit (Admin)",
+                        schedule_id = ""
+                    };
 
-                // Update in Firebase using the key
-                await firebase.Child("Attendance").Child(currentFirebaseKey).PutAsync(updatedRecord);
+                    await firebase.Child("Attendance").Child(currentFirebaseKey).PutAsync(updatedRecord);
 
-                DataUpdated = true;
-                MessageBox.Show("Attendance updated successfully!", "Success",
-                              MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DataUpdated = true;
+                    MessageBox.Show("Attendance updated successfully by admin.", "Success",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    // --- NON-ADMIN: Create request in AttendanceNotifications ---
+                    var notificationRecord = new
+                    {
+                        employee_id = currentEmployeeId,
+                        attendance_date = currentDate,
+                        time_in = newTimeIn,
+                        time_out = newTimeOut,
+                        overtime_in = newOvertimeIn,
+                        overtime_out = newOvertimeOut,
+                        hours_worked = newHoursWorked,
+                        overtime_hours = newOvertime,
+                        status = newStatus,
+                        verification_method = "Manual Edit",
+                        request_type = "Attendance Edit Request",
+                        request_status = "Pending",
+                        request_timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                        firebase_key = currentFirebaseKey,
+                        requested_by_id = SessionClass.CurrentEmployeeId,
+                        requested_by_name = SessionClass.CurrentEmployeeName
+                    };
+
+                    await firebase.Child("AttendanceNotifications").PostAsync(notificationRecord);
+
+                    DataUpdated = true;
+                    MessageBox.Show("Edit request submitted successfully and is pending admin approval.",
+                                    "Request Sent", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
 
                 this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating attendance: {ex.Message}\n\nStack Trace: {ex.StackTrace}", "Error",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error processing attendance update: {ex.Message}\n\nStack Trace: {ex.StackTrace}",
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
                 Cursor.Current = Cursors.Default;
             }
         }
+
 
         private string FormatTimeForFirebase(string timeText)
         {
