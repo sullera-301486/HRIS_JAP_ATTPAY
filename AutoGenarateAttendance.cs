@@ -14,10 +14,15 @@ namespace HRIS_JAP_ATTPAY
             "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
         );
 
+        private Dictionary<string, List<EmployeeSchedule>> employeeSchedules = new Dictionary<string, List<EmployeeSchedule>>();
+
         public async Task GenerateWeeklyAttendance(DateTime startDate)
         {
             try
             {
+                // Load employee schedules first
+                await LoadEmployeeSchedules();
+
                 // Get all active employees (excluding archived)
                 var employees = await GetActiveEmployees();
 
@@ -52,6 +57,12 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
+                // Load employee schedules if not already loaded
+                if (employeeSchedules.Count == 0)
+                {
+                    await LoadEmployeeSchedules();
+                }
+
                 if (employees == null)
                     employees = await GetActiveEmployees();
 
@@ -73,14 +84,14 @@ namespace HRIS_JAP_ATTPAY
 
                 foreach (var employee in employees)
                 {
-                    var attendanceRecord = CreateInitialAbsentRecord(employee, date);
+                    var attendanceRecord = CreateInitialAttendanceRecord(employee, date);
                     attendanceRecords.Add(attendanceRecord);
                 }
 
                 // Save to Firebase
                 await SaveAttendanceRecords(attendanceRecords);
 
-                Console.WriteLine($"Initial absent attendance for {date:yyyy-MM-dd} generated successfully for {employees.Count} employees!");
+                Console.WriteLine($"Initial attendance for {date:yyyy-MM-dd} generated successfully for {employees.Count} employees!");
             }
             catch (Exception ex)
             {
@@ -89,30 +100,164 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private object CreateInitialAbsentRecord(Employee employee, DateTime date)
+        private object CreateInitialAttendanceRecord(Employee employee, DateTime date)
         {
-            return new
+            // Check if employee has schedule for this day
+            var schedule = GetEmployeeScheduleForDay(employee.EmployeeId, date);
+
+            if (schedule == null)
             {
-                employee_id = employee.EmployeeId,
-                attendance_date = date.ToString("yyyy-MM-dd"),
-                time_in = "N/A",
-                time_out = "N/A",
-                hours_worked = "0.00",
-                overtime_hours = "0.00",
-                status = "Absent",
-                verification_method = "Pending RFID",
-                created_date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                is_generated = true,
-                is_pending = true  // Flag to indicate this record needs RFID update
-            };
+                // Employee has no schedule for this day - mark as Day Off
+                return new
+                {
+                    employee_id = employee.EmployeeId,
+                    attendance_date = date.ToString("yyyy-MM-dd"),
+                    time_in = "N/A",
+                    time_out = "N/A",
+                    hours_worked = "0.00",
+                    overtime_hours = "0.00",
+                    status = "Day Off",
+                    verification_method = "System Generated",
+                    created_date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    is_generated = true,
+                    is_pending = false,  // No pending updates for day off
+                    schedule_id = ""
+                };
+            }
+            else
+            {
+                // Employee has schedule - mark as Absent initially
+                return new
+                {
+                    employee_id = employee.EmployeeId,
+                    attendance_date = date.ToString("yyyy-MM-dd"),
+                    time_in = "N/A",
+                    time_out = "N/A",
+                    hours_worked = "0.00",
+                    overtime_hours = "0.00",
+                    status = "Absent",
+                    verification_method = "Pending RFID",
+                    created_date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    is_generated = true,
+                    is_pending = true,  // Flag to indicate this record needs RFID update
+                    schedule_id = schedule.schedule_id
+                };
+            }
         }
 
-        // Method to update attendance when RFID is tapped
+        private EmployeeSchedule GetEmployeeScheduleForDay(string employeeId, DateTime date)
+        {
+            try
+            {
+                var dayOfWeek = date.DayOfWeek.ToString();
+
+                if (employeeSchedules.ContainsKey(employeeId))
+                {
+                    var normalizedTargetDay = NormalizeDayName(dayOfWeek);
+
+                    foreach (var schedule in employeeSchedules[employeeId])
+                    {
+                        if (schedule != null && !string.IsNullOrEmpty(schedule.day_of_week))
+                        {
+                            var normalizedScheduleDay = NormalizeDayName(schedule.day_of_week);
+
+                            if (string.Equals(normalizedScheduleDay, normalizedTargetDay, StringComparison.OrdinalIgnoreCase))
+                            {
+                                return schedule;
+                            }
+                        }
+                    }
+                }
+
+                return null; // No schedule found for this day
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting schedule for employee {employeeId} on {date:yyyy-MM-dd}: {ex.Message}");
+                return null;
+            }
+        }
+
+        private string NormalizeDayName(string dayName)
+        {
+            if (string.IsNullOrEmpty(dayName))
+                return dayName;
+
+            var normalized = dayName.Trim().ToLower();
+
+            switch (normalized)
+            {
+                case "monday": case "mon": return "monday";
+                case "tuesday": case "tue": return "tuesday";
+                case "wednesday": case "wed": return "wednesday";
+                case "thursday": case "thu": return "thursday";
+                case "friday": case "fri": return "friday";
+                case "saturday": case "sat": return "saturday";
+                case "sunday": case "sun": return "sunday";
+                default: return normalized;
+            }
+        }
+
+        private async Task LoadEmployeeSchedules()
+        {
+            try
+            {
+                employeeSchedules.Clear();
+
+                var schedulesData = await firebase.Child("Work_Schedule").OnceSingleAsync<JArray>();
+                if (schedulesData == null)
+                {
+                    Console.WriteLine("No work schedule data found.");
+                    return;
+                }
+
+                foreach (var scheduleItem in schedulesData)
+                {
+                    if (scheduleItem != null && scheduleItem.HasValues)
+                    {
+                        var schedule = new EmployeeSchedule
+                        {
+                            schedule_id = scheduleItem["schedule_id"]?.ToString(),
+                            employee_id = scheduleItem["employee_id"]?.ToString(),
+                            day_of_week = scheduleItem["day_of_week"]?.ToString(),
+                            start_time = scheduleItem["start_time"]?.ToString(),
+                            end_time = scheduleItem["end_time"]?.ToString(),
+                            schedule_type = scheduleItem["schedule_type"]?.ToString()
+                        };
+
+                        if (!string.IsNullOrEmpty(schedule.employee_id))
+                        {
+                            if (!employeeSchedules.ContainsKey(schedule.employee_id))
+                            {
+                                employeeSchedules[schedule.employee_id] = new List<EmployeeSchedule>();
+                            }
+                            employeeSchedules[schedule.employee_id].Add(schedule);
+                        }
+                    }
+                }
+
+                Console.WriteLine($"Loaded schedules for {employeeSchedules.Count} employees.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading employee schedules: {ex.Message}");
+            }
+        }
+
+        // Method to update attendance when RFID is tapped - updated to check schedules
         public async Task UpdateAttendanceFromRFID(string employeeId, DateTime tapTime, bool isTimeIn)
         {
             try
             {
                 string today = DateTime.Today.ToString("yyyy-MM-dd");
+
+                // Check if employee has schedule for today
+                var schedule = GetEmployeeScheduleForDay(employeeId, DateTime.Today);
+                if (schedule == null)
+                {
+                    Console.WriteLine($"Employee {employeeId} has no schedule for today. Day off - no attendance update.");
+                    return;
+                }
 
                 // Get today's attendance records
                 var attendanceData = await firebase.Child("Attendance").OnceSingleAsync<JArray>();
@@ -126,27 +271,32 @@ namespace HRIS_JAP_ATTPAY
                     string recordEmployeeId = record["employee_id"]?.ToString();
                     string recordDate = record["attendance_date"]?.ToString();
                     bool isPending = record["is_pending"]?.ToString() == "True";
+                    string currentStatus = record["status"]?.ToString();
+
+                    // Skip if record is "Day Off"
+                    if (currentStatus == "Day Off")
+                        continue;
 
                     if (recordEmployeeId == employeeId && recordDate == today && isPending)
                     {
                         if (isTimeIn)
                         {
                             // Update time in and change status from Absent to Pending (will be calculated later)
-                            record["time_in"] = tapTime.ToString("HH:mm:ss");
+                            record["time_in"] = tapTime.ToString("yyyy-MM-dd HH:mm:ss");
                             record["status"] = "Pending Calculation";
                             record["verification_method"] = "RFID";
                         }
                         else
                         {
                             // Update time out
-                            record["time_out"] = tapTime.ToString("HH:mm:ss");
+                            record["time_out"] = tapTime.ToString("yyyy-MM-dd HH:mm:ss");
                             record["verification_method"] = "RFID";
 
                             // If both time in and time out are set, calculate hours and status
                             string timeInStr = record["time_in"]?.ToString();
                             if (!string.IsNullOrEmpty(timeInStr) && timeInStr != "N/A")
                             {
-                                CalculateAndUpdateAttendance(record, tapTime);
+                                CalculateAndUpdateAttendance(record, tapTime, schedule);
                             }
                         }
 
@@ -175,7 +325,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private void CalculateAndUpdateAttendance(JToken record, DateTime timeOut)
+        private void CalculateAndUpdateAttendance(JToken record, DateTime timeOut, EmployeeSchedule schedule)
         {
             try
             {
@@ -188,17 +338,20 @@ namespace HRIS_JAP_ATTPAY
                     TimeSpan hoursWorked = timeOut - timeIn;
                     double totalHours = Math.Round(hoursWorked.TotalHours, 2);
 
-                    // Calculate overtime (anything over 8 hours)
-                    double overtimeHours = Math.Max(0, totalHours - 8.0);
+                    // Calculate overtime (anything over scheduled hours)
+                    TimeSpan scheduledStart = ParseTimeSpan(schedule.start_time);
+                    TimeSpan scheduledEnd = ParseTimeSpan(schedule.end_time);
+                    double scheduledHours = (scheduledEnd - scheduledStart).TotalHours;
+                    double overtimeHours = Math.Max(0, totalHours - scheduledHours);
 
-                    // Calculate status
-                    string status = CalculateStatus(timeIn, timeOut);
+                    // Calculate status based on schedule
+                    string status = CalculateStatus(timeIn, timeOut, schedule);
 
                     // Update record
                     record["hours_worked"] = totalHours.ToString("0.00");
                     record["overtime_hours"] = overtimeHours.ToString("0.00");
                     record["status"] = status;
-                    record["time_out"] = timeOut.ToString("HH:mm:ss");
+                    record["time_out"] = timeOut.ToString("yyyy-MM-dd HH:mm:ss");
                 }
             }
             catch (Exception ex)
@@ -207,10 +360,22 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private string CalculateStatus(DateTime timeIn, DateTime timeOut)
+        private TimeSpan ParseTimeSpan(string timeString)
         {
-            DateTime expectedStart = timeIn.Date.AddHours(8); // 8:00 AM expected start
-            DateTime expectedEnd = timeIn.Date.AddHours(17); // 5:00 PM expected end
+            if (DateTime.TryParse(timeString, out DateTime time))
+            {
+                return time.TimeOfDay;
+            }
+            return new TimeSpan(8, 0, 0); // Default to 8:00 AM if parsing fails
+        }
+
+        private string CalculateStatus(DateTime timeIn, DateTime timeOut, EmployeeSchedule schedule)
+        {
+            TimeSpan scheduledStart = ParseTimeSpan(schedule.start_time);
+            TimeSpan scheduledEnd = ParseTimeSpan(schedule.end_time);
+
+            DateTime expectedStart = timeIn.Date.Add(scheduledStart);
+            DateTime expectedEnd = timeIn.Date.Add(scheduledEnd);
             DateTime gracePeriodEnd = expectedStart.AddMinutes(15); // 15 minutes grace period
 
             bool isLate = timeIn > gracePeriodEnd;
@@ -249,11 +414,26 @@ namespace HRIS_JAP_ATTPAY
                     var employee = new Employee
                     {
                         EmployeeId = employeeId,
+                        employee_id = employeeId,
                         FirstName = emp.Object.first_name ?? "",
+                        first_name = emp.Object.first_name ?? "",
                         MiddleName = emp.Object.middle_name ?? "",
+                        middle_name = emp.Object.middle_name ?? "",
                         LastName = emp.Object.last_name ?? "",
+                        last_name = emp.Object.last_name ?? "",
+                        full_name = emp.Object.full_name ?? "",
                         EmploymentStatus = "Active",
-                        RFIDTag = emp.Object.rfid_tag?.ToString() ?? ""
+                        RFIDTag = emp.Object.rfid_tag?.ToString() ?? "",
+                        rfid_tag = emp.Object.rfid_tag?.ToString() ?? "",
+                        email = emp.Object.email ?? "",
+                        contact = emp.Object.contact ?? "",
+                        address = emp.Object.address ?? "",
+                        date_of_birth = emp.Object.date_of_birth ?? "",
+                        gender = emp.Object.gender ?? "",
+                        marital_status = emp.Object.marital_status ?? "",
+                        nationality = emp.Object.nationality ?? "",
+                        image_url = emp.Object.image_url ?? "",
+                        created_at = emp.Object.created_at ?? ""
                     };
 
                     employees.Add(employee);
@@ -334,7 +514,7 @@ namespace HRIS_JAP_ATTPAY
                 // Save back to Firebase
                 await firebase.Child("Attendance").PutAsync(existingData);
 
-                Console.WriteLine($"Saved {records.Count} initial absent attendance records to Firebase.");
+                Console.WriteLine($"Saved {records.Count} initial attendance records to Firebase.");
             }
             catch (Exception ex)
             {
@@ -395,14 +575,13 @@ namespace HRIS_JAP_ATTPAY
         public async Task<List<DateTime>> GetMissingAttendanceDates(DateTime startDate, DateTime endDate)
         {
             var missingDates = new List<DateTime>();
-            var generator = new AttendanceGenerator();
 
             for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
             {
                 if (date.DayOfWeek == DayOfWeek.Sunday)
                     continue;
 
-                bool exists = await generator.CheckAttendanceExists(date);
+                bool exists = await CheckAttendanceExists(date);
                 if (!exists)
                 {
                     missingDates.Add(date);
@@ -411,6 +590,44 @@ namespace HRIS_JAP_ATTPAY
 
             return missingDates;
         }
+
+        // Method to get employee schedule summary
+        public async Task<Dictionary<string, string>> GetEmployeeScheduleSummary()
+        {
+            await LoadEmployeeSchedules();
+
+            var summary = new Dictionary<string, string>();
+            var employees = await GetActiveEmployees();
+
+            foreach (var employee in employees)
+            {
+                var schedules = employeeSchedules.ContainsKey(employee.EmployeeId)
+                    ? employeeSchedules[employee.EmployeeId]
+                    : new List<EmployeeSchedule>();
+
+                if (schedules.Count == 0)
+                {
+                    summary[employee.EmployeeId] = "No Schedule";
+                }
+                else
+                {
+                    var scheduleDays = schedules.Select(s => s.day_of_week).Distinct();
+                    summary[employee.EmployeeId] = string.Join(", ", scheduleDays);
+                }
+            }
+
+            return summary;
+        }
+    }
+
+    public class EmployeeSchedule
+    {
+        public string schedule_id { get; set; }
+        public string employee_id { get; set; }
+        public string day_of_week { get; set; }
+        public string start_time { get; set; }
+        public string end_time { get; set; }
+        public string schedule_type { get; set; }
     }
 
     public class Employee
@@ -421,5 +638,21 @@ namespace HRIS_JAP_ATTPAY
         public string LastName { get; set; }
         public string EmploymentStatus { get; set; }
         public string RFIDTag { get; set; }
+        public string employee_id { get; set; }
+        public string first_name { get; set; }
+        public string last_name { get; set; }
+        public string middle_name { get; set; }
+        public string full_name { get; set; }
+        public string rfid_tag { get; set; }
+        public string email { get; set; }
+        public string contact { get; set; }
+        public string department { get; set; }
+        public string address { get; set; }
+        public string date_of_birth { get; set; }
+        public string gender { get; set; }
+        public string marital_status { get; set; }
+        public string nationality { get; set; }
+        public string image_url { get; set; }
+        public string created_at { get; set; }
     }
 }

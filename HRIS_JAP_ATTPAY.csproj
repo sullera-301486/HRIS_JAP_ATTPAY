@@ -534,6 +534,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RFIDAttendanceHandler.cs" />
     <Compile Include="ScanRFID.cs">
       <SubType>Form</SubType>
     </Compile>
