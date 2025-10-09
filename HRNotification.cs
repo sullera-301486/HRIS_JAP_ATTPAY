@@ -1,108 +1,176 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Firebase.Database;
+using Firebase.Database.Query;
+using Newtonsoft.Json.Linq;
 
 namespace HRIS_JAP_ATTPAY
 {
     public partial class HRNotification : Form
     {
-        
+        private FirebaseClient firebase = new FirebaseClient(
+            "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        );
+
+        // --- prevent duplicates and allow updates/removes ---
+        private readonly HashSet<string> displayedKeys = new HashSet<string>();
+        private readonly Dictionary<string, SummaryNotificationItem> itemMap = new Dictionary<string, SummaryNotificationItem>();
+        private IDisposable hrSubscription;
+
         public HRNotification()
         {
             InitializeComponent();
             SetFont();
         }
-        
 
-        private void HRNotification_Load(object sender, EventArgs e)
+        private async void HRNotification_Load(object sender, EventArgs e)
         {
-            // Example 1 - Pending
-            var notif1 = new SummaryNotificationItem();
-            notif1.SetData(
-                "Ej Sullera’s entry for 5-28-2025 pending admin review.",
-                Properties.Resources.icon_pending
-            );
-            flowSummary.Controls.Add(notif1);
+            flowSummary.Controls.Clear();
 
-            // Declined
-            var notif2 = new SummaryNotificationItem();
-            notif2.SetData(
-                "Marcus Verzo’s attendance on 5-28-2025 declined by admin.",
-                Properties.Resources.icon_cross
-            );
-            flowSummary.Controls.Add(notif2);
+            // Ensure the form handle is created BEFORE we might try to marshal to it.
+            // This doesn't guarantee callbacks won't fire before the handle exists,
+            // so we still use SafeInvoke in the subscription below.
+            var _ = this.Handle;
 
-            // Approved
-            var notif3 = new SummaryNotificationItem();
-            notif3.SetData(
-                "Elijah Siena’s attendance on 5-22-2025 approved by admin.",
-                Properties.Resources.icon_check
-            );
-            flowSummary.Controls.Add(notif3);
+            // --- Load existing HR notifications once (initial snapshot) ---
+            var hrData = await firebase.Child("HRNotifications").OnceAsync<JObject>();
+            foreach (var item in hrData)
+            {
+                var data = item.Object;
+                string key = item.Key;
+                if (data == null) continue;
 
-            var notif4 = new SummaryNotificationItem();
-            notif4.SetData(
-                "Maria Hiwaga’s sick attendance was approved by the admin.",
-                Properties.Resources.icon_check
-            );
-            flowSummary.Controls.Add(notif4);
+                string message = data["message"]?.ToString() ?? "Notification";
+                string status = data["status"]?.ToString() ?? "Pending";
 
-            var notif5 = new SummaryNotificationItem();
-            notif5.SetData(
-                "Franz Capuno’s attendance on 5-18-2025 approved by admin.",
-                Properties.Resources.icon_check
-            );
-            flowSummary.Controls.Add(notif5);
+                AddOrUpdateNotificationToFlow(key, message, status);
+            }
 
-            var notif6 = new SummaryNotificationItem();
-            notif6.SetData(
-                "Charles Macaraig’s attendance on 5-11-2025 approved by admin.",
-                Properties.Resources.icon_check
-            );
-            flowSummary.Controls.Add(notif6);
+            // --- Subscribe to realtime updates ---
+            hrSubscription = firebase.Child("HRNotifications")
+                .AsObservable<JObject>()
+                .Subscribe(d =>
+                {
+                    string key = d.Key;
 
-            var notif7 = new SummaryNotificationItem();
-            notif7.SetData(
-                "Marcus Verzo’s attendance on 4-27-2025 declined by admin.",
-                Properties.Resources.icon_cross
-            );
-            flowSummary.Controls.Add(notif7);
+                    if (d.EventType == Firebase.Database.Streaming.FirebaseEventType.Delete)
+                    {
+                        // remove notification on delete
+                        SafeInvoke(() => RemoveNotificationFromFlow(key));
+                        return;
+                    }
 
-            var notif8 = new SummaryNotificationItem();
-            notif8.SetData(
-                "Marcus Verzo’s attendance on 4-27-2025 declined by admin.",
-                Properties.Resources.icon_cross
-            );
-            flowSummary.Controls.Add(notif8);
+                    if (d.EventType == Firebase.Database.Streaming.FirebaseEventType.InsertOrUpdate && d.Object != null)
+                    {
+                        string msg = d.Object["message"]?.ToString() ?? "Notification";
+                        string stat = d.Object["status"]?.ToString() ?? "Pending";
 
-            var notif9 = new SummaryNotificationItem();
-            notif9.SetData(
-                "Marcus Verzo’s attendance on 4-27-2025 declined by admin.",
-                Properties.Resources.icon_cross
-            );
-            flowSummary.Controls.Add(notif9);
-
-            var notif10 = new SummaryNotificationItem();
-            notif10.SetData(
-                "Marcus Verzo’s attendance on 4-27-2025 declined by admin.",
-                Properties.Resources.icon_cross
-            );
-            flowSummary.Controls.Add(notif10);
-
-            var notif11 = new SummaryNotificationItem();
-            notif11.SetData(
-                "Marcus Verzo’s attendance on 4-27-2025 declined by admin.",
-                Properties.Resources.icon_cross
-            );
-            flowSummary.Controls.Add(notif11);
+                        SafeInvoke(() => AddOrUpdateNotificationToFlow(key, msg, stat));
+                    }
+                });
         }
-        
+
+        // Ensure we clean up subscription to avoid callbacks after dispose
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            try { hrSubscription?.Dispose(); } catch { }
+            base.OnFormClosing(e);
+        }
+
+        // --- Safe invoker: won't call Invoke if handle isn't ready; queues for HandleCreated otherwise ---
+        private void SafeInvoke(Action action)
+        {
+            if (action == null) return;
+
+            // If handle is ready and control not disposed -> use BeginInvoke if required
+            if (this.IsHandleCreated && !this.IsDisposed && !this.Disposing)
+            {
+                if (this.InvokeRequired)
+                    this.BeginInvoke(action);
+                else
+                    action();
+                return;
+            }
+
+            // If handle not created yet, attach a one-time handler that will execute action when created
+            void Handler(object s, EventArgs e)
+            {
+                this.HandleCreated -= Handler;
+                if (!this.IsDisposed && !this.Disposing)
+                {
+                    try { this.BeginInvoke(action); } catch { /* ignore if still invalid */ }
+                }
+            }
+
+            this.HandleCreated += Handler;
+        }
+
+        // --- Add new or update existing notification in the flow panel ---
+        private void AddOrUpdateNotificationToFlow(string key, string message, string status)
+        {
+            if (string.IsNullOrEmpty(key))
+                key = Guid.NewGuid().ToString();
+
+            // update existing
+            if (displayedKeys.Contains(key))
+            {
+                if (itemMap.TryGetValue(key, out SummaryNotificationItem existing))
+                {
+                    Image icon = IconForStatus(status);
+                    existing.SetData(message, icon);
+
+                    // ✅ Move updated notification to the top visually
+                    flowSummary.Controls.SetChildIndex(existing, 0);
+                }
+                return;
+            }
+
+            // create new UI item
+            var notif = new SummaryNotificationItem();
+            notif.Tag = key;
+            Image iconNew = IconForStatus(status);
+            notif.SetData(message, iconNew);
+
+            // ✅ Add to top instead of bottom
+            flowSummary.Controls.Add(notif);
+            flowSummary.Controls.SetChildIndex(notif, 0);
+
+            displayedKeys.Add(key);
+            itemMap[key] = notif;
+        }
+
+
+        // --- Remove notification by key ---
+        private void RemoveNotificationFromFlow(string key)
+        {
+            if (string.IsNullOrEmpty(key)) return;
+
+            if (itemMap.TryGetValue(key, out SummaryNotificationItem item))
+            {
+                flowSummary.Controls.Remove(item);
+                try { item.Dispose(); } catch { }
+                itemMap.Remove(key);
+                displayedKeys.Remove(key);
+            }
+        }
+
+        // --- Pick icon for status ---
+        private Image IconForStatus(string status)
+        {
+            switch (status)
+            {
+                case "Approved":
+                    return Properties.Resources.icon_check;
+                case "Declined":
+                    return Properties.Resources.icon_cross;
+                default:
+                    return Properties.Resources.icon_pending;
+            }
+        }
+
         private void SetFont()
         {
             labelNotification.Font = AttributesClass.GetFont("Roboto-Regular", 26f);
@@ -111,6 +179,42 @@ namespace HRIS_JAP_ATTPAY
         private void XpictureBox_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private async void buttonClearNotif_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Snapshot all HR notifications from Firebase
+                var hrData = await firebase.Child("HRNotifications").OnceAsync<JObject>();
+
+                // Loop through each and remove if NOT Pending
+                foreach (var item in hrData)
+                {
+                    var data = item.Object;
+                    if (data == null) continue;
+
+                    string key = item.Key;
+                    string status = data["status"]?.ToString() ?? "Pending";
+
+                    if (!status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // ✅ Delete from Firebase
+                        await firebase.Child("HRNotifications").Child(key).DeleteAsync();
+
+                        // ✅ Remove from UI immediately (if displayed)
+                        SafeInvoke(() => RemoveNotificationFromFlow(key));
+                    }
+                }
+
+                MessageBox.Show("Cleared all approved/declined notifications successfully!",
+                                "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error clearing notifications: " + ex.Message,
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
     }

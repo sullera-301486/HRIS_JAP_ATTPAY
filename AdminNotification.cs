@@ -104,14 +104,22 @@ namespace HRIS_JAP_ATTPAY
                         firebaseKey: notif.Key
                     );
 
+                    // ✅ ADD HR NOTIFICATION FOR PENDING LEAVE
+                    await firebase.Child("HRNotifications").Child(notif.Key).PutAsync(new
+                    {
+                        message = $"{notif.Employee} filed a leave request ({notif.LeaveType}) pending admin review.",
+                        status = "Pending",
+                        createdAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                    });
+
                     leaveNotif.ApproveClicked += async (s, ev) =>
                     {
-                        await Task.Delay(300);
+                        await ApproveLeaveRequest(notif.Key, notif.Employee, notif.LeaveType);
                         await LoadNotifications();
                     };
                     leaveNotif.DeclineClicked += async (s, ev) =>
                     {
-                        await Task.Delay(300);
+                        await DeclineLeaveRequest(notif.Key, notif.Employee, notif.LeaveType);
                         await LoadNotifications();
                     };
 
@@ -122,9 +130,8 @@ namespace HRIS_JAP_ATTPAY
                     var attNotif = new AttendanceNotificationItems();
                     DateTime parsedDate = DateTime.TryParse(notif.AttendanceDate, out DateTime tempDate)
                         ? tempDate : DateTime.Now;
-                    DateTime createdAt = SafeParseDate(notif.CreatedAt); // ⏰ Use request_timestamp for time ago
+                    DateTime createdAt = SafeParseDate(notif.CreatedAt);
 
-                    // ✅ Pass createdAt to SetData so "time ago" displays correctly
                     attNotif.SetData(
                         notif.Title,
                         notif.SubmittedBy,
@@ -138,14 +145,20 @@ namespace HRIS_JAP_ATTPAY
                         createdAt
                     );
 
-                    // 🔹 APPROVE BUTTON ACTION
+                    // ✅ ADD HR NOTIFICATION FOR PENDING ATTENDANCE
+                    await firebase.Child("HRNotifications").Child(notif.Key).PutAsync(new
+                    {
+                        message = $"{notif.SubmittedBy} has a pending attendance edit request for {notif.AttendanceDate}.",
+                        status = "Pending",
+                        createdAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                    });
+
                     attNotif.ApproveClicked += async (s, ev) =>
                     {
                         await ApproveAttendanceRequest(notif.Key);
                         await LoadNotifications();
                     };
 
-                    // 🔹 DECLINE BUTTON ACTION
                     attNotif.DeclineClicked += async (s, ev) =>
                     {
                         await DeclineAttendanceRequest(notif.Key);
@@ -169,7 +182,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // ✅ Helper: Safe date parse
         private DateTime SafeParseDate(string dateStr)
         {
             if (DateTime.TryParse(dateStr, out DateTime result))
@@ -178,12 +190,10 @@ namespace HRIS_JAP_ATTPAY
         }
 
         // --- ATTENDANCE APPROVE / DECLINE ---
-
         private async Task ApproveAttendanceRequest(string key)
         {
             try
             {
-                // 🔹 Step 1: Retrieve notification data
                 var notif = await firebase.Child("AttendanceNotifications").Child(key).OnceSingleAsync<JObject>();
                 if (notif == null)
                 {
@@ -191,43 +201,19 @@ namespace HRIS_JAP_ATTPAY
                     return;
                 }
 
-                // Extract all fields first
-                string employeeId = notif["employee_id"]?.ToString() ?? "Unknown";
-                string attendanceDate = notif["attendance_date"]?.ToString() ?? "Unknown";
-                string timeIn = notif["time_in"]?.ToString() ?? "N/A";
-                string timeOut = notif["time_out"]?.ToString() ?? "N/A";
-                string overtimeIn = notif["overtime_in"]?.ToString() ?? "N/A";
-                string overtimeOut = notif["overtime_out"]?.ToString() ?? "N/A";
-                string hoursWorked = notif["hours_worked"]?.ToString() ?? "0.00";
-                string overtimeHours = notif["overtime_hours"]?.ToString() ?? "0.00";
-                string status = notif["status"]?.ToString() ?? "Approved";
-                string firebaseKey = notif["firebase_key"]?.ToString() ?? "";
+                string employeeName = notif["requested_by_name"]?.ToString() ?? "Unknown";
+                string date = notif["attendance_date"]?.ToString() ?? "Unknown";
 
-                // 🔹 Step 2: Update the Attendance table
-                if (!string.IsNullOrEmpty(firebaseKey))
+                // ✅ Notify HR
+                await firebase.Child("HRNotifications").Child(key).PutAsync(new
                 {
-                    var updatedRecord = new
-                    {
-                        employee_id = employeeId,
-                        attendance_date = attendanceDate,
-                        time_in = timeIn,
-                        time_out = timeOut,
-                        overtime_in = overtimeIn,
-                        overtime_out = overtimeOut,
-                        hours_worked = hoursWorked,
-                        overtime_hours = overtimeHours,
-                        status = status,
-                        verification_method = "Approved Manual Edit (Admin)"
-                    };
+                    message = $"{employeeName}'s attendance on {date} approved by admin.",
+                    status = "Approved",
+                    createdAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                });
 
-                    await firebase.Child("Attendance").Child(firebaseKey).PutAsync(updatedRecord);
-                }
-
-                // 🔹 Step 3: Delete the notification after updating attendance
                 await firebase.Child("AttendanceNotifications").Child(key).DeleteAsync();
-
-                // 🔹 Step 4: Refresh UI
-                MessageBox.Show("Attendance request approved and removed successfully!");
+                MessageBox.Show("Attendance request approved!");
                 await LoadNotifications();
             }
             catch (Exception ex)
@@ -240,11 +226,22 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // 🔹 Directly delete the declined notification
-                await firebase.Child("AttendanceNotifications").Child(key).DeleteAsync();
+                var notif = await firebase.Child("AttendanceNotifications").Child(key).OnceSingleAsync<JObject>();
+                if (notif == null) return;
 
-                // 🔹 Refresh UI after deletion
-                MessageBox.Show("Attendance request declined and removed successfully!");
+                string employeeName = notif["requested_by_name"]?.ToString() ?? "Unknown";
+                string date = notif["attendance_date"]?.ToString() ?? "Unknown";
+
+                // ✅ Notify HR
+                await firebase.Child("HRNotifications").Child(key).PutAsync(new
+                {
+                    message = $"{employeeName}'s attendance on {date} was declined by admin.",
+                    status = "Declined",
+                    createdAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                });
+
+                await firebase.Child("AttendanceNotifications").Child(key).DeleteAsync();
+                MessageBox.Show("Attendance request declined!");
                 await LoadNotifications();
             }
             catch (Exception ex)
@@ -253,6 +250,32 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
+        // --- LEAVE APPROVE / DECLINE ---
+        private async Task ApproveLeaveRequest(string key, string employee, string leaveType)
+        {
+            await firebase.Child("HRNotifications").Child(key).PutAsync(new
+            {
+                message = $"{employee}'s {leaveType} leave request approved by admin.",
+                status = "Approved",
+                createdAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            });
+
+            await firebase.Child("LeaveNotifications").Child(key).DeleteAsync();
+            MessageBox.Show("Leave request approved!");
+        }
+
+        private async Task DeclineLeaveRequest(string key, string employee, string leaveType)
+        {
+            await firebase.Child("HRNotifications").Child(key).PutAsync(new
+            {
+                message = $"{employee}'s {leaveType} leave request declined by admin.",
+                status = "Declined",
+                createdAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            });
+
+            await firebase.Child("LeaveNotifications").Child(key).DeleteAsync();
+            MessageBox.Show("Leave request declined!");
+        }
 
         private void SetFont()
         {
@@ -264,7 +287,6 @@ namespace HRIS_JAP_ATTPAY
             this.Close();
         }
 
-        // --- Internal Notification Data Structure ---
         private class NotificationBase
         {
             public string Key { get; set; }

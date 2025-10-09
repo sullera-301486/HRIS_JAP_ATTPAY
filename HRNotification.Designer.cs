@@ -33,6 +33,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.flowSummary = new System.Windows.Forms.FlowLayoutPanel();
+            this.buttonClearNotif = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -65,20 +66,21 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.White;
+            this.panel1.Controls.Add(this.buttonClearNotif);
             this.panel1.Controls.Add(this.labelNotification);
             this.panel1.Controls.Add(this.XpictureBox);
             this.panel1.Location = new System.Drawing.Point(0, -2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(541, 73);
+            this.panel1.Size = new System.Drawing.Size(541, 94);
             this.panel1.TabIndex = 2;
             // 
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.White;
             this.panel2.Controls.Add(this.flowSummary);
-            this.panel2.Location = new System.Drawing.Point(0, 73);
+            this.panel2.Location = new System.Drawing.Point(0, 94);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(541, 342);
+            this.panel2.Size = new System.Drawing.Size(541, 365);
             this.panel2.TabIndex = 3;
             // 
             // flowSummary
@@ -86,15 +88,29 @@
             this.flowSummary.AutoScroll = true;
             this.flowSummary.Location = new System.Drawing.Point(0, 0);
             this.flowSummary.Name = "flowSummary";
-            this.flowSummary.Size = new System.Drawing.Size(541, 342);
+            this.flowSummary.Size = new System.Drawing.Size(541, 365);
             this.flowSummary.TabIndex = 0;
+            // 
+            // buttonClearNotif
+            // 
+            this.buttonClearNotif.BackColor = System.Drawing.Color.Red;
+            this.buttonClearNotif.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonClearNotif.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonClearNotif.ForeColor = System.Drawing.Color.White;
+            this.buttonClearNotif.Location = new System.Drawing.Point(450, 60);
+            this.buttonClearNotif.Name = "buttonClearNotif";
+            this.buttonClearNotif.Size = new System.Drawing.Size(82, 27);
+            this.buttonClearNotif.TabIndex = 2;
+            this.buttonClearNotif.Text = "Clear";
+            this.buttonClearNotif.UseVisualStyleBackColor = false;
+            this.buttonClearNotif.Click += new System.EventHandler(this.buttonClearNotif_Click);
             // 
             // HRNotification
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(540, 416);
+            this.ClientSize = new System.Drawing.Size(540, 459);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -118,5 +134,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.FlowLayoutPanel flowSummary;
+        private System.Windows.Forms.Button buttonClearNotif;
     }
 }
