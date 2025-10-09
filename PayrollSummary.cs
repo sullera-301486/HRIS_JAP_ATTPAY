@@ -23,11 +23,7 @@ namespace HRIS_JAP_ATTPAY
         // Data dictionaries
         private Dictionary<string, dynamic> employeeDetails = new Dictionary<string, dynamic>();
         private Dictionary<string, Dictionary<string, string>> employmentInfo = new Dictionary<string, Dictionary<string, string>>();
-        private Dictionary<string, Dictionary<string, string>> payrollData = new Dictionary<string, Dictionary<string, string>>();
-        private Dictionary<string, Dictionary<string, string>> payrollSummaryData = new Dictionary<string, Dictionary<string, string>>();
-        private Dictionary<string, Dictionary<string, string>> govDeductions = new Dictionary<string, Dictionary<string, string>>();
-        private Dictionary<string, Dictionary<string, string>> employeeDeductions = new Dictionary<string, Dictionary<string, string>>();
-        private Dictionary<string, Dictionary<string, string>> payrollEarnings = new Dictionary<string, Dictionary<string, string>>();
+        private Dictionary<string, Dictionary<string, string>> leaveCredits = new Dictionary<string, Dictionary<string, string>>();
         private List<Dictionary<string, string>> attendanceRecords = new List<Dictionary<string, string>>();
         private List<Dictionary<string, string>> employeeLoans = new List<Dictionary<string, string>>();
 
@@ -36,8 +32,11 @@ namespace HRIS_JAP_ATTPAY
 
         // Constants for validation
         private const decimal MINIMUM_DAILY_RATE = 500m;
-        private const decimal MINIMUM_WORK_MINUTES = 30m;
         private const decimal MAX_DEDUCTION_PERCENTAGE = 0.4m;
+
+        // Date coverage
+        private DateTime cutoffStartDate = new DateTime(2025, 9, 1);
+        private DateTime cutoffEndDate = new DateTime(2025, 9, 15);
 
         public PayrollSummary(string employeeId, string period = null)
         {
@@ -46,240 +45,14 @@ namespace HRIS_JAP_ATTPAY
             InitializeComponent();
             setFont();
 
-            this.Load += async (sender, e) => await LoadAndUpdatePayrollDataAsync();
+            this.Load += async (sender, e) => await LoadPayrollDataAsync();
         }
 
         public async void SetEmployeeId(string employeeId)
         {
             currentEmployeeId = employeeId;
-            await LoadAndUpdatePayrollDataAsync();
-        }
-
-        private async Task LoadAndUpdatePayrollDataAsync()
-        {
             await LoadPayrollDataAsync();
-
-            if (ExportData != null)
-            {
-                await UpdatePayrollDataAsync(currentEmployeeId, ExportData);
-            }
         }
-
-        // Simplified JSON parsing method - READ ONLY for EmployeeLoans
-        private List<Dictionary<string, string>> ParseFirebaseArrayStructure(string rawJson)
-        {
-            var records = new List<Dictionary<string, string>>();
-
-            try
-            {
-                if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null") return records;
-
-                var jArray = JArray.Parse(rawJson);
-
-                foreach (var item in jArray)
-                {
-                    if (item.Type == JTokenType.Null) continue;
-
-                    if (item.Type == JTokenType.Object)
-                    {
-                        var record = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                        foreach (var prop in item.Children<JProperty>())
-                        {
-                            record[prop.Name] = prop.Value?.ToString() ?? "";
-                        }
-                        if (record.Count > 0) records.Add(record);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Firebase array parsing error: " + ex.Message);
-            }
-
-            return records;
-        }
-
-        // READ-ONLY: Load EmployeeLoans without modifying Firebase structure
-        private async Task LoadEmployeeLoansDirectly()
-        {
-            try
-            {
-                employeeLoans.Clear();
-
-                var loansData = await firebase.Child("EmployeeLoans").OnceAsJsonAsync();
-                string rawJson = loansData?.ToString() ?? "";
-
-                if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null") return;
-
-                // Use parser but DO NOT modify the original Firebase structure
-                var records = ParseFirebaseArrayStructure(rawJson);
-
-                foreach (var record in records)
-                {
-                    if (record != null && record.Count > 0)
-                    {
-                        // Create read-only copy for calculations only
-                        var loanCopy = new Dictionary<string, string>(record);
-                        employeeLoans.Add(loanCopy);
-                    }
-                }
-
-                Console.WriteLine($"Total loans loaded (READ-ONLY): {employeeLoans.Count}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading EmployeeLoans (READ-ONLY): {ex.Message}");
-            }
-        }
-
-        // READ-ONLY: Load attendance data
-        private async Task LoadAttendanceDataWithMixedFormats()
-        {
-            try
-            {
-                attendanceRecords.Clear();
-
-                var attendanceData = await firebase.Child("Attendance").OnceAsJsonAsync();
-                string rawJson = attendanceData?.ToString() ?? "";
-
-                if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null") return;
-
-                var records = ParseFirebaseArrayStructure(rawJson);
-
-                foreach (var record in records)
-                {
-                    if (record != null && record.Count > 0)
-                    {
-                        var normalizedRecord = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                        foreach (var kvp in record)
-                        {
-                            normalizedRecord[kvp.Key.ToLower()] = kvp.Value;
-                        }
-
-                        if (IsValidAttendanceRecord(normalizedRecord))
-                        {
-                            attendanceRecords.Add(normalizedRecord);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading attendance data: {ex.Message}");
-            }
-        }
-
-        // READ-ONLY: Load employment info
-        private async Task LoadEmploymentInfoWithFirebaseStructure()
-        {
-            try
-            {
-                employmentInfo.Clear();
-
-                var employmentData = await firebase.Child("EmploymentInfo").OnceAsJsonAsync();
-                string rawJson = employmentData?.ToString() ?? "";
-
-                if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null") return;
-
-                var records = ParseFirebaseArrayStructure(rawJson);
-
-                foreach (var record in records)
-                {
-                    if (record != null && record.Count > 0)
-                    {
-                        string employeeId = GetDictionaryValue(record, "employee_id", "");
-                        if (!string.IsNullOrEmpty(employeeId))
-                        {
-                            employmentInfo[employeeId] = record;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading EmploymentInfo: {ex.Message}");
-            }
-        }
-
-        private bool IsValidAttendanceRecord(Dictionary<string, string> record)
-        {
-            string attendanceDate = GetDictionaryValue(record, "attendancedate", "") ??
-                                   GetDictionaryValue(record, "attendance_date", "");
-
-            if (attendanceDate.Contains("0001-01-01") || string.IsNullOrEmpty(attendanceDate))
-                return false;
-
-            string employeeId = GetDictionaryValue(record, "employeeid", "") ??
-                               GetDictionaryValue(record, "employee_id", "");
-
-            return !string.IsNullOrEmpty(employeeId);
-        }
-
-        private (int fullDays, int halfDays) CalculateWorkDaysInPeriod(DateTime startDate, DateTime endDate)
-        {
-            int fullDays = 0;
-            int halfDays = 0;
-
-            for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
-            {
-                if (date.DayOfWeek == DayOfWeek.Saturday)
-                {
-                    halfDays++;
-                }
-                else if (date.DayOfWeek != DayOfWeek.Sunday)
-                {
-                    fullDays++;
-                }
-            }
-
-            return (fullDays, halfDays);
-        }
-
-        #region Government Contributions & Tax Calculations
-        private decimal CalculatePhilHealthContribution(decimal monthlySalary)
-        {
-            decimal employeeShareRate = 0.0275m;
-            decimal contribution = monthlySalary * employeeShareRate;
-
-            if (contribution < 200m) contribution = 200m;
-            if (contribution > 400m) contribution = 400m;
-
-            return Math.Round(contribution / 2, 2);
-        }
-
-        private decimal CalculatePagibigContribution(decimal monthlySalary)
-        {
-            decimal rate = monthlySalary > 1500m ? 0.02m : 0.01m;
-            decimal contribution = monthlySalary * rate;
-            return Math.Round(Math.Min(contribution, 100m) / 2, 2);
-        }
-
-        private decimal CalculateWithholdingTax(decimal monthlySalary)
-        {
-            decimal semiMonthlySalary = monthlySalary / 2;
-
-            if (semiMonthlySalary <= 10417m) return 0;
-            if (semiMonthlySalary <= 16666m) return (semiMonthlySalary - 10417m) * 0.15m;
-            if (semiMonthlySalary <= 33332m) return 937.50m + (semiMonthlySalary - 16666m) * 0.20m;
-            if (semiMonthlySalary <= 83332m) return 4270.50m + (semiMonthlySalary - 33332m) * 0.25m;
-            if (semiMonthlySalary <= 333332m) return 16770.50m + (semiMonthlySalary - 83332m) * 0.30m;
-            return 91770.50m + (semiMonthlySalary - 333332m) * 0.35m;
-        }
-
-        private decimal CalculateOvertimePay(decimal dailyRate, decimal overtimeHours)
-        {
-            decimal hourlyRate = dailyRate / 8m;
-            decimal overtimeRate = hourlyRate * 1.25m;
-            return Math.Round(overtimeHours * overtimeRate, 2);
-        }
-
-        private decimal CalculateOvertimeMinutesPay(decimal dailyRate, decimal overtimeMinutes)
-        {
-            decimal hourlyRate = dailyRate / 8m;
-            decimal minuteRate = (hourlyRate / 60m) * 1.25m;
-            return Math.Round(overtimeMinutes * minuteRate, 2);
-        }
-        #endregion
 
         // Main payroll data loading method
         private async Task LoadPayrollDataAsync()
@@ -289,28 +62,16 @@ namespace HRIS_JAP_ATTPAY
                 // Clear previous data
                 employeeDetails.Clear();
                 employmentInfo.Clear();
-                payrollData.Clear();
-                payrollSummaryData.Clear();
-                govDeductions.Clear();
-                employeeDeductions.Clear();
-                payrollEarnings.Clear();
                 attendanceRecords.Clear();
                 employeeLoans.Clear();
+                leaveCredits.Clear();
 
-                // Load EmployeeDetails
-                var empDetails = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
-                foreach (var e in empDetails)
-                {
-                    if (e.Object != null)
-                    {
-                        employeeDetails[e.Key] = e.Object;
-                    }
-                }
-
-                // Load other data
-                await LoadEmploymentInfoWithFirebaseStructure();
-                await LoadEmployeeLoansDirectly();
-                await LoadAttendanceDataWithMixedFormats();
+                // Load all required data
+                await LoadEmployeeDetails();
+                await LoadEmploymentInfo();
+                await LoadEmployeeLoans();
+                await LoadAttendanceData();
+                await LoadLeaveCredits();
 
                 // Basic validation
                 if (string.IsNullOrEmpty(currentEmployeeId) || !employeeDetails.ContainsKey(currentEmployeeId))
@@ -331,12 +92,16 @@ namespace HRIS_JAP_ATTPAY
                 labelDepartmentInput.Text = GetSafeValue(employment, "department") ?? "Not Specified";
                 labelPositionInput.Text = GetSafeValue(employment, "position") ?? "Not Specified";
 
+                // Set date covered
+                labelDateCoveredInput.Text = $"{cutoffStartDate:MMM dd, yyyy} - {cutoffEndDate:MMM dd, yyyy}";
+
                 // Calculate daily rate
                 decimal dailyRate = CalculateDailyRate(employment);
                 labelDailyRateInput.Text = dailyRate.ToString("0.00");
 
-                // Calculate work days
-                int requiredDays = 22; // Default
+                // Calculate work days for the period
+                var workDays = CalculateWorkDaysInPeriod(cutoffStartDate, cutoffEndDate);
+                int requiredDays = workDays.fullDays + workDays.halfDays;
                 labelDaysInput.Text = requiredDays.ToString();
 
                 int daysWorked = CalculateDaysWorked(currentEmployeeId);
@@ -346,31 +111,47 @@ namespace HRIS_JAP_ATTPAY
                 decimal totalSalary = dailyRate * requiredDays;
                 labelSalaryInput.Text = totalSalary.ToString("0.00");
 
+                // Calculate basic pay
                 decimal basicPay = dailyRate * daysWorked;
                 labelBasicPayAmountBaseInput.Text = basicPay.ToString("0.00");
                 labelBasicPayAmountCreditInput.Text = basicPay.ToString("0.00");
 
                 // Calculate overtime
-                decimal totalOvertimeHours = CalculateOvertimeForEmployee(currentEmployeeId);
+                var overtimeData = CalculateOvertimeForEmployee(currentEmployeeId);
+                decimal totalOvertimeHours = overtimeData.totalHours;
+                decimal totalOvertimeMinutes = overtimeData.totalMinutes;
+
+                // Calculate overtime rates
+                decimal overtimeHourlyRate = dailyRate / 8m;
+                decimal overtimeMinuteRate = overtimeHourlyRate / 60m;
+
+                // Calculate overtime pay
+                decimal overtimePayHours = totalOvertimeHours * overtimeHourlyRate * 1.25m; // 25% premium
+                decimal overtimePayMinutes = totalOvertimeMinutes * overtimeMinuteRate * 1.25m;
+                decimal totalOvertimePay = overtimePayHours + overtimePayMinutes;
+
+                // Display overtime calculations
                 labelOvertimeInput.Text = totalOvertimeHours.ToString("0.00");
-                decimal overtimePay = CalculateOvertimePay(dailyRate, totalOvertimeHours);
-                labelOvertimePerHourAmountCreditInput.Text = overtimePay.ToString("0.00");
+                labelOvertimePerHourAmountBaseInput.Text = totalOvertimeHours.ToString("0.00");
+                labelOvertimePerHourAmountCreditInput.Text = overtimePayHours.ToString("0.00");
+                labelOvertimePerMinuteAmountBaseInput.Text = totalOvertimeMinutes.ToString("0.00");
+                labelOvertimePerMinuteAmountCreditInput.Text = overtimePayMinutes.ToString("0.00");
 
-                // Set earnings (simplified - you can load from Firebase if needed)
-                decimal commission = 0m, communication = 0m, foodAllowance = 0m, gasAllowance = 0m, gondola = 0m, incentives = 0m;
+                // Load and display earnings from existing payroll data
+                var earnings = await LoadEarningsFromPayroll(currentEmployeeId);
 
-                labelCommissionAmountBaseInput.Text = commission.ToString("0.00");
-                labelCommissionAmountCreditInput.Text = commission.ToString("0.00");
-                labelCommunicationAmountBaseInput.Text = communication.ToString("0.00");
-                labelCommunicationAmountCreditInput.Text = communication.ToString("0.00");
-                labelFoodAllowanceAmountBaseInput.Text = foodAllowance.ToString("0.00");
-                labelFoodAllowanceAmountCreditInput.Text = foodAllowance.ToString("0.00");
-                labelGasAllowanceAmountBaseInput.Text = gasAllowance.ToString("0.00");
-                labelGasAllowanceAmountCreditInput.Text = gasAllowance.ToString("0.00");
-                labelGondolaAmountBaseInput.Text = gondola.ToString("0.00");
-                labelGondolaAmountCreditInput.Text = gondola.ToString("0.00");
-                labelIncentivesAmountBaseInput.Text = incentives.ToString("0.00");
-                labelIncentivesAmountCreditInput.Text = incentives.ToString("0.00");
+                labelCommissionAmountBaseInput.Text = earnings.Commission.ToString("0.00");
+                labelCommissionAmountCreditInput.Text = earnings.Commission.ToString("0.00");
+                labelCommunicationAmountBaseInput.Text = earnings.Communication.ToString("0.00");
+                labelCommunicationAmountCreditInput.Text = earnings.Communication.ToString("0.00");
+                labelFoodAllowanceAmountBaseInput.Text = earnings.FoodAllowance.ToString("0.00");
+                labelFoodAllowanceAmountCreditInput.Text = earnings.FoodAllowance.ToString("0.00");
+                labelGasAllowanceAmountBaseInput.Text = earnings.GasAllowance.ToString("0.00");
+                labelGasAllowanceAmountCreditInput.Text = earnings.GasAllowance.ToString("0.00");
+                labelGondolaAmountBaseInput.Text = earnings.Gondola.ToString("0.00");
+                labelGondolaAmountCreditInput.Text = earnings.Gondola.ToString("0.00");
+                labelIncentivesAmountBaseInput.Text = earnings.Incentives.ToString("0.00");
+                labelIncentivesAmountCreditInput.Text = earnings.Incentives.ToString("0.00");
 
                 // Calculate government contributions
                 decimal monthlySalary = dailyRate * requiredDays * 2;
@@ -385,31 +166,35 @@ namespace HRIS_JAP_ATTPAY
                 labelPagIbigAmountDebitInput.Text = pagibig.ToString("0.00");
                 labelWithTaxAmountDebitInput.Text = withholdingTax.ToString("0.00");
 
-                // Calculate loan deductions (READ-ONLY from EmployeeLoans)
-                var loanDeductions = CalculateLoanDeductionsFromExistingValues(currentEmployeeId);
+                // Calculate loan deductions using bi_monthly_amortization
+                var loanDeductions = CalculateLoanDeductions(currentEmployeeId);
                 labelSSSLoanAmountDebitInput.Text = loanDeductions.sssLoan.ToString("0.00");
                 labelPagIbigLoanAmountDebitInput.Text = loanDeductions.pagibigLoan.ToString("0.00");
                 labelCarLoanAmountDebitInput.Text = loanDeductions.carLoan.ToString("0.00");
                 labelHousingLoanAmountDebitInput.Text = loanDeductions.housingLoan.ToString("0.00");
                 labelCoopLoanAmountDebitInput.Text = loanDeductions.coopLoan.ToString("0.00");
 
-                // Other deductions
-                decimal cashAdvance = 0m, coopContribution = 0m, otherDeductions = 0m;
-                labelCashAdvanceAmountDebitInput.Text = cashAdvance.ToString("0.00");
-                labelCoopContriAmountDebitInput.Text = coopContribution.ToString("0.00");
-                labelOthersAmountDebitInput.Text = otherDeductions.ToString("0.00");
+                // Load and display other deductions from existing payroll data
+                var deductions = await LoadDeductionsFromPayroll(currentEmployeeId);
+                labelCashAdvanceAmountDebitInput.Text = deductions.CashAdvance.ToString("0.00");
+                labelCoopContriAmountDebitInput.Text = deductions.CoopContribution.ToString("0.00");
+                labelOthersAmountDebitInput.Text = deductions.OtherDeductions.ToString("0.00");
 
-                // Calculate gross pay
-                decimal grossPay = basicPay + overtimePay + commission + communication + foodAllowance + gasAllowance + gondola + incentives;
+                // Update leave credits display
+                UpdateLeaveCreditsDisplay(currentEmployeeId);
+
+                // Calculate gross pay (sum of all earnings)
+                decimal grossPay = basicPay + totalOvertimePay + earnings.Commission + earnings.Communication +
+                                 earnings.FoodAllowance + earnings.GasAllowance + earnings.Gondola + earnings.Incentives;
                 labelGrossPayInput.Text = grossPay.ToString("0.00");
 
                 // Calculate total deductions
                 decimal totalDeductions = sss + philhealth + pagibig + withholdingTax +
                                          loanDeductions.sssLoan + loanDeductions.pagibigLoan + loanDeductions.carLoan +
-                                         loanDeductions.housingLoan + loanDeductions.coopLoan + cashAdvance +
-                                         coopContribution + otherDeductions;
+                                         loanDeductions.housingLoan + loanDeductions.coopLoan + deductions.CashAdvance +
+                                         deductions.CoopContribution + deductions.OtherDeductions;
 
-                totalDeductions = ValidateDeductions(totalDeductions, grossPay, monthlySalary);
+                totalDeductions = ValidateDeductions(totalDeductions, grossPay);
                 labelDeductionsInput.Text = totalDeductions.ToString("0.00");
 
                 // Calculate net pay
@@ -423,20 +208,20 @@ namespace HRIS_JAP_ATTPAY
                     EmployeeName = labelNameInput.Text,
                     Department = labelDepartmentInput.Text,
                     Position = labelPositionInput.Text,
-                    DateCovered = "Current Period",
+                    DateCovered = labelDateCoveredInput.Text,
                     Days = requiredDays.ToString(),
                     DaysPresent = daysWorked.ToString(),
                     DailyRate = dailyRate.ToString("0.00"),
                     Salary = totalSalary.ToString("0.00"),
                     Overtime = totalOvertimeHours.ToString("0.00"),
                     BasicPay = basicPay.ToString("0.00"),
-                    OvertimePerHour = overtimePay.ToString("0.00"),
-                    Incentives = incentives.ToString("0.00"),
-                    Commission = commission.ToString("0.00"),
-                    FoodAllowance = foodAllowance.ToString("0.00"),
-                    Communication = communication.ToString("0.00"),
-                    GasAllowance = gasAllowance.ToString("0.00"),
-                    Gondola = gondola.ToString("0.00"),
+                    OvertimePerHour = totalOvertimePay.ToString("0.00"),
+                    Incentives = earnings.Incentives.ToString("0.00"),
+                    Commission = earnings.Commission.ToString("0.00"),
+                    FoodAllowance = earnings.FoodAllowance.ToString("0.00"),
+                    Communication = earnings.Communication.ToString("0.00"),
+                    GasAllowance = earnings.GasAllowance.ToString("0.00"),
+                    Gondola = earnings.Gondola.ToString("0.00"),
                     GrossPay = grossPay.ToString("0.00"),
                     WithholdingTax = withholdingTax.ToString("0.00"),
                     SSS = sss.ToString("0.00"),
@@ -446,19 +231,356 @@ namespace HRIS_JAP_ATTPAY
                     PagIbigLoan = loanDeductions.pagibigLoan.ToString("0.00"),
                     CarLoan = loanDeductions.carLoan.ToString("0.00"),
                     HousingLoan = loanDeductions.housingLoan.ToString("0.00"),
-                    CashAdvance = cashAdvance.ToString("0.00"),
+                    CashAdvance = deductions.CashAdvance.ToString("0.00"),
                     CoopLoan = loanDeductions.coopLoan.ToString("0.00"),
-                    CoopContribution = coopContribution.ToString("0.00"),
-                    Others = otherDeductions.ToString("0.00"),
+                    CoopContribution = deductions.CoopContribution.ToString("0.00"),
+                    Others = deductions.OtherDeductions.ToString("0.00"),
                     TotalDeductions = totalDeductions.ToString("0.00"),
                     NetPay = netPay.ToString("0.00")
                 };
+
+                // Update payroll data in Firebase using existing payroll IDs (1,2,3 format)
+                await UpdateExistingPayrollData(currentEmployeeId, ExportData);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error loading payroll data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        #region Data Loading Methods
+        private async Task LoadEmployeeDetails()
+        {
+            var empDetails = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
+            foreach (var e in empDetails)
+            {
+                if (e.Object != null)
+                {
+                    employeeDetails[e.Key] = e.Object;
+                }
+            }
+        }
+
+        private async Task LoadEmploymentInfo()
+        {
+            var employmentData = await firebase.Child("EmploymentInfo").OnceAsJsonAsync();
+            string rawJson = employmentData?.ToString() ?? "";
+
+            if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null") return;
+
+            var records = ParseFirebaseArrayStructure(rawJson);
+            foreach (var record in records)
+            {
+                if (record != null && record.Count > 0)
+                {
+                    string employeeId = GetDictionaryValue(record, "employee_id", "");
+                    if (!string.IsNullOrEmpty(employeeId))
+                    {
+                        employmentInfo[employeeId] = record;
+                    }
+                }
+            }
+        }
+
+        private async Task LoadEmployeeLoans()
+        {
+            var loansData = await firebase.Child("EmployeeLoans").OnceAsJsonAsync();
+            string rawJson = loansData?.ToString() ?? "";
+
+            if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null") return;
+
+            var records = ParseFirebaseArrayStructure(rawJson);
+            foreach (var record in records)
+            {
+                if (record != null && record.Count > 0)
+                {
+                    employeeLoans.Add(record);
+                }
+            }
+        }
+
+        private async Task LoadAttendanceData()
+        {
+            var attendanceData = await firebase.Child("Attendance").OnceAsJsonAsync();
+            string rawJson = attendanceData?.ToString() ?? "";
+
+            if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null") return;
+
+            var allRecords = new List<Dictionary<string, string>>();
+
+            try
+            {
+                var jObject = JObject.Parse(rawJson);
+                foreach (var property in jObject.Properties())
+                {
+                    if (property.Value.Type == JTokenType.Object)
+                    {
+                        var record = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        foreach (var prop in ((JObject)property.Value).Properties())
+                        {
+                            record[prop.Name] = prop.Value?.ToString() ?? "";
+                        }
+                        if (record.Count > 0 && IsInDateRange(record))
+                        {
+                            attendanceRecords.Add(record);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                var records = ParseFirebaseArrayStructure(rawJson);
+                foreach (var record in records)
+                {
+                    if (record != null && record.Count > 0 && IsInDateRange(record))
+                    {
+                        attendanceRecords.Add(record);
+                    }
+                }
+            }
+        }
+
+        private async Task LoadLeaveCredits()
+        {
+            try
+            {
+                var leaveData = await firebase.Child("Leave Credits").OnceAsync<dynamic>();
+                foreach (var leave in leaveData)
+                {
+                    if (leave.Object != null)
+                    {
+                        var leaveDict = new Dictionary<string, string>();
+                        var obj = leave.Object as IDictionary<string, object>;
+
+                        if (obj != null)
+                        {
+                            foreach (var prop in obj)
+                            {
+                                leaveDict[prop.Key] = prop.Value?.ToString() ?? "";
+                            }
+
+                            string employeeId = leaveDict.ContainsKey("employee_id") ? leaveDict["employee_id"] : "";
+                            if (!string.IsNullOrEmpty(employeeId))
+                            {
+                                leaveCredits[employeeId] = leaveDict;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading leave credits: {ex.Message}");
+            }
+        }
+        #endregion
+
+        #region Calculation Methods
+        private (decimal totalHours, decimal totalMinutes) CalculateOvertimeForEmployee(string employeeId)
+        {
+            decimal totalHours = 0;
+            decimal totalMinutes = 0;
+
+            foreach (var attendance in attendanceRecords)
+            {
+                string attEmployeeId = GetDictionaryValue(attendance, "employeeid", "") ??
+                                      GetDictionaryValue(attendance, "employee_id", "");
+
+                if (attEmployeeId == employeeId)
+                {
+                    // Get overtime hours from overtime_hours field
+                    if (attendance.ContainsKey("overtime_hours") && decimal.TryParse(attendance["overtime_hours"], out decimal overtime))
+                    {
+                        totalHours += overtime;
+                    }
+
+                    // Calculate additional overtime from overtime_in and overtime_out
+                    string overtimeIn = GetDictionaryValue(attendance, "overtime_in", "");
+                    string overtimeOut = GetDictionaryValue(attendance, "overtime_out", "");
+
+                    if (!string.IsNullOrEmpty(overtimeIn) && !string.IsNullOrEmpty(overtimeOut) &&
+                        overtimeIn != "N/A" && overtimeOut != "N/A" &&
+                        DateTime.TryParse(overtimeIn, out DateTime otIn) && DateTime.TryParse(overtimeOut, out DateTime otOut))
+                    {
+                        TimeSpan otDuration = otOut - otIn;
+                        totalHours += (decimal)otDuration.TotalHours;
+                    }
+                }
+            }
+
+            return (totalHours, totalMinutes);
+        }
+
+        private async Task<EmployeeEarnings> LoadEarningsFromPayroll(string employeeId)
+        {
+            var earnings = new EmployeeEarnings();
+
+            try
+            {
+                // Find existing payroll record for this employee
+                var payrollRecords = await firebase.Child("Payroll")
+                    .OnceAsync<dynamic>();
+
+                var employeePayroll = payrollRecords
+                    .FirstOrDefault(p =>
+                    {
+                        var obj = p.Object as IDictionary<string, object>;
+                        return obj != null && obj.ContainsKey("employee_id") &&
+                               obj["employee_id"]?.ToString() == employeeId;
+                    });
+
+                if (employeePayroll != null)
+                {
+                    string payrollId = employeePayroll.Key;
+
+                    // Load earnings from PayrollEarnings
+                    var earningsData = await firebase.Child("PayrollEarnings")
+                        .Child(payrollId)
+                        .OnceSingleAsync<dynamic>();
+
+                    if (earningsData != null)
+                    {
+                        var earningsObj = earningsData as IDictionary<string, object>;
+                        if (earningsObj != null)
+                        {
+                            earnings.Commission = earningsObj.ContainsKey("commission") ? Convert.ToDecimal(earningsObj["commission"]) : 0m;
+                            earnings.Communication = earningsObj.ContainsKey("communication") ? Convert.ToDecimal(earningsObj["communication"]) : 0m;
+                            earnings.FoodAllowance = earningsObj.ContainsKey("food_allowance") ? Convert.ToDecimal(earningsObj["food_allowance"]) : 0m;
+                            earnings.GasAllowance = earningsObj.ContainsKey("gas_allowance") ? Convert.ToDecimal(earningsObj["gas_allowance"]) : 0m;
+                            earnings.Gondola = earningsObj.ContainsKey("gondola") ? Convert.ToDecimal(earningsObj["gondola"]) : 0m;
+                            earnings.Incentives = earningsObj.ContainsKey("incentives") ? Convert.ToDecimal(earningsObj["incentives"]) : 0m;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading earnings from payroll: {ex.Message}");
+            }
+
+            return earnings;
+        }
+
+        private async Task<EmployeeDeductions> LoadDeductionsFromPayroll(string employeeId)
+        {
+            var deductions = new EmployeeDeductions();
+
+            try
+            {
+                // Find existing payroll record for this employee
+                var payrollRecords = await firebase.Child("Payroll")
+                    .OnceAsync<dynamic>();
+
+                var employeePayroll = payrollRecords
+                    .FirstOrDefault(p =>
+                    {
+                        var obj = p.Object as IDictionary<string, object>;
+                        return obj != null && obj.ContainsKey("employee_id") &&
+                               obj["employee_id"]?.ToString() == employeeId;
+                    });
+
+                if (employeePayroll != null)
+                {
+                    string payrollId = employeePayroll.Key;
+
+                    // Load deductions from EmployeeDeductions
+                    var deductionsData = await firebase.Child("EmployeeDeductions")
+                        .Child(payrollId)
+                        .OnceSingleAsync<dynamic>();
+
+                    if (deductionsData != null)
+                    {
+                        var deductionsObj = deductionsData as IDictionary<string, object>;
+                        if (deductionsObj != null)
+                        {
+                            deductions.CashAdvance = deductionsObj.ContainsKey("cash_advance") ? Convert.ToDecimal(deductionsObj["cash_advance"]) : 0m;
+                            deductions.CoopContribution = deductionsObj.ContainsKey("coop_contribution") ? Convert.ToDecimal(deductionsObj["coop_contribution"]) : 0m;
+                            deductions.OtherDeductions = deductionsObj.ContainsKey("other_deductions") ? Convert.ToDecimal(deductionsObj["other_deductions"]) : 0m;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading deductions from payroll: {ex.Message}");
+            }
+
+            return deductions;
+        }
+
+        private (decimal sssLoan, decimal pagibigLoan, decimal carLoan, decimal housingLoan, decimal coopLoan) CalculateLoanDeductions(string employeeId)
+        {
+            decimal sssLoan = 0m, pagibigLoan = 0m, carLoan = 0m, housingLoan = 0m, coopLoan = 0m;
+
+            foreach (var loan in employeeLoans)
+            {
+                string loanEmployeeId = GetDictionaryValue(loan, "employee_id", "");
+                string loanStatus = GetDictionaryValue(loan, "status", "");
+                string loanType = GetDictionaryValue(loan, "loan_type", "Unknown");
+
+                if (loanEmployeeId == employeeId && loanStatus == "Active")
+                {
+                    // Use bi_monthly_amortization field directly from Firebase
+                    decimal biMonthlyAmortization = ParseDecimalSafe(loan, "bi_monthly_amortization");
+
+                    if (biMonthlyAmortization > 0)
+                    {
+                        if (loanType.ToLower().Contains("sss"))
+                            sssLoan += biMonthlyAmortization;
+                        else if (loanType.ToLower().Contains("pagibig") || loanType.ToLower().Contains("pag-ibig"))
+                            pagibigLoan += biMonthlyAmortization;
+                        else if (loanType.ToLower().Contains("car"))
+                            carLoan += biMonthlyAmortization;
+                        else if (loanType.ToLower().Contains("housing"))
+                            housingLoan += biMonthlyAmortization;
+                        else if (loanType.ToLower().Contains("coop"))
+                            coopLoan += biMonthlyAmortization;
+                    }
+                }
+            }
+
+            return (sssLoan, pagibigLoan, carLoan, housingLoan, coopLoan);
+        }
+
+        private void UpdateLeaveCreditsDisplay(string employeeId)
+        {
+            try
+            {
+                if (leaveCredits.ContainsKey(employeeId))
+                {
+                    var leaveData = leaveCredits[employeeId];
+
+                    // Get sick leave and vacation leave from Leave Credits
+                    decimal sickLeave = ParseDecimalSafe(leaveData, "sick_leave");
+                    decimal vacationLeave = ParseDecimalSafe(leaveData, "vacation_leave");
+
+                    // Display current balances
+                    labelSickLeaveBalance.Text = sickLeave.ToString("0");
+                    labelVacationLeaveBalance.Text = vacationLeave.ToString("0");
+
+                    // For this payroll period, we'll show current balances and no new credits/debits
+                    labelSickLeaveCredit.Text = "0";
+                    labelSickLeaveDebit.Text = "0";
+                    labelVacationLeaveCredit.Text = "0";
+                    labelVacationLeaveDebit.Text = "0";
+                }
+                else
+                {
+                    // Default values if no leave data found
+                    labelSickLeaveBalance.Text = "0";
+                    labelVacationLeaveBalance.Text = "0";
+                    labelSickLeaveCredit.Text = "0";
+                    labelSickLeaveDebit.Text = "0";
+                    labelVacationLeaveCredit.Text = "0";
+                    labelVacationLeaveDebit.Text = "0";
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating leave credits: {ex.Message}");
+            }
+        }
+        #endregion
 
         #region Helper Methods
         private string FormatEmployeeName(dynamic emp)
@@ -499,13 +621,11 @@ namespace HRIS_JAP_ATTPAY
         {
             decimal dailyRate = 0m;
 
-            // Try employment info first
             if (employment != null && employment.ContainsKey("daily_rate") && !string.IsNullOrEmpty(employment["daily_rate"]))
             {
                 decimal.TryParse(employment["daily_rate"], out dailyRate);
             }
 
-            // Fallback: Check employee details
             if (dailyRate == 0m && employeeDetails.ContainsKey(currentEmployeeId))
             {
                 var emp = employeeDetails[currentEmployeeId];
@@ -519,44 +639,10 @@ namespace HRIS_JAP_ATTPAY
             return dailyRate == 0m ? MINIMUM_DAILY_RATE : dailyRate;
         }
 
-        private decimal ValidateDeductions(decimal totalDeductions, decimal grossPay, decimal monthlySalary)
+        private decimal ValidateDeductions(decimal totalDeductions, decimal grossPay)
         {
             decimal maxAllowedDeductions = grossPay * MAX_DEDUCTION_PERCENTAGE;
             return totalDeductions > maxAllowedDeductions ? maxAllowedDeductions : totalDeductions;
-        }
-
-        // READ-ONLY: Calculate loan deductions from existing Firebase values
-        private (decimal sssLoan, decimal pagibigLoan, decimal carLoan, decimal housingLoan, decimal coopLoan) CalculateLoanDeductionsFromExistingValues(string employeeId)
-        {
-            decimal sssLoan = 0m, pagibigLoan = 0m, carLoan = 0m, housingLoan = 0m, coopLoan = 0m;
-
-            foreach (var loan in employeeLoans)
-            {
-                string loanEmployeeId = GetDictionaryValue(loan, "employee_id", "");
-                string loanStatus = GetDictionaryValue(loan, "status", "");
-                string loanType = GetDictionaryValue(loan, "loan_type", "Unknown");
-
-                if (loanEmployeeId == employeeId && loanStatus == "Active")
-                {
-                    decimal biMonthlyAmortization = ParseDecimalSafe(loan, "bi_monthly_amortization");
-                    
-                    if (biMonthlyAmortization > 0)
-                    {
-                        if (loanType.ToLower().Contains("sss"))
-                            sssLoan += biMonthlyAmortization;
-                        else if (loanType.ToLower().Contains("pagibig") || loanType.ToLower().Contains("pag-ibig"))
-                            pagibigLoan += biMonthlyAmortization;
-                        else if (loanType.ToLower().Contains("car"))
-                            carLoan += biMonthlyAmortization;
-                        else if (loanType.ToLower().Contains("housing"))
-                            housingLoan += biMonthlyAmortization;
-                        else if (loanType.ToLower().Contains("coop"))
-                            coopLoan += biMonthlyAmortization;
-                    }
-                }
-            }
-
-            return (sssLoan, pagibigLoan, carLoan, housingLoan, coopLoan);
         }
 
         private decimal ParseDecimalSafe(Dictionary<string, string> dict, string key)
@@ -566,30 +652,6 @@ namespace HRIS_JAP_ATTPAY
                 return result;
             }
             return 0m;
-        }
-
-        private decimal CalculateOvertimeForEmployee(string employeeId)
-        {
-            decimal totalOvertime = 0;
-
-            foreach (var attendance in attendanceRecords)
-            {
-                string attEmployeeId = GetDictionaryValue(attendance, "employeeid", "") ??
-                                      GetDictionaryValue(attendance, "employee_id", "");
-
-                if (attEmployeeId == employeeId)
-                {
-                    if (attendance.ContainsKey("overtime_hours") && decimal.TryParse(attendance["overtime_hours"], out decimal overtime))
-                    {
-                        if (overtime >= 0 && overtime <= 12)
-                        {
-                            totalOvertime += overtime;
-                        }
-                    }
-                }
-            }
-
-            return totalOvertime;
         }
 
         private int CalculateDaysWorked(string employeeId)
@@ -620,80 +682,210 @@ namespace HRIS_JAP_ATTPAY
 
             return daysWorked;
         }
-        #endregion
 
-        // UPDATED: Firebase update - NO EmployeeLoans modification
-        private async Task UpdatePayrollDataAsync(string employeeId, PayrollExportData computedData)
+        private bool IsInDateRange(Dictionary<string, string> record)
         {
+            string attendanceDate = GetDictionaryValue(record, "attendancedate", "") ??
+                                   GetDictionaryValue(record, "attendance_date", "");
+
+            if (DateTime.TryParse(attendanceDate, out DateTime recordDate))
+            {
+                return recordDate >= cutoffStartDate && recordDate <= cutoffEndDate;
+            }
+
+            return false;
+        }
+
+        private List<Dictionary<string, string>> ParseFirebaseArrayStructure(string rawJson)
+        {
+            var records = new List<Dictionary<string, string>>();
+
             try
             {
-                string payrollId = $"payroll_{employeeId}_{DateTime.Now:yyyyMMddHHmmss}";
-                string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                if (string.IsNullOrWhiteSpace(rawJson) || rawJson == "null") return records;
 
-                // Update only payroll-related nodes - NO EmployeeLoans
-                await firebase.Child("EmployeeDetails").Child(employeeId).PatchAsync(new
+                var jArray = JArray.Parse(rawJson);
+                foreach (var item in jArray)
                 {
-                    daily_rate = decimal.Parse(computedData.DailyRate),
-                    gross_pay = decimal.Parse(computedData.GrossPay),
-                    net_pay = decimal.Parse(computedData.NetPay),
-                    total_deductions = decimal.Parse(computedData.TotalDeductions),
-                    salary_frequency = "Semi-Monthly",
-                    last_updated = timestamp
-                });
+                    if (item.Type == JTokenType.Null) continue;
 
-                await firebase.Child("PayrollEarnings").Child(payrollId).PatchAsync(new
-                {
-                    basic_pay = decimal.Parse(computedData.BasicPay),
-                    overtime_pay = decimal.Parse(computedData.OvertimePerHour),
-                    total_earnings = decimal.Parse(computedData.GrossPay),
-                    daily_rate = decimal.Parse(computedData.DailyRate),
-                    days_present = int.Parse(computedData.DaysPresent),
-                    last_updated = timestamp
-                });
-
-                await firebase.Child("PayrollSummary").Child(payrollId).PatchAsync(new
-                {
-                    gross_pay = decimal.Parse(computedData.GrossPay),
-                    net_pay = decimal.Parse(computedData.NetPay),
-                    total_deductions = decimal.Parse(computedData.TotalDeductions),
-                    last_updated = timestamp
-                });
-
-                await firebase.Child("GovernmentDeductions").Child(payrollId).PatchAsync(new
-                {
-                    sss = decimal.Parse(computedData.SSS),
-                    philhealth = decimal.Parse(computedData.Philhealth),
-                    pagibig = decimal.Parse(computedData.PagIbig),
-                    withholding_tax = decimal.Parse(computedData.WithholdingTax),
-                    total_gov_deductions = decimal.Parse(computedData.TotalDeductions),
-                    last_updated = timestamp
-                });
-
-                await firebase.Child("EmployeeDeductions").Child(payrollId).PatchAsync(new
-                {
-                    cash_advance = decimal.Parse(computedData.CashAdvance),
-                    coop_contribution = decimal.Parse(computedData.CoopContribution),
-                    other_deductions = decimal.Parse(computedData.Others),
-                    last_updated = timestamp
-                });
-
-                await firebase.Child("Payroll").Child(payrollId).PatchAsync(new
-                {
-                    employee_id = employeeId,
-                    net_pay = decimal.Parse(computedData.NetPay),
-                    created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt"),
-                    last_updated = timestamp
-                });
-
-                Console.WriteLine($"Payroll data saved (EmployeeLoans UNTOUCHED) at {timestamp}");
+                    if (item.Type == JTokenType.Object)
+                    {
+                        var record = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        foreach (var prop in item.Children<JProperty>())
+                        {
+                            record[prop.Name] = prop.Value?.ToString() ?? "";
+                        }
+                        if (record.Count > 0) records.Add(record);
+                    }
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating payroll data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine("Firebase array parsing error: " + ex.Message);
             }
+
+            return records;
         }
 
-        // Rest of your UI event handlers remain the same
+        private (int fullDays, int halfDays) CalculateWorkDaysInPeriod(DateTime startDate, DateTime endDate)
+        {
+            int fullDays = 0;
+            int halfDays = 0;
+
+            for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
+            {
+                if (date.DayOfWeek == DayOfWeek.Saturday)
+                {
+                    halfDays++;
+                }
+                else if (date.DayOfWeek != DayOfWeek.Sunday)
+                {
+                    fullDays++;
+                }
+            }
+
+            return (fullDays, halfDays);
+        }
+        #endregion
+
+        #region Government Contributions & Tax Calculations
+        private decimal CalculatePhilHealthContribution(decimal monthlySalary)
+        {
+            decimal employeeShareRate = 0.0275m;
+            decimal contribution = monthlySalary * employeeShareRate;
+
+            if (contribution < 200m) contribution = 200m;
+            if (contribution > 400m) contribution = 400m;
+
+            return Math.Round(contribution / 2, 2);
+        }
+
+        private decimal CalculatePagibigContribution(decimal monthlySalary)
+        {
+            decimal rate = monthlySalary > 1500m ? 0.02m : 0.01m;
+            decimal contribution = monthlySalary * rate;
+            return Math.Round(Math.Min(contribution, 100m) / 2, 2);
+        }
+
+        private decimal CalculateWithholdingTax(decimal monthlySalary)
+        {
+            decimal semiMonthlySalary = monthlySalary / 2;
+
+            if (semiMonthlySalary <= 10417m) return 0;
+            if (semiMonthlySalary <= 16666m) return (semiMonthlySalary - 10417m) * 0.15m;
+            if (semiMonthlySalary <= 33332m) return 937.50m + (semiMonthlySalary - 16666m) * 0.20m;
+            if (semiMonthlySalary <= 83332m) return 4270.50m + (semiMonthlySalary - 33332m) * 0.25m;
+            if (semiMonthlySalary <= 333332m) return 16770.50m + (semiMonthlySalary - 83332m) * 0.30m;
+            return 91770.50m + (semiMonthlySalary - 333332m) * 0.35m;
+        }
+        #endregion
+
+        #region Firebase Update Methods
+        private async Task UpdateExistingPayrollData(string employeeId, PayrollExportData data)
+        {
+            try
+            {
+                string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                // Find existing payroll record for this employee (using 1,2,3 format)
+                var payrollRecords = await firebase.Child("Payroll")
+                    .OnceAsync<dynamic>();
+
+                var existingPayroll = payrollRecords
+                    .FirstOrDefault(p =>
+                    {
+                        var obj = p.Object as IDictionary<string, object>;
+                        return obj != null && obj.ContainsKey("employee_id") &&
+                               obj["employee_id"]?.ToString() == employeeId;
+                    });
+
+                if (existingPayroll != null)
+                {
+                    string payrollId = existingPayroll.Key;
+                    Console.WriteLine($"Updating existing payroll record: {payrollId}");
+
+                    // Update all payroll collections with the existing payroll ID
+                    var updateTasks = new List<Task>
+                    {
+                        // Update EmployeeDetails
+                        firebase.Child("EmployeeDetails").Child(employeeId).PatchAsync(new
+                        {
+                            daily_rate = decimal.Parse(data.DailyRate),
+                            gross_pay = decimal.Parse(data.GrossPay),
+                            net_pay = decimal.Parse(data.NetPay),
+                            total_deductions = decimal.Parse(data.TotalDeductions),
+                            last_updated = timestamp
+                        }),
+
+                        // Update PayrollEarnings
+                        firebase.Child("PayrollEarnings").Child(payrollId).PatchAsync(new
+                        {
+                            basic_pay = decimal.Parse(data.BasicPay),
+                            overtime_pay = decimal.Parse(data.OvertimePerHour),
+                            commission = decimal.Parse(data.Commission),
+                            communication = decimal.Parse(data.Communication),
+                            food_allowance = decimal.Parse(data.FoodAllowance),
+                            gas_allowance = decimal.Parse(data.GasAllowance),
+                            gondola = decimal.Parse(data.Gondola),
+                            incentives = decimal.Parse(data.Incentives),
+                            total_earnings = decimal.Parse(data.GrossPay),
+                            last_updated = timestamp
+                        }),
+
+                        // Update PayrollSummary
+                        firebase.Child("PayrollSummary").Child(payrollId).PatchAsync(new
+                        {
+                            gross_pay = decimal.Parse(data.GrossPay),
+                            net_pay = decimal.Parse(data.NetPay),
+                            total_deductions = decimal.Parse(data.TotalDeductions),
+                            last_updated = timestamp
+                        }),
+
+                        // Update GovernmentDeductions
+                        firebase.Child("GovernmentDeductions").Child(payrollId).PatchAsync(new
+                        {
+                            sss = decimal.Parse(data.SSS),
+                            philhealth = decimal.Parse(data.Philhealth),
+                            pagibig = decimal.Parse(data.PagIbig),
+                            withholding_tax = decimal.Parse(data.WithholdingTax),
+                            total_gov_deductions = decimal.Parse(data.TotalDeductions),
+                            last_updated = timestamp
+                        }),
+
+                        // Update EmployeeDeductions
+                        firebase.Child("EmployeeDeductions").Child(payrollId).PatchAsync(new
+                        {
+                            cash_advance = decimal.Parse(data.CashAdvance),
+                            coop_contribution = decimal.Parse(data.CoopContribution),
+                            other_deductions = decimal.Parse(data.Others),
+                            last_updated = timestamp
+                        }),
+
+                        // Update Payroll
+                        firebase.Child("Payroll").Child(payrollId).PatchAsync(new
+                        {
+                            net_pay = decimal.Parse(data.NetPay),
+                            last_updated = timestamp
+                        })
+                    };
+
+                    await Task.WhenAll(updateTasks);
+                    Console.WriteLine($"Successfully updated payroll data for {employeeId} using record {payrollId}");
+                }
+                else
+                {
+                    Console.WriteLine($"No existing payroll record found for {employeeId}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating payroll data: {ex.Message}");
+            }
+        }
+        #endregion
+
+        #region UI Event Handlers
         private void buttonCancel_Click(object sender, EventArgs e)
         {
             if (ExportData == null)
@@ -718,6 +910,7 @@ namespace HRIS_JAP_ATTPAY
         {
             this.Close();
         }
+        #endregion
 
         private void setFont()
         {
@@ -836,7 +1029,24 @@ namespace HRIS_JAP_ATTPAY
         }
     }
 
-    // SSS Computation Classes (keep as is)
+    #region Helper Classes
+    public class EmployeeEarnings
+    {
+        public decimal Commission { get; set; }
+        public decimal Communication { get; set; }
+        public decimal FoodAllowance { get; set; }
+        public decimal GasAllowance { get; set; }
+        public decimal Gondola { get; set; }
+        public decimal Incentives { get; set; }
+    }
+
+    public class EmployeeDeductions
+    {
+        public decimal CashAdvance { get; set; }
+        public decimal CoopContribution { get; set; }
+        public decimal OtherDeductions { get; set; }
+    }
+
     public class SssContribution
     {
         public decimal MSC { get; set; }
@@ -873,4 +1083,5 @@ namespace HRIS_JAP_ATTPAY
             return result;
         }
     }
+    #endregion
 }
