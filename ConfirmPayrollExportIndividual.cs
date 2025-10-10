@@ -72,7 +72,7 @@ namespace HRIS_JAP_ATTPAY
                 columns.Append(new Column() { Min = 4, Max = 4, Width = 19, CustomWidth = true }); // Column D
                 columns.Append(new Column() { Min = 5, Max = 5, Width = 27, CustomWidth = true }); // Column E
                 columns.Append(new Column() { Min = 6, Max = 6, Width = 16, CustomWidth = true }); // Column F
-                columns.Append(new Column() { Min = 7, Max = 7, Width = 15, CustomWidth = true }); // Column G
+                columns.Append(new Column() { Min = 7, Max = 7, Width = 16, CustomWidth = true }); // Column G
                 columns.Append(new Column() { Min = 8, Max = 8, Width = 9, CustomWidth = true });  // Column H
                 columns.Append(new Column() { Min = 9, Max = 9, Width = 10, CustomWidth = true }); // Column I
 
@@ -193,6 +193,18 @@ namespace HRIS_JAP_ATTPAY
             // Gondola row
             sheetData.AppendChild(CreateRow(new string[] { "", "Gondola", $"P{data.Gondola}",
                 "", $"P{data.Gondola}", "Cash Advance", $"P{data.CashAdvance}", $"{data.CashAdvanceDetails}" }));
+
+            // Coop Loan row
+            sheetData.AppendChild(CreateRow(new string[] { "", "", "",
+                "", "", "COOP Loan", $"P{data.CoopLoan}", $"{data.CoopLoanDetails}" }));
+
+            // Coop Contri row
+            sheetData.AppendChild(CreateRow(new string[] { "", "", "",
+                "", "", "COOP Contri", $"P{data.CoopContribution}", $"{data.CoopContributionDetails}" }));
+
+            // Others row
+            sheetData.AppendChild(CreateRow(new string[] { "", "", "",
+                "", "", "Others", $"P{data.Others}", $"{data.OthersDetails}" }));
 
             // Empty row
             sheetData.AppendChild(CreateRow(new string[] { "" }));
