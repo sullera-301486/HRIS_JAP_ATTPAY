@@ -122,7 +122,7 @@ namespace HRIS_JAP_ATTPAY
                     Image icon = IconForStatus(status);
                     existing.SetData(message, icon);
 
-                    // ✅ Move updated notification to the top visually
+                    // Move updated notification to the top visually
                     flowSummary.Controls.SetChildIndex(existing, 0);
                 }
                 return;
@@ -134,7 +134,7 @@ namespace HRIS_JAP_ATTPAY
             Image iconNew = IconForStatus(status);
             notif.SetData(message, iconNew);
 
-            // ✅ Add to top instead of bottom
+            // Add to top instead of bottom
             flowSummary.Controls.Add(notif);
             flowSummary.Controls.SetChildIndex(notif, 0);
 
@@ -174,6 +174,7 @@ namespace HRIS_JAP_ATTPAY
         private void SetFont()
         {
             labelNotification.Font = AttributesClass.GetFont("Roboto-Regular", 26f);
+            buttonClearNotif.Font = AttributesClass.GetFont("Roboto-Regular", 9f);
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
@@ -199,10 +200,10 @@ namespace HRIS_JAP_ATTPAY
 
                     if (!status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
                     {
-                        // ✅ Delete from Firebase
+                        // Delete from Firebase
                         await firebase.Child("HRNotifications").Child(key).DeleteAsync();
 
-                        // ✅ Remove from UI immediately (if displayed)
+                        // Remove from UI immediately (if displayed)
                         SafeInvoke(() => RemoveNotificationFromFlow(key));
                     }
                 }
