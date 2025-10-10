@@ -38,7 +38,7 @@ namespace HRIS_JAP_ATTPAY
             LoadAttendanceSummary(DateTime.Today);
             PopulateDateComboBox();
             LoadTodoList();
-
+            LoadPayrollLogs();
         }
 
         private void setFont()
@@ -376,11 +376,6 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewPayrollLogs.ColumnHeadersHeight = 40;
             dataGridViewPayrollLogs.DefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Light", 10f);
             dataGridViewPayrollLogs.ColumnHeadersDefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-
-            for (int i = 1; i < 30; i++) //test code; will be replaced with actual data from database
-            {
-                dataGridViewPayrollLogs.Rows.Add("5 - " + i + " - 25", "9:30 PM", "Export Individual Payroll", "Export payroll for Franz Louies Deloritos.");
-            }
         }
 
         private void setAdminLogsDataGridViewAttributes()
@@ -891,6 +886,49 @@ namespace HRIS_JAP_ATTPAY
         public void RefreshTodoList()
         {
             LoadTodoList();
+        }
+
+        private async void LoadPayrollLogs()
+        {
+            try
+            {
+                dataGridViewPayrollLogs.Rows.Clear();
+
+                // Load payroll logs from Firebase
+                var payrollLogs = await firebase
+                    .Child("PayrollLogs")
+                    .OnceAsync<Dictionary<string, object>>();
+
+                if (payrollLogs != null && payrollLogs.Any())
+                {
+                    foreach (var log in payrollLogs.OrderByDescending(l => l.Key))
+                    {
+                        var logData = log.Object;
+                        if (logData != null)
+                        {
+                            string date = logData.ContainsKey("date") ? logData["date"]?.ToString() ?? "" : "";
+                            string time = logData.ContainsKey("time") ? logData["time"]?.ToString() ?? "" : "";
+                            string action = logData.ContainsKey("action") ? logData["action"]?.ToString() ?? "" : "";
+                            string details = logData.ContainsKey("details") ? logData["details"]?.ToString() ?? "" : "";
+
+                            // Add to DataGridView
+                            dataGridViewPayrollLogs.Rows.Add(date, time, action, details);
+                        }
+                    }
+                }
+
+                // If no logs found, show message
+                if (dataGridViewPayrollLogs.Rows.Count == 0)
+                {
+                    dataGridViewPayrollLogs.Rows.Add("No payroll logs found", "", "", "");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading payroll logs: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                dataGridViewPayrollLogs.Rows.Add("Error loading logs", "", "", "");
+            }
         }
 
         private async void LoadTodoList()

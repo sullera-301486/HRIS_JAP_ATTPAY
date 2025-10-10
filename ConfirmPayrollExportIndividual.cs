@@ -4,6 +4,9 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Linq;
 using System.Windows.Forms;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -23,7 +26,7 @@ namespace HRIS_JAP_ATTPAY
             this.Close();
         }
 
-        private void buttonConfirm_Click(object sender, EventArgs e)
+        private async void buttonConfirm_Click(object sender, EventArgs e)
         {
             try
             {
@@ -36,8 +39,20 @@ namespace HRIS_JAP_ATTPAY
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     GenerateExcelFile(saveFileDialog.FileName, _payrollData);
-                    MessageBox.Show("Payroll exported successfully!", "Export Complete",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // Log the export action to Firebase - this will automatically create the table
+                    bool logSuccess = await LogPayrollExportToFirebase(_payrollData.EmployeeName, _payrollData.EmployeeId);
+
+                    if (logSuccess)
+                    {
+                        MessageBox.Show("Payroll exported successfully and logged to system!", "Export Complete",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Payroll exported successfully, but failed to log to system.", "Export Complete",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
                     this.Close();
                 }
             }
@@ -45,6 +60,53 @@ namespace HRIS_JAP_ATTPAY
             {
                 MessageBox.Show($"Error exporting payroll: {ex.Message}", "Export Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async Task<bool> LogPayrollExportToFirebase(string employeeName, string employeeId)
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    // Firebase database URL - CORRECTED to match AdminOverview
+                    string firebaseUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/";
+
+                    // Create log entry with the four required values
+                    var logEntry = new
+                    {
+                        date = DateTime.Now.ToString("yyyy-MM-dd"),
+                        time = DateTime.Now.ToString("hh:mm tt").ToUpper(),
+                        action = "Export individual payroll",
+                        details = $"Exported {employeeName}"
+                    };
+
+                    // Post to PayrollLogs table - Firebase automatically creates it if it doesn't exist
+                    string payrollLogsUrl = $"{firebaseUrl}PayrollLogs.json";
+                    string jsonData = JsonConvert.SerializeObject(logEntry);
+                    var content = new StringContent(jsonData, System.Text.Encoding.UTF8, "application/json");
+
+                    var response = await client.PostAsync(payrollLogsUrl, content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Firebase log created successfully!");
+                        return true;
+                    }
+                    else
+                    {
+                        // Log failure but don't interrupt the export process
+                        string errorContent = await response.Content.ReadAsStringAsync();
+                        System.Diagnostics.Debug.WriteLine($"Firebase log failed: {response.StatusCode} - {errorContent}");
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Don't show error to user for logging failure, just debug
+                System.Diagnostics.Debug.WriteLine($"Firebase logging error: {ex.Message}");
+                return false;
             }
         }
 
