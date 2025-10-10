@@ -1474,7 +1474,7 @@
             this.labelWithTaxDetails.Name = "labelWithTaxDetails";
             this.labelWithTaxDetails.Size = new System.Drawing.Size(129, 31);
             this.labelWithTaxDetails.TabIndex = 286;
-            this.labelWithTaxDetails.Text = "₱0.00";
+            this.labelWithTaxDetails.Text = "N/A";
             this.labelWithTaxDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelSSSDetails
@@ -1486,7 +1486,7 @@
             this.labelSSSDetails.Name = "labelSSSDetails";
             this.labelSSSDetails.Size = new System.Drawing.Size(129, 31);
             this.labelSSSDetails.TabIndex = 287;
-            this.labelSSSDetails.Text = "₱0.00";
+            this.labelSSSDetails.Text = "N/A";
             this.labelSSSDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelPagIbigDetails
@@ -1498,7 +1498,7 @@
             this.labelPagIbigDetails.Name = "labelPagIbigDetails";
             this.labelPagIbigDetails.Size = new System.Drawing.Size(129, 31);
             this.labelPagIbigDetails.TabIndex = 288;
-            this.labelPagIbigDetails.Text = "₱0.00";
+            this.labelPagIbigDetails.Text = "N/A";
             this.labelPagIbigDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelPhilhealthDetails
@@ -1510,7 +1510,7 @@
             this.labelPhilhealthDetails.Name = "labelPhilhealthDetails";
             this.labelPhilhealthDetails.Size = new System.Drawing.Size(129, 31);
             this.labelPhilhealthDetails.TabIndex = 289;
-            this.labelPhilhealthDetails.Text = "₱0.00";
+            this.labelPhilhealthDetails.Text = "N/A";
             this.labelPhilhealthDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelSSSLoanDetails
@@ -1522,7 +1522,7 @@
             this.labelSSSLoanDetails.Name = "labelSSSLoanDetails";
             this.labelSSSLoanDetails.Size = new System.Drawing.Size(129, 31);
             this.labelSSSLoanDetails.TabIndex = 290;
-            this.labelSSSLoanDetails.Text = "₱0.00";
+            this.labelSSSLoanDetails.Text = "N/A";
             this.labelSSSLoanDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelPagIbigLoanDetails
@@ -1534,7 +1534,7 @@
             this.labelPagIbigLoanDetails.Name = "labelPagIbigLoanDetails";
             this.labelPagIbigLoanDetails.Size = new System.Drawing.Size(129, 31);
             this.labelPagIbigLoanDetails.TabIndex = 291;
-            this.labelPagIbigLoanDetails.Text = "₱0.00";
+            this.labelPagIbigLoanDetails.Text = "N/A";
             this.labelPagIbigLoanDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelCarLoanDetails
@@ -1546,7 +1546,7 @@
             this.labelCarLoanDetails.Name = "labelCarLoanDetails";
             this.labelCarLoanDetails.Size = new System.Drawing.Size(129, 31);
             this.labelCarLoanDetails.TabIndex = 292;
-            this.labelCarLoanDetails.Text = "₱0.00";
+            this.labelCarLoanDetails.Text = "N/A";
             this.labelCarLoanDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelHousingLoanDetails
@@ -1558,7 +1558,7 @@
             this.labelHousingLoanDetails.Name = "labelHousingLoanDetails";
             this.labelHousingLoanDetails.Size = new System.Drawing.Size(129, 31);
             this.labelHousingLoanDetails.TabIndex = 293;
-            this.labelHousingLoanDetails.Text = "₱0.00";
+            this.labelHousingLoanDetails.Text = "N/A";
             this.labelHousingLoanDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelCoopLoanDetails
@@ -1570,7 +1570,7 @@
             this.labelCoopLoanDetails.Name = "labelCoopLoanDetails";
             this.labelCoopLoanDetails.Size = new System.Drawing.Size(129, 31);
             this.labelCoopLoanDetails.TabIndex = 294;
-            this.labelCoopLoanDetails.Text = "₱0.00";
+            this.labelCoopLoanDetails.Text = "N/A";
             this.labelCoopLoanDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // PayrollSummaryEdit

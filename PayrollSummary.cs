@@ -216,6 +216,7 @@ namespace HRIS_JAP_ATTPAY
                     Overtime = totalOvertimeHours.ToString("0.00"),
                     BasicPay = basicPay.ToString("0.00"),
                     OvertimePerHour = totalOvertimePay.ToString("0.00"),
+                    OvertimePerMinute = totalOvertimeMinutes.ToString("0.00"),
                     Incentives = earnings.Incentives.ToString("0.00"),
                     Commission = earnings.Commission.ToString("0.00"),
                     FoodAllowance = earnings.FoodAllowance.ToString("0.00"),
@@ -236,7 +237,25 @@ namespace HRIS_JAP_ATTPAY
                     CoopContribution = deductions.CoopContribution.ToString("0.00"),
                     Others = deductions.OtherDeductions.ToString("0.00"),
                     TotalDeductions = totalDeductions.ToString("0.00"),
-                    NetPay = netPay.ToString("0.00")
+                    NetPay = netPay.ToString("0.00"),
+                    TaxDetails = labelWithTaxDetails.Text,
+                    SSSDetails = labelSSSDetails.Text,
+                    PhilhealthDetails = labelPhilhealthDetails.Text,
+                    PagIbigDetails = labelPagIbigDetails.Text,
+                    SSSLoanDetails = labelSSSLoanDetails.Text,
+                    PagIbigLoanDetails = labelPagIbigLoanDetails.Text,
+                    CarLoanDetails = labelCarLoanDetails.Text,
+                    HousingLoanDetails = labelHousingLoanDetails.Text,
+                    CashAdvanceDetails = labelCashAdvanceDetails.Text,
+                    CoopLoanDetails = labelCoopLoanDetails.Text,
+                    CoopContributionDetails = labelCoopContriDetails.Text,
+                    OthersDetails = labelOthersDetails.Text,
+                    VacationLeaveCredit = labelVacationLeaveCredit.Text,
+                    VacationLeaveDebit = labelVacationLeaveDebit.Text,
+                    VacationLeaveBalance = labelVacationLeaveBalance.Text,
+                    SickLeaveCredit = labelSickLeaveCredit.Text,
+                    SickLeaveDebit = labelSickLeaveDebit.Text,
+                    SickLeaveBalance = labelSickLeaveBalance.Text
                 };
 
                 // Update payroll data in Firebase using existing payroll IDs (1,2,3 format)
@@ -1000,6 +1019,7 @@ namespace HRIS_JAP_ATTPAY
             labelPagIbigLoan.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
             labelPagIbigLoanAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
             labelPagIbigLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+            labelPayAndAllowances.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
             labelPhilhealth.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
             labelPhilhealthAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
             labelPhilhealthDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);

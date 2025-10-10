@@ -46,6 +46,21 @@ namespace HRIS_JAP_ATTPAY
         public string Others { get; set; }
         public string TotalDeductions { get; set; }
 
+        // Details
+        public string TaxDetails { get; set; }
+        public string SSSDetails { get; set; }
+        public string PagIbigDetails { get; set; }
+        public string PhilhealthDetails { get; set; }
+        public string SSSLoanDetails { get; set; }
+        public string PagIbigLoanDetails { get; set; }
+        public string CarLoanDetails { get; set; }
+        public string HousingLoanDetails { get; set; }
+        public string CashAdvanceDetails { get; set; }
+        public string CoopLoanDetails { get; set; }
+        public string CoopContributionDetails { get; set; }
+        public string OthersDetails { get; set; }
+
+
         // Leave balances
         public string VacationLeaveCredit { get; set; }
         public string VacationLeaveDebit { get; set; }

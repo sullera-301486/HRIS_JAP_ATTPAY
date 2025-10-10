@@ -36,14 +36,14 @@ namespace HRIS_JAP_ATTPAY
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     GenerateExcelFile(saveFileDialog.FileName, _payrollData);
-                    MessageBox.Show("Payroll exported successfully!", "Export Complete", 
+                    MessageBox.Show("Payroll exported successfully!", "Export Complete",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                     this.Close();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error exporting payroll: {ex.Message}", "Export Error", 
+                MessageBox.Show($"Error exporting payroll: {ex.Message}", "Export Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -57,7 +57,27 @@ namespace HRIS_JAP_ATTPAY
                 workbookPart.Workbook = new Workbook();
 
                 WorksheetPart worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
-                worksheetPart.Worksheet = new Worksheet(new SheetData());
+
+                // Create worksheet with sheet data
+                SheetData sheetData = new SheetData();
+                Worksheet worksheet = new Worksheet();
+                worksheet.Append(sheetData);
+
+                // Add column configurations
+                Columns columns = new Columns();
+                // Set widths for columns A-I (index 1-9)
+                columns.Append(new Column() { Min = 1, Max = 1, Width = 25, CustomWidth = true }); // Column A
+                columns.Append(new Column() { Min = 2, Max = 2, Width = 17, CustomWidth = true }); // Column B
+                columns.Append(new Column() { Min = 3, Max = 3, Width = 35, CustomWidth = true }); // Column C
+                columns.Append(new Column() { Min = 4, Max = 4, Width = 19, CustomWidth = true }); // Column D
+                columns.Append(new Column() { Min = 5, Max = 5, Width = 27, CustomWidth = true }); // Column E
+                columns.Append(new Column() { Min = 6, Max = 6, Width = 16, CustomWidth = true }); // Column F
+                columns.Append(new Column() { Min = 7, Max = 7, Width = 15, CustomWidth = true }); // Column G
+                columns.Append(new Column() { Min = 8, Max = 8, Width = 9, CustomWidth = true });  // Column H
+                columns.Append(new Column() { Min = 9, Max = 9, Width = 10, CustomWidth = true }); // Column I
+
+                worksheet.InsertBefore(columns, sheetData);
+                worksheetPart.Worksheet = worksheet;
 
                 // Add styles
                 WorkbookStylesPart stylesPart = workbookPart.AddNewPart<WorkbookStylesPart>();
@@ -73,8 +93,6 @@ namespace HRIS_JAP_ATTPAY
                     Name = "Payroll Summary"
                 };
                 sheets.Append(sheet);
-
-                SheetData sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
 
                 // Create the payroll summary
                 CreatePayrollSummary(sheetData, data);
@@ -100,8 +118,8 @@ namespace HRIS_JAP_ATTPAY
                 new Fills(
                     new Fill(new PatternFill() { PatternType = PatternValues.None }), // Index 0
                     new Fill(new PatternFill() { PatternType = PatternValues.Gray125 }), // Index 1
-                    new Fill(new PatternFill(new ForegroundColor { Rgb = new HexBinaryValue { Value = "D3D3D3" } }) 
-                        { PatternType = PatternValues.Solid }) // Index 2 - light gray
+                    new Fill(new PatternFill(new ForegroundColor { Rgb = new HexBinaryValue { Value = "D3D3D3" } })
+                    { PatternType = PatternValues.Solid }) // Index 2 - light gray
                 ),
                 new Borders(
                     new Border(), // Index 0 - no border
@@ -127,61 +145,61 @@ namespace HRIS_JAP_ATTPAY
             sheetData.AppendChild(CreateRow(new string[] { "Payroll Summary" }, 1, 8));
 
             // Employee info section
-            sheetData.AppendChild(CreateRow(new string[] { "OVER", "Name ID", $"{data.EmployeeName} {data.EmployeeId}", 
-                "Department Position", $"{data.Department} {data.Position}", "Salary Daily Rate", $"{data.Salary} {data.DailyRate}" }, 1));
-            
+            sheetData.AppendChild(CreateRow(new string[] { "", "Name/ID", $"{data.EmployeeName}/{data.EmployeeId}",
+                "Department/Position", $"{data.Department}/{data.Position}", "Salary/Daily Rate", $"{data.Salary}/{data.DailyRate}" }, 1));
+
             // Date covered section
-            sheetData.AppendChild(CreateRow(new string[] { $"Payroll for {DateTime.Now:MMMM d, yyyy}", "Date Covered Days", 
-                $"{data.DateCovered} {data.Days}", "Day Present", data.DaysPresent, "Overtime", data.Overtime }, 1));
+            sheetData.AppendChild(CreateRow(new string[] { $"Payroll for {DateTime.Now:MMMM d, yyyy}", "Date Covered/Days",
+                $"{data.DateCovered}/{data.Days}", "Days Present", data.DaysPresent, "Overtime", data.Overtime }, 1));
 
             // Empty row
             sheetData.AppendChild(CreateRow(new string[] { "" }));
 
             // Table header
-            sheetData.AppendChild(CreateRow(new string[] { "ID", "Pay & Allowances", "Amounts", "Credit", "Amounts", 
-                "Debit", "Amount", "Details", "Net Pay" }, 3));
+            sheetData.AppendChild(CreateRow(new string[] { "", "Pay & Allowances", "Amounts", "Credit", "Amounts",
+                "Debit", "Amount", "Details", "" }, 3));
 
             // Basic Pay row
-            sheetData.AppendChild(CreateRow(new string[] { "1.", data.EmployeeId, "Basic Pay", $"P{data.BasicPay}", 
-                data.DaysPresent, $"P{data.BasicPay}", "W/Tax", $"P{data.WithholdingTax}", $"P{data.NetPay}" }));
+            sheetData.AppendChild(CreateRow(new string[] { "", "Basic Pay", $"P{data.BasicPay}",
+                data.DaysPresent, $"P{data.BasicPay}", "W/Tax", $"P{data.WithholdingTax}", $"{data.TaxDetails}", "" }));
 
             // Overtime rows
-            sheetData.AppendChild(CreateRow(new string[] { "", data.EmployeeId, "Overtime/hr", $"P{data.OvertimePerHour}", 
-                data.Overtime, $"P{data.OvertimePerHour}", "SSS", $"P{data.SSS}", "" }));
-            
-            sheetData.AppendChild(CreateRow(new string[] { "2.", data.EmployeeId, "Overtime/min", $"P{data.OvertimePerMinute}", 
-                "", $"P{data.OvertimePerMinute}", "PAG-IBIG", $"P{data.PagIbig}", "" }));
+            sheetData.AppendChild(CreateRow(new string[] { "", "Overtime/hr", $"P{data.OvertimePerHour}",
+                data.Overtime, $"P{data.OvertimePerHour}", "SSS", $"P{data.SSS}", $"{data.SSSDetails}" }));
+
+            sheetData.AppendChild(CreateRow(new string[] { "", "Overtime/min", $"P{data.OvertimePerMinute}",
+                "", $"P{data.OvertimePerMinute}", "PAG-IBIG", $"P{data.PagIbig}", $"{data.PagIbigDetails}" }));
 
             // Incentives row
-            sheetData.AppendChild(CreateRow(new string[] { "3.", data.EmployeeId, "Incentives", $"P{data.Incentives}", 
-                "", $"P{data.Incentives}", "PHILHEALTH", $"P{data.Philhealth}", "" }));
+            sheetData.AppendChild(CreateRow(new string[] { "", "Incentives", $"P{data.Incentives}",
+                "", $"P{data.Incentives}", "PHILHEALTH", $"P{data.Philhealth}", $"{data.PhilhealthDetails}" }));
 
             // Commission row
-            sheetData.AppendChild(CreateRow(new string[] { "4.", data.EmployeeId, "Commission", $"P{data.Commission}", 
-                "", $"P{data.Commission}", "SSS Loan", $"P{data.SSSLoan}", "" }));
+            sheetData.AppendChild(CreateRow(new string[] { "", "Commission", $"P{data.Commission}",
+                "", $"P{data.Commission}", "SSS Loan", $"P{data.SSSLoan}", $"{data.SSSLoanDetails}" }));
 
             // Food Allowance row
-            sheetData.AppendChild(CreateRow(new string[] { "5.", data.EmployeeId, "Food Allowance", $"P{data.FoodAllowance}", 
-                "", $"P{data.FoodAllowance}", "PAG-IBIG Loan", $"P{data.PagIbigLoan}", "" }));
+            sheetData.AppendChild(CreateRow(new string[] { "", "Food Allowance", $"P{data.FoodAllowance}",
+                "", $"P{data.FoodAllowance}", "PAG-IBIG Loan", $"P{data.PagIbigLoan}", $"{data.PagIbigLoanDetails}" }));
 
             // Communication row
-            sheetData.AppendChild(CreateRow(new string[] { "6.", data.EmployeeId, "Communication", $"P{data.Communication}", 
-                "", $"P{data.Communication}", "Car Loan", $"P{data.CarLoan}", "" }));
+            sheetData.AppendChild(CreateRow(new string[] { "" , "Communication", $"P{data.Communication}",
+                "", $"P{data.Communication}", "Car Loan", $"P{data.CarLoan}", $"{data.CarLoanDetails}"}));
 
             // Gas Allowance row
-            sheetData.AppendChild(CreateRow(new string[] { "7.", data.EmployeeId, "Gas Allowance", $"P{data.GasAllowance}", 
-                "", $"P{data.GasAllowance}", "Housing Loan", $"P{data.HousingLoan}", "" }));
+            sheetData.AppendChild(CreateRow(new string[] { "", "Gas Allowance", $"P{data.GasAllowance}",
+                "", $"P{data.GasAllowance}", "Housing Loan", $"P{data.HousingLoan}", $"{data.HousingLoanDetails}"}));
 
             // Gondola row
-            sheetData.AppendChild(CreateRow(new string[] { "8.", data.EmployeeId, "Gondola", $"P{data.Gondola}", 
-                "", $"P{data.Gondola}", "Cash Advance", $"P{data.CashAdvance}", "" }));
+            sheetData.AppendChild(CreateRow(new string[] { "", "Gondola", $"P{data.Gondola}",
+                "", $"P{data.Gondola}", "Cash Advance", $"P{data.CashAdvance}", $"{data.CashAdvanceDetails}" }));
 
             // Empty row
             sheetData.AppendChild(CreateRow(new string[] { "" }));
 
             // Gross Pay and Deductions summary
-            sheetData.AppendChild(CreateRow(new string[] { "", "", "Gross Pay", $"P{data.GrossPay}", 
-                "Deductions", $"P{data.TotalDeductions}", "", "", $"P{data.NetPay}" }, 1));
+            sheetData.AppendChild(CreateRow(new string[] { "", "", "", "Gross Pay", $"P{data.GrossPay}",
+                "Deductions", $"P{data.TotalDeductions}", "Net Pay", $"P{data.NetPay}" }, 1));
 
             // Empty row
             sheetData.AppendChild(CreateRow(new string[] { "" }));
@@ -190,11 +208,11 @@ namespace HRIS_JAP_ATTPAY
             sheetData.AppendChild(CreateRow(new string[] { "Leave", "Credit", "Debit", "Balance" }, 1));
 
             // Vacation Leave
-            sheetData.AppendChild(CreateRow(new string[] { "Vacation Leave", data.VacationLeaveCredit, 
+            sheetData.AppendChild(CreateRow(new string[] { "Vacation Leave", data.VacationLeaveCredit,
                 data.VacationLeaveDebit, data.VacationLeaveBalance }));
 
             // Sick Leave
-            sheetData.AppendChild(CreateRow(new string[] { "Sick Leave", data.SickLeaveCredit, 
+            sheetData.AppendChild(CreateRow(new string[] { "Sick Leave", data.SickLeaveCredit,
                 data.SickLeaveDebit, data.SickLeaveBalance }));
         }
 

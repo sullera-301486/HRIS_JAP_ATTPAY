@@ -826,10 +826,8 @@ namespace HRIS_JAP_ATTPAY
 
         private void dataGridViewTodo_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
         {
-            dataGridViewTodo.Cursor = Cursors.Default; if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
-            {
-                dataGridViewTodo.Cursor = Cursors.Default;
-            }
+            if (e.RowIndex >= 0 && dataGridViewTodo.Columns[e.ColumnIndex].Name == "ColumnTrash")
+                dataGridViewTodo.Cursor = Cursors.Hand;
         }
 
         private void dataGridViewTodo_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
