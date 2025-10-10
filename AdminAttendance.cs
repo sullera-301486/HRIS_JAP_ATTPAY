@@ -37,7 +37,9 @@ namespace HRIS_JAP_ATTPAY
             setFont();
             setTextBoxAttributes();
             setDataGridViewAttributes();
-
+            comboBoxSelectDate.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBoxSelectDate.IntegralHeight = false;
+            comboBoxSelectDate.MaxDropDownItems = 5;
 
             // Load data asynchronously
             LoadDataAsync();
@@ -45,11 +47,13 @@ namespace HRIS_JAP_ATTPAY
 
         private async void LoadDataAsync()
         {
+            // Initialize with no specific sorting (will use natural order from Firebase)
+            currentAttendanceFilters = new AttendanceFilterCriteria();
+
             // Load employee department mapping first
             await LoadEmployeeDepartmentMap();
 
-            // Then load attendance data
-            LoadFirebaseAttendanceData();
+            // Then populate dates which will trigger data loading with today's date
             PopulateDateComboBox();
         }
 
@@ -565,6 +569,7 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewAttendance.CellMouseEnter += dataGridViewAttendance_CellMouseEnter;
             dataGridViewAttendance.CellMouseLeave += dataGridViewAttendance_CellMouseLeave;
             dataGridViewAttendance.CellFormatting += dataGridViewAttendance_CellFormatting;
+
             // Define columns
             dataGridViewAttendance.Columns.Clear();
             dataGridViewAttendance.Columns.Add(new DataGridViewTextBoxColumn { Name = "RowNumber", HeaderText = "", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 25 });
@@ -841,60 +846,40 @@ namespace HRIS_JAP_ATTPAY
                 var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
                 var uniqueDates = new HashSet<string>();
 
+                System.Diagnostics.Debug.WriteLine($"Total attendance records found: {attendanceRecords?.Count()}");
+
                 foreach (var record in attendanceRecords)
                 {
                     if (record?.Object != null)
                     {
                         try
                         {
-                            string dateStr = "";
+                            string dateStr = ExtractDateFromAnyRecordType(record.Object, record.Key);
 
-                            // Convert to dictionary for easier access
-                            var recordDict = record.Object as IDictionary<string, object>;
-                            if (recordDict != null)
+                            if (!string.IsNullOrEmpty(dateStr))
                             {
-                                // Try different date field names
-                                if (recordDict.ContainsKey("attendance_date") && recordDict["attendance_date"] != null)
-                                {
-                                    dateStr = recordDict["attendance_date"].ToString();
-                                }
-                                else if (recordDict.ContainsKey("date") && recordDict["date"] != null)
-                                {
-                                    dateStr = recordDict["date"].ToString();
-                                }
-                                else if (recordDict.ContainsKey("time_in") && recordDict["time_in"] != null)
-                                {
-                                    string timeInStr = recordDict["time_in"].ToString();
-                                    if (!string.IsNullOrEmpty(timeInStr) && timeInStr != "N/A")
-                                    {
-                                        if (DateTime.TryParse(timeInStr, out DateTime timeInDate))
-                                        {
-                                            dateStr = timeInDate.ToString("yyyy-MM-dd");
-                                        }
-                                    }
-                                }
-
                                 // Try to parse the date string
-                                if (!string.IsNullOrEmpty(dateStr))
+                                DateTime parsedDate;
+                                if (DateTime.TryParse(dateStr, out parsedDate))
                                 {
-                                    // Handle different date formats
-                                    DateTime parsedDate;
-                                    if (DateTime.TryParse(dateStr, out parsedDate))
-                                    {
-                                        uniqueDates.Add(parsedDate.ToString("yyyy-MM-dd"));
-                                    }
-                                    else if (DateTime.TryParseExact(dateStr, "yyyy-MM-dd",
-                                             System.Globalization.CultureInfo.InvariantCulture,
-                                             System.Globalization.DateTimeStyles.None, out parsedDate))
-                                    {
-                                        uniqueDates.Add(parsedDate.ToString("yyyy-MM-dd"));
-                                    }
-                                    else
-                                    {
-                                        // DEBUG: Log unparseable dates
-                                        System.Diagnostics.Debug.WriteLine($"Could not parse date: {dateStr}");
-                                    }
+                                    uniqueDates.Add(parsedDate.ToString("yyyy-MM-dd"));
+                                    System.Diagnostics.Debug.WriteLine($"✓ Added date: {parsedDate:yyyy-MM-dd} from key: {record.Key}");
                                 }
+                                else if (DateTime.TryParseExact(dateStr, "yyyy-MM-dd",
+                                         System.Globalization.CultureInfo.InvariantCulture,
+                                         System.Globalization.DateTimeStyles.None, out parsedDate))
+                                {
+                                    uniqueDates.Add(parsedDate.ToString("yyyy-MM-dd"));
+                                    System.Diagnostics.Debug.WriteLine($"✓ Added date (exact): {parsedDate:yyyy-MM-dd} from key: {record.Key}");
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"✗ Could not parse date: {dateStr} from key: {record.Key}");
+                                }
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine($"✗ No date found for key: {record.Key}");
                             }
                         }
                         catch (Exception ex)
@@ -904,51 +889,164 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                // DEBUG: Show what dates were found
-                System.Diagnostics.Debug.WriteLine($"Found {uniqueDates.Count} unique dates:");
-                foreach (var date in uniqueDates)
-                {
-                    System.Diagnostics.Debug.WriteLine($"  - {date}");
-                }
+                System.Diagnostics.Debug.WriteLine($"Total unique dates found: {uniqueDates.Count}");
 
                 // Add today's date for testing if no dates found
                 if (uniqueDates.Count == 0)
                 {
-                    System.Diagnostics.Debug.WriteLine("No dates found in attendance records, adding today's date for testing");
-                    uniqueDates.Add(DateTime.Today.ToString("yyyy-MM-dd"));
-                    uniqueDates.Add(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
+                    System.Diagnostics.Debug.WriteLine("No dates found, adding fallback dates");
+                    for (int i = 0; i < 30; i++)
+                    {
+                        uniqueDates.Add(DateTime.Today.AddDays(-i).ToString("yyyy-MM-dd"));
+                    }
                 }
 
                 // Add dates to combo box in descending order
                 var sortedDates = uniqueDates.Select(d => DateTime.Parse(d))
-                                            .OrderByDescending(d => d)
-                                            .Select(d => d.ToString("yyyy-MM-dd"))
-                                            .ToList();
+                                     .OrderByDescending(d => d)
+                                     .Select(d => d.ToString("yyyy-MM-dd"))
+                                     .ToList();
 
                 foreach (var date in sortedDates)
                 {
                     comboBoxSelectDate.Items.Add(date);
                 }
 
-                comboBoxSelectDate.SelectedIndex = 0;
+                System.Diagnostics.Debug.WriteLine($"ComboBox now has {comboBoxSelectDate.Items.Count} items");
+
+                // Set today's date as default
+                string todayString = DateTime.Today.ToString("yyyy-MM-dd");
+
+                if (comboBoxSelectDate.Items.Contains(todayString))
+                {
+                    comboBoxSelectDate.SelectedItem = todayString;
+                    DateTime selectedDate = DateTime.Parse(todayString);
+                    LoadFirebaseAttendanceData(selectedDate);
+                }
+                else if (comboBoxSelectDate.Items.Count > 1)
+                {
+                    comboBoxSelectDate.SelectedIndex = 1;
+                    string firstDate = comboBoxSelectDate.SelectedItem.ToString();
+                    DateTime selectedDate = DateTime.Parse(firstDate);
+                    LoadFirebaseAttendanceData(selectedDate);
+                }
+                else
+                {
+                    comboBoxSelectDate.SelectedIndex = 0;
+                    LoadFirebaseAttendanceData(null);
+                }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error populating date combo box: " + ex.Message);
 
-                // Add fallback dates for testing
+                // Enhanced fallback with more dates
                 comboBoxSelectDate.Items.Clear();
                 comboBoxSelectDate.Items.Add("All Dates");
-                for (int i = 0; i < 7; i++)
+
+                // Add a wider range of fallback dates including September dates
+                for (int i = 0; i < 60; i++)
                 {
                     string testDate = DateTime.Today.AddDays(-i).ToString("yyyy-MM-dd");
                     comboBoxSelectDate.Items.Add(testDate);
-                    System.Diagnostics.Debug.WriteLine($"Added fallback date: {testDate}");
                 }
-                comboBoxSelectDate.SelectedIndex = 0;
+
+                comboBoxSelectDate.SelectedItem = DateTime.Today.ToString("yyyy-MM-dd");
+                LoadFirebaseAttendanceData(DateTime.Today);
             }
         }
 
+        // NEW METHOD: Extract date from any record type
+        private string ExtractDateFromAnyRecordType(dynamic record, string recordKey)
+        {
+            try
+            {
+                // Method 1: Try direct property access (for dictionary-like records)
+                try
+                {
+                    if (record is IDictionary<string, object> dict)
+                    {
+                        if (dict.ContainsKey("attendance_date") && dict["attendance_date"] != null)
+                        {
+                            string dateStr = dict["attendance_date"].ToString();
+                            if (!string.IsNullOrEmpty(dateStr) && dateStr != "N/A")
+                            {
+                                System.Diagnostics.Debug.WriteLine($"Found attendance_date in dict: {dateStr} for key: {recordKey}");
+                                return dateStr;
+                            }
+                        }
+                    }
+                }
+                catch { }
+
+                // Method 2: Try JSON serialization approach
+                try
+                {
+                    string json = Newtonsoft.Json.JsonConvert.SerializeObject(record);
+                    var jsonDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+
+                    if (jsonDict != null)
+                    {
+                        if (jsonDict.ContainsKey("attendance_date") && jsonDict["attendance_date"] != null)
+                        {
+                            string dateStr = jsonDict["attendance_date"].ToString();
+                            if (!string.IsNullOrEmpty(dateStr) && dateStr != "N/A")
+                            {
+                                System.Diagnostics.Debug.WriteLine($"Found attendance_date in JSON: {dateStr} for key: {recordKey}");
+                                return dateStr;
+                            }
+                        }
+
+                        // Also try other possible date field names
+                        string[] possibleDateFields = { "date", "attendanceDate", "attendance_date", "AttendanceDate" };
+                        foreach (string field in possibleDateFields)
+                        {
+                            if (jsonDict.ContainsKey(field) && jsonDict[field] != null)
+                            {
+                                string dateStr = jsonDict[field].ToString();
+                                if (!string.IsNullOrEmpty(dateStr) && dateStr != "N/A")
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"Found {field} in JSON: {dateStr} for key: {recordKey}");
+                                    return dateStr;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch { }
+
+                // Method 3: Try reflection as last resort
+                try
+                {
+                    var properties = record.GetType().GetProperties();
+                    foreach (var prop in properties)
+                    {
+                        if (prop.Name.ToLower().Contains("date") && !prop.Name.ToLower().Contains("time"))
+                        {
+                            var value = prop.GetValue(record);
+                            if (value != null)
+                            {
+                                string dateStr = value.ToString();
+                                if (!string.IsNullOrEmpty(dateStr) && dateStr != "N/A")
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"Found {prop.Name} via reflection: {dateStr} for key: {recordKey}");
+                                    return dateStr;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch { }
+
+                System.Diagnostics.Debug.WriteLine($"No date field found for key: {recordKey}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in ExtractDateFromAnyRecordType for key {recordKey}: {ex.Message}");
+                return null;
+            }
+        }
         private async void LoadFirebaseAttendanceData(DateTime? selectedDate = null)
         {
             if (isLoading) return;
@@ -1032,8 +1130,21 @@ namespace HRIS_JAP_ATTPAY
 
                 UpdateStatusLabel(selectedDate);
 
-                // Apply filters after loading data
+                // Apply any existing filters (but no default sorting)
                 ApplyAllAttendanceFilters();
+
+                // Force a refresh to ensure data is visible
+                if (dataGridViewAttendance.InvokeRequired)
+                {
+                    dataGridViewAttendance.Invoke((MethodInvoker)delegate
+                    {
+                        dataGridViewAttendance.Refresh();
+                    });
+                }
+                else
+                {
+                    dataGridViewAttendance.Refresh();
+                }
             }
             catch (Exception ex)
             {

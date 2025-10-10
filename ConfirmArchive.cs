@@ -141,10 +141,8 @@ namespace HRIS_JAP_ATTPAY
                     return;
                 }
 
-                // Check if form handle is created before any UI operations
                 if (!IsHandleCreated)
                 {
-                    // Wait for handle to be created
                     await Task.Run(() =>
                     {
                         while (!IsHandleCreated)
@@ -154,7 +152,6 @@ namespace HRIS_JAP_ATTPAY
                     });
                 }
 
-                // Show loading state
                 SafeSetButtonText(buttonConfirm, "Archiving...");
 
                 // 1. Get all employee data
@@ -168,6 +165,12 @@ namespace HRIS_JAP_ATTPAY
                     MessageBox.Show("Employee not found in database.");
                     return;
                 }
+
+                // Get employee name for logging
+                string firstName = employeeData.first_name?.ToString() ?? "";
+                string middleName = employeeData.middle_name?.ToString() ?? "";
+                string lastName = employeeData.last_name?.ToString() ?? "";
+                string fullName = $"{firstName} {middleName} {lastName}".Replace("  ", " ").Trim();
 
                 // 2. Get all related data
                 var employmentData = await GetEmploymentInfo();
@@ -198,7 +201,7 @@ namespace HRIS_JAP_ATTPAY
                     payroll_summaries = payrollSummaries,
                     todos = todos,
                     archived_date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    archived_by = "System",
+                    archived_by = SessionClass.CurrentEmployeeName, // Changed from "System"
                     is_archived = true
                 };
 
@@ -210,6 +213,9 @@ namespace HRIS_JAP_ATTPAY
 
                 // 5. Remove from all active tables
                 await RemoveFromAllActiveTables();
+
+                // 6. Log the archive action
+                await LogArchiveAction(fullName);
 
                 // Set UserConfirmed to true on success
                 this.UserConfirmed = true;
@@ -1099,6 +1105,22 @@ namespace HRIS_JAP_ATTPAY
         protected override void OnHandleCreated(EventArgs e)
         {
             base.OnHandleCreated(e);
+        }
+        private async Task LogArchiveAction(string employeeName)
+        {
+            try
+            {
+                string description = $"Archived employee: {employeeName}";
+                await AdminLogService.LogAdminAction(
+                    AdminLogService.Actions.ARCHIVE_EMPLOYEE,
+                    description,
+                    employeeId
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error logging archive action: {ex.Message}");
+            }
         }
     }
 }

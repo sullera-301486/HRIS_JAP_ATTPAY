@@ -13,25 +13,30 @@ namespace HRIS_JAP_ATTPAY
     public partial class ConfirmAddEmployee : Form
     {
         public bool UserConfirmed { get; private set; } = false;
+        private string employeeId;
+        private string employeeName;
 
-        public ConfirmAddEmployee()
+        // Updated constructor to accept employee info
+        public ConfirmAddEmployee(string employeeId = null, string employeeName = null)
         {
             InitializeComponent();
+            this.employeeId = employeeId;
+            this.employeeName = employeeName;
             setFont();
             this.Load += ConfirmProfileUpdate_Load;
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
         {
-            this.UserConfirmed = false; // Fixed: Should be false for cancel/X
-            this.DialogResult = DialogResult.Cancel; // Fixed: Should be Cancel
+            this.UserConfirmed = false;
+            this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-            this.UserConfirmed = false; // Fixed: Should be false for cancel
-            this.DialogResult = DialogResult.Cancel; // Fixed: Should be Cancel
+            this.UserConfirmed = false;
+            this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
 
@@ -50,10 +55,22 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private void buttonConfirm_Click(object sender, EventArgs e) // Removed async - not needed
+        private async void buttonConfirm_Click(object sender, EventArgs e)
         {
             this.UserConfirmed = true;
             this.DialogResult = DialogResult.OK;
+
+            // Log the action
+            if (!string.IsNullOrEmpty(employeeId))
+            {
+                string description = $"Added new employee: {employeeName ?? employeeId}";
+                await AdminLogService.LogAdminAction(
+                    AdminLogService.Actions.ADD_EMPLOYEE,
+                    description,
+                    employeeId
+                );
+            }
+
             this.Close();
         }
 

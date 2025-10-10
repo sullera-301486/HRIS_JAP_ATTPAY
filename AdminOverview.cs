@@ -37,9 +37,15 @@ namespace HRIS_JAP_ATTPAY
             setPanelAttributes();
             LoadAttendanceSummary(DateTime.Today);
             PopulateDateComboBox();
+            LoadAttendanceSummary(DateTime.Today);
+            LoadAdminLogs();
             LoadTodoList();
             LoadPayrollLogs();
+            comboBoxSelectDate.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBoxSelectDate.IntegralHeight = false;
+            comboBoxSelectDate.MaxDropDownItems = 5;
         }
+
 
         private void setFont()
         {
@@ -124,49 +130,43 @@ namespace HRIS_JAP_ATTPAY
 
             try
             {
-                // FIX: Load attendance as dictionary instead of JArray
+                // FIX: Use the same pattern as AdminAttendance
                 var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
 
-                if (attendanceRecords != null)
+                System.Diagnostics.Debug.WriteLine($"Total attendance records found: {attendanceRecords?.Count()}");
+
+                foreach (var attendanceRecord in attendanceRecords)
                 {
-                    foreach (var attendanceRecord in attendanceRecords)
+                    if (attendanceRecord?.Object != null)
                     {
-                        if (attendanceRecord?.Object != null)
+                        try
                         {
-                            // Convert dynamic to dictionary for safe access
-                            var attendanceDict = attendanceRecord.Object as IDictionary<string, object>;
-                            if (attendanceDict != null)
+                            // Use the robust date extraction method from AdminAttendance
+                            string dateStr = ExtractDateFromAnyRecordType(attendanceRecord.Object, attendanceRecord.Key);
+
+                            if (!string.IsNullOrEmpty(dateStr))
                             {
-                                // Extract date from both possible fields
-                                string attendanceDateStr = attendanceDict.ContainsKey("attendance_date") ?
-                                    attendanceDict["attendance_date"]?.ToString() ?? "" : "";
-                                string timeInStr = attendanceDict.ContainsKey("time_in") ?
-                                    attendanceDict["time_in"]?.ToString() ?? "" : "";
-
-                                DateTime? recordDate = null;
-
-                                // Try to get date from attendance_date field first
-                                if (!string.IsNullOrEmpty(attendanceDateStr) &&
-                                    DateTime.TryParse(attendanceDateStr, out DateTime parsedDate))
+                                DateTime parsedDate;
+                                if (DateTime.TryParse(dateStr, out parsedDate))
                                 {
-                                    recordDate = parsedDate;
+                                    uniqueDates.Add(parsedDate.ToString("yyyy-MM-dd"));
                                 }
-                                // If not available, try to extract from time_in field
-                                else if (!string.IsNullOrEmpty(timeInStr) &&
-                                         DateTime.TryParse(timeInStr, out DateTime timeInDate))
+                                else if (DateTime.TryParseExact(dateStr, "yyyy-MM-dd",
+                                         System.Globalization.CultureInfo.InvariantCulture,
+                                         System.Globalization.DateTimeStyles.None, out parsedDate))
                                 {
-                                    recordDate = timeInDate.Date;
-                                }
-
-                                if (recordDate.HasValue)
-                                {
-                                    // Add date in consistent format
-                                    uniqueDates.Add(recordDate.Value.ToString("yyyy-MM-dd"));
+                                    uniqueDates.Add(parsedDate.ToString("yyyy-MM-dd"));
                                 }
                             }
                         }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Error processing record {attendanceRecord.Key}: {ex.Message}");
+                        }
                     }
                 }
+
+                System.Diagnostics.Debug.WriteLine($"Total unique dates found: {uniqueDates.Count}");
 
                 // Sort dates in descending order (most recent first)
                 return uniqueDates.OrderByDescending(d => DateTime.Parse(d)).ToList();
@@ -240,11 +240,8 @@ namespace HRIS_JAP_ATTPAY
                 int lateCount = 0;
                 int absentCount = 0;
 
-                // FIX: Load attendance as dictionary instead of JArray
+                // FIX: Count using status field directly
                 var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
-
-                // Create a set of active employees who attended on the selected date
-                var attendedEmployees = new HashSet<string>();
                 string targetDate = date.ToString("yyyy-MM-dd");
 
                 if (attendanceRecords != null)
@@ -254,53 +251,34 @@ namespace HRIS_JAP_ATTPAY
                         if (attendanceRecord?.Object != null)
                         {
                             // Convert dynamic to dictionary for safe access
-                            var attendanceDict = attendanceRecord.Object as IDictionary<string, object>;
-                            if (attendanceDict != null)
+                            Dictionary<string, object> attendanceDict = ConvertToDictionary(attendanceRecord.Object);
+
+                            if (attendanceDict != null && attendanceDict.Any())
                             {
-                                // Extract values safely
-                                string attendanceDateStr = attendanceDict.ContainsKey("attendance_date") ?
-                                    attendanceDict["attendance_date"]?.ToString() ?? "" : "";
-                                string timeInStr = attendanceDict.ContainsKey("time_in") ?
-                                    attendanceDict["time_in"]?.ToString() ?? "" : "";
-                                string status = attendanceDict.ContainsKey("status") ?
-                                    attendanceDict["status"]?.ToString() ?? "Absent" : "Absent";
-                                string employeeId = attendanceDict.ContainsKey("employee_id") ?
-                                    attendanceDict["employee_id"]?.ToString() ?? "" : "";
+                                // Extract values safely using helper methods
+                                string status = GetSafeString(attendanceDict, "status", "Absent");
+                                string employeeId = GetSafeString(attendanceDict, "employee_id");
 
-                                // Check if this record matches the selected date
-                                bool matchesDate = false;
-
-                                // Check attendance_date first
-                                if (!string.IsNullOrEmpty(attendanceDateStr) && attendanceDateStr == targetDate)
-                                {
-                                    matchesDate = true;
-                                }
-
-                                // Check time_in date if not already matched
-                                if (!matchesDate && !string.IsNullOrEmpty(timeInStr) &&
-                                    DateTime.TryParse(timeInStr, out DateTime timeInDate))
-                                {
-                                    matchesDate = timeInDate.ToString("yyyy-MM-dd") == targetDate;
-                                }
+                                // Use robust date extraction
+                                string extractedDate = ExtractDateFromAnyRecordType(attendanceRecord.Object, attendanceRecord.Key);
+                                bool matchesDate = !string.IsNullOrEmpty(extractedDate) && extractedDate == targetDate;
 
                                 // Only count if employee is active (not archived) and matches date
                                 if (matchesDate && !string.IsNullOrEmpty(employeeId) && allEmployees.Contains(employeeId))
                                 {
-                                    attendedEmployees.Add(employeeId);
+                                    string lowerStatus = status.ToLower();
 
-                                    switch (status.ToLower())
+                                    if (lowerStatus == "on time" || lowerStatus == "ontime" || lowerStatus == "on-time")
                                     {
-                                        case "on time":
-                                            onTimeCount++;
-                                            break;
-                                        case "late":
-                                        case "early out":
-                                        case "late & early out":
-                                            lateCount++;
-                                            break;
-                                        default:
-                                            // Employee attended but with different status
-                                            break;
+                                        onTimeCount++;
+                                    }
+                                    else if (lowerStatus.Contains("late") || lowerStatus.Contains("early out") || lowerStatus == "late")
+                                    {
+                                        lateCount++;
+                                    }
+                                    else if (lowerStatus == "absent")
+                                    {
+                                        absentCount++;
                                     }
                                 }
                             }
@@ -308,7 +286,11 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                absentCount = totalEmployees - attendedEmployees.Count;
+                // DEBUG: Check the counts
+                System.Diagnostics.Debug.WriteLine($"Total Employees: {totalEmployees}");
+                System.Diagnostics.Debug.WriteLine($"On Time: {onTimeCount}");
+                System.Diagnostics.Debug.WriteLine($"Late/Early Out: {lateCount}");
+                System.Diagnostics.Debug.WriteLine($"Absent (from status): {absentCount}");
 
                 // Update UI with counts
                 labelTotalNumber.Text = totalEmployees.ToString();
@@ -318,6 +300,10 @@ namespace HRIS_JAP_ATTPAY
 
                 // Update the date range label
                 labelAlertDateRange.Text = $"Date: {targetDate}";
+
+                // Also refresh the alert grids
+                LoadTodaysAbsentEmployees();
+                LoadTodaysLateEmployees();
             }
             catch (Exception ex)
             {
@@ -473,11 +459,10 @@ namespace HRIS_JAP_ATTPAY
             try
             {
                 var today = DateTime.Today.ToString("yyyy-MM-dd");
-                var activeEmployees = await GetAllActiveEmployeesAsync();
 
-                // FIX: Get attendance as dictionary
+                // FIX: Use status field to find absent employees
                 var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
-                var attendedToday = new HashSet<string>();
+                var absentEmployees = new Dictionary<string, int>();
 
                 if (attendanceRecords != null)
                 {
@@ -485,65 +470,61 @@ namespace HRIS_JAP_ATTPAY
                     {
                         if (attendanceRecord?.Object != null)
                         {
-                            var attendanceDict = attendanceRecord.Object as IDictionary<string, object>;
-                            if (attendanceDict != null)
+                            // Convert dynamic to dictionary for safe access
+                            Dictionary<string, object> attendanceDict = ConvertToDictionary(attendanceRecord.Object);
+
+                            if (attendanceDict != null && attendanceDict.Any())
                             {
-                                string attendanceDateStr = attendanceDict.ContainsKey("attendance_date") ?
-                                    attendanceDict["attendance_date"]?.ToString() ?? "" : "";
-                                string timeInStr = attendanceDict.ContainsKey("time_in") ?
-                                    attendanceDict["time_in"]?.ToString() ?? "" : "";
-                                string employeeId = attendanceDict.ContainsKey("employee_id") ?
-                                    attendanceDict["employee_id"]?.ToString() ?? "" : "";
+                                string status = GetSafeString(attendanceDict, "status");
+                                string employeeId = GetSafeString(attendanceDict, "employee_id");
 
-                                bool matchesDate = false;
-                                if (!string.IsNullOrEmpty(attendanceDateStr) && attendanceDateStr == today)
-                                {
-                                    matchesDate = true;
-                                }
-                                else if (!matchesDate && !string.IsNullOrEmpty(timeInStr) &&
-                                         DateTime.TryParse(timeInStr, out DateTime timeInDate))
-                                {
-                                    matchesDate = timeInDate.ToString("yyyy-MM-dd") == today;
-                                }
+                                // Use robust date extraction
+                                string extractedDate = ExtractDateFromAnyRecordType(attendanceRecord.Object, attendanceRecord.Key);
+                                bool matchesDate = !string.IsNullOrEmpty(extractedDate) && extractedDate == today;
 
-                                if (matchesDate && !string.IsNullOrEmpty(employeeId))
+                                if (matchesDate && !string.IsNullOrEmpty(employeeId) && status.ToLower() == "absent")
                                 {
-                                    attendedToday.Add(employeeId);
+                                    if (absentEmployees.ContainsKey(employeeId))
+                                    {
+                                        absentEmployees[employeeId]++;
+                                    }
+                                    else
+                                    {
+                                        absentEmployees[employeeId] = 1;
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
-                // Find absent employees (active employees who didn't attend today)
-                var absentEmployees = activeEmployees.Where(empId => !attendedToday.Contains(empId)).ToList();
+                // Load employee names
+                var employeeDetails = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
+                var absentEmployeeCounts = new Dictionary<string, int>();
 
-                // Load employee names and count absences
-                var employeeDetails = await firebase.Child("EmployeeDetails").OnceAsync<JObject>();
-                var absenceCounts = new Dictionary<string, int>();
-
-                foreach (var empId in absentEmployees)
+                foreach (var entry in absentEmployees)
                 {
-                    if (employeeDetails.Any(e => e.Key == empId))
+                    string empId = entry.Key;
+                    int count = entry.Value;
+
+                    var empRecord = employeeDetails.FirstOrDefault(e => e.Key == empId);
+                    if (empRecord != null)
                     {
-                        var empData = employeeDetails.First(e => e.Key == empId).Object;
-                        string firstName = empData["first_name"]?.ToString() ?? "";
-                        string lastName = empData["last_name"]?.ToString() ?? "";
+                        Dictionary<string, object> empDict = ConvertToDictionary(empRecord.Object);
+                        string firstName = GetSafeString(empDict, "first_name");
+                        string lastName = GetSafeString(empDict, "last_name");
                         string fullName = $"{firstName} {lastName}".Trim();
 
-                        if (absenceCounts.ContainsKey(fullName))
+                        if (!string.IsNullOrEmpty(fullName))
                         {
-                            absenceCounts[fullName]++;
-                        }
-                        else
-                        {
-                            absenceCounts[fullName] = 1;
+                            absentEmployeeCounts[fullName] = count;
                         }
                     }
                 }
 
-                // Add to DataGridView
-                foreach (var entry in absenceCounts)
+                // Clear and add to DataGridView
+                dataGridViewAlertAbsent.Rows.Clear();
+                foreach (var entry in absentEmployeeCounts)
                 {
                     dataGridViewAlertAbsent.Rows.Add(entry.Key, entry.Value);
                 }
@@ -558,9 +539,11 @@ namespace HRIS_JAP_ATTPAY
             {
                 MessageBox.Show($"Error loading absent employees: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+                dataGridViewAlertAbsent.Rows.Clear();
                 dataGridViewAlertAbsent.Rows.Add("Error loading data", "0");
             }
         }
+
 
         private async void LoadTodaysLateEmployees()
         {
@@ -568,7 +551,7 @@ namespace HRIS_JAP_ATTPAY
             {
                 var today = DateTime.Today.ToString("yyyy-MM-dd");
 
-                // FIX: Get attendance as dictionary
+                // FIX: Use the same robust pattern as AdminAttendance
                 var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
                 var lateEmployees = new Dictionary<string, int>();
 
@@ -578,28 +561,17 @@ namespace HRIS_JAP_ATTPAY
                     {
                         if (attendanceRecord?.Object != null)
                         {
-                            var attendanceDict = attendanceRecord.Object as IDictionary<string, object>;
-                            if (attendanceDict != null)
-                            {
-                                string attendanceDateStr = attendanceDict.ContainsKey("attendance_date") ?
-                                    attendanceDict["attendance_date"]?.ToString() ?? "" : "";
-                                string timeInStr = attendanceDict.ContainsKey("time_in") ?
-                                    attendanceDict["time_in"]?.ToString() ?? "" : "";
-                                string status = attendanceDict.ContainsKey("status") ?
-                                    attendanceDict["status"]?.ToString() ?? "" : "";
-                                string employeeId = attendanceDict.ContainsKey("employee_id") ?
-                                    attendanceDict["employee_id"]?.ToString() ?? "" : "";
+                            // Convert dynamic to dictionary for safe access
+                            Dictionary<string, object> attendanceDict = ConvertToDictionary(attendanceRecord.Object);
 
-                                bool matchesDate = false;
-                                if (!string.IsNullOrEmpty(attendanceDateStr) && attendanceDateStr == today)
-                                {
-                                    matchesDate = true;
-                                }
-                                else if (!matchesDate && !string.IsNullOrEmpty(timeInStr) &&
-                                         DateTime.TryParse(timeInStr, out DateTime timeInDate))
-                                {
-                                    matchesDate = timeInDate.ToString("yyyy-MM-dd") == today;
-                                }
+                            if (attendanceDict != null && attendanceDict.Any())
+                            {
+                                string status = GetSafeString(attendanceDict, "status");
+                                string employeeId = GetSafeString(attendanceDict, "employee_id");
+
+                                // Use robust date extraction
+                                string extractedDate = ExtractDateFromAnyRecordType(attendanceRecord.Object, attendanceRecord.Key);
+                                bool matchesDate = !string.IsNullOrEmpty(extractedDate) && extractedDate == today;
 
                                 if (matchesDate && !string.IsNullOrEmpty(employeeId) &&
                                     (status.ToLower() == "late" || status.ToLower() == "early out" || status.ToLower() == "late & early out"))
@@ -619,7 +591,7 @@ namespace HRIS_JAP_ATTPAY
                 }
 
                 // Load employee names
-                var employeeDetails = await firebase.Child("EmployeeDetails").OnceAsync<JObject>();
+                var employeeDetails = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
                 var lateEmployeeCounts = new Dictionary<string, int>();
 
                 foreach (var entry in lateEmployees)
@@ -627,18 +599,23 @@ namespace HRIS_JAP_ATTPAY
                     string empId = entry.Key;
                     int count = entry.Value;
 
-                    if (employeeDetails.Any(e => e.Key == empId))
+                    var empRecord = employeeDetails.FirstOrDefault(e => e.Key == empId);
+                    if (empRecord != null)
                     {
-                        var empData = employeeDetails.First(e => e.Key == empId).Object;
-                        string firstName = empData["first_name"]?.ToString() ?? "";
-                        string lastName = empData["last_name"]?.ToString() ?? "";
+                        Dictionary<string, object> empDict = ConvertToDictionary(empRecord.Object);
+                        string firstName = GetSafeString(empDict, "first_name");
+                        string lastName = GetSafeString(empDict, "last_name");
                         string fullName = $"{firstName} {lastName}".Trim();
 
-                        lateEmployeeCounts[fullName] = count;
+                        if (!string.IsNullOrEmpty(fullName))
+                        {
+                            lateEmployeeCounts[fullName] = count;
+                        }
                     }
                 }
 
-                // Add to DataGridView
+                // Clear and add to DataGridView
+                dataGridViewAlertLate.Rows.Clear();
                 foreach (var entry in lateEmployeeCounts)
                 {
                     dataGridViewAlertLate.Rows.Add(entry.Key, entry.Value);
@@ -654,8 +631,90 @@ namespace HRIS_JAP_ATTPAY
             {
                 MessageBox.Show($"Error loading late employees: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+                dataGridViewAlertLate.Rows.Clear();
                 dataGridViewAlertLate.Rows.Add("Error loading data", "0");
             }
+        }
+        // ADD THESE HELPER METHODS FROM AdminAttendance
+        private string ExtractDateFromAnyRecordType(dynamic record, string recordKey)
+        {
+            try
+            {
+                // Convert to dictionary first
+                Dictionary<string, object> dict = ConvertToDictionary(record);
+
+                if (dict != null)
+                {
+                    // Check all possible date fields in priority order
+                    string[] possibleDateFields = {
+                "attendance_date", "created_date", "date",
+                "attendanceDate", "AttendanceDate"
+            };
+
+                    foreach (string field in possibleDateFields)
+                    {
+                        if (dict.ContainsKey(field) && dict[field] != null)
+                        {
+                            string dateStr = dict[field].ToString();
+                            if (!string.IsNullOrEmpty(dateStr) && dateStr != "N/A")
+                            {
+                                // Extract just the date part (before space if there's time)
+                                if (dateStr.Contains(" "))
+                                {
+                                    dateStr = dateStr.Split(' ')[0];
+                                }
+
+                                System.Diagnostics.Debug.WriteLine($"Found {field}: {dateStr} for key: {recordKey}");
+                                return dateStr;
+                            }
+                        }
+                    }
+                }
+
+                System.Diagnostics.Debug.WriteLine($"No date field found for key: {recordKey}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in ExtractDateFromAnyRecordType for key {recordKey}: {ex.Message}");
+                return null;
+            }
+        }
+
+        private Dictionary<string, object> ConvertToDictionary(dynamic obj)
+        {
+            try
+            {
+                if (obj is IDictionary<string, object> directDict)
+                {
+                    return new Dictionary<string, object>(directDict);
+                }
+                else
+                {
+                    string json = Newtonsoft.Json.JsonConvert.SerializeObject(obj);
+                    return Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                }
+            }
+            catch
+            {
+                return new Dictionary<string, object>();
+            }
+        }
+
+        private string GetSafeString(Dictionary<string, object> dict, string key, string defaultValue = "")
+        {
+            try
+            {
+                if (dict.ContainsKey(key) && dict[key] != null)
+                {
+                    return dict[key].ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting {key}: {ex.Message}");
+            }
+            return defaultValue;
         }
 
         private void setPanelAttributes()
@@ -888,49 +947,6 @@ namespace HRIS_JAP_ATTPAY
             LoadTodoList();
         }
 
-        private async void LoadPayrollLogs()
-        {
-            try
-            {
-                dataGridViewPayrollLogs.Rows.Clear();
-
-                // Load payroll logs from Firebase
-                var payrollLogs = await firebase
-                    .Child("PayrollLogs")
-                    .OnceAsync<Dictionary<string, object>>();
-
-                if (payrollLogs != null && payrollLogs.Any())
-                {
-                    foreach (var log in payrollLogs.OrderByDescending(l => l.Key))
-                    {
-                        var logData = log.Object;
-                        if (logData != null)
-                        {
-                            string date = logData.ContainsKey("date") ? logData["date"]?.ToString() ?? "" : "";
-                            string time = logData.ContainsKey("time") ? logData["time"]?.ToString() ?? "" : "";
-                            string action = logData.ContainsKey("action") ? logData["action"]?.ToString() ?? "" : "";
-                            string details = logData.ContainsKey("details") ? logData["details"]?.ToString() ?? "" : "";
-
-                            // Add to DataGridView
-                            dataGridViewPayrollLogs.Rows.Add(date, time, action, details);
-                        }
-                    }
-                }
-
-                // If no logs found, show message
-                if (dataGridViewPayrollLogs.Rows.Count == 0)
-                {
-                    dataGridViewPayrollLogs.Rows.Add("No payroll logs found", "", "", "");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading payroll logs: {ex.Message}", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                dataGridViewPayrollLogs.Rows.Add("Error loading logs", "", "", "");
-            }
-        }
-
         private async void LoadTodoList()
         {
             try
@@ -1011,6 +1027,174 @@ namespace HRIS_JAP_ATTPAY
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 dataGridViewTodo.Rows.Add("Error loading tasks", "");
                 Console.WriteLine($"Error loading todos: {ex.Message}");
+            }
+        }
+        private async void LoadPayrollLogs()
+        {
+            try
+            {
+                dataGridViewPayrollLogs.Rows.Clear();
+
+                // Load payroll logs from Firebase
+                var payrollLogs = await firebase
+                    .Child("PayrollLogs")
+                    .OnceAsync<Dictionary<string, object>>();
+
+                if (payrollLogs != null && payrollLogs.Any())
+                {
+                    foreach (var log in payrollLogs.OrderByDescending(l => l.Key))
+                    {
+                        var logData = log.Object;
+                        if (logData != null)
+                        {
+                            string date = logData.ContainsKey("date") ? logData["date"]?.ToString() ?? "" : "";
+                            string time = logData.ContainsKey("time") ? logData["time"]?.ToString() ?? "" : "";
+                            string action = logData.ContainsKey("action") ? logData["action"]?.ToString() ?? "" : "";
+                            string details = logData.ContainsKey("details") ? logData["details"]?.ToString() ?? "" : "";
+
+                            // Add to DataGridView
+                            dataGridViewPayrollLogs.Rows.Add(date, time, action, details);
+                        }
+                    }
+                }
+
+                // If no logs found, show message
+                if (dataGridViewPayrollLogs.Rows.Count == 0)
+                {
+                    dataGridViewPayrollLogs.Rows.Add("No payroll logs found", "", "", "");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading payroll logs: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                dataGridViewPayrollLogs.Rows.Add("Error loading logs", "", "", "");
+            }
+        }
+        private async void LoadAdminLogs()
+        {
+            try
+            {
+                // Clear existing rows
+                dataGridViewAdminLogs.Rows.Clear();
+
+                // Load admin logs from Firebase
+                var adminLogs = await firebase
+                    .Child("AdminLogs")
+                    .OnceAsync<dynamic>();
+
+                if (adminLogs != null && adminLogs.Any())
+                {
+                    // Create a list to sort by timestamp
+                    var logEntries = new List<(DateTime timestamp, string date, string time, string action, string details)>();
+
+                    foreach (var log in adminLogs)
+                    {
+                        try
+                        {
+                            var logData = log.Object;
+
+                            // Extract data from Firebase structure
+                            string timestampStr = logData.timestamp?.ToString() ?? "";
+                            string actionType = logData.action_type?.ToString() ?? "Unknown Action";
+                            string description = logData.description?.ToString() ?? "";
+                            string details = logData.details?.ToString() ?? "";
+                            string adminName = logData.admin_name?.ToString() ?? "";
+                            string targetEmployeeId = logData.target_employee_id?.ToString() ?? "";
+
+                            // Parse timestamp for sorting
+                            DateTime timestamp = DateTime.MinValue;
+                            if (!string.IsNullOrEmpty(timestampStr) &&
+                                DateTime.TryParse(timestampStr, out DateTime parsedTime))
+                            {
+                                timestamp = parsedTime;
+                            }
+                            else
+                            {
+                                // Use current time if parsing fails
+                                timestamp = DateTime.Now;
+                            }
+
+                            // Format date and time in the required format
+                            string date = timestamp.ToString("M - d - yy"); // "6 - 10 - 25"
+                            string time = timestamp.ToString("h:mm tt");    // "10:30 PM"
+
+                            // Format the action and details
+                            string action = FormatActionType(actionType);
+
+                            logEntries.Add((timestamp, date, time, action, description));
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error processing log entry: {ex.Message}");
+                            // Continue to next log entry
+                        }
+                    }
+
+                    // Sort by timestamp descending (most recent first) and take last 30
+                    var sortedLogs = logEntries
+                        .OrderByDescending(entry => entry.timestamp)
+                        .Take(30);
+
+                    foreach (var entry in sortedLogs)
+                    {
+                        dataGridViewAdminLogs.Rows.Add(entry.date, entry.time, entry.action, entry.details);
+                    }
+                }
+
+                // Show placeholder if no logs
+                if (dataGridViewAdminLogs.Rows.Count == 0)
+                {
+                    // Add sample data matching your required format
+                    dataGridViewAdminLogs.Rows.Add("N/A", "N/A", "N/A", "N/A.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading admin logs: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                // Add sample data on error for testing
+                dataGridViewAdminLogs.Rows.Add("Error", "Error", "Error", "Error");
+            }
+        }
+
+        // Helper method to format action types
+        // Helper method to format action types
+        private string FormatActionType(string actionType)
+        {
+            if (string.IsNullOrEmpty(actionType))
+                return "Unknown Action";
+
+            // Map Firebase action types to display format using classic switch case
+            switch (actionType)
+            {
+                case "Employee Updated":
+                    return "Updated Employee Profile";
+                case "Employee Added":
+                    return "Added Employee";
+                case "Employee Archived":
+                    return "Archived Employee";
+                case "Attendance Updated":
+                    return "Updated Attendance";
+                case "Leave Approved":
+                    return "Approved Leave";
+                case "Leave Rejected":
+                    return "Rejected Leave";
+                case "Payroll Generated":
+                    return "Generated Payroll";
+                case "Payroll Exported":
+                    return "Exported Payroll";
+                case "Work Schedule Updated":
+                    return "Updated Work Schedule";
+                case "User Account Added":
+                    return "Added User Account";
+                case "User Account Updated":
+                    return "Updated User Account";
+                case "User Account Removed":
+                    return "Removed User Account";
+                default:
+                    return actionType;
             }
         }
     }

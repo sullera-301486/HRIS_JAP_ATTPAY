@@ -8,24 +8,24 @@ namespace HRIS_JAP_ATTPAY
     public partial class ConfirmProfileUpdate : Form
     {
         public bool UserConfirmed { get; private set; } = false;
+        private string employeeId;
+        private string employeeName;
 
-        // ✅ Constructor must NOT be async
-        public ConfirmProfileUpdate()
+        // Updated constructor to accept employee info
+        public ConfirmProfileUpdate(string employeeId = null, string employeeName = null)
         {
             InitializeComponent();
+            this.employeeId = employeeId;
+            this.employeeName = employeeName;
             setFont();
-
-            // Hook the Load event to run async work later
             this.Load += ConfirmProfileUpdate_Load;
         }
 
-        // ✅ Async work belongs in Load or other event handlers
         private async void ConfirmProfileUpdate_Load(object sender, EventArgs e)
         {
             try
             {
-                // Example async call (replace with Firebase if needed)
-                await Task.Delay(200); // simulate async loading
+                await Task.Delay(200);
             }
             catch (Exception ex)
             {
@@ -45,7 +45,6 @@ namespace HRIS_JAP_ATTPAY
             this.Close();
         }
 
-
         private void setFont()
         {
             try
@@ -61,10 +60,22 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private void buttonConfirm_Click_1(object sender, EventArgs e)
+        private async void buttonConfirm_Click_1(object sender, EventArgs e)
         {
             this.UserConfirmed = true;
             this.DialogResult = DialogResult.OK;
+
+            // Log the action
+            if (!string.IsNullOrEmpty(employeeId))
+            {
+                string description = $"Employee profile updated for {employeeName ?? employeeId}";
+                await AdminLogService.LogAdminAction(
+                    AdminLogService.Actions.UPDATE_EMPLOYEE,
+                    description,
+                    employeeId
+                );
+            }
+
             this.Close();
         }
     }

@@ -227,6 +227,7 @@
     <Compile Include="AdminLoan.Designer.cs">
       <DependentUpon>AdminLoan.cs</DependentUpon>
     </Compile>
+    <Compile Include="AdminLogService.cs" />
     <Compile Include="AdminMenu.cs">
       <SubType>UserControl</SubType>
     </Compile>
