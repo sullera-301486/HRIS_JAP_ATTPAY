@@ -44,7 +44,7 @@
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonCancel.ForeColor = System.Drawing.Color.White;
             this.buttonCancel.Location = new System.Drawing.Point(231, 187);
-            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(135, 37);
             this.buttonCancel.TabIndex = 27;
@@ -60,12 +60,13 @@
             this.buttonConfirm.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonConfirm.ForeColor = System.Drawing.Color.White;
             this.buttonConfirm.Location = new System.Drawing.Point(72, 187);
-            this.buttonConfirm.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonConfirm.Margin = new System.Windows.Forms.Padding(4);
             this.buttonConfirm.Name = "buttonConfirm";
             this.buttonConfirm.Size = new System.Drawing.Size(135, 37);
             this.buttonConfirm.TabIndex = 26;
             this.buttonConfirm.Text = "Confirm";
             this.buttonConfirm.UseVisualStyleBackColor = false;
+            this.buttonConfirm.Click += new System.EventHandler(this.buttonConfirm_Click);
             // 
             // labelMessage
             // 
@@ -116,7 +117,7 @@
             this.Controls.Add(this.labelMessage);
             this.Controls.Add(this.labelRequestConfirm);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ConfirmPayrollExportAll";
             this.ShowInTaskbar = false;
             this.Text = "ConfirmPayrollExportAll";

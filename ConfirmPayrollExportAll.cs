@@ -35,5 +35,20 @@ namespace HRIS_JAP_ATTPAY
         {
             this.Close();
         }
+
+        private async void buttonConfirm_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog sfd = new SaveFileDialog
+            {
+                Filter = "Excel Files|*.xlsx",
+                FileName = $"Payroll_All_{DateTime.Now:yyyyMMddHHmmss}.xlsx"
+            })
+            {
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                     await PayrollExportAllData.GenerateAllPayrollsAsync(sfd.FileName);
+                }
+            }
+        }
     }
 }

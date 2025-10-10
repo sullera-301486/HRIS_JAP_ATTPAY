@@ -321,6 +321,7 @@
     <Compile Include="ConfirmPayrollExportIndividual.Designer.cs">
       <DependentUpon>ConfirmPayrollExportIndividual.cs</DependentUpon>
     </Compile>
+    <Compile Include="ConfirmPayrollExportIndividualShared.cs" />
     <Compile Include="ConfirmPayrollUpdate.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -507,6 +508,7 @@
       <DependentUpon>NewLeave.cs</DependentUpon>
     </Compile>
     <Compile Include="NotificationItems.cs" />
+    <Compile Include="PayrollExportAllData.cs" />
     <Compile Include="PayrollExportData.cs" />
     <Compile Include="PayrollSummary.cs">
       <SubType>Form</SubType>
