@@ -776,7 +776,7 @@ namespace HRIS_JAP_ATTPAY
 
         // NEW METHOD: Calculate status based on business rules
         // Updated CalculateStatus method for AdminAttendance.cs
-        private string CalculateStatus(string timeInStr, string timeOutStr, string existingStatus = "")
+        private async Task<string> CalculateStatusWithSchedule(string timeInStr, string timeOutStr, string employeeId, string attendanceDate, string existingStatus = "")
         {
             // If time in is N/A, then it's Absent
             if (string.IsNullOrEmpty(timeInStr) || timeInStr == "N/A")
@@ -784,34 +784,53 @@ namespace HRIS_JAP_ATTPAY
 
             try
             {
+                // Get the employee's schedule for this specific day
+                var schedule = await GetEmployeeScheduleForDay(employeeId, attendanceDate);
+
+                if (!schedule.HasValue)
+                {
+                    // No schedule found - use default times as fallback
+                    System.Diagnostics.Debug.WriteLine($"⚠️ No schedule for {employeeId} on {attendanceDate}, using default 8-5 times");
+                    return CalculateStatusWithDefaultTimes(timeInStr, timeOutStr, existingStatus);
+                }
+
+                TimeSpan expectedStart = schedule.Value.startTime;
+                TimeSpan expectedEnd = schedule.Value.endTime;
+
+                System.Diagnostics.Debug.WriteLine($"📅 Using schedule times - Start: {expectedStart}, End: {expectedEnd}");
+
                 DateTime timeIn, timeOut;
 
                 // Try to parse different time formats for Time In
-                bool timeInParsed = DateTime.TryParseExact(timeInStr, "HH:mm", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
+                bool timeInParsed = DateTime.TryParseExact(timeInStr, "yyyy-MM-dd HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
+                                   DateTime.TryParseExact(timeInStr, "HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
+                                   DateTime.TryParseExact(timeInStr, "HH:mm", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
                                    DateTime.TryParseExact(timeInStr, "hh:mm tt", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
                                    DateTime.TryParse(timeInStr, out timeIn);
 
-                bool timeOutParsed = DateTime.TryParseExact(timeOutStr, "HH:mm", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
+                bool timeOutParsed = DateTime.TryParseExact(timeOutStr, "yyyy-MM-dd HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
+                                    DateTime.TryParseExact(timeOutStr, "HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
+                                    DateTime.TryParseExact(timeOutStr, "HH:mm", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
                                     DateTime.TryParseExact(timeOutStr, "hh:mm tt", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
                                     DateTime.TryParse(timeOutStr, out timeOut);
 
                 if (timeInParsed)
                 {
-                    // Basic status calculation - adjust based on your business rules
-                    DateTime expectedStart = DateTime.Today.AddHours(8); // 8:00 AM
-                    DateTime expectedEnd = DateTime.Today.AddHours(17); // 5:00 PM
+                    TimeSpan actualTimeIn = new TimeSpan(timeIn.Hour, timeIn.Minute, timeIn.Second);
 
-                    DateTime actualTimeIn = DateTime.Today.AddHours(timeIn.Hour).AddMinutes(timeIn.Minute);
-
-                    bool isLate = actualTimeIn > expectedStart; // No grace period - late if after 8:00 AM
+                    bool isLate = actualTimeIn > expectedStart;
                     bool isEarlyOut = false;
 
                     // Check for early out only if we have valid time out
                     if (timeOutParsed && timeOutStr != "N/A" && !string.IsNullOrEmpty(timeOutStr))
                     {
-                        DateTime actualTimeOut = DateTime.Today.AddHours(timeOut.Hour).AddMinutes(timeOut.Minute);
-                        isEarlyOut = actualTimeOut < expectedEnd; // Early out if before 5:00 PM
+                        TimeSpan actualTimeOut = new TimeSpan(timeOut.Hour, timeOut.Minute, timeOut.Second);
+                        isEarlyOut = actualTimeOut < expectedEnd;
+
+                        System.Diagnostics.Debug.WriteLine($"⏰ Time Out: {actualTimeOut} vs Expected: {expectedEnd}, Early Out: {isEarlyOut}");
                     }
+
+                    System.Diagnostics.Debug.WriteLine($"⏰ Time In: {actualTimeIn} vs Expected: {expectedStart}, Late: {isLate}");
 
                     if (isLate && isEarlyOut)
                         return "Late & Early Out";
@@ -824,13 +843,13 @@ namespace HRIS_JAP_ATTPAY
                 }
                 else
                 {
-                    // If parsing fails, return the existing status or Absent
+                    System.Diagnostics.Debug.WriteLine($"❌ Failed to parse time in: {timeInStr}");
                     return !string.IsNullOrEmpty(existingStatus) ? existingStatus : "Absent";
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // If any error occurs, return the existing status or Absent
+                System.Diagnostics.Debug.WriteLine($"❌ Error in CalculateStatusWithSchedule: {ex.Message}");
                 return !string.IsNullOrEmpty(existingStatus) ? existingStatus : "Absent";
             }
         }
@@ -1115,7 +1134,7 @@ namespace HRIS_JAP_ATTPAY
                         // DEBUG: Show each record being processed
                         System.Diagnostics.Debug.WriteLine($"Processing record {firebaseKey}");
 
-                        bool recordAdded = ProcessAttendanceRecord(attendanceRecord.Object, employeeDict, selectedDate, counter, rowIndex, firebaseKey);
+                        bool recordAdded = await ProcessAttendanceRecord(attendanceRecord.Object, employeeDict, selectedDate, counter, rowIndex, firebaseKey);
                         if (recordAdded)
                         {
                             counter++;
@@ -1187,7 +1206,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private bool ProcessAttendanceRecord(dynamic attendance, Dictionary<string, dynamic> employeeDict, DateTime? selectedDate, int counter, int rowIndex, string firebaseKey)
+        private async Task<bool> ProcessAttendanceRecord(dynamic attendance, Dictionary<string, dynamic> employeeDict, DateTime? selectedDate, int counter, int rowIndex, string firebaseKey)
         {
             try
             {
@@ -1297,7 +1316,10 @@ namespace HRIS_JAP_ATTPAY
                 // Process the data
                 string timeIn = FormatFirebaseTime(timeInStr);
                 string timeOut = FormatFirebaseTime(timeOutStr);
-                string status = CalculateStatus(timeInStr, timeOutStr, existingStatus);
+
+                // FIXED: Call async method with correct parameters
+                string status = await CalculateStatusWithSchedule(timeInStr, timeOutStr, employeeId, attendanceDateStr, existingStatus);
+
                 string overtime = CalculateOvertimeHours(overtimeHoursStr, hoursWorked, employeeId, "");
 
                 // Adjust hours worked by subtracting overtime
@@ -1457,6 +1479,225 @@ namespace HRIS_JAP_ATTPAY
                 System.Diagnostics.Debug.WriteLine($"Error in GetEmployeeProperty for {propertyName}: {ex.Message}");
                 return "";
             }
+        }
+        private async Task<(TimeSpan startTime, TimeSpan endTime)?> GetEmployeeScheduleForDay(string employeeId, string attendanceDate)
+        {
+            try
+            {
+                // Parse the attendance date to get day of week
+                if (!DateTime.TryParse(attendanceDate, out DateTime date))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed to parse attendance date: {attendanceDate}");
+                    return null;
+                }
+
+                string dayOfWeek = date.DayOfWeek.ToString();
+                string normalizedTargetDay = NormalizeDayOfWeek(dayOfWeek);
+
+                System.Diagnostics.Debug.WriteLine($"Looking for schedule: Employee {employeeId} on {dayOfWeek} ({normalizedTargetDay})");
+
+                // Get all schedules from Firebase using the same approach as ReliableAttendanceService
+                var scheduleRecords = await firebase.Child("Work_Schedule").OnceAsync<dynamic>();
+
+                if (scheduleRecords == null || !scheduleRecords.Any())
+                {
+                    System.Diagnostics.Debug.WriteLine("No schedule records found in Firebase");
+                    return null;
+                }
+
+                System.Diagnostics.Debug.WriteLine($"Found {scheduleRecords.Count()} total schedule records");
+
+                foreach (var scheduleRecord in scheduleRecords)
+                {
+                    if (scheduleRecord?.Object != null)
+                    {
+                        try
+                        {
+                            // Extract schedule data safely
+                            string schedEmpId = GetScheduleProperty(scheduleRecord.Object, "employee_id");
+                            string schedDay = GetScheduleProperty(scheduleRecord.Object, "day_of_week");
+
+                            // Normalize the schedule day for comparison
+                            string normalizedSchedDay = NormalizeDayOfWeek(schedDay);
+
+                            System.Diagnostics.Debug.WriteLine($"  Checking schedule: EmpID={schedEmpId}, Day={schedDay} ({normalizedSchedDay})");
+
+                            // Match employee ID and day of week
+                            if (schedEmpId == employeeId && normalizedSchedDay == normalizedTargetDay)
+                            {
+                                string startTimeStr = GetScheduleProperty(scheduleRecord.Object, "start_time");
+                                string endTimeStr = GetScheduleProperty(scheduleRecord.Object, "end_time");
+
+                                System.Diagnostics.Debug.WriteLine($"✅ Found matching schedule for {employeeId} on {dayOfWeek}: {startTimeStr} - {endTimeStr}");
+
+                                // Parse times - handle both HH:mm:ss and HH:mm formats
+                                if (TryParseScheduleTime(startTimeStr, out TimeSpan startTime) &&
+                                    TryParseScheduleTime(endTimeStr, out TimeSpan endTime))
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"✅ Parsed times successfully: Start={startTime}, End={endTime}");
+                                    return (startTime, endTime);
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"❌ Failed to parse times: Start='{startTimeStr}', End='{endTimeStr}'");
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Error processing schedule record: {ex.Message}");
+                        }
+                    }
+                }
+
+                System.Diagnostics.Debug.WriteLine($"❌ No matching schedule found for {employeeId} on {dayOfWeek}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error getting schedule: {ex.Message}");
+                return null;
+            }
+        }
+        private string NormalizeDayOfWeek(string day)
+        {
+            if (string.IsNullOrEmpty(day)) return day;
+
+            string normalized = day.Trim().ToLower();
+
+            // Handle common abbreviations and variations
+            if (normalized == "mon" || normalized == "monday")
+                return "monday";
+            else if (normalized == "tue" || normalized == "tues" || normalized == "tuesday")
+                return "tuesday";
+            else if (normalized == "wed" || normalized == "wednesday")
+                return "wednesday";
+            else if (normalized == "thu" || normalized == "thur" || normalized == "thurs" || normalized == "thursday")
+                return "thursday";
+            else if (normalized == "fri" || normalized == "friday")
+                return "friday";
+            else if (normalized == "sat" || normalized == "saturday")
+                return "saturday";
+            else if (normalized == "sun" || normalized == "sunday")
+                return "sunday";
+            else
+                return normalized;
+        }
+        private string CalculateStatusWithDefaultTimes(string timeInStr, string timeOutStr, string existingStatus = "")
+        {
+            try
+            {
+                DateTime timeIn, timeOut;
+
+                bool timeInParsed = DateTime.TryParseExact(timeInStr, "yyyy-MM-dd HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
+                                   DateTime.TryParseExact(timeInStr, "HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
+                                   DateTime.TryParseExact(timeInStr, "HH:mm", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
+                                   DateTime.TryParseExact(timeInStr, "hh:mm tt", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
+                                   DateTime.TryParse(timeInStr, out timeIn);
+
+                bool timeOutParsed = DateTime.TryParseExact(timeOutStr, "yyyy-MM-dd HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
+                                    DateTime.TryParseExact(timeOutStr, "HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
+                                    DateTime.TryParseExact(timeOutStr, "HH:mm", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
+                                    DateTime.TryParseExact(timeOutStr, "hh:mm tt", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
+                                    DateTime.TryParse(timeOutStr, out timeOut);
+
+                if (timeInParsed)
+                {
+                    TimeSpan expectedStart = new TimeSpan(8, 0, 0);  // 8:00 AM
+                    TimeSpan expectedEnd = new TimeSpan(17, 0, 0);   // 5:00 PM
+
+                    TimeSpan actualTimeIn = new TimeSpan(timeIn.Hour, timeIn.Minute, timeIn.Second);
+
+                    bool isLate = actualTimeIn > expectedStart;
+                    bool isEarlyOut = false;
+
+                    if (timeOutParsed && timeOutStr != "N/A" && !string.IsNullOrEmpty(timeOutStr))
+                    {
+                        TimeSpan actualTimeOut = new TimeSpan(timeOut.Hour, timeOut.Minute, timeOut.Second);
+                        isEarlyOut = actualTimeOut < expectedEnd;
+                    }
+
+                    if (isLate && isEarlyOut)
+                        return "Late & Early Out";
+                    else if (isLate)
+                        return "Late";
+                    else if (isEarlyOut)
+                        return "Early Out";
+                    else
+                        return "On Time";
+                }
+                else
+                {
+                    return !string.IsNullOrEmpty(existingStatus) ? existingStatus : "Absent";
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in CalculateStatusWithDefaultTimes: {ex.Message}");
+                return !string.IsNullOrEmpty(existingStatus) ? existingStatus : "Absent";
+            }
+        }
+        private string GetScheduleProperty(dynamic scheduleObj, string propertyName)
+        {
+            try
+            {
+                // Try direct property access
+                if (scheduleObj is IDictionary<string, object> dict)
+                {
+                    if (dict.ContainsKey(propertyName) && dict[propertyName] != null)
+                        return dict[propertyName].ToString();
+                }
+
+                // Try JSON conversion approach
+                try
+                {
+                    string json = Newtonsoft.Json.JsonConvert.SerializeObject(scheduleObj);
+                    var jsonDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                    if (jsonDict != null && jsonDict.ContainsKey(propertyName) && jsonDict[propertyName] != null)
+                        return jsonDict[propertyName].ToString();
+                }
+                catch { }
+
+                // Try reflection as last resort
+                try
+                {
+                    var prop = scheduleObj.GetType().GetProperty(propertyName);
+                    if (prop != null)
+                    {
+                        var value = prop.GetValue(scheduleObj);
+                        if (value != null)
+                            return value.ToString();
+                    }
+                }
+                catch { }
+
+                return "";
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting property {propertyName}: {ex.Message}");
+                return "";
+            }
+        }
+        private bool TryParseScheduleTime(string timeStr, out TimeSpan time)
+        {
+            time = TimeSpan.Zero;
+
+            if (string.IsNullOrEmpty(timeStr))
+                return false;
+
+            // Try standard TimeSpan parsing
+            if (TimeSpan.TryParse(timeStr, out time))
+                return true;
+
+            // Try parsing as time with various formats
+            if (DateTime.TryParse(timeStr, out DateTime dateTime))
+            {
+                time = dateTime.TimeOfDay;
+                return true;
+            }
+
+            return false;
         }
 
     }

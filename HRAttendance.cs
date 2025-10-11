@@ -23,7 +23,7 @@ namespace HRIS_JAP_ATTPAY
         private AttendanceFilterCriteria currentAttendanceFilters = new AttendanceFilterCriteria();
         private Dictionary<string, (string Department, string Position)> employeeDepartmentMap = new Dictionary<string, (string Department, string Position)>();
         private Dictionary<int, string> attendanceKeyMap = new Dictionary<int, string>();
-
+        private Dictionary<string, List<EmployeeSchedule>> employeeSchedules = new Dictionary<string, List<EmployeeSchedule>>();
 
         private bool isLoading = false;
 
@@ -40,13 +40,12 @@ namespace HRIS_JAP_ATTPAY
             setFont();
             setTextBoxAttributes();
             setDataGridViewAttributes();
-
-            // Remove these two lines:
-            // LoadEmployeeDepartmentMapping();
-            // LoadFirebaseAttendanceData();
-
-            // Replace with this async initialization:
+            comboBoxSelectDate.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBoxSelectDate.IntegralHeight = false;
+            comboBoxSelectDate.MaxDropDownItems = 5;
+            comboBoxSelectDate.SelectedIndexChanged += comboBoxSelectDate_SelectedIndexChanged;
             LoadDataAsync();
+            LoadEmployeeSchedules();
         }
 
         private async void LoadDataAsync()
@@ -206,6 +205,36 @@ namespace HRIS_JAP_ATTPAY
             }
 
             return DateTime.MinValue;
+        }
+        private async Task LoadEmployeeSchedules()
+        {
+            try
+            {
+                employeeSchedules.Clear();
+
+                var scheduleRecords = await firebase.Child("Work_Schedule").OnceAsync<EmployeeSchedule>();
+
+                foreach (var record in scheduleRecords)
+                {
+                    if (record?.Object != null && !string.IsNullOrEmpty(record.Object.employee_id))
+                    {
+                        string employeeId = record.Object.employee_id;
+
+                        if (!employeeSchedules.ContainsKey(employeeId))
+                        {
+                            employeeSchedules[employeeId] = new List<EmployeeSchedule>();
+                        }
+
+                        employeeSchedules[employeeId].Add(record.Object);
+                    }
+                }
+
+                System.Diagnostics.Debug.WriteLine($"HR: Loaded schedules for {employeeSchedules.Count} employees");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"HR: Error loading schedules: {ex.Message}");
+            }
         }
 
         private string ExtractFirstName(string fullName)
@@ -385,17 +414,48 @@ namespace HRIS_JAP_ATTPAY
         }
 
         // 🔹 STATUS + OVERTIME - UPDATED TO MATCH ADMINATTENDANCE LOGIC
-        private string CalculateStatus(string timeInStr, string timeOutStr, string existingStatus = "")
+        // 🔹 STATUS + OVERTIME - UPDATED TO PRESERVE "DAY OFF" LIKE ADMINATTENDANCE
+        private string CalculateStatus(string timeInStr, string timeOutStr, string employeeId, string attendanceDateStr, string existingStatus = "")
         {
-            // If time in is N/A, then it's Absent
+            // If the existing status is already "Day Off", preserve it
+            if (!string.IsNullOrEmpty(existingStatus) && existingStatus.Equals("Day Off", StringComparison.OrdinalIgnoreCase))
+                return "Day Off";
+
+            // Check if employee has schedule for this day
+            if (!HasScheduleForDate(employeeId, attendanceDateStr))
+            {
+                return "Day Off";
+            }
+
+            // If time in is N/A and employee should be working, mark as Absent
             if (string.IsNullOrEmpty(timeInStr) || timeInStr == "N/A")
+            {
+                // If we have an existing status that's not Day Off, use it
+                if (!string.IsNullOrEmpty(existingStatus) && !existingStatus.Equals("Day Off", StringComparison.OrdinalIgnoreCase))
+                    return existingStatus;
                 return "Absent";
+            }
 
             try
             {
-                DateTime timeIn, timeOut;
+                // Get schedule for this employee and date
+                var schedule = GetScheduleForDate(employeeId, attendanceDateStr);
+                if (schedule == null)
+                {
+                    return !string.IsNullOrEmpty(existingStatus) ? existingStatus : "Absent";
+                }
 
-                // Try to parse different time formats for Time In
+                DateTime timeIn, timeOut;
+                DateTime expectedStart, expectedEnd;
+
+                // Parse expected times from schedule (not hardcoded)
+                if (!DateTime.TryParse(schedule.start_time, out expectedStart) ||
+                    !DateTime.TryParse(schedule.end_time, out expectedEnd))
+                {
+                    return !string.IsNullOrEmpty(existingStatus) ? existingStatus : "On Time";
+                }
+
+                // Try to parse actual times
                 bool timeInParsed = DateTime.TryParseExact(timeInStr, "HH:mm", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
                                    DateTime.TryParseExact(timeInStr, "hh:mm tt", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
                                    DateTime.TryParse(timeInStr, out timeIn);
@@ -406,20 +466,19 @@ namespace HRIS_JAP_ATTPAY
 
                 if (timeInParsed)
                 {
-                    // Basic status calculation - adjust based on your business rules
-                    DateTime expectedStart = DateTime.Today.AddHours(8); // 8:00 AM
-                    DateTime expectedEnd = DateTime.Today.AddHours(17); // 5:00 PM
-
+                    // Create comparable times using schedule times instead of hardcoded 8-5
                     DateTime actualTimeIn = DateTime.Today.AddHours(timeIn.Hour).AddMinutes(timeIn.Minute);
+                    DateTime scheduleStart = DateTime.Today.AddHours(expectedStart.Hour).AddMinutes(expectedStart.Minute);
+                    DateTime scheduleEnd = DateTime.Today.AddHours(expectedEnd.Hour).AddMinutes(expectedEnd.Minute);
 
-                    bool isLate = actualTimeIn > expectedStart; // No grace period - late if after 8:00 AM
+                    bool isLate = actualTimeIn > scheduleStart.AddMinutes(15); // 15 minutes grace period
                     bool isEarlyOut = false;
 
                     // Check for early out only if we have valid time out
-                    if (timeOutParsed)
+                    if (timeOutParsed && timeOutStr != "N/A" && !string.IsNullOrEmpty(timeOutStr))
                     {
                         DateTime actualTimeOut = DateTime.Today.AddHours(timeOut.Hour).AddMinutes(timeOut.Minute);
-                        isEarlyOut = actualTimeOut < expectedEnd; // Early out if before 5:00 PM
+                        isEarlyOut = actualTimeOut < scheduleEnd.AddMinutes(-15); // 15 minutes early out threshold
                     }
 
                     if (isLate && isEarlyOut)
@@ -444,15 +503,34 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private string CalculateOvertimeHours(string overtimeStr, string hoursWorkedStr)
+        private string CalculateOvertimeHours(string overtimeStr, string hoursWorkedStr, string employeeId, string attendanceDateStr)
         {
-            if (!string.IsNullOrEmpty(overtimeStr) && double.TryParse(overtimeStr, out double overtime))
-                return Math.Round(overtime, 2).ToString("0.00");
+            // First try to use the overtime_hours field directly from Firebase
+            if (!string.IsNullOrEmpty(overtimeStr) && double.TryParse(overtimeStr, out double overtimeHours))
+            {
+                return Math.Round(overtimeHours, 2).ToString("0.00");
+            }
 
-            if (!string.IsNullOrEmpty(hoursWorkedStr) && double.TryParse(hoursWorkedStr, out double worked))
-                return Math.Max(0, worked - 8.0).ToString("0.00");
+            // Fallback calculation using schedule hours
+            double regularHours = 8.0; // Default fallback
 
-            return "0.00";
+            // Try to get actual scheduled hours
+            var schedule = GetScheduleForDate(employeeId, attendanceDateStr);
+            if (schedule != null)
+            {
+                DateTime startTime, endTime;
+                if (DateTime.TryParse(schedule.start_time, out startTime) &&
+                    DateTime.TryParse(schedule.end_time, out endTime))
+                {
+                    regularHours = (endTime - startTime).TotalHours;
+                }
+            }
+
+            if (string.IsNullOrEmpty(hoursWorkedStr) || hoursWorkedStr == "N/A" || !double.TryParse(hoursWorkedStr, out double workedHours))
+                return "0.00";
+
+            double overtime = Math.Max(0, workedHours - regularHours);
+            return Math.Round(overtime, 2).ToString("0.00");
         }
 
         // 🔹 LOAD EMPLOYEE DEPARTMENT MAPPING (same as before)
@@ -571,6 +649,7 @@ namespace HRIS_JAP_ATTPAY
         {
             string selectedText = comboBoxSelectDate.SelectedItem?.ToString();
             DateTime? selectedDate = null;
+
             if (!string.IsNullOrEmpty(selectedText) && selectedText != "All Dates")
             {
                 if (DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
@@ -581,6 +660,8 @@ namespace HRIS_JAP_ATTPAY
                     selectedDate = parsedDate;
                 }
             }
+
+            // Only load data for the selected date
             LoadFirebaseAttendanceData(selectedDate);
         }
 
@@ -597,6 +678,7 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewAttendance.ColumnHeadersHeight = 40;
             dataGridViewAttendance.DefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Light", 10f);
             dataGridViewAttendance.ColumnHeadersDefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+
 
             dataGridViewAttendance.CellFormatting += dataGridView1_CellFormatting;
             dataGridViewAttendance.CellMouseEnter += dataGridViewAttendance_CellMouseEnter;
@@ -753,8 +835,6 @@ namespace HRIS_JAP_ATTPAY
                 var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
                 var uniqueDates = new HashSet<string>();
 
-                System.Diagnostics.Debug.WriteLine($"Total attendance records found: {attendanceRecords?.Count()}");
-
                 foreach (var record in attendanceRecords)
                 {
                     if (record?.Object != null)
@@ -765,28 +845,14 @@ namespace HRIS_JAP_ATTPAY
 
                             if (!string.IsNullOrEmpty(dateStr))
                             {
-                                // Try to parse the date string
                                 DateTime parsedDate;
-                                if (DateTime.TryParse(dateStr, out parsedDate))
-                                {
-                                    uniqueDates.Add(parsedDate.ToString("yyyy-MM-dd"));
-                                    System.Diagnostics.Debug.WriteLine($"✓ Added date: {parsedDate:yyyy-MM-dd} from key: {record.Key}");
-                                }
-                                else if (DateTime.TryParseExact(dateStr, "yyyy-MM-dd",
+                                if (DateTime.TryParse(dateStr, out parsedDate) ||
+                                    DateTime.TryParseExact(dateStr, "yyyy-MM-dd",
                                          System.Globalization.CultureInfo.InvariantCulture,
                                          System.Globalization.DateTimeStyles.None, out parsedDate))
                                 {
                                     uniqueDates.Add(parsedDate.ToString("yyyy-MM-dd"));
-                                    System.Diagnostics.Debug.WriteLine($"✓ Added date (exact): {parsedDate:yyyy-MM-dd} from key: {record.Key}");
                                 }
-                                else
-                                {
-                                    System.Diagnostics.Debug.WriteLine($"✗ Could not parse date: {dateStr} from key: {record.Key}");
-                                }
-                            }
-                            else
-                            {
-                                System.Diagnostics.Debug.WriteLine($"✗ No date found for key: {record.Key}");
                             }
                         }
                         catch (Exception ex)
@@ -796,19 +862,16 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                System.Diagnostics.Debug.WriteLine($"Total unique dates found: {uniqueDates.Count}");
-
-                // Add today's date for testing if no dates found
+                // Add fallback dates if none found
                 if (uniqueDates.Count == 0)
                 {
-                    System.Diagnostics.Debug.WriteLine("No dates found, adding fallback dates");
                     for (int i = 0; i < 30; i++)
                     {
                         uniqueDates.Add(DateTime.Today.AddDays(-i).ToString("yyyy-MM-dd"));
                     }
                 }
 
-                // Add dates to combo box in descending order - FIXED SORTING
+                // Add dates to combo box in descending order
                 var sortedDates = uniqueDates.Select(d => DateTime.Parse(d))
                                      .OrderByDescending(d => d)
                                      .Select(d => d.ToString("yyyy-MM-dd"))
@@ -819,23 +882,19 @@ namespace HRIS_JAP_ATTPAY
                     comboBoxSelectDate.Items.Add(date);
                 }
 
-                System.Diagnostics.Debug.WriteLine($"ComboBox now has {comboBoxSelectDate.Items.Count} items");
-
                 // Set today's date as default
                 string todayString = DateTime.Today.ToString("yyyy-MM-dd");
 
                 if (comboBoxSelectDate.Items.Contains(todayString))
                 {
                     comboBoxSelectDate.SelectedItem = todayString;
-                    DateTime selectedDate = DateTime.Parse(todayString);
-                    LoadFirebaseAttendanceData(selectedDate);
+                    LoadFirebaseAttendanceData(DateTime.Today);
                 }
                 else if (comboBoxSelectDate.Items.Count > 1)
                 {
                     comboBoxSelectDate.SelectedIndex = 1;
                     string firstDate = comboBoxSelectDate.SelectedItem.ToString();
-                    DateTime selectedDate = DateTime.Parse(firstDate);
-                    LoadFirebaseAttendanceData(selectedDate);
+                    LoadFirebaseAttendanceData(DateTime.Parse(firstDate));
                 }
                 else
                 {
@@ -847,28 +906,22 @@ namespace HRIS_JAP_ATTPAY
             {
                 System.Diagnostics.Debug.WriteLine("Error populating date combo box: " + ex.Message);
 
-                // Enhanced fallback with more dates
+                // Simple fallback
                 comboBoxSelectDate.Items.Clear();
                 comboBoxSelectDate.Items.Add("All Dates");
-
-                // Add a wider range of fallback dates
-                for (int i = 0; i < 60; i++)
-                {
-                    string testDate = DateTime.Today.AddDays(-i).ToString("yyyy-MM-dd");
-                    comboBoxSelectDate.Items.Add(testDate);
-                }
-
-                comboBoxSelectDate.SelectedItem = DateTime.Today.ToString("yyyy-MM-dd");
+                comboBoxSelectDate.Items.Add(DateTime.Today.ToString("yyyy-MM-dd"));
+                comboBoxSelectDate.SelectedIndex = 1;
                 LoadFirebaseAttendanceData(DateTime.Today);
             }
         }
+
 
         // Add this method from AdminAttendance
         private string ExtractDateFromAnyRecordType(dynamic record, string recordKey)
         {
             try
             {
-                // Method 1: Try direct property access (for dictionary-like records)
+                // Method 1: Try direct property access
                 try
                 {
                     if (record is IDictionary<string, object> dict)
@@ -878,7 +931,6 @@ namespace HRIS_JAP_ATTPAY
                             string dateStr = dict["attendance_date"].ToString();
                             if (!string.IsNullOrEmpty(dateStr) && dateStr != "N/A")
                             {
-                                System.Diagnostics.Debug.WriteLine($"Found attendance_date in dict: {dateStr} for key: {recordKey}");
                                 return dateStr;
                             }
                         }
@@ -886,7 +938,7 @@ namespace HRIS_JAP_ATTPAY
                 }
                 catch { }
 
-                // Method 2: Try JSON serialization approach
+                // Method 2: Try JSON approach
                 try
                 {
                     string json = Newtonsoft.Json.JsonConvert.SerializeObject(record);
@@ -894,18 +946,7 @@ namespace HRIS_JAP_ATTPAY
 
                     if (jsonDict != null)
                     {
-                        if (jsonDict.ContainsKey("attendance_date") && jsonDict["attendance_date"] != null)
-                        {
-                            string dateStr = jsonDict["attendance_date"].ToString();
-                            if (!string.IsNullOrEmpty(dateStr) && dateStr != "N/A")
-                            {
-                                System.Diagnostics.Debug.WriteLine($"Found attendance_date in JSON: {dateStr} for key: {recordKey}");
-                                return dateStr;
-                            }
-                        }
-
-                        // Also try other possible date field names
-                        string[] possibleDateFields = { "date", "attendanceDate", "attendance_date", "AttendanceDate" };
+                        string[] possibleDateFields = { "attendance_date", "date", "attendanceDate", "AttendanceDate" };
                         foreach (string field in possibleDateFields)
                         {
                             if (jsonDict.ContainsKey(field) && jsonDict[field] != null)
@@ -913,7 +954,6 @@ namespace HRIS_JAP_ATTPAY
                                 string dateStr = jsonDict[field].ToString();
                                 if (!string.IsNullOrEmpty(dateStr) && dateStr != "N/A")
                                 {
-                                    System.Diagnostics.Debug.WriteLine($"Found {field} in JSON: {dateStr} for key: {recordKey}");
                                     return dateStr;
                                 }
                             }
@@ -922,35 +962,11 @@ namespace HRIS_JAP_ATTPAY
                 }
                 catch { }
 
-                // Method 3: Try reflection as last resort
-                try
-                {
-                    var properties = record.GetType().GetProperties();
-                    foreach (var prop in properties)
-                    {
-                        if (prop.Name.ToLower().Contains("date") && !prop.Name.ToLower().Contains("time"))
-                        {
-                            var value = prop.GetValue(record);
-                            if (value != null)
-                            {
-                                string dateStr = value.ToString();
-                                if (!string.IsNullOrEmpty(dateStr) && dateStr != "N/A")
-                                {
-                                    System.Diagnostics.Debug.WriteLine($"Found {prop.Name} via reflection: {dateStr} for key: {recordKey}");
-                                    return dateStr;
-                                }
-                            }
-                        }
-                    }
-                }
-                catch { }
-
-                System.Diagnostics.Debug.WriteLine($"No date field found for key: {recordKey}");
                 return null;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error in ExtractDateFromAnyRecordType for key {recordKey}: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Error extracting date for key {recordKey}: {ex.Message}");
                 return null;
             }
         }
@@ -962,7 +978,7 @@ namespace HRIS_JAP_ATTPAY
 
             try
             {
-                // Clear UI
+                // Clear grid using your existing method
                 if (dataGridViewAttendance.InvokeRequired)
                 {
                     dataGridViewAttendance.Invoke((MethodInvoker)delegate
@@ -979,69 +995,61 @@ namespace HRIS_JAP_ATTPAY
 
                 Cursor.Current = Cursors.WaitCursor;
 
-                // DEBUG: Show what we're loading
-                System.Diagnostics.Debug.WriteLine($"HR: Loading attendance data. Selected date: {selectedDate}");
-
-                // Load employee data
+                // Load employee data (use your existing method)
                 var firebaseEmployees = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
                 var employeeDict = new Dictionary<string, dynamic>();
                 foreach (var emp in firebaseEmployees)
                     employeeDict[emp.Key] = emp.Object;
 
-                System.Diagnostics.Debug.WriteLine($"HR: Loaded {employeeDict.Count} employees");
+                // KEY: Only process records for the selected date
+                var allAttendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
+                var recordsToProcess = new List<(dynamic record, string key)>();
 
-                // FIX: Handle Attendance as dictionary instead of JArray
-                var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
-
-                // DEBUG: Check what we got from Firebase
-                System.Diagnostics.Debug.WriteLine($"HR: Found {attendanceRecords?.Count()} attendance records");
-
-                if (attendanceRecords == null || !attendanceRecords.Any())
-                {
-                    System.Diagnostics.Debug.WriteLine("HR: No attendance records found in Firebase");
-                    if (this.InvokeRequired)
-                    {
-                        this.Invoke((MethodInvoker)delegate
-                        {
-                            MessageBox.Show("No attendance records found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        });
-                    }
-                    return;
-                }
-
-                int counter = 1;
-                int rowIndex = 0;
-                int processedCount = 0;
-
-                // FIX: Iterate through dictionary instead of JArray
-                foreach (var attendanceRecord in attendanceRecords)
+                foreach (var attendanceRecord in allAttendanceRecords)
                 {
                     if (attendanceRecord?.Object != null)
                     {
-                        string firebaseKey = attendanceRecord.Key; // Use the actual Firebase key ("29", "30", etc.)
+                        string firebaseKey = attendanceRecord.Key;
+                        string recordDateStr = ExtractDateFromAnyRecordType(attendanceRecord.Object, firebaseKey);
 
-                        // DEBUG: Show each record being processed
-                        System.Diagnostics.Debug.WriteLine($"HR: Processing record {firebaseKey}");
-
-                        bool recordAdded = ProcessAttendanceRecord(attendanceRecord.Object, employeeDict, selectedDate, counter, rowIndex, firebaseKey);
-                        if (recordAdded)
+                        if (selectedDate.HasValue)
                         {
-                            counter++;
-                            rowIndex++;
-                            processedCount++;
+                            // Only include records that match the selected date
+                            if (!string.IsNullOrEmpty(recordDateStr) &&
+                                DateTime.TryParse(recordDateStr, out DateTime recordDate))
+                            {
+                                if (recordDate.Date == selectedDate.Value.Date)
+                                {
+                                    recordsToProcess.Add((attendanceRecord.Object, firebaseKey));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // If no date selected (All Dates), include all records
+                            recordsToProcess.Add((attendanceRecord.Object, firebaseKey));
                         }
                     }
                 }
 
-                // DEBUG: Show final count
-                System.Diagnostics.Debug.WriteLine($"HR: Successfully processed {processedCount} records");
+                // Process only the filtered records using your existing ProcessAttendanceRecord method
+                int counter = 1;
+                foreach (var (record, key) in recordsToProcess)
+                {
+                    // Use your existing ProcessAttendanceRecord method - it will work as-is
+                    // since we're only passing records that match the date filter
+                    ProcessAttendanceRecord(record, employeeDict, selectedDate, counter, counter - 1, key);
+                    counter++;
+                }
 
+                // Update UI
                 UpdateStatusLabel(selectedDate);
-                ApplyAllAttendanceFilters();
+                ApplyAllAttendanceFilters(); // Use your existing filter method
+                dataGridViewAttendance.Refresh();
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"HR: Error in LoadFirebaseAttendanceData: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Error in LoadFirebaseAttendanceData: {ex.Message}");
                 MessageBox.Show($"Error loading attendance data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -1051,10 +1059,13 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
+
+
         private bool ProcessAttendanceRecord(dynamic attendance, Dictionary<string, dynamic> employeeDict, DateTime? selectedDate, int counter, int rowIndex, string firebaseKey)
         {
             try
             {
+
                 System.Diagnostics.Debug.WriteLine($"HR: === Processing record {firebaseKey} ===");
 
                 // Handle the dynamic data more carefully
@@ -1096,6 +1107,7 @@ namespace HRIS_JAP_ATTPAY
                 }
 
                 // Extract values with safe fallbacks
+
                 string timeInStr = GetSafeString(attendanceDict, "time_in");
                 string timeOutStr = GetSafeString(attendanceDict, "time_out");
                 string attendanceDateStr = GetSafeString(attendanceDict, "attendance_date");
@@ -1134,8 +1146,8 @@ namespace HRIS_JAP_ATTPAY
                 // Process the data
                 string timeIn = FormatFirebaseTime(timeInStr);
                 string timeOut = FormatFirebaseTime(timeOutStr);
-                string status = CalculateStatus(timeInStr, timeOutStr, existingStatus);
-                string overtime = CalculateOvertimeHours(overtimeHoursStr, hoursWorked);
+                string status = CalculateStatus(timeInStr, timeOutStr, employeeId, attendanceDateStr, existingStatus);
+                string overtime = CalculateOvertimeHours(overtimeHoursStr, hoursWorked, employeeId, attendanceDateStr);
 
                 // Adjust hours worked by subtracting overtime
                 if (double.TryParse(hoursWorked, out double hw) && double.TryParse(overtime, out double ot))
@@ -1340,7 +1352,6 @@ namespace HRIS_JAP_ATTPAY
                 }
             }
         }
-
         private void setFont()
         {
             labelHREmployee.Font = AttributesClass.GetFont("Roboto-Light", 20f);
@@ -1362,5 +1373,60 @@ namespace HRIS_JAP_ATTPAY
             LeaveRequest LeaveRequestForm = new LeaveRequest();
             AttributesClass.ShowWithOverlay(parentForm, LeaveRequestForm);
         }
+        private EmployeeSchedule GetScheduleForDate(string employeeId, string dateStr)
+        {
+            if (string.IsNullOrEmpty(employeeId) || string.IsNullOrEmpty(dateStr))
+                return null;
+
+            try
+            {
+                DateTime attendanceDate;
+                if (!DateTime.TryParse(dateStr, out attendanceDate))
+                    return null;
+
+                // Get day of week from attendance date
+                string dayOfWeek = attendanceDate.DayOfWeek.ToString();
+
+                if (employeeSchedules.ContainsKey(employeeId))
+                {
+                    return employeeSchedules[employeeId]
+                        .FirstOrDefault(s => s.day_of_week?.Equals(dayOfWeek, StringComparison.OrdinalIgnoreCase) == true);
+                }
+
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        private bool HasScheduleForDate(string employeeId, string dateStr)
+        {
+            if (string.IsNullOrEmpty(employeeId) || string.IsNullOrEmpty(dateStr))
+                return false;
+
+            try
+            {
+                DateTime attendanceDate;
+                if (!DateTime.TryParse(dateStr, out attendanceDate))
+                    return false;
+
+                // Get day of week from attendance date
+                string dayOfWeek = attendanceDate.DayOfWeek.ToString();
+
+                if (employeeSchedules.ContainsKey(employeeId))
+                {
+                    return employeeSchedules[employeeId]
+                        .Any(s => s.day_of_week?.Equals(dayOfWeek, StringComparison.OrdinalIgnoreCase) == true);
+                }
+
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
     }
 }

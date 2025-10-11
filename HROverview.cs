@@ -65,37 +65,47 @@ namespace HRIS_JAP_ATTPAY
             {
                 comboBoxSelectDate.Items.Clear();
 
-                // Add special options
-                comboBoxSelectDate.Items.Add("Today");
-                comboBoxSelectDate.Items.Add("Yesterday");
-
                 // Get ALL unique dates from Firebase attendance data
                 var allDates = await GetAllAttendanceDatesAsync();
 
                 if (allDates.Count > 0)
                 {
-                    // Add all unique dates to the combo box
+                    // Add all unique dates to the combo box (already sorted by GetAllAttendanceDatesAsync)
                     foreach (var date in allDates)
                     {
                         comboBoxSelectDate.Items.Add(date);
                     }
+
+                    // ALWAYS select the most recent date (index 0 since they're sorted descending)
+                    comboBoxSelectDate.SelectedIndex = 0;
+
+                    System.Diagnostics.Debug.WriteLine($"Default selected date: {comboBoxSelectDate.SelectedItem}");
                 }
                 else
                 {
-                    // Fallback: Add dates for the last 30 days if no data in Firebase
-                    for (int i = 2; i < 30; i++)
+                    // Fallback: Add dates for the last 7 days if no data in Firebase
+                    for (int i = 0; i < 7; i++)
                     {
-                        comboBoxSelectDate.Items.Add(DateTime.Today.AddDays(-i).ToString("yyyy-MM-dd"));
+                        string date = DateTime.Today.AddDays(-i).ToString("yyyy-MM-dd");
+                        comboBoxSelectDate.Items.Add(date);
+                    }
+
+                    if (comboBoxSelectDate.Items.Count > 0)
+                    {
+                        // Select the most recent date (today)
+                        comboBoxSelectDate.SelectedIndex = 0;
                     }
                 }
-
-                // Set default selection
-                comboBoxSelectDate.SelectedItem = "Today";
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error populating date combo box: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                // Simple fallback
+                comboBoxSelectDate.Items.Clear();
+                comboBoxSelectDate.Items.Add(DateTime.Today.ToString("yyyy-MM-dd"));
+                comboBoxSelectDate.SelectedIndex = 0;
             }
         }
         private async Task<List<string>> GetAllAttendanceDatesAsync()
@@ -104,7 +114,6 @@ namespace HRIS_JAP_ATTPAY
 
             try
             {
-                // FIX: Use the same pattern as AdminAttendance
                 var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
 
                 System.Diagnostics.Debug.WriteLine($"Total attendance records found: {attendanceRecords?.Count()}");
@@ -115,7 +124,6 @@ namespace HRIS_JAP_ATTPAY
                     {
                         try
                         {
-                            // Use the robust date extraction method from AdminAttendance
                             string dateStr = ExtractDateFromAnyRecordType(attendanceRecord.Object, attendanceRecord.Key);
 
                             if (!string.IsNullOrEmpty(dateStr))
@@ -142,16 +150,30 @@ namespace HRIS_JAP_ATTPAY
 
                 System.Diagnostics.Debug.WriteLine($"Total unique dates found: {uniqueDates.Count}");
 
-                // Sort dates in descending order (most recent first)
-                return uniqueDates.OrderByDescending(d => DateTime.Parse(d)).ToList();
+                // Sort dates in descending order (most recent first) - THIS IS KEY
+                var sortedDates = uniqueDates.Select(d => DateTime.Parse(d))
+                                     .OrderByDescending(d => d)
+                                     .Select(d => d.ToString("yyyy-MM-dd"))
+                                     .ToList();
+
+                // Debug: Show the order of dates
+                System.Diagnostics.Debug.WriteLine("Dates in combo box (most recent first):");
+                foreach (var date in sortedDates)
+                {
+                    System.Diagnostics.Debug.WriteLine($"  {date}");
+                }
+
+                return sortedDates;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error retrieving attendance dates: {ex.Message}", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                System.Diagnostics.Debug.WriteLine($"Error retrieving attendance dates: {ex.Message}");
+
+                // Return empty list - the calling method will handle fallback
                 return new List<string>();
             }
         }
+
         private async void LoadAttendanceSummary(DateTime date)
         {
             try
@@ -296,11 +318,28 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                var today = DateTime.Today.ToString("yyyy-MM-dd");
+                // Get the selected date from combo box
+                string selectedText = comboBoxSelectDate.SelectedItem?.ToString();
+                DateTime targetDate;
 
-                // FIX: Use status field to find absent employees
+                if (DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None, out DateTime parsedDate))
+                {
+                    targetDate = parsedDate;
+                }
+                else
+                {
+                    targetDate = DateTime.Today;
+                }
+
+                string targetDateStr = targetDate.ToString("yyyy-MM-dd");
+
                 var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
                 var absentEmployees = new Dictionary<string, int>();
+
+                // Load employee data
+                var employeeDetails = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
 
                 if (attendanceRecords != null)
                 {
@@ -308,7 +347,6 @@ namespace HRIS_JAP_ATTPAY
                     {
                         if (attendanceRecord?.Object != null)
                         {
-                            // Convert dynamic to dictionary for safe access
                             Dictionary<string, object> attendanceDict = ConvertToDictionary(attendanceRecord.Object);
 
                             if (attendanceDict != null && attendanceDict.Any())
@@ -316,19 +354,34 @@ namespace HRIS_JAP_ATTPAY
                                 string status = GetSafeString(attendanceDict, "status");
                                 string employeeId = GetSafeString(attendanceDict, "employee_id");
 
-                                // Use robust date extraction
+                                // Use date extraction
                                 string extractedDate = ExtractDateFromAnyRecordType(attendanceRecord.Object, attendanceRecord.Key);
-                                bool matchesDate = !string.IsNullOrEmpty(extractedDate) && extractedDate == today;
+                                bool matchesDate = !string.IsNullOrEmpty(extractedDate) && extractedDate == targetDateStr;
 
                                 if (matchesDate && !string.IsNullOrEmpty(employeeId) && status.ToLower() == "absent")
                                 {
-                                    if (absentEmployees.ContainsKey(employeeId))
+                                    // Get employee name
+                                    string fullName = "N/A";
+                                    var empRecord = employeeDetails.FirstOrDefault(e => e.Key == employeeId);
+                                    if (empRecord != null)
                                     {
-                                        absentEmployees[employeeId]++;
+                                        Dictionary<string, object> empDict = ConvertToDictionary(empRecord.Object);
+                                        string firstName = GetSafeString(empDict, "first_name");
+                                        string middleName = GetSafeString(empDict, "middle_name");
+                                        string lastName = GetSafeString(empDict, "last_name");
+                                        fullName = $"{firstName} {middleName} {lastName}".Trim();
                                     }
-                                    else
+
+                                    if (!string.IsNullOrEmpty(fullName) && fullName != "N/A")
                                     {
-                                        absentEmployees[employeeId] = 1;
+                                        if (absentEmployees.ContainsKey(fullName))
+                                        {
+                                            absentEmployees[fullName]++;
+                                        }
+                                        else
+                                        {
+                                            absentEmployees[fullName] = 1;
+                                        }
                                     }
                                 }
                             }
@@ -336,41 +389,16 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                // Load employee names
-                var employeeDetails = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
-                var absentEmployeeCounts = new Dictionary<string, int>();
-
-                foreach (var entry in absentEmployees)
-                {
-                    string empId = entry.Key;
-                    int count = entry.Value;
-
-                    var empRecord = employeeDetails.FirstOrDefault(e => e.Key == empId);
-                    if (empRecord != null)
-                    {
-                        Dictionary<string, object> empDict = ConvertToDictionary(empRecord.Object);
-                        string firstName = GetSafeString(empDict, "first_name");
-                        string lastName = GetSafeString(empDict, "last_name");
-                        string fullName = $"{firstName} {lastName}".Trim();
-
-                        if (!string.IsNullOrEmpty(fullName))
-                        {
-                            absentEmployeeCounts[fullName] = count;
-                        }
-                    }
-                }
-
-                // Clear and add to DataGridView
+                // Update DataGridView
                 dataGridViewAlertAbsent.Rows.Clear();
-                foreach (var entry in absentEmployeeCounts)
+                foreach (var entry in absentEmployees)
                 {
                     dataGridViewAlertAbsent.Rows.Add(entry.Key, entry.Value);
                 }
 
-                // If no absent employees, show message
                 if (dataGridViewAlertAbsent.Rows.Count == 0)
                 {
-                    dataGridViewAlertAbsent.Rows.Add("No absent employees today", "0");
+                    dataGridViewAlertAbsent.Rows.Add("No absent employees", "0");
                 }
             }
             catch (Exception ex)
@@ -381,16 +409,32 @@ namespace HRIS_JAP_ATTPAY
                 dataGridViewAlertAbsent.Rows.Add("Error loading data", "0");
             }
         }
-
         private async void LoadTodaysLateEmployees()
         {
             try
             {
-                var today = DateTime.Today.ToString("yyyy-MM-dd");
+                // Get the selected date from combo box
+                string selectedText = comboBoxSelectDate.SelectedItem?.ToString();
+                DateTime targetDate;
 
-                // FIX: Use the same robust pattern as AdminAttendance
+                if (DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None, out DateTime parsedDate))
+                {
+                    targetDate = parsedDate;
+                }
+                else
+                {
+                    targetDate = DateTime.Today;
+                }
+
+                string targetDateStr = targetDate.ToString("yyyy-MM-dd");
+
                 var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
                 var lateEmployees = new Dictionary<string, int>();
+
+                // Load employee data
+                var employeeDetails = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
 
                 if (attendanceRecords != null)
                 {
@@ -398,7 +442,6 @@ namespace HRIS_JAP_ATTPAY
                     {
                         if (attendanceRecord?.Object != null)
                         {
-                            // Convert dynamic to dictionary for safe access
                             Dictionary<string, object> attendanceDict = ConvertToDictionary(attendanceRecord.Object);
 
                             if (attendanceDict != null && attendanceDict.Any())
@@ -406,20 +449,35 @@ namespace HRIS_JAP_ATTPAY
                                 string status = GetSafeString(attendanceDict, "status");
                                 string employeeId = GetSafeString(attendanceDict, "employee_id");
 
-                                // Use robust date extraction
+                                // Use date extraction
                                 string extractedDate = ExtractDateFromAnyRecordType(attendanceRecord.Object, attendanceRecord.Key);
-                                bool matchesDate = !string.IsNullOrEmpty(extractedDate) && extractedDate == today;
+                                bool matchesDate = !string.IsNullOrEmpty(extractedDate) && extractedDate == targetDateStr;
 
                                 if (matchesDate && !string.IsNullOrEmpty(employeeId) &&
                                     (status.ToLower() == "late" || status.ToLower() == "early out" || status.ToLower() == "late & early out"))
                                 {
-                                    if (lateEmployees.ContainsKey(employeeId))
+                                    // Get employee name
+                                    string fullName = "N/A";
+                                    var empRecord = employeeDetails.FirstOrDefault(e => e.Key == employeeId);
+                                    if (empRecord != null)
                                     {
-                                        lateEmployees[employeeId]++;
+                                        Dictionary<string, object> empDict = ConvertToDictionary(empRecord.Object);
+                                        string firstName = GetSafeString(empDict, "first_name");
+                                        string middleName = GetSafeString(empDict, "middle_name");
+                                        string lastName = GetSafeString(empDict, "last_name");
+                                        fullName = $"{firstName} {middleName} {lastName}".Trim();
                                     }
-                                    else
+
+                                    if (!string.IsNullOrEmpty(fullName) && fullName != "N/A")
                                     {
-                                        lateEmployees[employeeId] = 1;
+                                        if (lateEmployees.ContainsKey(fullName))
+                                        {
+                                            lateEmployees[fullName]++;
+                                        }
+                                        else
+                                        {
+                                            lateEmployees[fullName] = 1;
+                                        }
                                     }
                                 }
                             }
@@ -427,41 +485,16 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                // Load employee names
-                var employeeDetails = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
-                var lateEmployeeCounts = new Dictionary<string, int>();
-
-                foreach (var entry in lateEmployees)
-                {
-                    string empId = entry.Key;
-                    int count = entry.Value;
-
-                    var empRecord = employeeDetails.FirstOrDefault(e => e.Key == empId);
-                    if (empRecord != null)
-                    {
-                        Dictionary<string, object> empDict = ConvertToDictionary(empRecord.Object);
-                        string firstName = GetSafeString(empDict, "first_name");
-                        string lastName = GetSafeString(empDict, "last_name");
-                        string fullName = $"{firstName} {lastName}".Trim();
-
-                        if (!string.IsNullOrEmpty(fullName))
-                        {
-                            lateEmployeeCounts[fullName] = count;
-                        }
-                    }
-                }
-
-                // Clear and add to DataGridView
+                // Update DataGridView
                 dataGridViewAlertLate.Rows.Clear();
-                foreach (var entry in lateEmployeeCounts)
+                foreach (var entry in lateEmployees)
                 {
                     dataGridViewAlertLate.Rows.Add(entry.Key, entry.Value);
                 }
 
-                // If no late employees, show message
                 if (dataGridViewAlertLate.Rows.Count == 0)
                 {
-                    dataGridViewAlertLate.Rows.Add("No late/early out employees today", "0");
+                    dataGridViewAlertLate.Rows.Add("No late/early out employees", "0");
                 }
             }
             catch (Exception ex)
@@ -874,15 +907,8 @@ namespace HRIS_JAP_ATTPAY
             string selectedText = comboBoxSelectDate.SelectedItem.ToString();
             DateTime selectedDate;
 
-            if (selectedText == "Today")
-            {
-                selectedDate = DateTime.Today;
-            }
-            else if (selectedText == "Yesterday")
-            {
-                selectedDate = DateTime.Today.AddDays(-1);
-            }
-            else if (DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
+            // All items in combo box are now actual dates in "yyyy-MM-dd" format
+            if (DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
                 System.Globalization.CultureInfo.InvariantCulture,
                 System.Globalization.DateTimeStyles.None,
                 out DateTime parsedDate))
@@ -891,6 +917,7 @@ namespace HRIS_JAP_ATTPAY
             }
             else
             {
+                // Fallback to today if parsing fails
                 selectedDate = DateTime.Today;
             }
 

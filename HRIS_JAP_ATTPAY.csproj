@@ -267,7 +267,7 @@
     <Compile Include="AttendanceNotificationModel.cs" />
     <Compile Include="AttributesClassAlt.cs" />
     <Compile Include="AttributesScanner.cs" />
-    <Compile Include="AutoGenarateAttendance.cs" />
+    <Compile Include="EmployeeSchedules.cs" />
     <Compile Include="Calendar.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -335,7 +335,7 @@
     <Compile Include="ConfirmProfileUpdate.Designer.cs">
       <DependentUpon>ConfirmProfileUpdate.cs</DependentUpon>
     </Compile>
-    <Compile Include="DailyAttendanceService.cs" />
+    <Compile Include="ReliableAttendanceService.cs" />
     <Compile Include="EditAttendance.cs">
       <SubType>Form</SubType>
     </Compile>

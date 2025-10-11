@@ -12,7 +12,7 @@ namespace HRIS_JAP_ATTPAY
         private static string currentUserId;
         private static string currentEmployeeId;
         private static string payrollPeriod;
-        private static DailyAttendanceService _attendanceService;
+        private static ReliableAttendanceService _attendanceService;
 
         /// <summary>
         /// The main entry point for the application.
@@ -23,7 +23,7 @@ namespace HRIS_JAP_ATTPAY
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var attendanceService = new DailyAttendanceService();
+            var attendanceService = new ReliableAttendanceService();
             _ = attendanceService.GenerateTodaysAttendanceOnceAsync();
             FormHost hostForm = new FormHost();
             Application.Run(hostForm); // Run app using persistent host
@@ -92,7 +92,7 @@ namespace HRIS_JAP_ATTPAY
             nextForm.Show();
         }
 
-        public static DailyAttendanceService GetAttendanceService()
+        public static ReliableAttendanceService GetAttendanceService()
         {
             return _attendanceService;
         }
