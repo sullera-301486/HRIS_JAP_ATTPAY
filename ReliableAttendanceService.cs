@@ -64,6 +64,13 @@ namespace HRIS_JAP_ATTPAY
                 // Step 3: Create attendance records with DYNAMIC schedule ID matching
                 string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 var newRecords = await CreateAttendanceRecordsWithDynamicScheduleIdsAsync(activeEmployeeIds, today, currentTime);
+
+                if (newRecords == null || newRecords.Count == 0)
+                {
+                    Debug.WriteLine(" No attendance records created - possible error in schedule lookup");
+                    return;
+                }
+
                 Debug.WriteLine($" Created {newRecords.Count} attendance records");
 
                 // Step 4: Save to Firebase
@@ -161,6 +168,8 @@ namespace HRIS_JAP_ATTPAY
                     if (json.StartsWith("["))
                     {
                         schedulesList = JsonConvert.DeserializeObject<List<EmployeeSchedule>>(json) ?? new List<EmployeeSchedule>();
+                        // FILTER OUT NULL ENTRIES
+                        schedulesList = schedulesList.Where(s => s != null).ToList();
                     }
                     else if (json.StartsWith("{"))
                     {
@@ -168,7 +177,7 @@ namespace HRIS_JAP_ATTPAY
                         schedulesList = schedulesDict?.Values.Where(s => s != null).ToList() ?? new List<EmployeeSchedule>();
                     }
 
-                    // Group schedules by employee_id
+                    // Group schedules by employee_id AND FILTER OUT NULL employee_id
                     allSchedules = schedulesList
                         .Where(s => !string.IsNullOrEmpty(s.employee_id))
                         .GroupBy(s => s.employee_id)
@@ -202,8 +211,9 @@ namespace HRIS_JAP_ATTPAY
             var employeeSchedules = allSchedules[employeeId];
             string normalizedTargetDay = NormalizeDayOfWeek(dayOfWeek);
 
-            // Find the schedule for this specific day
+            // Find the schedule for this specific day WITH NULL SAFETY
             var scheduleForDay = employeeSchedules.FirstOrDefault(s =>
+                s != null && // ADD NULL CHECK
                 !string.IsNullOrEmpty(s.day_of_week) &&
                 NormalizeDayOfWeek(s.day_of_week) == normalizedTargetDay);
 
@@ -484,7 +494,9 @@ namespace HRIS_JAP_ATTPAY
                 {
                     var record = attendanceEntry.Value;
 
-                    if (!string.IsNullOrEmpty(record.attendance_date) &&
+                    // ADD NULL CHECK FOR RECORD
+                    if (record != null &&
+                        !string.IsNullOrEmpty(record.attendance_date) &&
                         !string.IsNullOrEmpty(record.employee_id))
                     {
                         // Get the day of week from attendance date

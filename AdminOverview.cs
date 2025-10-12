@@ -77,6 +77,7 @@ namespace HRIS_JAP_ATTPAY
                 labelTodoDesc.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
                 labelAlertDesc.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
                 labelAlertDateRange.Font = AttributesClass.GetFont("Roboto-Light", 11f);
+                labelDayOffDate.Font = AttributesClass.GetFont("Roboto-Light", 11f);
             }
             catch (Exception ex)
             {
@@ -91,11 +92,8 @@ namespace HRIS_JAP_ATTPAY
                 comboBoxSelectDate.Items.Clear();
                 comboBoxSelectDate.Items.Add("All Dates");
 
-                // Get all attendance records
                 var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
                 var uniqueDates = new HashSet<string>();
-
-                System.Diagnostics.Debug.WriteLine($"Total attendance records found: {attendanceRecords?.Count()}");
 
                 foreach (var record in attendanceRecords)
                 {
@@ -104,31 +102,16 @@ namespace HRIS_JAP_ATTPAY
                         try
                         {
                             string dateStr = ExtractDateFromAnyRecordType(record.Object, record.Key);
-
                             if (!string.IsNullOrEmpty(dateStr))
                             {
-                                // Try to parse the date string
                                 DateTime parsedDate;
-                                if (DateTime.TryParse(dateStr, out parsedDate))
+                                if (DateTime.TryParse(dateStr, out parsedDate) ||
+                                    DateTime.TryParseExact(dateStr, "yyyy-MM-dd",
+                                        System.Globalization.CultureInfo.InvariantCulture,
+                                        System.Globalization.DateTimeStyles.None, out parsedDate))
                                 {
                                     uniqueDates.Add(parsedDate.ToString("yyyy-MM-dd"));
-                                    System.Diagnostics.Debug.WriteLine($"✓ Added date: {parsedDate:yyyy-MM-dd} from key: {record.Key}");
                                 }
-                                else if (DateTime.TryParseExact(dateStr, "yyyy-MM-dd",
-                                         System.Globalization.CultureInfo.InvariantCulture,
-                                         System.Globalization.DateTimeStyles.None, out parsedDate))
-                                {
-                                    uniqueDates.Add(parsedDate.ToString("yyyy-MM-dd"));
-                                    System.Diagnostics.Debug.WriteLine($"✓ Added date (exact): {parsedDate:yyyy-MM-dd} from key: {record.Key}");
-                                }
-                                else
-                                {
-                                    System.Diagnostics.Debug.WriteLine($"✗ Could not parse date: {dateStr} from key: {record.Key}");
-                                }
-                            }
-                            else
-                            {
-                                System.Diagnostics.Debug.WriteLine($"✗ No date found for key: {record.Key}");
                             }
                         }
                         catch (Exception ex)
@@ -138,19 +121,14 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                System.Diagnostics.Debug.WriteLine($"Total unique dates found: {uniqueDates.Count}");
-
-                // Add today's date for testing if no dates found
                 if (uniqueDates.Count == 0)
                 {
-                    System.Diagnostics.Debug.WriteLine("No dates found, adding fallback dates");
                     for (int i = 0; i < 30; i++)
                     {
                         uniqueDates.Add(DateTime.Today.AddDays(-i).ToString("yyyy-MM-dd"));
                     }
                 }
 
-                // Add dates to combo box in descending order
                 var sortedDates = uniqueDates.Select(d => DateTime.Parse(d))
                                      .OrderByDescending(d => d)
                                      .Select(d => d.ToString("yyyy-MM-dd"))
@@ -161,11 +139,7 @@ namespace HRIS_JAP_ATTPAY
                     comboBoxSelectDate.Items.Add(date);
                 }
 
-                System.Diagnostics.Debug.WriteLine($"ComboBox now has {comboBoxSelectDate.Items.Count} items");
-
-                // Set today's date as default
                 string todayString = DateTime.Today.ToString("yyyy-MM-dd");
-
                 if (comboBoxSelectDate.Items.Contains(todayString))
                 {
                     comboBoxSelectDate.SelectedItem = todayString;
@@ -179,23 +153,17 @@ namespace HRIS_JAP_ATTPAY
                     DateTime selectedDate = DateTime.Parse(firstDate);
                     LoadAttendanceSummary(selectedDate);
                 }
-                
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error populating date combo box: " + ex.Message);
-
-                // Enhanced fallback with more dates
                 comboBoxSelectDate.Items.Clear();
                 comboBoxSelectDate.Items.Add("All Dates");
-
-                // Add a wider range of fallback dates including September dates
                 for (int i = 0; i < 60; i++)
                 {
                     string testDate = DateTime.Today.AddDays(-i).ToString("yyyy-MM-dd");
                     comboBoxSelectDate.Items.Add(testDate);
                 }
-
                 comboBoxSelectDate.SelectedItem = DateTime.Today.ToString("yyyy-MM-dd");
                 LoadAttendanceSummary(DateTime.Today);
             }
@@ -220,7 +188,6 @@ namespace HRIS_JAP_ATTPAY
                 }
             }
 
-            // Load attendance summary for the selected date
             if (selectedDate.HasValue)
             {
                 LoadAttendanceSummary(selectedDate.Value);
@@ -231,13 +198,11 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // Show loading state
                 labelTotalNumber.Text = "";
                 labelOnTimeNumber.Text = "0";
                 labelLateNumber.Text = "0";
                 labelAbsentNumber.Text = "0";
 
-                // Load ALL employee data and filter out archived employees
                 var allEmployees = await GetAllActiveEmployeesAsync();
                 int totalEmployees = allEmployees.Count;
 
@@ -251,12 +216,11 @@ namespace HRIS_JAP_ATTPAY
                     return;
                 }
 
-                // Initialize counters
                 int onTimeCount = 0;
                 int lateCount = 0;
                 int absentCount = 0;
+                int dayOffCount = 0;
 
-                // Use the same robust approach as AdminAttendance
                 var allAttendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
                 string targetDate = date.ToString("yyyy-MM-dd");
 
@@ -267,8 +231,6 @@ namespace HRIS_JAP_ATTPAY
                         if (attendanceRecord?.Object != null)
                         {
                             string firebaseKey = attendanceRecord.Key;
-
-                            // Use the same robust processing as AdminAttendance
                             Dictionary<string, object> attendanceDict = ConvertToDictionary(attendanceRecord.Object);
 
                             if (attendanceDict != null && attendanceDict.Any())
@@ -278,17 +240,13 @@ namespace HRIS_JAP_ATTPAY
                                 string existingStatus = GetSafeString(attendanceDict, "status");
                                 string employeeId = GetSafeString(attendanceDict, "employee_id");
 
-                                // Use the same date extraction method as AdminAttendance
                                 string extractedDate = ExtractDateFromAnyRecordType(attendanceRecord.Object, firebaseKey);
                                 bool matchesDate = !string.IsNullOrEmpty(extractedDate) && extractedDate == targetDate;
 
-                                // Only count if employee is active and matches date
                                 if (matchesDate && !string.IsNullOrEmpty(employeeId) && allEmployees.Contains(employeeId))
                                 {
-                                    // Use the same status calculation as AdminAttendance
                                     string status = CalculateStatus(timeInStr, timeOutStr, existingStatus);
 
-                                    // Count based on unified status logic
                                     if (status.Equals("On Time", StringComparison.OrdinalIgnoreCase))
                                     {
                                         onTimeCount++;
@@ -303,32 +261,27 @@ namespace HRIS_JAP_ATTPAY
                                     {
                                         absentCount++;
                                     }
-                                    // Note: "Day Off" and "Leave" are not counted in any category
+                                    else if (status.Equals("Day Off", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        dayOffCount++;
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
-                // Update UI with counts
-                labelTotalNumber.Text = totalEmployees.ToString();
+                int totalExpectedEmployees = totalEmployees - dayOffCount;
+                labelTotalNumber.Text = totalExpectedEmployees.ToString();
                 labelOnTimeNumber.Text = onTimeCount.ToString();
                 labelLateNumber.Text = lateCount.ToString();
                 labelAbsentNumber.Text = absentCount.ToString();
-
-                // Update the date range label
                 labelAlertDateRange.Text = $"Date: {targetDate}";
-
-                // Also refresh the alert grids
-                LoadTodaysAbsentEmployees();
-                LoadTodaysLateEmployees();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error loading attendance summary: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                // Reset UI on error
                 labelTotalNumber.Text = "0";
                 labelOnTimeNumber.Text = "0";
                 labelLateNumber.Text = "0";
@@ -340,10 +293,8 @@ namespace HRIS_JAP_ATTPAY
         private async Task<HashSet<string>> GetAllActiveEmployeesAsync()
         {
             var activeEmployees = new HashSet<string>();
-
             try
             {
-                // Load current employees
                 var currentEmployees = await firebase.Child("EmployeeDetails").OnceAsync<JObject>();
                 if (currentEmployees != null)
                 {
@@ -353,7 +304,6 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                // Load archived employees and remove them from active list
                 var archivedEmployees = await firebase.Child("ArchivedEmployees").OnceAsync<JObject>();
                 if (archivedEmployees != null)
                 {
@@ -398,16 +348,154 @@ namespace HRIS_JAP_ATTPAY
 
         private void setDailyEmployeeLogsDataGridViewAttributes()
         {
-            dataGridViewDailyEmployeeLogs.GridColor = Color.White;
-            dataGridViewDailyEmployeeLogs.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dataGridViewDailyEmployeeLogs.ColumnHeadersHeight = 40;
-            dataGridViewDailyEmployeeLogs.DefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Light", 10f);
-            dataGridViewDailyEmployeeLogs.ColumnHeadersDefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+            dataGridViewDayOffLogs.GridColor = Color.White;
+            dataGridViewDayOffLogs.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            dataGridViewDayOffLogs.ColumnHeadersHeight = 40;
+            dataGridViewDayOffLogs.DefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+            dataGridViewDayOffLogs.ColumnHeadersDefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+            dataGridViewDayOffLogs.Columns.Clear();
 
-            for (int i = 1; i < 30; i++) //test code; will be replaced with actual data from database
+            dataGridViewDayOffLogs.Columns.Add("ColumnName", "Name");
+            dataGridViewDayOffLogs.Columns.Add("ColumnCount", "Count");
+
+            dataGridViewDayOffLogs.Columns["ColumnName"].Width = 200;
+            dataGridViewDayOffLogs.Columns["ColumnCount"].Width = 100;
+
+            dataGridViewDayOffLogs.Rows.Clear();
+            LoadTodaysDayOffEmployees();
+        }
+        private async void LoadTodaysDayOffEmployees()
+        {
+            try
             {
-                dataGridViewDailyEmployeeLogs.Rows.Add("John Doe time out.");
+                // Get the selected date from the combo box - same pattern as alert grids
+                string selectedText = comboBoxSelectDate.SelectedItem?.ToString();
+                DateTime targetDate;
+
+                if (string.IsNullOrEmpty(selectedText) || selectedText == "All Dates")
+                    targetDate = DateTime.Today;
+                else if (DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
+                         System.Globalization.CultureInfo.InvariantCulture,
+                         System.Globalization.DateTimeStyles.None, out DateTime parsedDate))
+                    targetDate = parsedDate;
+                else
+                    targetDate = DateTime.Today;
+
+                string targetDateStr = targetDate.ToString("yyyy-MM-dd");
+
+                // Use the same approach as AdminAttendance - following alert grid pattern
+                var allAttendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
+                var dayOffEmployees = new Dictionary<string, int>(); // Name -> Count (following alert grid pattern)
+
+                // Load employee data first (same as alert grids)
+                var firebaseEmployees = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
+                var employeeDict = new Dictionary<string, dynamic>();
+                foreach (var emp in firebaseEmployees)
+                    employeeDict[emp.Key] = emp.Object;
+
+                // Also load archived employees for complete data
+                var archivedEmployees = await firebase.Child("ArchivedEmployees").OnceAsync<dynamic>();
+                foreach (var archivedEmp in archivedEmployees)
+                {
+                    if (archivedEmp.Object != null && archivedEmp.Object.employee_data != null)
+                    {
+                        employeeDict[archivedEmp.Key] = archivedEmp.Object.employee_data;
+                    }
+                }
+
+                if (allAttendanceRecords != null)
+                {
+                    foreach (var attendanceRecord in allAttendanceRecords)
+                    {
+                        if (attendanceRecord?.Object != null)
+                        {
+                            string firebaseKey = attendanceRecord.Key;
+
+                            // Use the same robust processing as alert grids
+                            Dictionary<string, object> attendanceDict = ConvertToDictionary(attendanceRecord.Object);
+
+                            if (attendanceDict != null && attendanceDict.Any())
+                            {
+                                string status = GetSafeString(attendanceDict, "status", "Absent");
+                                string employeeId = GetSafeString(attendanceDict, "employee_id");
+
+                                // Use the same date extraction method as alert grids
+                                string extractedDate = ExtractDateFromAnyRecordType(attendanceRecord.Object, firebaseKey);
+                                bool matchesDate = !string.IsNullOrEmpty(extractedDate) && extractedDate == targetDateStr;
+
+                                // Check for Day Off status - same logic pattern as alert grids
+                                if (matchesDate && !string.IsNullOrEmpty(employeeId) &&
+                                    status.Equals("Day Off", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    // Get employee name using the ConvertToDictionary approach - same as alert grids
+                                    string fullName = "N/A";
+                                    if (employeeDict.ContainsKey(employeeId))
+                                    {
+                                        var employee = employeeDict[employeeId];
+                                        Dictionary<string, object> empDict = ConvertToDictionary(employee);
+                                        string firstName = GetSafeString(empDict, "first_name");
+                                        string middleName = GetSafeString(empDict, "middle_name");
+                                        string lastName = GetSafeString(empDict, "last_name");
+
+                                        // Try full_name field if available
+                                        string fullNameField = GetSafeString(empDict, "full_name");
+                                        if (!string.IsNullOrEmpty(fullNameField))
+                                        {
+                                            fullName = fullNameField;
+                                        }
+                                        else
+                                        {
+                                            fullName = $"{firstName} {middleName} {lastName}".Trim();
+                                        }
+                                    }
+
+                                    if (!string.IsNullOrEmpty(fullName) && fullName != "N/A")
+                                    {
+                                        // Following the same pattern as alert grids - count occurrences
+                                        if (dayOffEmployees.ContainsKey(fullName))
+                                        {
+                                            dayOffEmployees[fullName]++;
+                                        }
+                                        else
+                                        {
+                                            dayOffEmployees[fullName] = 1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Clear and add to DataGridView - same pattern as alert grids
+                dataGridViewDayOffLogs.Rows.Clear();
+                foreach (var entry in dayOffEmployees)
+                {
+                    dataGridViewDayOffLogs.Rows.Add(entry.Key, entry.Value);
+                }
+
+                // If no day off employees, show message - same pattern as alert grids
+                if (dataGridViewDayOffLogs.Rows.Count == 0)
+                {
+                    dataGridViewDayOffLogs.Rows.Add("No employees on day off", "0");
+                }
+
+                // Update the date label for Day Off section to match the alert format
+                UpdateDayOffDateLabel(targetDate);
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading day off employees: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                dataGridViewDayOffLogs.Rows.Clear();
+                dataGridViewDayOffLogs.Rows.Add("Error loading data", "0");
+            }
+        }
+        private void UpdateDayOffDateLabel(DateTime date)
+        {
+
+            labelDayOffDate.Text = $"Date: {date.ToString("yyyy-MM-dd")}";
+
         }
 
         private void setTodoDataGridViewAttributes()
@@ -421,24 +509,23 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewTodo.CellMouseLeave += dataGridViewTodo_CellMouseLeave;
             dataGridViewTodo.CellClick += dataGridViewTodo_CellClick;
 
-            // Clear existing columns and add the correct ones
             dataGridViewTodo.Columns.Clear();
 
-            // Task column
             dataGridViewTodo.Columns.Add("ColumnTask", "Task");
             dataGridViewTodo.Columns["ColumnTask"].Width = 250;
             dataGridViewTodo.Columns["ColumnTask"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewTodo.Columns["ColumnTask"].ReadOnly = true;
 
-            // Due Date column
             dataGridViewTodo.Columns.Add("ColumnDueDate", "Due Date");
             dataGridViewTodo.Columns["ColumnDueDate"].Width = 150;
+            dataGridViewTodo.Columns["ColumnDueDate"].ReadOnly = true;
 
-            // Delete button column (make sure you have a trash icon resource)
             DataGridViewImageColumn deleteColumn = new DataGridViewImageColumn();
             deleteColumn.Name = "ColumnTrash";
             deleteColumn.HeaderText = "";
             deleteColumn.Width = 40;
             deleteColumn.Image = Properties.Resources.TrashBin;
+            deleteColumn.ReadOnly = true;
             dataGridViewTodo.Columns.Add(deleteColumn);
         }
 
@@ -1257,6 +1344,10 @@ namespace HRIS_JAP_ATTPAY
                 // If any error occurs, return the existing status or Absent
                 return !string.IsNullOrEmpty(existingStatus) ? existingStatus : "Absent";
             }
+        }
+        private void dataGridViewDayOffLogs_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
 
         private string FormatActionType(string actionType)

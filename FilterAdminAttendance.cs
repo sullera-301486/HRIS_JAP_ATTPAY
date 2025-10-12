@@ -294,6 +294,12 @@ namespace HRIS_JAP_ATTPAY
                 OvertimeTwoHoursPlus = checkBoxAboveTwoHours.Checked
             };
 
+            // Ensure sort value is properly set
+            if (string.IsNullOrEmpty(filters.SortBy) && comboBoxSort.SelectedItem != null)
+            {
+                filters.SortBy = comboBoxSort.SelectedItem.ToString();
+            }
+
             System.Diagnostics.Debug.WriteLine($"Filter Apply: SortBy = '{filters.SortBy}'");
             FiltersApplied?.Invoke(filters);
             this.Close();
@@ -301,6 +307,34 @@ namespace HRIS_JAP_ATTPAY
 
         private void buttonReset_Click(object sender, EventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine("Reset button clicked in filter form");
+
+            // Reset all filter controls in the form
+            textBoxID.Text = "";
+            textBoxName.Text = "";
+
+            // Safely reset ComboBoxes - only set SelectedIndex if there are items
+            if (comboBoxDepartment.Items.Count > 0)
+                comboBoxDepartment.SelectedIndex = 0;
+
+            if (comboBoxPosition.Items.Count > 0)
+                comboBoxPosition.SelectedIndex = 0;
+
+            comboBoxSort.SelectedIndex = -1; // Clear sort selection
+            textBoxTimeIn.Text = "";
+            textBoxTimeOut.Text = "";
+
+            // Reset all checkboxes
+            checkBoxPresent.Checked = false;
+            checkBoxAbsent.Checked = false;
+            checkBoxLate.Checked = false;
+            checkBoxEarlyOut.Checked = false;
+            checkBoxEightHours.Checked = false;
+            checkBoxBelowEightHours.Checked = false;
+            checkBoxOneHour.Checked = false;
+            checkBoxAboveTwoHours.Checked = false;
+
+            // Trigger the reset event
             FiltersReset?.Invoke();
             this.Close();
         }
@@ -345,5 +379,19 @@ namespace HRIS_JAP_ATTPAY
         // Overtime filters
         public bool OvertimeOneHour { get; set; } = false;
         public bool OvertimeTwoHoursPlus { get; set; } = false;
+    }
+    public class AttendanceRowData
+    {
+        public string RowNumber { get; set; }
+        public string EmployeeId { get; set; }
+        public string FullName { get; set; }
+        public string TimeIn { get; set; }
+        public string TimeOut { get; set; }
+        public string HoursWorked { get; set; }
+        public string Status { get; set; }
+        public string OvertimeHours { get; set; }
+        public string VerificationMethod { get; set; }
+        public string AttendanceDate { get; set; }
+        public string FirebaseKey { get; set; }
     }
 }

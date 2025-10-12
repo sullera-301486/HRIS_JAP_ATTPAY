@@ -80,75 +80,138 @@ namespace HRIS_JAP_ATTPAY
 
         private void ResetAttendanceFilters()
         {
+            System.Diagnostics.Debug.WriteLine("=== RESETTING FILTERS ===");
+
+            // Reset the filter criteria
             currentAttendanceFilters = new AttendanceFilterCriteria();
-            ApplyAllAttendanceFilters();
+
+            // Clear the search text
+            textBoxSearchEmployee.Text = "";
+
+            // DON'T reset the date selection - keep the current date
+            // Get the CURRENTLY selected date (don't change it)
+            string selectedText = comboBoxSelectDate.SelectedItem?.ToString();
+            DateTime? selectedDate = null;
+
+            if (!string.IsNullOrEmpty(selectedText) && selectedText != "All Dates")
+            {
+                DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None,
+                    out DateTime parsedDate);
+                selectedDate = parsedDate;
+            }
+
+            // Reload the Firebase data with the CURRENT date selection
+            LoadFirebaseAttendanceData(selectedDate);
+
+            System.Diagnostics.Debug.WriteLine("=== FILTERS RESET COMPLETE ===");
         }
 
         private void ApplyAllAttendanceFilters()
         {
-            string searchText = textBoxSearchEmployee.Text.Trim().ToLower();
-            var filteredRows = new List<DataGridViewRow>();
+            dataGridViewAttendance.SuspendLayout();
 
-            System.Diagnostics.Debug.WriteLine($"ApplyAllAttendanceFilters: SearchText='{searchText}', SortBy='{currentAttendanceFilters?.SortBy}'");
-
-            // First, collect all rows that match search and filters
-            foreach (DataGridViewRow row in dataGridViewAttendance.Rows)
+            try
             {
-                if (!row.IsNewRow)
+                string searchText = textBoxSearchEmployee.Text.Trim().ToLower();
+
+                System.Diagnostics.Debug.WriteLine($"ApplyAllAttendanceFilters: SearchText='{searchText}', SortBy='{currentAttendanceFilters?.SortBy}'");
+
+                // Store the current rows with their data and Firebase keys
+                var rowsData = new List<AttendanceRowData>();
+
+                foreach (DataGridViewRow row in dataGridViewAttendance.Rows)
                 {
-                    bool matchesSearch = MatchesSearchText(row, searchText);
-                    bool matchesFilters = MatchesAttendanceFilters(row);
+                    if (!row.IsNewRow)
+                    {
+                        var rowData = new AttendanceRowData
+                        {
+                            RowNumber = row.Cells["RowNumber"]?.Value?.ToString() ?? "",
+                            EmployeeId = row.Cells["EmployeeId"]?.Value?.ToString() ?? "",
+                            FullName = row.Cells["FullName"]?.Value?.ToString() ?? "",
+                            TimeIn = row.Cells["TimeIn"]?.Value?.ToString() ?? "",
+                            TimeOut = row.Cells["TimeOut"]?.Value?.ToString() ?? "",
+                            HoursWorked = row.Cells["HoursWorked"]?.Value?.ToString() ?? "",
+                            Status = row.Cells["Status"]?.Value?.ToString() ?? "",
+                            OvertimeHours = row.Cells["OvertimeHours"]?.Value?.ToString() ?? "",
+                            VerificationMethod = row.Cells["VerificationMethod"]?.Value?.ToString() ?? "",
+                            AttendanceDate = row.Cells["AttendanceDate"]?.Value?.ToString() ?? "",
+                            FirebaseKey = attendanceKeyMap.ContainsKey(row.Index) ? attendanceKeyMap[row.Index] : null
+                        };
 
-                    if (matchesSearch && matchesFilters)
-                        filteredRows.Add(row);
+                        // Check if this row matches filters
+                        bool matchesSearch = MatchesSearchText(row, searchText);
+                        bool matchesFilters = MatchesAttendanceFilters(row);
 
-                    row.Visible = false;
+                        if (matchesSearch && matchesFilters)
+                        {
+                            rowsData.Add(rowData);
+                        }
+                    }
+                }
+
+                System.Diagnostics.Debug.WriteLine($"Matching rows count before sorting: {rowsData.Count}");
+
+                // Apply sorting if specified
+                List<AttendanceRowData> sortedData;
+                if (!string.IsNullOrEmpty(currentAttendanceFilters?.SortBy))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Calling ApplySorting with: {currentAttendanceFilters.SortBy}");
+                    sortedData = ApplySortingToData(rowsData);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("No sorting applied - using natural order");
+                    sortedData = rowsData;
+                }
+
+                System.Diagnostics.Debug.WriteLine($"Final rows count after sorting: {sortedData.Count}");
+
+                // Clear the grid and re-add rows in sorted order
+                dataGridViewAttendance.Rows.Clear();
+                attendanceKeyMap.Clear();
+
+                int counter = 1;
+                foreach (var rowData in sortedData)
+                {
+                    int newRowIndex = dataGridViewAttendance.Rows.Add(
+                        counter,
+                        rowData.EmployeeId,
+                        rowData.FullName,
+                        rowData.TimeIn,
+                        rowData.TimeOut,
+                        rowData.HoursWorked,
+                        rowData.Status,
+                        rowData.OvertimeHours,
+                        rowData.VerificationMethod,
+                        rowData.AttendanceDate,
+                        Properties.Resources.VerticalThreeDots
+                    );
+
+                    // Store the Firebase key mapping
+                    if (!string.IsNullOrEmpty(rowData.FirebaseKey))
+                    {
+                        attendanceKeyMap[newRowIndex] = rowData.FirebaseKey;
+                    }
+
+                    counter++;
                 }
             }
-
-            System.Diagnostics.Debug.WriteLine($"Filtered rows count before sorting: {filteredRows.Count}");
-
-            // Debug: Print filtered rows before sorting
-            foreach (var row in filteredRows)
+            finally
             {
-                string name = row.Cells["FullName"]?.Value?.ToString() ?? "";
-                System.Diagnostics.Debug.WriteLine($"Before sorting: '{name}'");
+                dataGridViewAttendance.ResumeLayout();
+                dataGridViewAttendance.Refresh();
             }
-
-            // ALWAYS apply sorting if we have a sort criteria
-            List<DataGridViewRow> finalRows;
-
-            if (!string.IsNullOrEmpty(currentAttendanceFilters?.SortBy))
-            {
-                System.Diagnostics.Debug.WriteLine($"Calling ApplySorting with: {currentAttendanceFilters.SortBy}");
-                finalRows = ApplySorting(filteredRows);
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("No sorting applied - SortBy is empty or null");
-                finalRows = filteredRows;
-            }
-
-            System.Diagnostics.Debug.WriteLine($"Final rows count after sorting: {finalRows.Count}");
-
-            // Make the final rows visible
-            foreach (var row in finalRows)
-                row.Visible = true;
-
-            UpdateRowNumbers();
         }
-
-        // 🔹 SORTING - FIXED TO MATCH HRAttendance
-        // 🔹 SORTING - FIXED TO USE EXISTING EXTRACTFIRSTNAME METHOD
-        // 🔹 SORTING - FIXED VERSION
-        private List<DataGridViewRow> ApplySorting(List<DataGridViewRow> rows)
+        private List<AttendanceRowData> ApplySortingToData(List<AttendanceRowData> data)
         {
-            System.Diagnostics.Debug.WriteLine($"ApplySorting called with {rows.Count} rows");
+            System.Diagnostics.Debug.WriteLine($"ApplySortingToData called with {data.Count} items");
 
             if (currentAttendanceFilters == null || string.IsNullOrEmpty(currentAttendanceFilters.SortBy))
             {
-                System.Diagnostics.Debug.WriteLine("No sort criteria specified - returning rows as-is");
-                return rows;
+                System.Diagnostics.Debug.WriteLine("No sort criteria specified - returning data as-is");
+                return data;
             }
 
             string sort = currentAttendanceFilters.SortBy.ToLower().Trim();
@@ -156,54 +219,50 @@ namespace HRIS_JAP_ATTPAY
 
             try
             {
-                List<DataGridViewRow> sortedRows = new List<DataGridViewRow>();
+                List<AttendanceRowData> sortedData = new List<AttendanceRowData>();
 
                 switch (sort)
                 {
                     case "a-z":
-                        System.Diagnostics.Debug.WriteLine("Applying A-Z sort by FIRST LETTER");
-                        sortedRows = rows.OrderBy(r =>
+                        System.Diagnostics.Debug.WriteLine("Applying A-Z sort by FULL NAME");
+                        sortedData = data.OrderBy(d =>
                         {
-                            string fullName = r.Cells["FullName"]?.Value?.ToString() ?? "";
-                            char firstLetter = ExtractFirstLetter(fullName);
-                            System.Diagnostics.Debug.WriteLine($"A-Z Sorting: '{fullName}' -> '{firstLetter}'");
-                            return firstLetter;
-                        }).ToList();
+                            string fullName = d.FullName?.Trim() ?? "";
+                            System.Diagnostics.Debug.WriteLine($"A-Z Sorting: '{fullName}'");
+                            return fullName;
+                        }, StringComparer.OrdinalIgnoreCase).ToList();
                         break;
 
                     case "z-a":
-                        System.Diagnostics.Debug.WriteLine("Applying Z-A sort by FIRST LETTER");
-                        sortedRows = rows.OrderByDescending(r =>
+                        System.Diagnostics.Debug.WriteLine("Applying Z-A sort by FULL NAME");
+                        sortedData = data.OrderByDescending(d =>
                         {
-                            string fullName = r.Cells["FullName"]?.Value?.ToString() ?? "";
-                            char firstLetter = ExtractFirstLetter(fullName);
-                            System.Diagnostics.Debug.WriteLine($"Z-A Sorting: '{fullName}' -> '{firstLetter}'");
-                            return firstLetter;
-                        }).ToList();
+                            string fullName = d.FullName?.Trim() ?? "";
+                            System.Diagnostics.Debug.WriteLine($"Z-A Sorting: '{fullName}'");
+                            return fullName;
+                        }, StringComparer.OrdinalIgnoreCase).ToList();
                         break;
 
                     default:
                         System.Diagnostics.Debug.WriteLine($"Unknown sort option: {sort} - returning original order");
-                        sortedRows = rows;
+                        sortedData = data;
                         break;
                 }
 
-                System.Diagnostics.Debug.WriteLine($"After sorting, rows count: {sortedRows.Count}");
+                System.Diagnostics.Debug.WriteLine($"After sorting, data count: {sortedData.Count}");
 
                 // Debug: Print the sorted order
-                foreach (var row in sortedRows)
+                foreach (var item in sortedData.Take(5))
                 {
-                    string name = row.Cells["FullName"]?.Value?.ToString() ?? "";
-                    char firstLetter = ExtractFirstLetter(name);
-                    System.Diagnostics.Debug.WriteLine($"Sorted: '{name}' (First letter: '{firstLetter}')");
+                    System.Diagnostics.Debug.WriteLine($"Sorted Data: '{item.FullName}'");
                 }
 
-                return sortedRows;
+                return sortedData;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"ERROR in ApplySorting: {ex.Message}");
-                return rows;
+                System.Diagnostics.Debug.WriteLine($"ERROR in ApplySortingToData: {ex.Message}");
+                return data;
             }
         }
 
@@ -214,8 +273,20 @@ namespace HRIS_JAP_ATTPAY
             {
                 if (!row.IsNewRow && row.Visible)
                 {
-                    row.Cells["RowNumber"].Value = counter;
+                    // Ensure the RowNumber cell exists and is accessible
+                    if (row.Cells["RowNumber"] != null)
+                    {
+                        row.Cells["RowNumber"].Value = counter;
+                    }
                     counter++;
+                }
+                else if (!row.IsNewRow)
+                {
+                    // Ensure hidden rows don't show row numbers
+                    if (row.Cells["RowNumber"] != null)
+                    {
+                        row.Cells["RowNumber"].Value = "";
+                    }
                 }
             }
         }
@@ -340,28 +411,7 @@ namespace HRIS_JAP_ATTPAY
             return true;
         }
 
-        private char ExtractFirstLetter(string fullName)
-        {
-            if (string.IsNullOrEmpty(fullName))
-            {
-                System.Diagnostics.Debug.WriteLine("ExtractFirstLetter: Empty fullName");
-                return ' '; // Space will sort before letters
-            }
-
-            // Clean up the name - remove extra spaces and get the very first character
-            fullName = fullName.Trim();
-
-            if (fullName.Length == 0)
-                return ' ';
-
-            char firstLetter = fullName[0];
-
-            // Convert to uppercase for consistent sorting
-            firstLetter = char.ToUpper(firstLetter);
-
-            System.Diagnostics.Debug.WriteLine($"ExtractFirstLetter: '{fullName}' -> '{firstLetter}'");
-            return firstLetter;
-        }
+       
 
         // ADD THESE METHODS (same as in the filter form):
         // Helper method to get values safely
@@ -707,25 +757,31 @@ namespace HRIS_JAP_ATTPAY
                 switch (e.Value.ToString())
                 {
                     case "On Time":
-                        statusBackColor = Color.FromArgb(95, 218, 71);
+                        statusBackColor = Color.FromArgb(95, 218, 71); // Green
                         statusForeColor = Color.White;
                         break;
                     case "Late":
+                        statusBackColor = Color.FromArgb(255, 163, 74); 
+                        statusForeColor = Color.White;
+                        break;
                     case "Early Out":
-                    case "Late & Early Out":  // Added this line
+                        statusBackColor = Color.FromArgb(255, 163, 74);
+                        statusForeColor = Color.White;
+                        break;
+                    case "Late & Early Out":
                         statusBackColor = Color.FromArgb(255, 163, 74);
                         statusForeColor = Color.White;
                         break;
                     case "Absent":
-                        statusBackColor = Color.FromArgb(221, 60, 60);
+                        statusBackColor = Color.FromArgb(221, 60, 60); 
                         statusForeColor = Color.White;
                         break;
                     case "Leave":
-                        statusBackColor = Color.FromArgb(71, 93, 218);
+                        statusBackColor = Color.FromArgb(180, 174, 189); 
                         statusForeColor = Color.White;
                         break;
                     case "Day Off":
-                        statusBackColor = Color.FromArgb(180, 174, 189);
+                        statusBackColor = Color.FromArgb(71, 93, 218); 
                         statusForeColor = Color.White;
                         break;
                 }
@@ -778,79 +834,117 @@ namespace HRIS_JAP_ATTPAY
         // Updated CalculateStatus method for AdminAttendance.cs
         private async Task<string> CalculateStatusWithSchedule(string timeInStr, string timeOutStr, string employeeId, string attendanceDate, string existingStatus = "")
         {
-            // If time in is N/A, then it's Absent
-            if (string.IsNullOrEmpty(timeInStr) || timeInStr == "N/A")
-                return "Absent";
-
             try
             {
-                // Get the employee's schedule for this specific day
-                var schedule = await GetEmployeeScheduleForDay(employeeId, attendanceDate);
+                // DEBUG: Log what we're processing
+                System.Diagnostics.Debug.WriteLine($"🔍 Status Calc: Emp={employeeId}, Date={attendanceDate}, TimeIn={timeInStr}, ExistingStatus={existingStatus}");
 
-                if (!schedule.HasValue)
+                // 1. PRESERVE SYSTEM-GENERATED STATUSES
+                // If Firebase already has a valid status, use it (especially for "Day Off", "Absent", etc.)
+                if (!string.IsNullOrEmpty(existingStatus) && existingStatus != "N/A")
                 {
-                    // No schedule found - use default times as fallback
-                    System.Diagnostics.Debug.WriteLine($"⚠️ No schedule for {employeeId} on {attendanceDate}, using default 8-5 times");
-                    return CalculateStatusWithDefaultTimes(timeInStr, timeOutStr, existingStatus);
+                    System.Diagnostics.Debug.WriteLine($"✅ Using existing status from Firebase: {existingStatus}");
+                    return existingStatus;
                 }
 
-                TimeSpan expectedStart = schedule.Value.startTime;
-                TimeSpan expectedEnd = schedule.Value.endTime;
+                // 2. CHECK IF EMPLOYEE WORKED TODAY
+                bool hasWorked = !(string.IsNullOrEmpty(timeInStr) || timeInStr == "N/A");
 
-                System.Diagnostics.Debug.WriteLine($"📅 Using schedule times - Start: {expectedStart}, End: {expectedEnd}");
+                // 3. GET SCHEDULE FOR THIS DAY
+                var schedule = await GetEmployeeScheduleForDay(employeeId, attendanceDate);
 
-                DateTime timeIn, timeOut;
-
-                // Try to parse different time formats for Time In
-                bool timeInParsed = DateTime.TryParseExact(timeInStr, "yyyy-MM-dd HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
-                                   DateTime.TryParseExact(timeInStr, "HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
-                                   DateTime.TryParseExact(timeInStr, "HH:mm", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
-                                   DateTime.TryParseExact(timeInStr, "hh:mm tt", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
-                                   DateTime.TryParse(timeInStr, out timeIn);
-
-                bool timeOutParsed = DateTime.TryParseExact(timeOutStr, "yyyy-MM-dd HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
-                                    DateTime.TryParseExact(timeOutStr, "HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
-                                    DateTime.TryParseExact(timeOutStr, "HH:mm", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
-                                    DateTime.TryParseExact(timeOutStr, "hh:mm tt", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
-                                    DateTime.TryParse(timeOutStr, out timeOut);
-
-                if (timeInParsed)
+                // 4. DECISION LOGIC
+                if (!schedule.HasValue)
                 {
-                    TimeSpan actualTimeIn = new TimeSpan(timeIn.Hour, timeIn.Minute, timeIn.Second);
-
-                    bool isLate = actualTimeIn > expectedStart;
-                    bool isEarlyOut = false;
-
-                    // Check for early out only if we have valid time out
-                    if (timeOutParsed && timeOutStr != "N/A" && !string.IsNullOrEmpty(timeOutStr))
+                    // No schedule for this day
+                    if (!hasWorked)
                     {
-                        TimeSpan actualTimeOut = new TimeSpan(timeOut.Hour, timeOut.Minute, timeOut.Second);
-                        isEarlyOut = actualTimeOut < expectedEnd;
-
-                        System.Diagnostics.Debug.WriteLine($"⏰ Time Out: {actualTimeOut} vs Expected: {expectedEnd}, Early Out: {isEarlyOut}");
+                        System.Diagnostics.Debug.WriteLine($"✅ No schedule + no work = Day Off for {employeeId}");
+                        return "Day Off";
                     }
-
-                    System.Diagnostics.Debug.WriteLine($"⏰ Time In: {actualTimeIn} vs Expected: {expectedStart}, Late: {isLate}");
-
-                    if (isLate && isEarlyOut)
-                        return "Late & Early Out";
-                    else if (isLate)
-                        return "Late";
-                    else if (isEarlyOut)
-                        return "Early Out";
                     else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"⚠️ No schedule but employee worked = On Time (unscheduled)");
                         return "On Time";
+                    }
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine($"❌ Failed to parse time in: {timeInStr}");
-                    return !string.IsNullOrEmpty(existingStatus) ? existingStatus : "Absent";
+                    // Has schedule for this day
+                    if (!hasWorked)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"❌ Has schedule but no work = Absent for {employeeId}");
+                        return "Absent";
+                    }
+                    else
+                    {
+                        // Calculate based on actual times vs schedule
+                        return await CalculateTimingStatus(timeInStr, timeOutStr, schedule.Value, employeeId, attendanceDate);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"❌ Error in CalculateStatusWithSchedule: {ex.Message}");
                 return !string.IsNullOrEmpty(existingStatus) ? existingStatus : "Absent";
+            }
+        }
+
+        private async Task<string> CalculateTimingStatus(string timeInStr, string timeOutStr, (TimeSpan startTime, TimeSpan endTime) schedule, string employeeId, string attendanceDate)
+        {
+            try
+            {
+                TimeSpan expectedStart = schedule.startTime;
+                TimeSpan expectedEnd = schedule.endTime;
+
+                System.Diagnostics.Debug.WriteLine($"📅 Schedule: {expectedStart} - {expectedEnd} for {employeeId}");
+
+                DateTime timeIn, timeOut;
+
+                // Parse Time In
+                bool timeInParsed = DateTime.TryParseExact(timeInStr, "yyyy-MM-dd HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
+                                   DateTime.TryParseExact(timeInStr, "HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeIn) ||
+                                   DateTime.TryParse(timeInStr, out timeIn);
+
+                // Parse Time Out
+                bool timeOutParsed = DateTime.TryParseExact(timeOutStr, "yyyy-MM-dd HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
+                                    DateTime.TryParseExact(timeOutStr, "HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timeOut) ||
+                                    DateTime.TryParse(timeOutStr, out timeOut);
+
+                if (!timeInParsed)
+                {
+                    System.Diagnostics.Debug.WriteLine($"❌ Failed to parse time in: {timeInStr}");
+                    return "Absent";
+                }
+
+                TimeSpan actualTimeIn = new TimeSpan(timeIn.Hour, timeIn.Minute, timeIn.Second);
+                bool isLate = actualTimeIn > expectedStart.Add(TimeSpan.FromMinutes(5)); // 5-minute grace period
+                bool isEarlyOut = false;
+
+                // Check early out only if we have valid time out
+                if (timeOutParsed && timeOutStr != "N/A" && !string.IsNullOrEmpty(timeOutStr))
+                {
+                    TimeSpan actualTimeOut = new TimeSpan(timeOut.Hour, timeOut.Minute, timeOut.Second);
+                    isEarlyOut = actualTimeOut < expectedEnd.Subtract(TimeSpan.FromMinutes(5)); // 5-minute grace period
+                    System.Diagnostics.Debug.WriteLine($"⏰ Time Out: {actualTimeOut} vs Expected: {expectedEnd}, Early Out: {isEarlyOut}");
+                }
+
+                System.Diagnostics.Debug.WriteLine($"⏰ Time In: {actualTimeIn} vs Expected: {expectedStart}, Late: {isLate}");
+
+                // Determine status
+                if (isLate && isEarlyOut)
+                    return "Late & Early Out";
+                else if (isLate)
+                    return "Late";
+                else if (isEarlyOut)
+                    return "Early Out";
+                else
+                    return "On Time";
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error in CalculateTimingStatus: {ex.Message}");
+                return "On Time"; // Default to On Time if calculation fails
             }
         }
 
@@ -1496,7 +1590,7 @@ namespace HRIS_JAP_ATTPAY
 
                 System.Diagnostics.Debug.WriteLine($"Looking for schedule: Employee {employeeId} on {dayOfWeek} ({normalizedTargetDay})");
 
-                // Get all schedules from Firebase using the same approach as ReliableAttendanceService
+                // Get all schedules from Firebase
                 var scheduleRecords = await firebase.Child("Work_Schedule").OnceAsync<dynamic>();
 
                 if (scheduleRecords == null || !scheduleRecords.Any())
@@ -1507,6 +1601,7 @@ namespace HRIS_JAP_ATTPAY
 
                 System.Diagnostics.Debug.WriteLine($"Found {scheduleRecords.Count()} total schedule records");
 
+                // First, try to find exact match for the day
                 foreach (var scheduleRecord in scheduleRecords)
                 {
                     if (scheduleRecord?.Object != null)
@@ -1550,7 +1645,24 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                System.Diagnostics.Debug.WriteLine($"❌ No matching schedule found for {employeeId} on {dayOfWeek}");
+                // If no exact match found, check if employee has any schedule at all
+                System.Diagnostics.Debug.WriteLine($"No exact schedule match for {employeeId} on {dayOfWeek}, checking if employee has any schedule...");
+
+                bool hasAnySchedule = scheduleRecords.Any(r =>
+                {
+                    string schedEmpId = GetScheduleProperty(r.Object, "employee_id");
+                    return schedEmpId == employeeId;
+                });
+
+                if (!hasAnySchedule)
+                {
+                    System.Diagnostics.Debug.WriteLine($"❌ Employee {employeeId} has no schedule defined at all");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"ℹ️ Employee {employeeId} has schedules but not for {dayOfWeek}");
+                }
+
                 return null;
             }
             catch (Exception ex)
@@ -1686,17 +1798,45 @@ namespace HRIS_JAP_ATTPAY
             if (string.IsNullOrEmpty(timeStr))
                 return false;
 
-            // Try standard TimeSpan parsing
+            // Clean the time string
+            timeStr = timeStr.Trim();
+
+            // Try standard TimeSpan parsing (handles HH:mm:ss)
             if (TimeSpan.TryParse(timeStr, out time))
                 return true;
 
-            // Try parsing as time with various formats
-            if (DateTime.TryParse(timeStr, out DateTime dateTime))
+            // Try parsing as DateTime with various formats
+            string[] timeFormats = {
+        "HH:mm:ss",
+        "HH:mm",
+        "h:mm tt",
+        "h:mm:ss tt",
+        "H:mm",
+        "H:mm:ss"
+    };
+
+            if (DateTime.TryParseExact(timeStr, timeFormats,
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out DateTime dateTime))
             {
                 time = dateTime.TimeOfDay;
                 return true;
             }
 
+            // Try parsing as simple time without seconds
+            if (timeStr.Length == 4 && int.TryParse(timeStr, out int timeInt))
+            {
+                // Handle "0830" format
+                int hours = timeInt / 100;
+                int minutes = timeInt % 100;
+                if (hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60)
+                {
+                    time = new TimeSpan(hours, minutes, 0);
+                    return true;
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine($"❌ Could not parse time string: '{timeStr}'");
             return false;
         }
 
