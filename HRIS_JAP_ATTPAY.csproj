@@ -258,6 +258,12 @@
     <Compile Include="AdminPayroll.Designer.cs">
       <DependentUpon>AdminPayroll.cs</DependentUpon>
     </Compile>
+    <Compile Include="adminUpdateAttendanceConfirm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="adminUpdateAttendanceConfirm.Designer.cs">
+      <DependentUpon>adminUpdateAttendanceConfirm.cs</DependentUpon>
+    </Compile>
     <Compile Include="AttendanceNotificationItems.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -267,6 +273,12 @@
     <Compile Include="AttendanceNotificationModel.cs" />
     <Compile Include="AttributesClassAlt.cs" />
     <Compile Include="AttributesScanner.cs" />
+    <Compile Include="ConfirmAdminLeaveEntry.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmAdminLeaveEntry.Designer.cs">
+      <DependentUpon>ConfirmAdminLeaveEntry.cs</DependentUpon>
+    </Compile>
     <Compile Include="EmployeeSchedules.cs" />
     <Compile Include="Calendar.cs">
       <SubType>UserControl</SubType>
@@ -608,6 +620,9 @@
     <EmbeddedResource Include="AdminPayroll.resx">
       <DependentUpon>AdminPayroll.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="adminUpdateAttendanceConfirm.resx">
+      <DependentUpon>adminUpdateAttendanceConfirm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AttendanceNotificationItems.resx">
       <DependentUpon>AttendanceNotificationItems.cs</DependentUpon>
     </EmbeddedResource>
@@ -619,6 +634,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ConfirmAddLoan.resx">
       <DependentUpon>ConfirmAddLoan.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmAdminLeaveEntry.resx">
+      <DependentUpon>ConfirmAdminLeaveEntry.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ConfirmDeleteTask.resx">
       <DependentUpon>ConfirmDeleteTask.cs</DependentUpon>

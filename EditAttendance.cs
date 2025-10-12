@@ -221,20 +221,46 @@ namespace HRIS_JAP_ATTPAY
                 }
             }
 
-            // Show confirmation dialog
+            // Show appropriate confirmation dialog based on user type
             Form parentForm = this.FindForm();
-            UpdateConfirmationEditAttendance confirmForm = new UpdateConfirmationEditAttendance();
+            bool isAdmin = SessionClass.CurrentEmployeeId == "JAP-001";
 
-            // Set up event handler for when the confirmation form closes
-            confirmForm.FormClosed += (s, args) => {
-                if (confirmForm.UserConfirmed)
-                {
-                    // Run the update process
-                    UpdateAttendanceInFirebase();
-                }
-            };
+            if (isAdmin)
+            {
+                // FIXED: Pass employee information to the admin confirmation form
+                adminUpdateAttendanceConfirm confirmForm = new adminUpdateAttendanceConfirm(
+                    employeeId: currentEmployeeId,
+                    employeeName: labelNameInput.Text,
+                    attendanceDate: currentDate
+                );
 
-            AttributesClass.ShowWithOverlay(parentForm, confirmForm);
+                // Set up event handler for when the confirmation form closes
+                confirmForm.FormClosed += (s, args) => {
+                    if (confirmForm.UserConfirmed)
+                    {
+                        // Run the update process
+                        UpdateAttendanceInFirebase();
+                    }
+                };
+
+                AttributesClass.ShowWithOverlay(parentForm, confirmForm);
+            }
+            else
+            {
+                // Show regular user confirmation form
+                UpdateConfirmationEditAttendance confirmForm = new UpdateConfirmationEditAttendance();
+
+                // Set up event handler for when the confirmation form closes
+                confirmForm.FormClosed += (s, args) => {
+                    if (confirmForm.UserConfirmed)
+                    {
+                        // Run the update process
+                        UpdateAttendanceInFirebase();
+                    }
+                };
+
+                AttributesClass.ShowWithOverlay(parentForm, confirmForm);
+            }
         }
 
         private async void UpdateAttendanceInFirebase()

@@ -85,6 +85,7 @@ namespace HRIS_JAP_ATTPAY
         }
 
         // 🟢 Send Request → show confirmation form first
+        // 🟢 Send Request → show confirmation form first
         private void buttonSendRequest_Click(object sender, EventArgs e)
         {
             string employee = comboBoxInputName.SelectedItem?.ToString();
@@ -102,8 +103,17 @@ namespace HRIS_JAP_ATTPAY
                 return;
             }
 
-            // 🔹 Show confirm dialog first
-            ConfirmLeaveEntry confirmForm = new ConfirmLeaveEntry();
+            // 🔹 Show confirm dialog first - MODIFIED PART
+            Form confirmForm;
+            if (SessionClass.CurrentEmployeeId == "101")
+            {
+                confirmForm = new ConfirmAdminLeaveEntry();
+            }
+            else
+            {
+                confirmForm = new ConfirmLeaveEntry();
+            }
+
             confirmForm.FormClosed += async (s, ev) =>
             {
                 // ✅ If user confirmed

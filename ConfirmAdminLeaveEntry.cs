@@ -4,9 +4,9 @@ using System.Windows.Forms;
 
 namespace HRIS_JAP_ATTPAY
 {
-    public partial class ConfirmLeaveEntry : Form
+    public partial class ConfirmAdminLeaveEntry : Form
     {
-        public ConfirmLeaveEntry()
+        public ConfirmAdminLeaveEntry()
         {
             InitializeComponent();
             setFont();
