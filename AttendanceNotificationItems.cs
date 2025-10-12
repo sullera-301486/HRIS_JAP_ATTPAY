@@ -50,13 +50,13 @@ namespace HRIS_JAP_ATTPAY
             {
                 lblTimeAgo.Font = AttributesClass.GetFont("Roboto-Regular", 9f);
                 lblTitle.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
-                label2.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
-                label3.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
-                label8.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
-                label1.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
-                label11.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
-                label9.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
-                label10.Font = AttributesClass.GetFont("Roboto-Regular", 11f);
+                label2.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
+                label3.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
+                label8.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
+                label1.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
+                label11.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
+                label9.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
+                label10.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
                 lblSubmittedBy.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 lblEmployee.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 lblDate.Font = AttributesClass.GetFont("Roboto-Light", 10f);
