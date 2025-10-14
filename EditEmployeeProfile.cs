@@ -584,39 +584,39 @@ namespace HRIS_JAP_ATTPAY
                 buttonCancel.Font = AttributesClass.GetFont("Roboto-Light", 14f);
                 buttonScanRFID.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 comboBoxDepartment.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelAddress.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelAltWorkDays.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelAltWorkHours.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelContact.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelContractType.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelAddress.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelAltWorkDays.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelAltWorkHours.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelContact.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelContractType.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
                 labelDashA.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
                 labelDashB.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
-                labelDateOfBirth.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelDateOfExit.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelDateOfJoining.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelDepartment.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelDateOfBirth.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelDateOfExit.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelDateOfJoining.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelDepartment.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
                 labelEditEmployeeDesc.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelEditEmployeeDetails.Font = AttributesClass.GetFont("Roboto-Regular", 18f);
-                labelEmail.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelEmployeeID.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelEmail.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelEmployeeID.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
                 labelEmployeeIDInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelEmploymentInformation.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
-                labelFirstName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelGender.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelLastName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelManager.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelMaritalStatus.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelMiddleName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelNationality.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelPassword.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelFirstName.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelGender.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelLastName.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelManager.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelMaritalStatus.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelMiddleName.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelNationality.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelPassword.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
                 labelPersonalInformation.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
-                labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
                 textBoxPositionInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelRFIDTag.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelRFIDTag.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
                 labelRFIDTagInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelShiftSchedule.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelWorkDays.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                labelWorkHours.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+                labelShiftSchedule.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelWorkDays.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
+                labelWorkHours.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
                 textBoxAddress.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxAltWorkHoursA.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxAltWorkHoursB.Font = AttributesClass.GetFont("Roboto-Light", 12f);
@@ -1980,6 +1980,11 @@ namespace HRIS_JAP_ATTPAY
             {
                 System.Diagnostics.Debug.WriteLine($"Error adding admin log: {ex.Message}");
             }
+        }
+
+        private void labelDateOfJoining_Click(object sender, EventArgs e)
+        {
+
         }
     }
 
