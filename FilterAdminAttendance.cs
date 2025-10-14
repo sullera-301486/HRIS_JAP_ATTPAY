@@ -320,7 +320,9 @@ namespace HRIS_JAP_ATTPAY
             if (comboBoxPosition.Items.Count > 0)
                 comboBoxPosition.SelectedIndex = 0;
 
-            comboBoxSort.SelectedIndex = -1; // Clear sort selection
+            // FIXED: Clear sort selection completely (matching FilterAdminEmployee pattern)
+            comboBoxSort.SelectedIndex = -1;
+
             textBoxTimeIn.Text = "";
             textBoxTimeOut.Text = "";
 
@@ -334,7 +336,7 @@ namespace HRIS_JAP_ATTPAY
             checkBoxOneHour.Checked = false;
             checkBoxAboveTwoHours.Checked = false;
 
-            // Trigger the reset event
+            // FIXED: Trigger the reset event EXACTLY like FilterAdminEmployee
             FiltersReset?.Invoke();
             this.Close();
         }
