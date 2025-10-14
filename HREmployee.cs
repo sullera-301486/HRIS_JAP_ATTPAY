@@ -1,14 +1,16 @@
-﻿using System;
+﻿using Firebase.Database;
+using Firebase.Database.Query;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Firebase.Database;
-using Firebase.Database.Query;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -123,44 +125,63 @@ namespace HRIS_JAP_ATTPAY
         // ADDED: Filter criteria matching
         private bool MatchesFilterCriteria(HREmployeeData emp)
         {
-            // Employee ID filter
-            if (!string.IsNullOrEmpty(currentFilters.EmployeeId) &&
-                currentFilters.EmployeeId.Trim().ToLower() != "search id")
+            try
             {
-                string searchId = currentFilters.EmployeeId.Trim().ToLower();
-                if (!(emp.EmployeeId?.ToLower().Contains(searchId) ?? false))
-                    return false;
-            }
+                // Safe null handling for all employee properties
+                string empDepartment = emp.Department ?? "";
+                string empPosition = emp.Position ?? "";
 
-            // Name filter
-            if (!string.IsNullOrEmpty(currentFilters.Name) &&
-                currentFilters.Name.Trim().ToLower() != "search name")
+                // Employee ID filter
+                if (!string.IsNullOrEmpty(currentFilters.EmployeeId) &&
+                    currentFilters.EmployeeId.Trim().ToLower() != "search id")
+                {
+                    string searchId = currentFilters.EmployeeId.Trim().ToLower();
+                    string empId = emp.EmployeeId?.ToLower() ?? "";
+                    if (!empId.Contains(searchId))
+                        return false;
+                }
+
+                // Name filter
+                if (!string.IsNullOrEmpty(currentFilters.Name) &&
+                    currentFilters.Name.Trim().ToLower() != "search name")
+                {
+                    string searchName = currentFilters.Name.Trim().ToLower();
+                    string fullName = emp.FullName?.ToLower() ?? "";
+                    if (!fullName.Contains(searchName))
+                        return false;
+                }
+
+                // Department filter - handle "Select department" and null values
+                if (!string.IsNullOrEmpty(currentFilters.Department) &&
+                    !currentFilters.Department.Equals("Select department", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (string.IsNullOrEmpty(empDepartment) ||
+                        !empDepartment.Equals(currentFilters.Department, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return false;
+                    }
+                }
+
+                // Position filter - handle "Select position" and null values
+                if (!string.IsNullOrEmpty(currentFilters.Position) &&
+                    !currentFilters.Position.Equals("Select position", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (string.IsNullOrEmpty(empPosition) ||
+                        !empPosition.Equals(currentFilters.Position, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
             {
-                string searchName = currentFilters.Name.Trim().ToLower();
-                if (!(emp.FullName?.ToLower().Contains(searchName) ?? false))
-                    return false;
+                System.Diagnostics.Debug.WriteLine($"Error in filter criteria for employee {emp.EmployeeId}: {ex.Message}");
+                return false;
             }
-
-            // Department filter
-            if (!string.IsNullOrEmpty(currentFilters.Department) &&
-                currentFilters.Department != "Select department")
-            {
-                if (!(emp.Department?.Equals(currentFilters.Department, StringComparison.OrdinalIgnoreCase) ?? false))
-                    return false;
-            }
-
-            // Position filter
-            if (!string.IsNullOrEmpty(currentFilters.Position) &&
-                currentFilters.Position != "Select position")
-            {
-                if (!(emp.Position?.Equals(currentFilters.Position, StringComparison.OrdinalIgnoreCase) ?? false))
-                    return false;
-            }
-
-            return true;
         }
 
-        // ADDED: Apply sorting
         private List<HREmployeeData> ApplySorting(List<HREmployeeData> employees)
         {
             if (string.IsNullOrEmpty(currentFilters.SortBy))
@@ -307,85 +328,157 @@ namespace HRIS_JAP_ATTPAY
                 dataGridViewEmployee.Rows.Clear();
                 allEmployees.Clear();
 
-                // Get EmployeeDetails (this should work fine)
-                var firebaseEmployees = await firebase
-                    .Child("EmployeeDetails")
-                    .OnceAsync<Dictionary<string, object>>();
-
-                System.Diagnostics.Debug.WriteLine($"Found {firebaseEmployees.Count} employee details");
-
-                // Try multiple approaches to get EmploymentInfo
-                var employmentDict = new Dictionary<string, (string Department, string Position)>();
-
-                // Approach 1: Try to get individual records by index
-                employmentDict = await TryGetEmploymentInfoByIndex();
-
-                // Approach 2: If first approach failed, try manual parsing
-                if (employmentDict.Count == 0)
+                using (var httpClient = new HttpClient())
                 {
-                    System.Diagnostics.Debug.WriteLine("Trying manual parsing approach...");
-                    employmentDict = await TryManualEmploymentInfoParsing();
-                }
-
-                System.Diagnostics.Debug.WriteLine($"Found {employmentDict.Count} employment records");
-
-                // Process each employee
-                foreach (var fbEmp in firebaseEmployees)
-                {
-                    try
+                    // Get EmployeeDetails
+                    string empDetailsUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/EmployeeDetails.json";
+                    var empResponse = await httpClient.GetAsync(empDetailsUrl);
+                    if (!empResponse.IsSuccessStatusCode)
                     {
-                        var data = fbEmp.Object as Dictionary<string, object>;
-                        if (data == null) continue;
+                        MessageBox.Show("Failed to load employee details", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
 
-                        // Extract employee data
-                        string employeeId = GetValue(data, "employee_id");
-                        string firstName = GetValue(data, "first_name");
-                        string middleName = GetValue(data, "middle_name");
-                        string lastName = GetValue(data, "last_name");
-                        string contact = GetValue(data, "contact");
-                        string email = GetValue(data, "email");
+                    string empJson = await empResponse.Content.ReadAsStringAsync();
+                    if (string.IsNullOrWhiteSpace(empJson) || empJson == "null")
+                    {
+                        MessageBox.Show("No employee data found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
 
-                        // Get employment info
-                        string department = "";
-                        string position = "";
+                    JObject employeeDetails = JObject.Parse(empJson);
 
-                        if (!string.IsNullOrEmpty(employeeId) && employmentDict.ContainsKey(employeeId))
+                    // Get EmploymentInfo as array with null handling
+                    string empInfoUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/EmploymentInfo.json";
+                    var empInfoResponse = await httpClient.GetAsync(empInfoUrl);
+                    List<JObject> employmentInfoList = new List<JObject>();
+
+                    if (empInfoResponse.IsSuccessStatusCode)
+                    {
+                        string empInfoJson = await empInfoResponse.Content.ReadAsStringAsync();
+                        if (!string.IsNullOrWhiteSpace(empInfoJson) && empInfoJson != "null")
                         {
-                            var employmentInfo = employmentDict[employeeId];
-                            department = employmentInfo.Department;
-                            position = employmentInfo.Position;
+                            try
+                            {
+                                var empInfoToken = JToken.Parse(empInfoJson);
+
+                                // Handle array format with null values
+                                if (empInfoToken is JArray array)
+                                {
+                                    foreach (var item in array)
+                                    {
+                                        if (item != null && item.Type != JTokenType.Null && item.Type != JTokenType.Undefined)
+                                        {
+                                            if (item is JObject jobj)
+                                            {
+                                                employmentInfoList.Add(jobj);
+                                            }
+                                            else
+                                            {
+                                                // Try to convert to JObject if it's not already
+                                                try
+                                                {
+                                                    var converted = item.ToObject<JObject>();
+                                                    if (converted != null)
+                                                        employmentInfoList.Add(converted);
+                                                }
+                                                catch
+                                                {
+                                                    // Skip if cannot convert
+                                                    continue;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                // Handle object format (key-value pairs)
+                                else if (empInfoToken is JObject obj)
+                                {
+                                    foreach (var prop in obj.Properties())
+                                    {
+                                        if (prop.Value != null && prop.Value.Type != JTokenType.Null && prop.Value.Type != JTokenType.Undefined)
+                                        {
+                                            if (prop.Value is JObject jobj)
+                                            {
+                                                employmentInfoList.Add(jobj);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"Error parsing EmploymentInfo: {ex.Message}");
+                            }
                         }
-
-                        var employee = new HREmployeeData
-                        {
-                            EmployeeId = employeeId,
-                            FullName = FormatFullName(firstName, middleName, lastName),
-                            Department = department,
-                            Position = position,
-                            Contact = contact,
-                            Email = email
-                        };
-
-                        allEmployees.Add(employee);
-
-                        System.Diagnostics.Debug.WriteLine($"Added employee {employeeId}: {department} - {position}");
                     }
-                    catch (Exception ex)
+
+                    System.Diagnostics.Debug.WriteLine($"Loaded {employmentInfoList.Count} valid employment records");
+
+                    // Process each employee
+                    foreach (var emp in employeeDetails)
                     {
-                        System.Diagnostics.Debug.WriteLine($"Skipped employee record: {ex.Message}");
-                        continue;
+                        try
+                        {
+                            string employeeId = emp.Key;
+                            JObject empObj = (JObject)emp.Value;
+
+                            // Safe null handling for employee details
+                            string firstName = empObj["first_name"]?.ToString() ?? "";
+                            string middleName = empObj["middle_name"]?.ToString() ?? "";
+                            string lastName = empObj["last_name"]?.ToString() ?? "";
+                            string contact = empObj["contact"]?.ToString() ?? "";
+                            string email = empObj["email"]?.ToString() ?? "";
+
+                            // Initialize employment info with default values
+                            string department = "Not Assigned";
+                            string position = "Not Assigned";
+
+                            // Find employment info for this employee with null-safe handling
+                            foreach (var employmentItem in employmentInfoList)
+                            {
+                                if (employmentItem == null) continue;
+
+                                string empId = employmentItem["employee_id"]?.ToString();
+                                if (!string.IsNullOrEmpty(empId) && empId == employeeId)
+                                {
+                                    // Safe extraction with fallback values
+                                    department = employmentItem["department"]?.ToString() ?? "Not Assigned";
+                                    position = employmentItem["position"]?.ToString() ?? "Not Assigned";
+                                    break;
+                                }
+                            }
+
+                            var employee = new HREmployeeData
+                            {
+                                EmployeeId = employeeId,
+                                FullName = FormatFullName(firstName, middleName, lastName),
+                                Department = department,
+                                Position = position,
+                                Contact = contact,
+                                Email = email
+                            };
+
+                            allEmployees.Add(employee);
+
+                            System.Diagnostics.Debug.WriteLine($"Loaded: {employeeId} - {department} - {position}");
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Error processing employee {emp.Key}: {ex.Message}");
+                            continue;
+                        }
                     }
                 }
 
-                // Apply filters after loading data
+                // Apply current filters after loading data
                 ApplyAllFilters();
 
-                System.Diagnostics.Debug.WriteLine($"Loaded {allEmployees.Count} employees total");
+                System.Diagnostics.Debug.WriteLine($"Successfully loaded {allEmployees.Count} employees");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to load Firebase data: " + ex.Message +
-                               "\n\nPlease check your internet connection and try again.",
+                MessageBox.Show("Failed to load Firebase data: " + ex.Message,
                                "Data Load Error",
                                MessageBoxButtons.OK,
                                MessageBoxIcon.Error);
@@ -573,16 +666,24 @@ namespace HRIS_JAP_ATTPAY
         // Helper method to format full name safely
         private string FormatFullName(string firstName, string middleName, string lastName)
         {
-            string first = firstName ?? "";
-            string middle = middleName ?? "";
-            string last = lastName ?? "";
+            try
+            {
+                string first = firstName ?? "";
+                string middle = middleName ?? "";
+                string last = lastName ?? "";
 
-            // Clean up extra spaces
-            string fullName = $"{first} {middle} {last}".Trim();
-            while (fullName.Contains("  "))
-                fullName = fullName.Replace("  ", " ");
+                // Remove extra whitespace and format
+                string fullName = $"{first} {middle} {last}".Trim();
+                while (fullName.Contains("  "))
+                    fullName = fullName.Replace("  ", " ");
 
-            return fullName;
+                return string.IsNullOrWhiteSpace(fullName) ? "Unknown" : fullName;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error formatting full name: {ex.Message}");
+                return "Unknown";
+            }
         }
     }
 
