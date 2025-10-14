@@ -252,8 +252,6 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                MessageBox.Show("✅ Existing Leave Credits updated with department and position.",
-                    "Update Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -466,10 +464,7 @@ namespace HRIS_JAP_ATTPAY
                             added++;
                     }
 
-                    MessageBox.Show(
-                        $"✅ Leave Credits sync complete!\n🆕 Added: {added}\n⏩ Skipped existing: {skipped}",
-                        "Success", MessageBoxButtons.OK, MessageBoxIcon.Information
-                    );
+                    
                 }
             }
             catch (Exception ex)
