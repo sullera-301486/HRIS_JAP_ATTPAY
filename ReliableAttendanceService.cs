@@ -145,7 +145,7 @@ namespace HRIS_JAP_ATTPAY
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ Error getting employees: {ex.Message}");
+                Debug.WriteLine($" Error getting employees: {ex.Message}");
             }
 
             return activeIds;
@@ -183,7 +183,7 @@ namespace HRIS_JAP_ATTPAY
                         .GroupBy(s => s.employee_id)
                         .ToDictionary(g => g.Key, g => g.ToList());
 
-                    Debug.WriteLine($"📅 Loaded schedules for {allSchedules.Count} employees");
+                    Debug.WriteLine($" Loaded schedules for {allSchedules.Count} employees");
 
                     // Debug: Show schedule counts per employee
                     foreach (var empSchedule in allSchedules)
@@ -194,7 +194,7 @@ namespace HRIS_JAP_ATTPAY
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ Error loading all schedules: {ex.Message}");
+                Debug.WriteLine($" Error loading all schedules: {ex.Message}");
             }
 
             return allSchedules;
@@ -204,7 +204,7 @@ namespace HRIS_JAP_ATTPAY
         {
             if (string.IsNullOrEmpty(employeeId) || !allSchedules.ContainsKey(employeeId))
             {
-                Debug.WriteLine($"❌ No schedules found for employee {employeeId}");
+                Debug.WriteLine($" No schedules found for employee {employeeId}");
                 return "";
             }
 
@@ -219,11 +219,11 @@ namespace HRIS_JAP_ATTPAY
 
             if (scheduleForDay != null)
             {
-                Debug.WriteLine($"✅ Found schedule for {employeeId} on {dayOfWeek}: ID {scheduleForDay.schedule_id}");
+                Debug.WriteLine($" Found schedule for {employeeId} on {dayOfWeek}: ID {scheduleForDay.schedule_id}");
                 return scheduleForDay.schedule_id ?? "";
             }
 
-            Debug.WriteLine($"❌ No schedule found for {employeeId} on {dayOfWeek}");
+            Debug.WriteLine($" No schedule found for {employeeId} on {dayOfWeek}");
             return "";
         }
 
@@ -232,7 +232,7 @@ namespace HRIS_JAP_ATTPAY
             var records = new List<AttendanceRecord>();
             var dayOfWeek = DateTime.Parse(date).DayOfWeek.ToString();
 
-            Debug.WriteLine($"🔄 Creating attendance records for {date} ({dayOfWeek})");
+            Debug.WriteLine($" Creating attendance records for {date} ({dayOfWeek})");
 
             // Load ALL schedules to ensure we have the latest data
             var allSchedules = await GetAllEmployeeSchedulesAsync();
@@ -262,7 +262,7 @@ namespace HRIS_JAP_ATTPAY
                         is_generated = true
                     });
 
-                    Debug.WriteLine($"✅ Created attendance for {empId} with CURRENT schedule ID: {currentScheduleId}");
+                    Debug.WriteLine($"Created attendance for {empId} with CURRENT schedule ID: {currentScheduleId}");
                 }
                 else
                 {
@@ -288,8 +288,8 @@ namespace HRIS_JAP_ATTPAY
                 }
             }
 
-            Debug.WriteLine($"📊 Created {records.Count(r => !string.IsNullOrEmpty(r.schedule_id))} records with schedule IDs");
-            Debug.WriteLine($"📊 Created {records.Count(r => string.IsNullOrEmpty(r.schedule_id))} records as Day Off");
+            Debug.WriteLine($" Created {records.Count(r => !string.IsNullOrEmpty(r.schedule_id))} records with schedule IDs");
+            Debug.WriteLine($" Created {records.Count(r => string.IsNullOrEmpty(r.schedule_id))} records as Day Off");
 
             return records;
         }
@@ -369,7 +369,7 @@ namespace HRIS_JAP_ATTPAY
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"📥 Existing attendance JSON: {json}");
+                    Debug.WriteLine($" Existing attendance JSON: {json}");
 
                     if (!string.IsNullOrEmpty(json) && json != "null")
                     {
@@ -402,7 +402,7 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                Debug.WriteLine($"📊 Existing records count: {allAttendance.Count}");
+                Debug.WriteLine($" Existing records count: {allAttendance.Count}");
 
                 // Find the next available key
                 int nextKey = 1;
@@ -457,7 +457,7 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                Debug.WriteLine("🔄 Fixing outdated schedule IDs in existing attendance records...");
+                Debug.WriteLine(" Fixing outdated schedule IDs in existing attendance records...");
 
                 // Get current schedules
                 var allSchedules = await GetAllEmployeeSchedulesAsync();
@@ -466,14 +466,14 @@ namespace HRIS_JAP_ATTPAY
                 var response = await _httpClient.GetAsync($"{_firebaseUrl}Attendance.json");
                 if (!response.IsSuccessStatusCode)
                 {
-                    Debug.WriteLine("❌ Failed to fetch attendance records");
+                    Debug.WriteLine(" Failed to fetch attendance records");
                     return;
                 }
 
                 var json = await response.Content.ReadAsStringAsync();
                 if (string.IsNullOrEmpty(json) || json == "null")
                 {
-                    Debug.WriteLine("ℹ️ No attendance records found");
+                    Debug.WriteLine(" No attendance records found");
                     return;
                 }
 
@@ -487,7 +487,7 @@ namespace HRIS_JAP_ATTPAY
                     allAttendance = JsonConvert.DeserializeObject<Dictionary<string, AttendanceRecord>>(json) ?? new Dictionary<string, AttendanceRecord>();
                 }
 
-                Debug.WriteLine($"📊 Processing {allAttendance.Count} attendance records...");
+                Debug.WriteLine($" Processing {allAttendance.Count} attendance records...");
 
                 // Fix records with potentially outdated schedule IDs
                 foreach (var attendanceEntry in allAttendance)
@@ -508,7 +508,7 @@ namespace HRIS_JAP_ATTPAY
                             // Update if we found a different schedule ID or if current one is empty
                             if (!string.IsNullOrEmpty(currentScheduleId) && record.schedule_id != currentScheduleId)
                             {
-                                Debug.WriteLine($"🔄 Updated schedule ID for {record.employee_id} on {record.attendance_date}: {record.schedule_id} -> {currentScheduleId}");
+                                Debug.WriteLine($" Updated schedule ID for {record.employee_id} on {record.attendance_date}: {record.schedule_id} -> {currentScheduleId}");
                                 record.schedule_id = currentScheduleId;
                                 hasChanges = true;
                                 updatedCount++;
@@ -527,23 +527,23 @@ namespace HRIS_JAP_ATTPAY
 
                     if (putResponse.IsSuccessStatusCode)
                     {
-                        Debug.WriteLine($"✅ Successfully fixed {updatedCount} outdated schedule IDs");
+                        Debug.WriteLine($" Successfully fixed {updatedCount} outdated schedule IDs");
                         MessageBox.Show($"Successfully updated {updatedCount} schedule IDs in existing attendance records!", "Schedule IDs Fixed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {
-                        Debug.WriteLine($"❌ Failed to save fixed schedule IDs: {putResponse.StatusCode}");
+                        Debug.WriteLine($" Failed to save fixed schedule IDs: {putResponse.StatusCode}");
                     }
                 }
                 else
                 {
-                    Debug.WriteLine("ℹ️ No outdated schedule IDs found");
+                    Debug.WriteLine(" No outdated schedule IDs found");
                     MessageBox.Show("No outdated schedule IDs found in attendance records.", "No Changes Needed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ Error fixing schedule IDs: {ex.Message}");
+                Debug.WriteLine($" Error fixing schedule IDs: {ex.Message}");
                 MessageBox.Show($"Error fixing schedule IDs: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

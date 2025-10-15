@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using System.Text; // Added missing using for Encoding
+using System.Text; 
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -69,7 +69,7 @@ namespace HRIS_JAP_ATTPAY
 
                 if (existingRecord == null || string.IsNullOrEmpty(existingRecord.time_in))
                 {
-                    // 1️⃣ TIME IN
+                    // TIME IN
                     await RecordTimeIn(employee, todaysSchedule, currentTime);
                     DisplayEmployeeInfo(employee, "TIME IN", CalculateTimeInStatus(employee, todaysSchedule, currentTime), "N/A");
                     AddToScanHistory($"[{DateTime.Now:HH:mm:ss}] {employee.first_name} {employee.last_name} - TIME IN - {CalculateTimeInStatus(employee, todaysSchedule, currentTime)}");
@@ -492,7 +492,7 @@ namespace HRIS_JAP_ATTPAY
 
             if (time <= startTime.Add(gracePeriod))
             {
-                return time <= startTime ? "ON TIME" : "LATE (Within Grace Period)";
+                return time <= startTime ? "On Time" : "Late";
             }
             else
             {
