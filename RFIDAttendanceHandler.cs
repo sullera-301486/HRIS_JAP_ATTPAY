@@ -496,7 +496,7 @@ namespace HRIS_JAP_ATTPAY
             }
             else
             {
-                return "LATE";
+                return "Late";
             }
         }
 
@@ -507,11 +507,11 @@ namespace HRIS_JAP_ATTPAY
 
             if (time < endTime)
             {
-                return "EARLY OUT";
+                return "Early Out";
             }
             else
             {
-                return "ON TIME";
+                return "On Time";
             }
         }
 
