@@ -47,7 +47,7 @@ namespace HRIS_JAP_ATTPAY
                 comboBoxSelectPayDate.Items.Clear();
 
                 // Add semi-monthly periods for current year
-                int currentYear = DateTime.Now.Year;
+                int currentYear = 2025; // Set to 2025 as requested
 
                 for (int month = 1; month <= 12; month++)
                 {
@@ -59,8 +59,18 @@ namespace HRIS_JAP_ATTPAY
                     comboBoxSelectPayDate.Items.Add($"{new DateTime(currentYear, month, 16):MMMM 16} - {lastDay:dd}, {currentYear}");
                 }
 
-                // Select the current period by default
-                comboBoxSelectPayDate.SelectedIndex = 0;
+                // Set default to September 1-15, 2025
+                // September is month 9, so the index would be: (8 * 2) = 16 (0-based index)
+                int septemberFirstHalfIndex = 16; // (9-1) * 2 = 16
+                if (septemberFirstHalfIndex < comboBoxSelectPayDate.Items.Count)
+                {
+                    comboBoxSelectPayDate.SelectedIndex = septemberFirstHalfIndex;
+                }
+                else
+                {
+                    // Fallback to first item if index is out of range
+                    comboBoxSelectPayDate.SelectedIndex = 0;
+                }
             }
             catch (Exception ex)
             {
@@ -271,8 +281,8 @@ namespace HRIS_JAP_ATTPAY
                     }
 
                     // Set specific values for JAP-001 to JAP-003
-                    decimal grossPay = 8302.88m;
-                    decimal netPay = 4677.11m;
+                    decimal grossPay = 0.00m;
+                    decimal netPay = 0.00m;
 
                     // Override values for specific employees
                     if (employeeId == "JAP-001")
@@ -296,8 +306,8 @@ namespace HRIS_JAP_ATTPAY
                         if (payrollData.ContainsKey(employeeId))
                         {
                             var payroll = payrollData[employeeId];
-                            decimal.TryParse(payroll.ContainsKey("gross_pay") ? payroll["gross_pay"] : "8302.88", out grossPay);
-                            decimal.TryParse(payroll.ContainsKey("net_pay") ? payroll["net_pay"] : "4677.11", out netPay);
+                            decimal.TryParse(payroll.ContainsKey("gross_pay") ? payroll["gross_pay"] : "0.00", out grossPay);
+                            decimal.TryParse(payroll.ContainsKey("net_pay") ? payroll["net_pay"] : "0.00", out netPay);
                         }
                     }
 

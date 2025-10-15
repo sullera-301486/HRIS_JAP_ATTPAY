@@ -1028,7 +1028,7 @@
             this.labelNameInput.Name = "labelNameInput";
             this.labelNameInput.Size = new System.Drawing.Size(221, 31);
             this.labelNameInput.TabIndex = 162;
-            this.labelNameInput.Text = "[name]";
+            this.labelNameInput.Text = "Franz Louies Deloritos";
             this.labelNameInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelSalary
@@ -1088,7 +1088,7 @@
             this.labelDepartmentInput.Name = "labelDepartmentInput";
             this.labelDepartmentInput.Size = new System.Drawing.Size(221, 31);
             this.labelDepartmentInput.TabIndex = 157;
-            this.labelDepartmentInput.Text = "[department]";
+            this.labelDepartmentInput.Text = "Human Resource";
             this.labelDepartmentInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelPositionInput
@@ -1100,7 +1100,7 @@
             this.labelPositionInput.Name = "labelPositionInput";
             this.labelPositionInput.Size = new System.Drawing.Size(221, 31);
             this.labelPositionInput.TabIndex = 156;
-            this.labelPositionInput.Text = "[position]";
+            this.labelPositionInput.Text = "Head of HR";
             this.labelPositionInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelIDInput
@@ -1111,7 +1111,7 @@
             this.labelIDInput.Name = "labelIDInput";
             this.labelIDInput.Size = new System.Drawing.Size(221, 31);
             this.labelIDInput.TabIndex = 155;
-            this.labelIDInput.Text = "N/A";
+            this.labelIDInput.Text = "JAP-001";
             this.labelIDInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelDateCovered

@@ -373,6 +373,12 @@ namespace HRIS_JAP_ATTPAY
             labelCoopLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
             labelCoopContriDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
             labelOthersDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+            labelPayAndAllowances.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
+            labelCredit.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
+            labelDebit.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
+            labelDetails.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
+            labelOvertimePerHourCredit.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+            labelOvertimePerMinuteCredit.Font = AttributesClass.GetFont("Roboto-Light", 10f);
         }
     }
 
