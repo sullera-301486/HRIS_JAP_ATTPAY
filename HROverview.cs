@@ -31,6 +31,7 @@
                 LoadTodoList();
                 LoadTodaysAbsentEmployees();
                 LoadTodaysLateEmployees();
+                LoadActivityLogs();
                 comboBoxSelectDate.DropDownStyle = ComboBoxStyle.DropDownList;
                 comboBoxSelectDate.IntegralHeight = false;
                 comboBoxSelectDate.MaxDropDownItems = 5;
@@ -663,11 +664,6 @@
                 dataGridViewActivityLogs.ColumnHeadersHeight = 40;
                 dataGridViewActivityLogs.DefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 dataGridViewActivityLogs.ColumnHeadersDefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-
-                for (int i = 1; i < 30; i++) //test code; will be replaced with actual data from database
-                {
-                    dataGridViewActivityLogs.Rows.Add("6 - " + i + " - 25", "10:30 PM", "Manual Entry Added", "Added attendance for Franz Louies Deloritos.");
-                }
             }
 
             private void panelActivityLog_Paint(object sender, PaintEventArgs e)
@@ -947,5 +943,129 @@
                 // Load the attendance summary for the selected date
                 LoadAttendanceSummary(selectedDate);
             }
+        private async void LoadActivityLogs()
+        {
+            try
+            {
+                // Clear existing rows
+                dataGridViewActivityLogs.Rows.Clear();
+
+                // Load activity logs from Firebase
+                var activityLogs = await firebase
+                    .Child("ActivityLogs")
+                    .OnceAsync<dynamic>();
+
+                if (activityLogs != null && activityLogs.Any())
+                {
+                    // Create a list to sort by timestamp
+                    var logEntries = new List<(DateTime timestamp, string date, string time, string action, string details)>();
+
+                    foreach (var log in activityLogs)
+                    {
+                        try
+                        {
+                            var logData = log.Object;
+
+                            // Extract data from Firebase structure
+                            string timestampStr = logData.timestamp?.ToString() ?? "";
+                            string actionType = logData.action_type?.ToString() ?? "Unknown Action";
+                            string description = logData.description?.ToString() ?? "";
+                            string performedByName = logData.performed_by_name?.ToString() ?? "";
+                            string targetEmployeeName = logData.target_employee_name?.ToString() ?? "";
+
+                            // Parse timestamp for sorting
+                            DateTime timestamp = DateTime.MinValue;
+                            if (!string.IsNullOrEmpty(timestampStr) &&
+                                DateTime.TryParse(timestampStr, out DateTime parsedTime))
+                            {
+                                timestamp = parsedTime;
+                            }
+                            else
+                            {
+                                // Use current time if parsing fails
+                                timestamp = DateTime.Now;
+                            }
+
+                            // Format date and time in the required format
+                            string date = timestamp.ToString("M - d - yy"); // "6 - 10 - 25"
+                            string time = timestamp.ToString("h:mm tt");    // "10:30 PM"
+
+                            // Format the action and details
+                            string action = FormatActivityActionType(actionType);
+                            string details = description;
+
+                            logEntries.Add((timestamp, date, time, action, details));
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error processing activity log entry: {ex.Message}");
+                            // Continue to next log entry
+                        }
+                    }
+
+                    // Sort by timestamp descending (most recent first) and take last 30
+                    var sortedLogs = logEntries
+                        .OrderByDescending(entry => entry.timestamp)
+                        .Take(30);
+
+                    foreach (var entry in sortedLogs)
+                    {
+                        dataGridViewActivityLogs.Rows.Add(entry.date, entry.time, entry.action, entry.details);
+                    }
+                }
+
+                // Show placeholder if no logs
+                if (dataGridViewActivityLogs.Rows.Count == 0)
+                {
+                    dataGridViewActivityLogs.Rows.Add("N/A", "N/A", "N/A", "No activity logs found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading activity logs: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                // Add sample data on error for testing
+                dataGridViewActivityLogs.Rows.Add("Error", "Error", "Error", "Error loading logs");
+            }
         }
+
+        // Helper method to format activity action types
+        private string FormatActivityActionType(string actionType)
+        {
+            if (string.IsNullOrEmpty(actionType))
+                return "Unknown Action";
+
+            // Map activity action types to display format
+            switch (actionType)
+            {
+                case "Attendance Edit Approved":
+                    return "Approved Attendance Edit";
+                case "Attendance Edit Declined":
+                    return "Declined Attendance Edit";
+                case "Attendance Edit Requested":
+                    return "Requested Attendance Edit";
+                case "Attendance Manually Added":
+                    return "Added Manual Attendance";
+                case "Leave Approved":
+                    return "Approved Leave";
+                case "Leave Declined":
+                    return "Declined Leave";
+                case "Leave Requested":
+                    return "Requested Leave";
+                case "Time In Recorded":
+                    return "Recorded Time In";
+                case "Time Out Recorded":
+                    return "Recorded Time Out";
+                case "Profile Updated":
+                    return "Updated Profile";
+                case "User Login":
+                    return "User Login";
+                case "User Logout":
+                    return "User Logout";
+                default:
+                    return actionType;
+            }
+        }
+    }
     }

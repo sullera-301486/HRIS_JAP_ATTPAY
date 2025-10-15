@@ -202,9 +202,40 @@ namespace HRIS_JAP_ATTPAY
                 }
 
                 string employeeName = notif["requested_by_name"]?.ToString() ?? "Unknown";
+                string employeeId = notif["employee_id"]?.ToString() ?? "Unknown";
                 string date = notif["attendance_date"]?.ToString() ?? "Unknown";
+                string firebaseKey = notif["firebase_key"]?.ToString();
 
-                // ✅ Notify HR
+                // ✅ LOG THE ACTIVITY - ADD THIS SECTION
+                await ActivityLogService.LogActivity(
+                    ActivityLogService.Actions.ATTENDANCE_EDIT_APPROVED,
+                    $"Approved attendance edit request for {employeeName} on {date}",
+                    SessionClass.CurrentEmployeeId, // admin who approved
+                    employeeId // affected employee
+                );
+
+                // ✅ UPDATE THE ORIGINAL ATTENDANCE RECORD (your existing code)
+                if (!string.IsNullOrEmpty(firebaseKey))
+                {
+                    var updatedAttendanceRecord = new
+                    {
+                        employee_id = notif["employee_id"]?.ToString(),
+                        attendance_date = notif["attendance_date"]?.ToString(),
+                        time_in = notif["time_in"]?.ToString(),
+                        time_out = notif["time_out"]?.ToString(),
+                        overtime_in = notif["overtime_in"]?.ToString(),
+                        overtime_out = notif["overtime_out"]?.ToString(),
+                        hours_worked = notif["hours_worked"]?.ToString(),
+                        status = notif["status"]?.ToString(),
+                        overtime_hours = notif["overtime_hours"]?.ToString(),
+                        verification_method = "Approved Manual Edit (Admin)",
+                        schedule_id = ""
+                    };
+
+                    await firebase.Child("Attendance").Child(firebaseKey).PutAsync(updatedAttendanceRecord);
+                }
+
+                // ✅ Notify HR (your existing code)
                 await firebase.Child("HRNotifications").Child(key).PutAsync(new
                 {
                     message = $"{employeeName}'s attendance on {date} approved by admin.",
@@ -213,7 +244,7 @@ namespace HRIS_JAP_ATTPAY
                 });
 
                 await firebase.Child("AttendanceNotifications").Child(key).DeleteAsync();
-                MessageBox.Show("Attendance request approved!");
+                MessageBox.Show("Attendance request approved and attendance record updated!");
                 await LoadNotifications();
             }
             catch (Exception ex)
@@ -230,9 +261,18 @@ namespace HRIS_JAP_ATTPAY
                 if (notif == null) return;
 
                 string employeeName = notif["requested_by_name"]?.ToString() ?? "Unknown";
+                string employeeId = notif["employee_id"]?.ToString() ?? "Unknown";
                 string date = notif["attendance_date"]?.ToString() ?? "Unknown";
 
-                // ✅ Notify HR
+                // ✅ LOG THE ACTIVITY - ADD THIS SECTION
+                await ActivityLogService.LogActivity(
+                    ActivityLogService.Actions.ATTENDANCE_EDIT_DECLINED,
+                    $"Declined attendance edit request for {employeeName} on {date}",
+                    SessionClass.CurrentEmployeeId, // admin who declined
+                    employeeId // affected employee
+                );
+
+                // ✅ Notify HR (your existing code)
                 await firebase.Child("HRNotifications").Child(key).PutAsync(new
                 {
                     message = $"{employeeName}'s attendance on {date} was declined by admin.",

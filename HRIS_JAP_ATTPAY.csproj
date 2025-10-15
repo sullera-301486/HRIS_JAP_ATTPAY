@@ -273,6 +273,7 @@
     <Compile Include="AttendanceNotificationModel.cs" />
     <Compile Include="AttributesClassAlt.cs" />
     <Compile Include="AttributesScanner.cs" />
+    <Compile Include="AvtivityLogService.cs" />
     <Compile Include="ConfirmAdminLeaveEntry.cs">
       <SubType>Form</SubType>
     </Compile>
