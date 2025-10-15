@@ -145,7 +145,7 @@ namespace HRIS_JAP_ATTPAY
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ Error getting employees: {ex.Message}");
+                Debug.WriteLine($" Error getting employees: {ex.Message}");
             }
 
             return activeIds;
@@ -183,7 +183,7 @@ namespace HRIS_JAP_ATTPAY
                         .GroupBy(s => s.employee_id)
                         .ToDictionary(g => g.Key, g => g.ToList());
 
-                    Debug.WriteLine($"📅 Loaded schedules for {allSchedules.Count} employees");
+                    Debug.WriteLine($" Loaded schedules for {allSchedules.Count} employees");
 
                     // Debug: Show schedule counts per employee
                     foreach (var empSchedule in allSchedules)
@@ -194,7 +194,7 @@ namespace HRIS_JAP_ATTPAY
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ Error loading all schedules: {ex.Message}");
+                Debug.WriteLine($" Error loading all schedules: {ex.Message}");
             }
 
             return allSchedules;
@@ -232,7 +232,7 @@ namespace HRIS_JAP_ATTPAY
             var records = new List<AttendanceRecord>();
             var dayOfWeek = DateTime.Parse(date).DayOfWeek.ToString();
 
-            Debug.WriteLine($"🔄 Creating attendance records for {date} ({dayOfWeek})");
+            Debug.WriteLine($" Creating attendance records for {date} ({dayOfWeek})");
 
             // Load ALL schedules to ensure we have the latest data
             var allSchedules = await GetAllEmployeeSchedulesAsync();
@@ -262,7 +262,7 @@ namespace HRIS_JAP_ATTPAY
                         is_generated = true
                     });
 
-                    Debug.WriteLine($"✅ Created attendance for {empId} with CURRENT schedule ID: {currentScheduleId}");
+                    Debug.WriteLine($"Created attendance for {empId} with CURRENT schedule ID: {currentScheduleId}");
                 }
                 else
                 {
@@ -288,8 +288,8 @@ namespace HRIS_JAP_ATTPAY
                 }
             }
 
-            Debug.WriteLine($"📊 Created {records.Count(r => !string.IsNullOrEmpty(r.schedule_id))} records with schedule IDs");
-            Debug.WriteLine($"📊 Created {records.Count(r => string.IsNullOrEmpty(r.schedule_id))} records as Day Off");
+            Debug.WriteLine($" Created {records.Count(r => !string.IsNullOrEmpty(r.schedule_id))} records with schedule IDs");
+            Debug.WriteLine($" Created {records.Count(r => string.IsNullOrEmpty(r.schedule_id))} records as Day Off");
 
             return records;
         }

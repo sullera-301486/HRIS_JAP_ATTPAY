@@ -68,7 +68,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🔹 FILTER HANDLERS
+        // FILTER HANDLERS
         private void ApplyAttendanceFilters(AttendanceFilterCriteria filters)
         {
             System.Diagnostics.Debug.WriteLine($"ApplyAttendanceFilters called with SortBy: '{filters?.SortBy}'");
@@ -245,7 +245,7 @@ namespace HRIS_JAP_ATTPAY
         }
 
 
-        // 🔹 SEARCH / FILTER LOGIC
+        //  SEARCH / FILTER LOGIC
         private bool MatchesSearchText(AttendanceRowData rowData, string searchText)
         {
             if (string.IsNullOrWhiteSpace(searchText) || searchText == "find employee")
@@ -370,19 +370,19 @@ namespace HRIS_JAP_ATTPAY
             return true;
         }
 
-        // 🔹 STATUS CALCULATION - EXACT COPY FROM ADMINATTENDANCE
+        //  STATUS CALCULATION - EXACT COPY FROM ADMINATTENDANCE
         private async Task<string> CalculateStatusWithSchedule(string timeInStr, string timeOutStr, string employeeId, string attendanceDate, string existingStatus = "")
         {
             try
             {
                 // DEBUG: Log what we're processing
-                System.Diagnostics.Debug.WriteLine($"🔍 HR Status Calc: Emp={employeeId}, Date={attendanceDate}, TimeIn={timeInStr}, ExistingStatus={existingStatus}");
+                System.Diagnostics.Debug.WriteLine($" HR Status Calc: Emp={employeeId}, Date={attendanceDate}, TimeIn={timeInStr}, ExistingStatus={existingStatus}");
 
                 // 1. PRESERVE SYSTEM-GENERATED STATUSES
                 // If Firebase already has a valid status, use it (especially for "Day Off", "Absent", etc.)
                 if (!string.IsNullOrEmpty(existingStatus) && existingStatus != "N/A")
                 {
-                    System.Diagnostics.Debug.WriteLine($"✅ HR Using existing status from Firebase: {existingStatus}");
+                    System.Diagnostics.Debug.WriteLine($" HR Using existing status from Firebase: {existingStatus}");
                     return existingStatus;
                 }
 
@@ -398,12 +398,12 @@ namespace HRIS_JAP_ATTPAY
                     // No schedule for this day
                     if (!hasWorked)
                     {
-                        System.Diagnostics.Debug.WriteLine($"✅ HR No schedule + no work = Day Off for {employeeId}");
+                        System.Diagnostics.Debug.WriteLine($" HR No schedule + no work = Day Off for {employeeId}");
                         return "Day Off";
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine($"⚠️ HR No schedule but employee worked = On Time (unscheduled)");
+                        System.Diagnostics.Debug.WriteLine($" HR No schedule but employee worked = On Time (unscheduled)");
                         return "On Time";
                     }
                 }
@@ -424,7 +424,7 @@ namespace HRIS_JAP_ATTPAY
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ HR Error in CalculateStatusWithSchedule: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($" HR Error in CalculateStatusWithSchedule: {ex.Message}");
                 return !string.IsNullOrEmpty(existingStatus) ? existingStatus : "Absent";
             }
         }
@@ -436,7 +436,7 @@ namespace HRIS_JAP_ATTPAY
                 TimeSpan expectedStart = schedule.startTime;
                 TimeSpan expectedEnd = schedule.endTime;
 
-                System.Diagnostics.Debug.WriteLine($"📅 HR Schedule: {expectedStart} - {expectedEnd} for {employeeId}");
+                System.Diagnostics.Debug.WriteLine($" HR Schedule: {expectedStart} - {expectedEnd} for {employeeId}");
 
                 DateTime timeIn, timeOut;
 
@@ -730,7 +730,7 @@ namespace HRIS_JAP_ATTPAY
                         statusForeColor = Color.White;
                         break;
                     case "Leave":
-                        statusBackColor = Color.FromArgb(180, 174, 189); 
+                        statusBackColor = Color.FromArgb(71, 93, 218); 
                         statusForeColor = Color.White;
                         break;
                     case "Day Off":
@@ -1408,12 +1408,12 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                System.Diagnostics.Debug.WriteLine($"HR: ❌ No matching schedule found for {employeeId} on {dayOfWeek}");
+                System.Diagnostics.Debug.WriteLine($"HR: No matching schedule found for {employeeId} on {dayOfWeek}");
                 return null;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"HR: ❌ Error getting schedule: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"HR: Error getting schedule: {ex.Message}");
                 return null;
             }
         }

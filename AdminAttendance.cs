@@ -771,7 +771,7 @@ namespace HRIS_JAP_ATTPAY
                         statusForeColor = Color.White;
                         break;
                     case "Leave":
-                        statusBackColor = Color.FromArgb(180, 174, 189); 
+                        statusBackColor = Color.FromArgb(71, 93, 218); 
                         statusForeColor = Color.White;
                         break;
                     case "Day Off":

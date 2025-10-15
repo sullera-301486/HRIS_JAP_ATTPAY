@@ -492,11 +492,11 @@ namespace HRIS_JAP_ATTPAY
 
             if (time <= startTime.Add(gracePeriod))
             {
-                return time <= startTime ? "ON TIME" : "LATE (Within Grace Period)";
+                return time <= startTime ? "On Time" : "Late";
             }
             else
             {
-                return "LATE";
+                return "Late";
             }
         }
 
@@ -507,11 +507,11 @@ namespace HRIS_JAP_ATTPAY
 
             if (time < endTime)
             {
-                return "EARLY OUT";
+                return "Early Out";
             }
             else
             {
-                return "ON TIME";
+                return "On Time";
             }
         }
 
