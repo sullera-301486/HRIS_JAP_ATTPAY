@@ -46,6 +46,7 @@
             this.XpictureBox.Size = new System.Drawing.Size(51, 50);
             this.XpictureBox.TabIndex = 33;
             this.XpictureBox.TabStop = false;
+            this.XpictureBox.Click += new System.EventHandler(this.XpictureBox_Click_1);
             // 
             // buttonCancel
             // 
@@ -61,6 +62,7 @@
             this.buttonCancel.TabIndex = 32;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = false;
+            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click_1);
             // 
             // buttonConfirm
             // 
@@ -76,6 +78,7 @@
             this.buttonConfirm.TabIndex = 31;
             this.buttonConfirm.Text = "Confirm";
             this.buttonConfirm.UseVisualStyleBackColor = false;
+            this.buttonConfirm.Click += new System.EventHandler(this.buttonConfirm_Click_1);
             // 
             // labelMessage
             // 

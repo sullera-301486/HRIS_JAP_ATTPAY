@@ -86,6 +86,8 @@ namespace HRIS_JAP_ATTPAY
 
         // 🟢 Send Request → show confirmation form first
         // 🟢 Send Request → show confirmation form first
+        // 🟢 Send Request → show appropriate confirmation form based on user role
+        // 🟢 Send Request → show appropriate confirmation form based on user role
         private void buttonSendRequest_Click(object sender, EventArgs e)
         {
             string employee = comboBoxInputName.SelectedItem?.ToString();
@@ -103,28 +105,59 @@ namespace HRIS_JAP_ATTPAY
                 return;
             }
 
-            // 🔹 Show confirm dialog first - MODIFIED PART
-            Form confirmForm;
-            if (SessionClass.CurrentEmployeeId == "101")
+            // 🔹 Check if current user is admin
+            bool isAdmin = SessionClass.IsAdmin; // Assuming you have this property
+
+            if (isAdmin)
             {
-                confirmForm = new ConfirmAdminLeaveEntry();
+                // 🔹 Admin users use ConfirmAdminLeaveEntry form
+                var confirmForm = new ConfirmAdminLeaveEntry(employee, leaveType, start, end);
+
+                confirmForm.FormClosed += async (s, ev) =>
+                {
+                    // ✅ If admin confirmed the leave entry
+                    if (confirmForm.DialogResult == DialogResult.OK && confirmForm.UserConfirmed)
+                    {
+                        // The logging already happened in ConfirmAdminLeaveEntry
+                        // Now process the actual leave request
+                        await ProcessLeaveRequest(employee, leaveType, start, end);
+                    }
+                };
+
+                Form parentForm = this.FindForm();
+                AttributesClass.ShowWithOverlay(parentForm, confirmForm);
             }
             else
             {
-                confirmForm = new ConfirmLeaveEntry();
-            }
-
-            confirmForm.FormClosed += async (s, ev) =>
-            {
-                // ✅ If user confirmed
-                if (confirmForm.DialogResult == DialogResult.OK)
+                // 🔹 Non-admin users use LeaveRequestConfirm form
+                var leaveRequestData = new LeaveRequestData
                 {
-                    await ProcessLeaveRequest(employee, leaveType, start, end);
-                }
-            };
+                    Title = $"Leave Request - {leaveType}",
+                    SubmittedBy = SessionClass.CurrentEmployeeName ?? "Unknown User",
+                    EmployeeName = employee,
+                    LeaveType = leaveType,
+                    Start = start,
+                    End = end,
+                    Notes = "", // You can add a notes field if needed
+                    Photo = null, // You can set photo if available
+                    CreatedAt = DateTime.Now
+                };
 
-            Form parentForm = this.FindForm();
-            AttributesClass.ShowWithOverlay(parentForm, confirmForm);
+                var confirmForm = new LeaveRequestConfirm(leaveRequestData);
+
+                confirmForm.FormClosed += async (s, ev) =>
+                {
+                    // ✅ If user confirmed the leave request
+                    if (confirmForm.DialogResult == DialogResult.OK && confirmForm.UserConfirmed)
+                    {
+                        // Process the leave request for non-admin users
+                        await ProcessLeaveRequest(employee, leaveType, start, end);
+                    }
+                };
+
+                Form parentForm = this.FindForm();
+                AttributesClass.ShowWithOverlay(parentForm, confirmForm);
+            }
         }
 
         // 🟢 Actual process to save and deduct leave

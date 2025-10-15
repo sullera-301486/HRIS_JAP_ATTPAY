@@ -5,6 +5,7 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class LeaveRequestConfirm : Form
     {
+        public bool UserConfirmed { get; private set; } = false;
         private readonly LeaveRequestData request;
 
         public LeaveRequestConfirm(LeaveRequestData req)
@@ -31,19 +32,19 @@ namespace HRIS_JAP_ATTPAY
 
         private void XpictureBox_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
+            UserConfirmed = false;
             this.Close();
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
+            UserConfirmed = false;
             this.Close();
         }
 
         private void buttonConfirm_Click(object sender, EventArgs e)
         {
-            // confirm returns OK to the caller (LeaveRequest) which will save the request
+            UserConfirmed = true;
             this.DialogResult = DialogResult.OK;
             this.Close();
         }

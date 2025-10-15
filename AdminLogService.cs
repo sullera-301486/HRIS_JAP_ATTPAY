@@ -11,6 +11,8 @@ namespace HRIS_JAP_ATTPAY
     public static class AdminLogService
     {
         private static FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        public const string ADD_LEAVE_ENTRY = "Leave Entry Added";
+        public const string APPROVE_LEAVE = "Leave Approved";
 
         /// <summary>
         /// Logs an admin action to Firebase

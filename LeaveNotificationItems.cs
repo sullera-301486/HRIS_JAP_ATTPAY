@@ -351,6 +351,13 @@ namespace HRIS_JAP_ATTPAY
 
         private async void btnApprove_Click(object sender, EventArgs e)
         {
+             await ActivityLogService.LogActivity(
+             ActivityLogService.Actions.LEAVE_APPROVED,
+             $"Approved {lblLeave.Text} leave for {lblEmployeeLeave.Text} ({lblPeriod.Text})"
+             );
+
+            await DeductLeaveBalanceAsync(lblEmployeeLeave.Text, lblLeave.Text);
+            ApproveClicked?.Invoke(this, EventArgs.Empty);
             await DeductLeaveBalanceAsync(lblEmployeeLeave.Text, lblLeave.Text);
             ApproveClicked?.Invoke(this, EventArgs.Empty);
 
