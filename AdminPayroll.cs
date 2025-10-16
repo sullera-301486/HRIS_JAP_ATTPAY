@@ -281,8 +281,8 @@ namespace HRIS_JAP_ATTPAY
                     }
 
                     // Set specific values for JAP-001 to JAP-003
-                    decimal grossPay = 0.00m;
-                    decimal netPay = 0.00m;
+                    decimal grossPay = 6519.50m;
+                    decimal netPay = 3214.15m;
 
                     // Override values for specific employees
                     if (employeeId == "JAP-001")
