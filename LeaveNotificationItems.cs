@@ -91,7 +91,7 @@ namespace HRIS_JAP_ATTPAY
                 refreshTimer.Start();
             }
 
-            this.Tag = firebaseKey; // ✅ holds Firebase record key
+            this.Tag = firebaseKey;
 
             if (saveToFirebase)
             {
@@ -232,8 +232,100 @@ namespace HRIS_JAP_ATTPAY
             return false;
         }
 
-        // 🟢 Deduct leave + yearly reset logic unchanged
-        private static async Task DeductLeaveBalanceAsync(string employeeName, string leaveType)
+        // ✅ APPROVE with Sunday Skipped
+        private async void btnApprove_Click(object sender, EventArgs e)
+        {
+            ApproveClicked?.Invoke(this, EventArgs.Empty);
+
+            if (!(Tag is string firebaseKey) || string.IsNullOrEmpty(firebaseKey))
+            {
+                MessageBox.Show("No Firebase key found — cannot move data.", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                var notif = await firebase
+                    .Child("LeaveNotifications")
+                    .Child(firebaseKey)
+                    .OnceSingleAsync<LeaveNotificationModel>();
+
+                if (notif == null)
+                {
+                    MessageBox.Show("Leave notification not found in Firebase.", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                string[] periodParts = notif.Period.Split('-');
+                if (periodParts.Length != 2)
+                {
+                    MessageBox.Show("Invalid leave period format.", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                string startStr = periodParts[0].Trim();
+                string endStr = periodParts[1].Trim();
+
+                string[] formats = { "MM/dd/yyyy", "M/d/yyyy", "yyyy-MM-dd", "dd/MM/yyyy", "d/M/yyyy" };
+                if (!DateTime.TryParseExact(startStr, formats, null, System.Globalization.DateTimeStyles.None, out DateTime startDate) ||
+                    !DateTime.TryParseExact(endStr, formats, null, System.Globalization.DateTimeStyles.None, out DateTime endDate))
+                {
+                    MessageBox.Show($"Failed to parse leave period.\nStart: {startStr}\nEnd: {endStr}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (endDate < startDate)
+                {
+                    MessageBox.Show("End date cannot be earlier than start date.", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // ✅ Count only non-Sunday days
+                int totalDays = 0;
+                for (var date = startDate; date <= endDate; date = date.AddDays(1))
+                {
+                    if (date.DayOfWeek != DayOfWeek.Sunday)
+                        totalDays++;
+                }
+
+                await DeductLeaveBalanceAsync(notif.Employee, notif.LeaveType, totalDays);
+
+                // ✅ Move to ManageLeave
+                var manageLeaveData = new
+                {
+                    created_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    employee = notif.Employee,
+                    leave_type = notif.LeaveType,
+                    notes = notif.Notes,
+                    period = notif.Period,
+                    submitted_by = notif.SubmittedBy
+                };
+
+                await firebase.Child("ManageLeave").PostAsync(manageLeaveData);
+                await firebase.Child("LeaveNotifications").Child(firebaseKey).DeleteAsync();
+                this.Parent?.Controls.Remove(this);
+
+                MessageBox.Show(
+                    $"Leave approved for {notif.Employee}.\nDeducted {totalDays} day(s) (Sundays skipped).",
+                    "Leave Approved",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error approving leave: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // ✅ Deduct leave balance logic
+        private static async Task DeductLeaveBalanceAsync(string employeeName, string leaveType, int totalDays)
         {
             try
             {
@@ -251,9 +343,7 @@ namespace HRIS_JAP_ATTPAY
                     string fullNameNoMiddle = $"{firstName} {lastName}".Trim();
 
                     if (string.Equals(fullNameWithMiddle, employeeName, StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(fullNameNoMiddle, employeeName, StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(firstName, employeeName, StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(lastName, employeeName, StringComparison.OrdinalIgnoreCase))
+                        string.Equals(fullNameNoMiddle, employeeName, StringComparison.OrdinalIgnoreCase))
                     {
                         employeeId = emp.Key;
                         fullName = fullNameWithMiddle;
@@ -275,31 +365,17 @@ namespace HRIS_JAP_ATTPAY
 
                 int sickLeave = 6;
                 int vacationLeave = 6;
-                int lastUpdatedYear = DateTime.Now.Year;
 
                 if (currentLeave != null)
                 {
-                    sickLeave = currentLeave.sick_leave != null ? (int)currentLeave.sick_leave : 6;
-                    vacationLeave = currentLeave.vacation_leave != null ? (int)currentLeave.vacation_leave : 6;
-
-                    if (currentLeave.updated_at != null)
-                    {
-                        DateTime.TryParse(currentLeave.updated_at.ToString(), out DateTime parsedDate);
-                        if (parsedDate != default)
-                            lastUpdatedYear = parsedDate.Year;
-                    }
-                }
-
-                if (lastUpdatedYear < DateTime.Now.Year)
-                {
-                    sickLeave = 6;
-                    vacationLeave = 6;
+                    try { sickLeave = Convert.ToInt32(currentLeave.sick_leave); } catch { }
+                    try { vacationLeave = Convert.ToInt32(currentLeave.vacation_leave); } catch { }
                 }
 
                 if (leaveType.ToLower().Contains("sick"))
-                    sickLeave = Math.Max(0, sickLeave - 1);
+                    sickLeave = Math.Max(0, sickLeave - totalDays);
                 else if (leaveType.ToLower().Contains("vacation"))
-                    vacationLeave = Math.Max(0, vacationLeave - 1);
+                    vacationLeave = Math.Max(0, vacationLeave - totalDays);
 
                 var updatedCredits = new
                 {
@@ -310,18 +386,7 @@ namespace HRIS_JAP_ATTPAY
                     updated_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
                 };
 
-                await firebase
-                    .Child("Leave Credits")
-                    .Child(employeeId)
-                    .PutAsync(updatedCredits);
-
-                MessageBox.Show(
-                    $"{employeeName}'s {leaveType} leave deducted successfully.\n" +
-                    $"Sick Leave: {sickLeave}\nVacation Leave: {vacationLeave}",
-                    "Leave Deducted",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information
-                );
+                await firebase.Child("Leave Credits").Child(employeeId).PutAsync(updatedCredits);
             }
             catch (Exception ex)
             {
@@ -348,67 +413,6 @@ namespace HRIS_JAP_ATTPAY
 
         public event EventHandler ApproveClicked;
         public event EventHandler DeclineClicked;
-
-        private async void btnApprove_Click(object sender, EventArgs e)
-        {
-             await ActivityLogService.LogActivity(
-             ActivityLogService.Actions.LEAVE_APPROVED,
-             $"Approved {lblLeave.Text} leave for {lblEmployeeLeave.Text} ({lblPeriod.Text})"
-             );
-
-            await DeductLeaveBalanceAsync(lblEmployeeLeave.Text, lblLeave.Text);
-            ApproveClicked?.Invoke(this, EventArgs.Empty);
-            await DeductLeaveBalanceAsync(lblEmployeeLeave.Text, lblLeave.Text);
-            ApproveClicked?.Invoke(this, EventArgs.Empty);
-
-            if (!(Tag is string firebaseKey) || string.IsNullOrEmpty(firebaseKey))
-            {
-                MessageBox.Show("No Firebase key found — cannot move data.", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            try
-            {
-                var notif = await firebase
-                    .Child("LeaveNotifications")
-                    .Child(firebaseKey)
-                    .OnceSingleAsync<LeaveNotificationModel>();
-
-                if (notif == null)
-                {
-                    MessageBox.Show("Leave notification not found in Firebase.", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                var manageLeaveData = new
-                {
-                    created_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    employee = notif.Employee,
-                    leave_type = notif.LeaveType,
-                    notes = notif.Notes,
-                    period = notif.Period,
-                    submitted_by = notif.SubmittedBy
-                };
-
-                await firebase.Child("ManageLeave").PostAsync(manageLeaveData);
-                await firebase.Child("LeaveNotifications").Child(firebaseKey).DeleteAsync();
-                this.Parent?.Controls.Remove(this);
-
-                MessageBox.Show(
-                    $"Leave request by {notif.Employee} moved successfully to Manage Leave.",
-                    "Leave Approved",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information
-                );
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error moving data to ManageLeave: " + ex.Message,
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
 
         private async void btnDecline_Click(object sender, EventArgs e)
         {

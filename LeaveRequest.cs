@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using Firebase.Database;
@@ -98,6 +99,63 @@ namespace HRIS_JAP_ATTPAY
                 return;
             }
 
+            // 🔹 Validate date formats and restrictions (STRICT mm/dd/yyyy)
+            if (!DateTime.TryParseExact(start, "MM/dd/yyyy", CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out DateTime startDate) ||
+                !DateTime.TryParseExact(end, "MM/dd/yyyy", CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out DateTime endDate))
+            {
+                MessageBox.Show("Please enter dates in the correct format: mm/dd/yyyy.",
+                    "Invalid Date Format", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (startDate.Date < DateTime.Now.Date)
+            {
+                MessageBox.Show("The start date cannot be earlier than today's date.",
+                    "Invalid Start Date", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (endDate.Date < startDate.Date)
+            {
+                MessageBox.Show("The end date cannot be earlier than the start date.",
+                    "Invalid End Date", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // ✅ Compute total days excluding Sundays
+            int totalDaysRequested = CountDaysExcludingSundays(startDate, endDate);
+
+            if (totalDaysRequested <= 0)
+            {
+                MessageBox.Show("The selected period includes only Sundays. Please select valid leave days.",
+                    "Invalid Leave Period", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 🔹 Check if requested days exceed available leave credits
+            int availableCredits = await GetAvailableLeaveCreditsAsync(employeeInput, leaveType);
+
+            if (availableCredits == -1)
+            {
+                MessageBox.Show($"Could not retrieve leave credits for {employeeInput}.",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (totalDaysRequested > availableCredits)
+            {
+                MessageBox.Show(
+                    $"The requested leave period is {totalDaysRequested} day(s) (excluding Sundays), " +
+                    $"but {employeeInput} only has {availableCredits} available {leaveType} credits.",
+                    "Exceeded Leave Credits",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+                return;
+            }
+
             // 🔹 Validate if the employee exists
             bool isValidEmployee = await IsEmployeeValidAsync(employeeInput);
             if (!isValidEmployee)
@@ -160,14 +218,27 @@ namespace HRIS_JAP_ATTPAY
                 if (confirmForm.DialogResult == DialogResult.OK)
                 {
                     await FirebaseSave(request);
-                    MessageBox.Show("Leave request submitted successfully!", "Success",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"Leave request submitted successfully!\n" +
+                        $"Total days (excluding Sundays): {totalDaysRequested}",
+                        "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     this.Close();
                 }
             };
 
             // 🟢 Show confirmation overlay
             AttributesClass.ShowWithOverlay(parentForm, confirmForm);
+        }
+
+        // ✅ Function to count total days excluding Sundays
+        private int CountDaysExcludingSundays(DateTime start, DateTime end)
+        {
+            int count = 0;
+            for (DateTime date = start; date <= end; date = date.AddDays(1))
+            {
+                if (date.DayOfWeek != DayOfWeek.Sunday)
+                    count++;
+            }
+            return count;
         }
 
         // 🔹 Check if employee has available leave credits
@@ -199,6 +270,37 @@ namespace HRIS_JAP_ATTPAY
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             return false;
+        }
+
+        // 🔹 Get available leave credits count
+        private static async Task<int> GetAvailableLeaveCreditsAsync(string employeeName, string leaveType)
+        {
+            try
+            {
+                var leaves = await firebase.Child("Leave Credits").OnceAsync<dynamic>();
+                foreach (var emp in leaves)
+                {
+                    string fullName = emp.Object.full_name?.ToString()?.Trim();
+                    if (string.Equals(fullName, employeeName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        int sickLeave = emp.Object.sick_leave != null ? (int)emp.Object.sick_leave : 0;
+                        int vacationLeave = emp.Object.vacation_leave != null ? (int)emp.Object.vacation_leave : 0;
+
+                        if (leaveType.ToLower().Contains("sick"))
+                            return sickLeave;
+                        if (leaveType.ToLower().Contains("vacation"))
+                            return vacationLeave;
+
+                        return 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error retrieving leave credits: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return -1;
         }
 
         // 🔹 Save to Firebase

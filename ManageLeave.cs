@@ -59,17 +59,20 @@ namespace HRIS_JAP_ATTPAY
             item.SetData(submittedBy, employee, date, leaveType, period, photo);
 
             // Hook up revoke event
-            item.RevokeClicked += (s, e) =>
+            item.RevokeClicked += async (s, e) =>
             {
                 MessageBox.Show($"Revoked {employee}'s {leaveType} ({period})");
                 flowLayoutPanel1.Controls.Remove(item);
+
+                // 🟢 After revoking, refresh ManageLeave list
+                await LoadManageLeaveDataAsync();
             };
 
             flowLayoutPanel1.Controls.Add(item);
         }
 
-        // 🟢 NEW: Load ManageLeave data from Firebase with sorting by most recent
-        private async Task LoadManageLeaveDataAsync()
+        // 🟢 Load ManageLeave data from Firebase with sorting by most recent
+        public async Task LoadManageLeaveDataAsync()
         {
             try
             {
@@ -82,7 +85,7 @@ namespace HRIS_JAP_ATTPAY
                 // 🟢 Create a list to hold leave items with their dates for sorting
                 var leaveItems = new List<(string submittedBy, string employee, string date, string leaveType, string period, DateTime sortDate)>();
 
-                // 🟢 First, collect all leave items and parse their dates
+                // 🟢 Collect all leave items and parse their dates
                 foreach (var leave in manageLeaveList)
                 {
                     string submittedBy = leave.Object.submitted_by ?? "Unknown";
@@ -91,7 +94,7 @@ namespace HRIS_JAP_ATTPAY
                     string leaveType = leave.Object.leave_type ?? "N/A";
                     string period = leave.Object.period ?? "N/A";
 
-                    // 🟢 Parse the creation date for sorting
+                    // 🟢 Parse creation date for sorting
                     DateTime sortDate = DateTime.MinValue;
                     if (!string.IsNullOrEmpty(date) && DateTime.TryParse(date, out DateTime parsedDate))
                     {
@@ -99,7 +102,7 @@ namespace HRIS_JAP_ATTPAY
                     }
                     else
                     {
-                        // If parsing fails, use current time as fallback
+                        // Fallback if parsing fails
                         sortDate = DateTime.Now;
                     }
 
@@ -109,7 +112,7 @@ namespace HRIS_JAP_ATTPAY
                 // 🟢 Sort by most recent first (descending order)
                 var sortedLeaves = leaveItems.OrderByDescending(x => x.sortDate).ToList();
 
-                // 🟢 Now add items to flowLayoutPanel in sorted order
+                // 🟢 Add items to flowLayoutPanel in sorted order
                 foreach (var leave in sortedLeaves)
                 {
                     // 🖼 Try to load employee image from EmployeeDetails

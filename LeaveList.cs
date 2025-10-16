@@ -174,6 +174,7 @@ namespace HRIS_JAP_ATTPAY
         }
 
         // 🟢 When revoke is clicked, restore leave + delete record from Firebase
+        // 🟢 When revoke is clicked, restore leave + delete record from Firebase
         private async void btnRevoke_Click(object sender, EventArgs e)
         {
             try
@@ -190,7 +191,57 @@ namespace HRIS_JAP_ATTPAY
                     return;
                 }
 
-                // ✅ Step 1: Add back 1 leave credit
+                // ✅ Step 1: Determine total leave days (excluding Sundays)
+                int totalDays = 0;
+                string[] parts = period.Split('-');
+
+                if (parts.Length == 2)
+                {
+                    string startPart = parts[0].Trim();
+                    string endPart = parts[1].Trim();
+
+                    // 🟢 Support multiple date formats (numeric + long names)
+                    string[] formats = {
+                "MM/dd/yyyy", "M/d/yyyy", "yyyy-MM-dd",
+                "dd/MM/yyyy", "d/M/yyyy",
+                "MMMM dd, yyyy", "MMMM d, yyyy",
+                "MMM dd, yyyy", "MMM d, yyyy"
+            };
+
+                    bool startParsed = DateTime.TryParseExact(
+                        startPart,
+                        formats,
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        System.Globalization.DateTimeStyles.None,
+                        out DateTime startDate
+                    );
+
+                    bool endParsed = DateTime.TryParseExact(
+                        endPart,
+                        formats,
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        System.Globalization.DateTimeStyles.None,
+                        out DateTime endDate
+                    );
+
+                    if (startParsed && endParsed)
+                    {
+                        for (DateTime d = startDate; d <= endDate; d = d.AddDays(1))
+                        {
+                            if (d.DayOfWeek != DayOfWeek.Sunday)
+                                totalDays++;
+                        }
+                    }
+                }
+
+                if (totalDays <= 0)
+                {
+                    MessageBox.Show("Invalid or Sunday-only leave period.",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // ✅ Step 2: Add back the totalDays leave credits
                 var employees = await firebase.Child("Leave Credits").OnceAsync<dynamic>();
                 string employeeId = null;
                 dynamic empData = null;
@@ -217,9 +268,9 @@ namespace HRIS_JAP_ATTPAY
                 int vacationLeave = empData.vacation_leave != null ? (int)empData.vacation_leave : 6;
 
                 if (leaveType.ToLower().Contains("sick"))
-                    sickLeave += 1;
+                    sickLeave += totalDays;
                 else if (leaveType.ToLower().Contains("vacation"))
-                    vacationLeave += 1;
+                    vacationLeave += totalDays;
 
                 var updatedCredits = new
                 {
@@ -234,7 +285,7 @@ namespace HRIS_JAP_ATTPAY
 
                 await firebase.Child("Leave Credits").Child(employeeId).PutAsync(updatedCredits);
 
-                // ✅ Step 2: Remove record from ManageLeave
+                // ✅ Step 3: Remove record from ManageLeave
                 var leaves = await firebase.Child("ManageLeave").OnceAsync<dynamic>();
                 foreach (var leave in leaves)
                 {
@@ -253,9 +304,19 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                // ✅ Step 3: Remove from UI + trigger event
+                // ✅ Step 4: Remove from UI + trigger refresh
                 this.Parent?.Controls.Remove(this);
                 RevokeClicked?.Invoke(this, EventArgs.Empty);
+
+                // ✅ Step 5: Refresh ManageLeave form (if open)
+                Form parentForm = this.FindForm();
+                if (parentForm is ManageLeave manageLeaveForm)
+                {
+                    await manageLeaveForm.LoadManageLeaveDataAsync();
+                }
+
+                MessageBox.Show($"{totalDays} day(s) restored to {employeeName}'s {leaveType} leave.",
+                    "Leave Revoked", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -263,5 +324,6 @@ namespace HRIS_JAP_ATTPAY
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
     }
 }

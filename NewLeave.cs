@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -84,10 +85,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🟢 Send Request → show confirmation form first
-        // 🟢 Send Request → show confirmation form first
-        // 🟢 Send Request → show appropriate confirmation form based on user role
-        // 🟢 Send Request → show appropriate confirmation form based on user role
+        // 🟢 Send Request → validate dates and show confirmation
         private void buttonSendRequest_Click(object sender, EventArgs e)
         {
             string employee = comboBoxInputName.SelectedItem?.ToString();
@@ -105,73 +103,97 @@ namespace HRIS_JAP_ATTPAY
                 return;
             }
 
-            // 🔹 Check if current user is admin
-            bool isAdmin = SessionClass.IsAdmin; // Assuming you have this property
-
-            if (isAdmin)
+            // ✅ Validate date formats
+            string[] formats = { "MM/dd/yyyy", "M/d/yyyy", "yyyy-MM-dd", "dd/MM/yyyy", "d/M/yyyy" };
+            if (!DateTime.TryParseExact(start, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime startDate) ||
+                !DateTime.TryParseExact(end, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime endDate))
             {
-                // 🔹 Admin users use ConfirmAdminLeaveEntry form
-                var confirmForm = new ConfirmAdminLeaveEntry(employee, leaveType, start, end);
-
-                confirmForm.FormClosed += async (s, ev) =>
-                {
-                    // ✅ If admin confirmed the leave entry
-                    if (confirmForm.DialogResult == DialogResult.OK && confirmForm.UserConfirmed)
-                    {
-                        // The logging already happened in ConfirmAdminLeaveEntry
-                        // Now process the actual leave request
-                        await ProcessLeaveRequest(employee, leaveType, start, end);
-                    }
-                };
-
-                Form parentForm = this.FindForm();
-                AttributesClass.ShowWithOverlay(parentForm, confirmForm);
+                MessageBox.Show("Invalid date format. Please use MM/DD/YYYY or YYYY-MM-DD.",
+                    "Invalid Dates", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
-            else
+
+            // ✅ Block if start date is before today
+            if (startDate.Date < DateTime.Now.Date)
             {
-                // 🔹 Non-admin users use LeaveRequestConfirm form
-                var leaveRequestData = new LeaveRequestData
-                {
-                    Title = $"Leave Request - {leaveType}",
-                    SubmittedBy = SessionClass.CurrentEmployeeName ?? "Unknown User",
-                    EmployeeName = employee,
-                    LeaveType = leaveType,
-                    Start = start,
-                    End = end,
-                    Notes = "", // You can add a notes field if needed
-                    Photo = null, // You can set photo if available
-                    CreatedAt = DateTime.Now
-                };
-
-                var confirmForm = new LeaveRequestConfirm(leaveRequestData);
-
-                confirmForm.FormClosed += async (s, ev) =>
-                {
-                    // ✅ If user confirmed the leave request
-                    if (confirmForm.DialogResult == DialogResult.OK && confirmForm.UserConfirmed)
-                    {
-                        // Process the leave request for non-admin users
-                        await ProcessLeaveRequest(employee, leaveType, start, end);
-                    }
-                };
-
-                Form parentForm = this.FindForm();
-                AttributesClass.ShowWithOverlay(parentForm, confirmForm);
+                MessageBox.Show("Start date cannot be earlier than today's date.",
+                    "Invalid Start Date", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
+
+            if (endDate < startDate)
+            {
+                MessageBox.Show("End date cannot be earlier than start date.",
+                    "Invalid Dates", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // ✅ Compute total days excluding Sundays
+            int totalDays = CountDaysExcludingSundays(startDate, endDate);
+
+            if (totalDays <= 0)
+            {
+                MessageBox.Show("Selected period contains no valid leave days (all Sundays).",
+                    "Invalid Leave Period", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // ✅ Confirm summary
+            DialogResult confirm = MessageBox.Show(
+                $"Confirm leave request?\n\nEmployee: {employee}\nType: {leaveType}\n" +
+                $"Period: {startDate:MM/dd/yyyy} - {endDate:MM/dd/yyyy}\n" +
+                $"Total Days (excluding Sundays): {totalDays}",
+                "Confirm Leave Request", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+
+            if (confirm != DialogResult.OK) return;
+
+            // 🟢 If admin (ID = 101), apply directly (no confirmation form)
+            if (SessionClass.CurrentEmployeeId == "101")
+            {
+                _ = ProcessLeaveRequest(employee, leaveType, startDate, endDate, totalDays);
+                return;
+            }
+
+            // 🔹 Otherwise, show confirmation form for regular users
+            Form confirmForm = new ConfirmLeaveEntry();
+
+            confirmForm.FormClosed += async (s, ev) =>
+            {
+                if (confirmForm.DialogResult == DialogResult.OK)
+                {
+                    await ProcessLeaveRequest(employee, leaveType, startDate, endDate, totalDays);
+                }
+            };
+
+            Form parentForm = this.FindForm();
+            AttributesClass.ShowWithOverlay(parentForm, confirmForm);
         }
 
-        // 🟢 Actual process to save and deduct leave
-        private async Task ProcessLeaveRequest(string employee, string leaveType, string start, string end)
+        // ✅ Function: Count total days excluding Sundays
+        private int CountDaysExcludingSundays(DateTime start, DateTime end)
+        {
+            int count = 0;
+            for (DateTime date = start; date <= end; date = date.AddDays(1))
+            {
+                if (date.DayOfWeek != DayOfWeek.Sunday)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        // 🟢 Process Leave Request with totalDays deduction
+        private async Task ProcessLeaveRequest(string employee, string leaveType, DateTime startDate, DateTime endDate, int totalDays)
         {
             try
             {
-                // 🟢 Get current logged-in user
                 string submittedBy = !string.IsNullOrEmpty(SessionClass.CurrentEmployeeName)
                     ? SessionClass.CurrentEmployeeName
                     : "Unknown User";
 
-                // 🟢 Deduct leave first
-                bool deducted = await DeductLeaveBalanceAsync(employee, leaveType);
+                // 🟢 Deduct total days from leave credits
+                bool deducted = await DeductLeaveBalanceAsync(employee, leaveType, totalDays);
                 if (!deducted)
                 {
                     MessageBox.Show("Unable to deduct leave. Please check leave credits.",
@@ -186,12 +208,17 @@ namespace HRIS_JAP_ATTPAY
                     submitted_by = submittedBy,
                     employee = employee,
                     leave_type = leaveType,
-                    period = $"{start} - {end}"
+                    period = $"{startDate:MM/dd/yyyy} - {endDate:MM/dd/yyyy}",
+                    total_days = totalDays,
+                    status = SessionClass.CurrentEmployeeId == "101" ? "Approved" : "Pending"
                 };
 
                 await firebase.Child("ManageLeave").PostAsync(manageLeaveData);
 
-                MessageBox.Show("Leave request successfully sent and leave deducted.",
+                MessageBox.Show(
+                    SessionClass.CurrentEmployeeId == "101"
+                    ? $"Leave successfully applied and approved.\n{totalDays} day(s) deducted from {leaveType}."
+                    : $"Leave request successfully sent.\n{totalDays} day(s) deducted from {leaveType} (Sundays excluded).",
                     "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
@@ -201,8 +228,8 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🟢 Deduct leave credits from "Leave Credits" table
-        private async Task<bool> DeductLeaveBalanceAsync(string employeeName, string leaveType)
+        // 🟢 Deduct leave credits (multi-day, Sundays excluded)
+        private async Task<bool> DeductLeaveBalanceAsync(string employeeName, string leaveType, int totalDays)
         {
             try
             {
@@ -228,29 +255,29 @@ namespace HRIS_JAP_ATTPAY
                     return false;
                 }
 
-                int sickLeave = empData.sick_leave != null ? (int)empData.sick_leave : 6;
-                int vacationLeave = empData.vacation_leave != null ? (int)empData.vacation_leave : 6;
+                int sickLeave = 6, vacationLeave = 6;
+                try { sickLeave = Convert.ToInt32(empData.sick_leave); } catch { }
+                try { vacationLeave = Convert.ToInt32(empData.vacation_leave); } catch { }
 
-                // 🧮 Check and deduct based on leave type
                 if (leaveType.ToLower().Contains("sick"))
                 {
-                    if (sickLeave <= 0)
+                    if (sickLeave < totalDays)
                     {
-                        MessageBox.Show($"{employeeName} has no remaining Sick Leave.",
-                            "No Leave Left", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show($"{employeeName} has only {sickLeave} sick leave(s) left but requested {totalDays}.",
+                            "Insufficient Sick Leave", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return false;
                     }
-                    sickLeave = Math.Max(0, sickLeave - 1);
+                    sickLeave -= totalDays;
                 }
                 else if (leaveType.ToLower().Contains("vacation"))
                 {
-                    if (vacationLeave <= 0)
+                    if (vacationLeave < totalDays)
                     {
-                        MessageBox.Show($"{employeeName} has no remaining Vacation Leave.",
-                            "No Leave Left", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show($"{employeeName} has only {vacationLeave} vacation leave(s) left but requested {totalDays}.",
+                            "Insufficient Vacation Leave", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return false;
                     }
-                    vacationLeave = Math.Max(0, vacationLeave - 1);
+                    vacationLeave -= totalDays;
                 }
 
                 var updatedCredits = new
@@ -266,7 +293,6 @@ namespace HRIS_JAP_ATTPAY
 
                 await firebase.Child("Leave Credits").Child(employeeId).PutAsync(updatedCredits);
 
-                // Update displayed values
                 labelSickLeaveInput.Text = sickLeave.ToString();
                 labelVacationLeaveInput.Text = vacationLeave.ToString();
 
