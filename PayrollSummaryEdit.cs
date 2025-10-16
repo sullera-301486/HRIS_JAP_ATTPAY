@@ -288,6 +288,8 @@ namespace HRIS_JAP_ATTPAY
                 if (confirmForm.UserConfirmed)
                 {
                     await ExecutePayrollUpdate();
+                    this.DialogResult = DialogResult.OK; // Set dialog result
+                    this.Close();
                 }
                 else
                 {

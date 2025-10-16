@@ -4,6 +4,7 @@ using Firebase.Database.Query;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -40,41 +41,140 @@ namespace HRIS_JAP_ATTPAY
             panelLoaderAdminLoan = new AttributesClassAlt(AdminViewPanel);
         }
 
-        private void LoadDateRanges()
+
+        private async void LoadDateRanges()
         {
             try
             {
                 comboBoxSelectPayDate.Items.Clear();
 
-                // Add semi-monthly periods for current year
-                int currentYear = 2025; // Set to 2025 as requested
+                // Get available date ranges from attendance records
+                var availablePeriods = await GetAvailableDateRangesFromAttendance();
 
-                for (int month = 1; month <= 12; month++)
+                if (availablePeriods.Count == 0)
                 {
-                    // First half: 1st to 15th
-                    comboBoxSelectPayDate.Items.Add($"{new DateTime(currentYear, month, 1):MMMM 1} - 15, {currentYear}");
-
-                    // Second half: 16th to end of month
-                    DateTime lastDay = new DateTime(currentYear, month, 1).AddMonths(1).AddDays(-1);
-                    comboBoxSelectPayDate.Items.Add($"{new DateTime(currentYear, month, 16):MMMM 16} - {lastDay:dd}, {currentYear}");
+                    // Fallback to current year if no attendance data
+                    LoadDefaultDateRanges();
+                    return;
                 }
 
-                // Set default to September 1-15, 2025
-                // September is month 9, so the index would be: (8 * 2) = 16 (0-based index)
-                int septemberFirstHalfIndex = 16; // (9-1) * 2 = 16
-                if (septemberFirstHalfIndex < comboBoxSelectPayDate.Items.Count)
+                // Add available periods to combobox
+                foreach (var period in availablePeriods)
                 {
-                    comboBoxSelectPayDate.SelectedIndex = septemberFirstHalfIndex;
+                    comboBoxSelectPayDate.Items.Add(period);
                 }
-                else
+
+                // Set default to most recent period
+                if (comboBoxSelectPayDate.Items.Count > 0)
                 {
-                    // Fallback to first item if index is out of range
-                    comboBoxSelectPayDate.SelectedIndex = 0;
+                    comboBoxSelectPayDate.SelectedIndex = comboBoxSelectPayDate.Items.Count - 1;
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to load date ranges: " + ex.Message);
+                // Fallback to default ranges
+                LoadDefaultDateRanges();
+            }
+        }
+
+        private async Task<List<string>> GetAvailableDateRangesFromAttendance()
+        {
+            var availablePeriods = new List<string>();
+            var attendanceDates = new HashSet<DateTime>();
+
+            try
+            {
+                // Load attendance records to find available dates
+                var attendanceData = await firebase
+                    .Child("Attendance")
+                    .OnceAsync<Dictionary<string, object>>();
+
+                // Extract unique dates from attendance records
+                foreach (var attendance in attendanceData)
+                {
+                    var data = attendance.Object;
+                    if (data.ContainsKey("attendance_date") &&
+                        DateTime.TryParse(data["attendance_date"]?.ToString(), out DateTime attendanceDate))
+                    {
+                        attendanceDates.Add(attendanceDate.Date);
+                    }
+                }
+
+                // Group dates by month and create semi-monthly periods
+                var datesByMonth = attendanceDates
+                    .GroupBy(d => new { d.Year, d.Month })
+                    .OrderBy(g => g.Key.Year)
+                    .ThenBy(g => g.Key.Month);
+
+                foreach (var monthGroup in datesByMonth)
+                {
+                    int year = monthGroup.Key.Year;
+                    int month = monthGroup.Key.Month;
+                    string monthName = new DateTime(year, month, 1).ToString("MMMM");
+                    int daysInMonth = DateTime.DaysInMonth(year, month);
+
+                    // Check first half (1st to 15th)
+                    bool hasFirstHalf = monthGroup.Any(d => d.Day >= 1 && d.Day <= 15);
+                    if (hasFirstHalf)
+                    {
+                        availablePeriods.Add($"{monthName} 1 - 15, {year}");
+                    }
+
+                    // Check second half (16th to end of month)
+                    bool hasSecondHalf = monthGroup.Any(d => d.Day >= 16 && d.Day <= daysInMonth);
+                    if (hasSecondHalf)
+                    {
+                        availablePeriods.Add($"{monthName} 16 - {daysInMonth}, {year}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting available date ranges: {ex.Message}");
+            }
+
+            return availablePeriods;
+        }
+
+        private void LoadDefaultDateRanges()
+        {
+            try
+            {
+                comboBoxSelectPayDate.Items.Clear();
+
+                // Fallback: Add current year periods
+                int currentYear = DateTime.Now.Year;
+
+                for (int month = 1; month <= 12; month++)
+                {
+                    string monthName = new DateTime(currentYear, month, 1).ToString("MMMM");
+                    int daysInMonth = DateTime.DaysInMonth(currentYear, month);
+
+                    // First half: 1st to 15th
+                    comboBoxSelectPayDate.Items.Add($"{monthName} 1 - 15, {currentYear}");
+
+                    // Second half: 16th to end of month
+                    comboBoxSelectPayDate.Items.Add($"{monthName} 16 - {daysInMonth}, {currentYear}");
+                }
+
+                // Set default to current period
+                int currentMonth = DateTime.Now.Month;
+                int currentDay = DateTime.Now.Day;
+                int currentIndex = (currentMonth - 1) * 2 + (currentDay > 15 ? 1 : 0);
+
+                if (currentIndex < comboBoxSelectPayDate.Items.Count)
+                {
+                    comboBoxSelectPayDate.SelectedIndex = currentIndex;
+                }
+                else
+                {
+                    comboBoxSelectPayDate.SelectedIndex = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to load default date ranges: " + ex.Message);
             }
         }
 
@@ -84,8 +184,12 @@ namespace HRIS_JAP_ATTPAY
             {
                 string selectedDateRange = comboBoxSelectPayDate.SelectedItem.ToString();
                 labelPayrollDate.Text = selectedDateRange;
+
+                // Reload data to recalculate for new date range
+                LoadFirebaseData();
             }
         }
+
 
         private void textBoxSearchEmployee_TextChanged(object sender, EventArgs e)
         {
@@ -218,15 +322,19 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewEmployee.Cursor = Cursors.Default;
         }
 
-        private void dataGridViewEmployee_CellClick(object sender, DataGridViewCellEventArgs e)
+        private async void dataGridViewEmployee_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0 && dataGridViewEmployee.Columns[e.ColumnIndex].Name == "Action")
             {
                 string selectedEmployeeId = dataGridViewEmployee.Rows[e.RowIndex].Cells["EmployeeId"].Value?.ToString();
                 if (!string.IsNullOrEmpty(selectedEmployeeId))
                 {
+                    // Get the current selected date range
+                    DateTime startDate, endDate;
+                    ParseDateRange(comboBoxSelectPayDate.SelectedItem?.ToString(), out startDate, out endDate);
+
                     Form parentForm = this.FindForm();
-                    PayrollSummary payrollSummaryForm = new PayrollSummary(currentEmployeeId);
+                    PayrollSummary payrollSummaryForm = new PayrollSummary(currentEmployeeId, null, startDate, endDate);
                     payrollSummaryForm.SetEmployeeId(selectedEmployeeId);
                     AttributesClass.ShowWithOverlay(parentForm, payrollSummaryForm);
                 }
@@ -239,9 +347,16 @@ namespace HRIS_JAP_ATTPAY
             {
                 dataGridViewEmployee.Rows.Clear();
 
+                // Get selected date range FIRST
+                DateTime startDate, endDate;
+                ParseDateRange(comboBoxSelectPayDate.SelectedItem?.ToString(), out startDate, out endDate);
+
                 var employeeDetails = new Dictionary<string, dynamic>();
                 var employmentInfo = new Dictionary<string, Dictionary<string, string>>();
-                var payrollData = new Dictionary<string, Dictionary<string, string>>();
+                var attendanceRecords = new Dictionary<string, List<Dictionary<string, string>>>();
+                var dailyRates = new Dictionary<string, decimal>();
+                var employeeDeductions = new Dictionary<string, Dictionary<string, decimal>>();
+                var governmentDeductions = new Dictionary<string, Dictionary<string, decimal>>();
 
                 // Load EmployeeDetails
                 var empDetails = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
@@ -256,13 +371,100 @@ namespace HRIS_JAP_ATTPAY
                         employmentInfo[employeeId] = item;
                 });
 
-                // Load Payroll (directly from Firebase)
-                await LoadArrayBasedData("Payroll", (item) =>
+                // Load Attendance Records - FILTER BY DATE RANGE
+                await LoadArrayBasedData("Attendance", (item) =>
                 {
                     var employeeId = item.ContainsKey("employee_id") ? item["employee_id"] : null;
                     if (!string.IsNullOrEmpty(employeeId))
-                        payrollData[employeeId] = item;
+                    {
+                        // Parse and check if attendance date is within selected range
+                        if (DateTime.TryParse(item.ContainsKey("attendance_date") ? item["attendance_date"] : "", out DateTime attendanceDate))
+                        {
+                            if (attendanceDate >= startDate && attendanceDate <= endDate)
+                            {
+                                if (!attendanceRecords.ContainsKey(employeeId))
+                                    attendanceRecords[employeeId] = new List<Dictionary<string, string>>();
+                                attendanceRecords[employeeId].Add(item);
+                            }
+                        }
+                    }
                 });
+
+                // Load Daily Rates from PayrollEarnings
+                await LoadArrayBasedData("PayrollEarnings", (item) =>
+                {
+                    var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
+                    if (!string.IsNullOrEmpty(payrollId))
+                    {
+                        // Get employee ID from Payroll table
+                        var payrollTask = firebase.Child("Payroll").Child(payrollId).OnceSingleAsync<Dictionary<string, object>>();
+                        payrollTask.Wait();
+                        var payroll = payrollTask.Result;
+
+                        if (payroll != null && payroll.ContainsKey("employee_id"))
+                        {
+                            string employeeId = payroll["employee_id"].ToString();
+                            if (decimal.TryParse(item.ContainsKey("daily_rate") ? item["daily_rate"] : "0", out decimal rate) && rate > 0)
+                            {
+                                dailyRates[employeeId] = rate;
+                            }
+                        }
+                    }
+                });
+
+                // Load Employee Deductions
+                await LoadArrayBasedData("EmployeeDeductions", (item) =>
+                {
+                    var employeeId = item.ContainsKey("employee_id") ? item["employee_id"] : null;
+                    if (!string.IsNullOrEmpty(employeeId))
+                    {
+                        employeeDeductions[employeeId] = new Dictionary<string, decimal>();
+
+                        if (decimal.TryParse(item.ContainsKey("cash_advance") ? item["cash_advance"] : "0", out decimal cashAdvance))
+                            employeeDeductions[employeeId]["cash_advance"] = cashAdvance;
+
+                        if (decimal.TryParse(item.ContainsKey("coop_contribution") ? item["coop_contribution"] : "0", out decimal coop))
+                            employeeDeductions[employeeId]["coop_contribution"] = coop;
+
+                        if (decimal.TryParse(item.ContainsKey("other_deductions") ? item["other_deductions"] : "0", out decimal other))
+                            employeeDeductions[employeeId]["other_deductions"] = other;
+                    }
+                });
+
+                // Load Government Deductions
+                await LoadArrayBasedData("GovernmentDeductions", (item) =>
+                {
+                    var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
+                    if (!string.IsNullOrEmpty(payrollId))
+                    {
+                        // Get employee ID from Payroll table
+                        var payrollTask = firebase.Child("Payroll").Child(payrollId).OnceSingleAsync<Dictionary<string, object>>();
+                        payrollTask.Wait();
+                        var payroll = payrollTask.Result;
+
+                        if (payroll != null && payroll.ContainsKey("employee_id"))
+                        {
+                            string employeeId = payroll["employee_id"].ToString();
+                            governmentDeductions[employeeId] = new Dictionary<string, decimal>();
+
+                            if (decimal.TryParse(item.ContainsKey("sss") ? item["sss"] : "0", out decimal sss))
+                                governmentDeductions[employeeId]["sss"] = sss;
+
+                            if (decimal.TryParse(item.ContainsKey("philhealth") ? item["philhealth"] : "0", out decimal philhealth))
+                                governmentDeductions[employeeId]["philhealth"] = philhealth;
+
+                            if (decimal.TryParse(item.ContainsKey("pagibig") ? item["pagibig"] : "0", out decimal pagibig))
+                                governmentDeductions[employeeId]["pagibig"] = pagibig;
+
+                            if (decimal.TryParse(item.ContainsKey("withholding_tax") ? item["withholding_tax"] : "0", out decimal tax))
+                                governmentDeductions[employeeId]["withholding_tax"] = tax;
+                        }
+                    }
+                });
+
+                // Get selected date range
+                
+                ParseDateRange(comboBoxSelectPayDate.SelectedItem?.ToString(), out startDate, out endDate);
 
                 int counter = 1;
                 foreach (var empEntry in employeeDetails)
@@ -280,36 +482,9 @@ namespace HRIS_JAP_ATTPAY
                         position = empInfo.ContainsKey("position") ? empInfo["position"] : "";
                     }
 
-                    // Set specific values for JAP-001 to JAP-003
-                    decimal grossPay = 6519.50m;
-                    decimal netPay = 3214.15m;
-
-                    // Override values for specific employees
-                    if (employeeId == "JAP-001")
-                    {
-                        grossPay = 8302.88m;
-                        netPay = 4677.11m;
-                    }
-                    else if (employeeId == "JAP-002")
-                    {
-                        grossPay = 8302.88m;
-                        netPay = 4677.11m;
-                    }
-                    else if (employeeId == "JAP-003")
-                    {
-                        grossPay = 8302.88m;
-                        netPay = 4677.11m;
-                    }
-                    else
-                    {
-                        // For other employees, use Firebase data if available
-                        if (payrollData.ContainsKey(employeeId))
-                        {
-                            var payroll = payrollData[employeeId];
-                            decimal.TryParse(payroll.ContainsKey("gross_pay") ? payroll["gross_pay"] : "0.00", out grossPay);
-                            decimal.TryParse(payroll.ContainsKey("net_pay") ? payroll["net_pay"] : "0.00", out netPay);
-                        }
-                    }
+                    // Calculate payroll for the SPECIFIC date range
+                    decimal grossPay = CalculateGrossPayFromAttendance(employeeId, startDate, endDate, attendanceRecords, dailyRates);
+                    decimal netPay = CalculateNetPay(grossPay, employeeId, employeeDeductions, governmentDeductions);
 
                     dataGridViewEmployee.Rows.Add(
                         counter,
@@ -330,13 +505,150 @@ namespace HRIS_JAP_ATTPAY
                 MessageBox.Show("Failed to load Firebase data: " + ex.Message);
             }
         }
+        private decimal CalculateGrossPayFromAttendance(string employeeId, DateTime startDate, DateTime endDate,
+    Dictionary<string, List<Dictionary<string, string>>> attendanceRecords, Dictionary<string, decimal> dailyRates)
+        {
+            decimal totalRegularHours = 0;
+            decimal totalOvertimeHours = 0;
+            int daysPresent = 0;
+
+            if (attendanceRecords.ContainsKey(employeeId))
+            {
+                var employeeAttendance = attendanceRecords[employeeId];
+
+                foreach (var record in employeeAttendance)
+                {
+                    // Parse attendance date
+                    if (DateTime.TryParse(record.ContainsKey("attendance_date") ? record["attendance_date"] : "", out DateTime attendanceDate))
+                    {
+                        // Check if within selected period
+                        if (attendanceDate >= startDate && attendanceDate <= endDate)
+                        {
+                            string status = record.ContainsKey("status") ? record["status"] : "";
+
+                            // Skip absent and day off records
+                            if (status != "Absent" && status != "Day Off")
+                            {
+                                // Parse hours worked
+                                if (decimal.TryParse(record.ContainsKey("hours_worked") ? record["hours_worked"] : "0", out decimal hoursWorked) && hoursWorked > 0)
+                                {
+                                    daysPresent++;
+
+                                    // Parse overtime hours
+                                    decimal overtimeHours = 0;
+                                    if (decimal.TryParse(record.ContainsKey("overtime_hours") ? record["overtime_hours"] : "0", out overtimeHours))
+                                    {
+                                        totalRegularHours += hoursWorked - overtimeHours;
+                                        totalOvertimeHours += overtimeHours;
+                                    }
+                                    else
+                                    {
+                                        totalRegularHours += hoursWorked;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Get daily rate (default to 500 if not found)
+            decimal dailyRate = dailyRates.ContainsKey(employeeId) ? dailyRates[employeeId] : 500m;
+            decimal hourlyRate = dailyRate / 8m; // Assuming 8-hour work day
+
+            // Calculate gross pay
+            decimal regularPay = totalRegularHours * hourlyRate;
+            decimal overtimePay = totalOvertimeHours * hourlyRate * 1.5m; // 1.5x for overtime
+            decimal grossPay = regularPay + overtimePay;
+
+            return grossPay;
+        }
+        private decimal CalculateNetPay(decimal grossPay, string employeeId,
+    Dictionary<string, Dictionary<string, decimal>> employeeDeductions,
+    Dictionary<string, Dictionary<string, decimal>> governmentDeductions)
+        {
+            decimal totalDeductions = 0;
+
+            // Add employee deductions
+            if (employeeDeductions.ContainsKey(employeeId))
+            {
+                var deductions = employeeDeductions[employeeId];
+                totalDeductions += deductions.ContainsKey("cash_advance") ? deductions["cash_advance"] : 0;
+                totalDeductions += deductions.ContainsKey("coop_contribution") ? deductions["coop_contribution"] : 0;
+                totalDeductions += deductions.ContainsKey("other_deductions") ? deductions["other_deductions"] : 0;
+            }
+
+            // Add government deductions
+            if (governmentDeductions.ContainsKey(employeeId))
+            {
+                var govDeductions = governmentDeductions[employeeId];
+                totalDeductions += govDeductions.ContainsKey("sss") ? govDeductions["sss"] : 0;
+                totalDeductions += govDeductions.ContainsKey("philhealth") ? govDeductions["philhealth"] : 0;
+                totalDeductions += govDeductions.ContainsKey("pagibig") ? govDeductions["pagibig"] : 0;
+                totalDeductions += govDeductions.ContainsKey("withholding_tax") ? govDeductions["withholding_tax"] : 0;
+            }
+
+            decimal netPay = grossPay - totalDeductions;
+            return netPay > 0 ? netPay : 0; // Ensure non-negative net pay
+        }
+        private void ParseDateRange(string dateRange, out DateTime startDate, out DateTime endDate)
+        {
+            if (string.IsNullOrEmpty(dateRange))
+            {
+                // Default to current period
+                DateTime now = DateTime.Now;
+                if (now.Day <= 15)
+                {
+                    startDate = new DateTime(now.Year, now.Month, 1);
+                    endDate = new DateTime(now.Year, now.Month, 15);
+                }
+                else
+                {
+                    startDate = new DateTime(now.Year, now.Month, 16);
+                    endDate = new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
+                }
+                return;
+            }
+
+            // Handle formats like "September 1 - 15, 2025" or "September 16 - 30, 2025"
+            var match = Regex.Match(dateRange, @"(\w+) (\d+) - (\d+), (\d{4})");
+            if (match.Success)
+            {
+                string month = match.Groups[1].Value;
+                int startDay = int.Parse(match.Groups[2].Value);
+                int endDay = int.Parse(match.Groups[3].Value);
+                int year = int.Parse(match.Groups[4].Value);
+
+                int monthNumber = DateTime.ParseExact(month, "MMMM", CultureInfo.InvariantCulture).Month;
+                startDate = new DateTime(year, monthNumber, startDay);
+                endDate = new DateTime(year, monthNumber, endDay);
+            }
+            else
+            {
+                // Fallback to current period
+                DateTime now = DateTime.Now;
+                if (now.Day <= 15)
+                {
+                    startDate = new DateTime(now.Year, now.Month, 1);
+                    endDate = new DateTime(now.Year, now.Month, 15);
+                }
+                else
+                {
+                    startDate = new DateTime(now.Year, now.Month, 16);
+                    endDate = new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
+                }
+            }
+        }
 
         private async Task LoadArrayBasedData(string childPath, Action<Dictionary<string, string>> processItem)
         {
             try
             {
+                // Get raw JSON from Firebase
                 var jsonResponse = await firebase.Child(childPath).OnceAsJsonAsync();
                 string rawJson = jsonResponse.ToString();
+
+                // Parse the malformed JSON structure
                 var records = ParseMalformedJson(rawJson);
                 foreach (var record in records)
                     processItem(record);
@@ -352,16 +664,20 @@ namespace HRIS_JAP_ATTPAY
             var records = new List<Dictionary<string, string>>();
             try
             {
+                // Clean up the JSON string
                 string cleanedJson = rawJson.Replace("\n", "").Replace("\r", "").Replace("\t", "")
                     .Replace("'", "\"").Replace("(", "[").Replace(")", "]")
                     .Replace("[null,", "[").Replace("], [", ",").Replace("}, {", "},{")
                     .Replace("},(", "},{").Replace("),{", "},{");
 
+                // Use regex to extract individual JSON objects
                 var matches = Regex.Matches(cleanedJson, @"\{[^{}]*\}");
                 foreach (Match match in matches)
                 {
                     var record = new Dictionary<string, string>();
                     string objectStr = match.Value;
+
+                    // Extract key-value pairs from each object
                     var kvpMatches = Regex.Matches(objectStr, @"""([^""]+)""\s*:\s*(""[^""]*""|\d+\.?\d*|true|false|null)");
                     foreach (Match kvpMatch in kvpMatches)
                     {
@@ -385,6 +701,23 @@ namespace HRIS_JAP_ATTPAY
         private void labelMoveLoan_Click(object sender, EventArgs e)
         {
             panelLoaderAdminLoan.LoadUserControl(new AdminLoan(AdminViewPanel, currentEmployeeId));
+        }
+        private Dictionary<string, decimal> GetEmployeeDailyRates()
+        {
+            var dailyRates = new Dictionary<string, decimal>();
+
+            // From PayrollEarnings data in JSON
+            var payrollEarnings = new Dictionary<string, decimal>
+    {
+        {"JAP-001", 500m},
+        {"JAP-002", 644.23m},
+        {"JAP-003", 644.23m},
+        {"JAP-004", 0m}, // Not in current data - would need default
+        {"JAP-005", 0m},
+        {"JAP-006", 0m}
+    };
+
+            return dailyRates;
         }
     }
 }

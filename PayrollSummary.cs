@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using Firebase.Database;
+using Firebase.Database.Query;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -13,6 +17,7 @@ namespace HRIS_JAP_ATTPAY
         private string currentEmployeeId = "";
         private DateTime cutoffStartDate;
         private DateTime cutoffEndDate;
+        private FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
 
         private PayrollEmployeeData employeeData;
         private List<PayrollAttendance> attendanceRecords = new List<PayrollAttendance>();
@@ -25,148 +30,666 @@ namespace HRIS_JAP_ATTPAY
         public PayrollSummary(string employeeId, string period = null, DateTime? startDate = null, DateTime? endDate = null)
         {
             currentEmployeeId = employeeId;
-
-            cutoffStartDate = startDate ?? new DateTime(DateTime.Today.Year, 9, 1);
-            cutoffEndDate = endDate ?? new DateTime(DateTime.Today.Year, 9, 15);
+            cutoffStartDate = startDate ?? new DateTime(2025, 9, 1);
+            cutoffEndDate = endDate ?? new DateTime(2025, 9, 15);
 
             InitializeComponent();
             SetFont();
 
-            this.Load += (sender, e) => LoadPayrollData();
+            this.Load += async (sender, e) => await LoadPayrollData();
         }
 
         public void SetEmployeeId(string employeeId)
         {
             currentEmployeeId = employeeId;
-            LoadPayrollData();
+            _ = LoadPayrollData();
         }
 
-        private void LoadPayrollData()
+        private async Task LoadPayrollData()
         {
-            employeeData = new PayrollEmployeeData();
-            attendanceRecords = new List<PayrollAttendance>();
-            employeeLoans = new List<PayrollLoan>();
-            payrollEarnings = new PayrollEarnings();
-            employeeDeductions = new PayrollDeductions();
-            governmentDeductions = new PayrollGovDeductions();
-            leaveCredits = new PayrollLeave();
+            try
+            {
+                await LoadEmployeeBasicInfo();
+                await LoadEmploymentInfo(); // This should populate employeeData.Department etc.
+                await LoadAttendanceRecords();
+                await LoadPayrollEarnings(); // Now this can use employeeData for defaults
+                await LoadEmployeeDeductions();
+                await LoadGovernmentDeductions();
+                await LoadEmployeeLoans();
+                await LoadLeaveCredits();
 
-            DisplayEmployeeInfo();
-            CalculateAndDisplayPayroll();
+                DisplayEmployeeInfo();
+                CalculateAndDisplayPayroll();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading payroll data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async Task LoadEmployeeBasicInfo()
+        {
+            try
+            {
+                var empData = await firebase
+                    .Child("EmployeeDetails")
+                    .Child(currentEmployeeId)
+                    .OnceSingleAsync<Dictionary<string, object>>();
+
+                if (empData != null)
+                {
+                    employeeData = new PayrollEmployeeData
+                    {
+                        EmployeeId = GetValue(empData, "employee_id"),
+                        FirstName = GetValue(empData, "first_name"),
+                        MiddleName = GetValue(empData, "middle_name"),
+                        LastName = GetValue(empData, "last_name"),
+                        Email = GetValue(empData, "email"),
+                        Contact = GetValue(empData, "contact")
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading basic info: {ex.Message}");
+            }
+        }
+
+        private async Task LoadEmploymentInfo()
+        {
+            try
+            {
+                await LoadArrayBasedData("EmploymentInfo", (item) =>
+                {
+                    var empId = item.ContainsKey("employee_id") ? item["employee_id"] : null;
+                    if (!string.IsNullOrEmpty(empId) && empId == currentEmployeeId)
+                    {
+                        employeeData.Department = item.ContainsKey("department") ? item["department"] : "";
+                        employeeData.Position = item.ContainsKey("position") ? item["position"] : "";
+                        employeeData.ContractType = item.ContainsKey("contract_type") ? item["contract_type"] : "";
+                        employeeData.DateOfJoining = item.ContainsKey("date_of_joining") ? item["date_of_joining"] : "";
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading employment info: {ex.Message}");
+            }
+        }
+
+        private async Task LoadAttendanceRecords()
+        {
+            try
+            {
+                await LoadArrayBasedData("Attendance", (item) =>
+                {
+                    var empId = item.ContainsKey("employee_id") ? item["employee_id"] : null;
+                    if (!string.IsNullOrEmpty(empId) && empId == currentEmployeeId)
+                    {
+                        if (DateTime.TryParse(item.ContainsKey("attendance_date") ? item["attendance_date"] : "", out DateTime attDate))
+                        {
+                            if (attDate >= cutoffStartDate && attDate <= cutoffEndDate)
+                            {
+                                var attendance = new PayrollAttendance
+                                {
+                                    EmployeeId = empId,
+                                    AttendanceDate = attDate,
+                                    Status = item.ContainsKey("status") ? item["status"] : ""
+                                };
+
+                                if (decimal.TryParse(item.ContainsKey("hours_worked") ? item["hours_worked"] : "0", out decimal hoursWorked))
+                                    attendance.HoursWorked = hoursWorked;
+
+                                if (decimal.TryParse(item.ContainsKey("overtime_hours") ? item["overtime_hours"] : "0", out decimal overtimeHours))
+                                    attendance.OvertimeHours = overtimeHours;
+
+                                attendanceRecords.Add(attendance);
+                            }
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading attendance: {ex.Message}");
+            }
+        }
+
+        private async Task LoadPayrollEarnings()
+        {
+            try
+            {
+                // Try to find existing payroll earnings for this employee directly
+                bool foundEarnings = false;
+
+                await LoadArrayBasedData("PayrollEarnings", (item) =>
+                {
+                    var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
+                    if (!string.IsNullOrEmpty(payrollId))
+                    {
+                        // Get employee ID from Payroll table to verify this belongs to current employee
+                        var payrollTask = firebase.Child("Payroll").Child(payrollId).OnceSingleAsync<Dictionary<string, object>>();
+                        payrollTask.Wait();
+                        var payroll = payrollTask.Result;
+
+                        if (payroll != null && payroll.ContainsKey("employee_id") && payroll["employee_id"].ToString() == currentEmployeeId)
+                        {
+                            // Load ALL earnings data
+                            if (decimal.TryParse(item.ContainsKey("daily_rate") ? item["daily_rate"] : "0", out decimal rate))
+                                payrollEarnings.DailyRate = rate;
+
+                            if (decimal.TryParse(item.ContainsKey("commission") ? item["commission"] : "0", out decimal commission))
+                                payrollEarnings.Commission = commission;
+
+                            if (decimal.TryParse(item.ContainsKey("incentives") ? item["incentives"] : "0", out decimal incentives))
+                                payrollEarnings.Incentives = incentives;
+
+                            if (decimal.TryParse(item.ContainsKey("food_allowance") ? item["food_allowance"] : "0", out decimal food))
+                                payrollEarnings.FoodAllowance = food;
+
+                            if (decimal.TryParse(item.ContainsKey("gas_allowance") ? item["gas_allowance"] : "0", out decimal gas))
+                                payrollEarnings.GasAllowance = gas;
+
+                            if (decimal.TryParse(item.ContainsKey("communication") ? item["communication"] : "0", out decimal comm))
+                                payrollEarnings.Communication = comm;
+
+                            if (decimal.TryParse(item.ContainsKey("gondola") ? item["gondola"] : "0", out decimal gondola))
+                                payrollEarnings.Gondola = gondola;
+
+                            foundEarnings = true;
+
+                            System.Diagnostics.Debug.WriteLine($"Found earnings for {currentEmployeeId}: DailyRate={rate}, Commission={commission}, Incentives={incentives}");
+                        }
+                    }
+                });
+
+                // If no earnings found through Payroll table, try direct lookup
+                if (!foundEarnings)
+                {
+                    await TryDirectEarningsLookup();
+                }
+
+                // If still no earnings found, set defaults
+                if (!foundEarnings)
+                {
+                    SetDefaultEarningsForEmployee();
+                    System.Diagnostics.Debug.WriteLine($"Using default earnings for {currentEmployeeId}");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading earnings: {ex.Message}");
+                SetDefaultEarningsForEmployee();
+            }
+        }
+        private async Task TryDirectEarningsLookup()
+        {
+            try
+            {
+                // Try to get earnings directly by scanning all records
+                var allEarnings = await firebase.Child("PayrollEarnings").OnceAsync<Dictionary<string, object>>();
+
+                foreach (var earningRecord in allEarnings)
+                {
+                    var earningData = earningRecord.Object;
+                    var payrollId = GetValue(earningData, "payroll_id");
+
+                    if (!string.IsNullOrEmpty(payrollId))
+                    {
+                        // Check if this payroll belongs to current employee
+                        var payrollData = await firebase.Child("Payroll").Child(payrollId).OnceSingleAsync<Dictionary<string, object>>();
+                        if (payrollData != null && payrollData.ContainsKey("employee_id") &&
+                            GetValue(payrollData, "employee_id") == currentEmployeeId)
+                        {
+                            // Found matching payroll record, load earnings
+                            if (decimal.TryParse(GetValue(earningData, "daily_rate"), out decimal rate))
+                                payrollEarnings.DailyRate = rate;
+
+                            if (decimal.TryParse(GetValue(earningData, "commission"), out decimal commission))
+                                payrollEarnings.Commission = commission;
+
+                            if (decimal.TryParse(GetValue(earningData, "incentives"), out decimal incentives))
+                                payrollEarnings.Incentives = incentives;
+
+                            if (decimal.TryParse(GetValue(earningData, "food_allowance"), out decimal food))
+                                payrollEarnings.FoodAllowance = food;
+
+                            if (decimal.TryParse(GetValue(earningData, "gas_allowance"), out decimal gas))
+                                payrollEarnings.GasAllowance = gas;
+
+                            if (decimal.TryParse(GetValue(earningData, "communication"), out decimal comm))
+                                payrollEarnings.Communication = comm;
+
+                            if (decimal.TryParse(GetValue(earningData, "gondola"), out decimal gondola))
+                                payrollEarnings.Gondola = gondola;
+
+                            System.Diagnostics.Debug.WriteLine($"Direct lookup found earnings for {currentEmployeeId}");
+                            return;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in direct earnings lookup: {ex.Message}");
+            }
+        }
+        private void SetDefaultEarningsForEmployee()
+        {
+            // Set default values based on employee data
+            payrollEarnings.DailyRate = 500m; // Default fallback
+
+            try
+            {
+                // Set different defaults based on department/position
+                if (employeeData != null && !string.IsNullOrEmpty(employeeData.Department))
+                {
+                    if (employeeData.Department.Equals("Human Resource", StringComparison.OrdinalIgnoreCase))
+                    {
+                        payrollEarnings.DailyRate = 500m;
+                        payrollEarnings.Incentives = 1000m;
+                        payrollEarnings.Commission = 500m;
+                    }
+                    else if (employeeData.Department.Equals("Finance", StringComparison.OrdinalIgnoreCase))
+                    {
+                        payrollEarnings.DailyRate = 644.23m;
+                        payrollEarnings.Incentives = 800m;
+                        payrollEarnings.Commission = 400m;
+                    }
+                    // Add more department-based defaults as needed
+                }
+
+                // Set other earnings to reasonable defaults
+                payrollEarnings.FoodAllowance = 400m;
+                payrollEarnings.GasAllowance = 300m;
+                payrollEarnings.Communication = 200m;
+                payrollEarnings.Gondola = 400m;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error setting default earnings: {ex.Message}");
+                // Set safe defaults
+                payrollEarnings.DailyRate = 500m;
+                payrollEarnings.Commission = 0m;
+                payrollEarnings.Incentives = 0m;
+                payrollEarnings.FoodAllowance = 0m;
+                payrollEarnings.GasAllowance = 0m;
+                payrollEarnings.Communication = 0m;
+                payrollEarnings.Gondola = 0m;
+            }
+        }
+
+
+
+        private async Task LoadEmployeeDeductions()
+        {
+            try
+            {
+                await LoadArrayBasedData("EmployeeDeductions", (item) =>
+                {
+                    var empId = item.ContainsKey("employee_id") ? item["employee_id"] : null;
+                    if (!string.IsNullOrEmpty(empId) && empId == currentEmployeeId)
+                    {
+                        if (decimal.TryParse(item.ContainsKey("cash_advance") ? item["cash_advance"] : "0", out decimal cashAdv))
+                            employeeDeductions.CashAdvance = cashAdv;
+
+                        if (decimal.TryParse(item.ContainsKey("coop_contribution") ? item["coop_contribution"] : "0", out decimal coop))
+                            employeeDeductions.CoopContribution = coop;
+
+                        if (decimal.TryParse(item.ContainsKey("other_deductions") ? item["other_deductions"] : "0", out decimal other))
+                            employeeDeductions.OtherDeductions = other;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading employee deductions: {ex.Message}");
+            }
+        }
+
+        private async Task LoadGovernmentDeductions()
+        {
+            try
+            {
+                await LoadArrayBasedData("GovernmentDeductions", (item) =>
+                {
+                    var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
+                    if (!string.IsNullOrEmpty(payrollId))
+                    {
+                        var payrollTask = firebase.Child("Payroll").Child(payrollId).OnceSingleAsync<Dictionary<string, object>>();
+                        payrollTask.Wait();
+                        var payroll = payrollTask.Result;
+
+                        if (payroll != null && payroll.ContainsKey("employee_id") && payroll["employee_id"].ToString() == currentEmployeeId)
+                        {
+                            if (decimal.TryParse(item.ContainsKey("sss") ? item["sss"] : "0", out decimal sss))
+                                governmentDeductions.SSS = sss;
+
+                            if (decimal.TryParse(item.ContainsKey("philhealth") ? item["philhealth"] : "0", out decimal philhealth))
+                                governmentDeductions.Philhealth = philhealth;
+
+                            if (decimal.TryParse(item.ContainsKey("pagibig") ? item["pagibig"] : "0", out decimal pagibig))
+                                governmentDeductions.Pagibig = pagibig;
+
+                            if (decimal.TryParse(item.ContainsKey("withholding_tax") ? item["withholding_tax"] : "0", out decimal tax))
+                                governmentDeductions.WithholdingTax = tax;
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading government deductions: {ex.Message}");
+            }
+        }
+
+        private async Task LoadEmployeeLoans()
+        {
+            try
+            {
+                var loans = await firebase.Child("EmployeeLoans").OnceAsync<Dictionary<string, object>>();
+
+                foreach (var loanItem in loans)
+                {
+                    var loanData = loanItem.Object;
+                    var empId = GetValue(loanData, "employee_id");
+                    var status = GetValue(loanData, "status");
+
+                    if (empId == currentEmployeeId && status.Equals("Active", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var loan = new PayrollLoan
+                        {
+                            LoanType = GetValue(loanData, "loan_type"),
+                            Status = status
+                        };
+
+                        if (decimal.TryParse(GetValue(loanData, "bi_monthly_amortization"), out decimal biMonthly))
+                            loan.BiMonthlyAmortization = biMonthly;
+
+                        if (decimal.TryParse(GetValue(loanData, "monthly_amortization"), out decimal monthly))
+                            loan.MonthlyAmortization = monthly;
+
+                        if (decimal.TryParse(GetValue(loanData, "loan_amount"), out decimal amount))
+                            loan.LoanAmount = amount;
+
+                        if (decimal.TryParse(GetValue(loanData, "balance"), out decimal balance))
+                            loan.Balance = balance;
+
+                        loan.StartDate = GetValue(loanData, "start_date");
+                        loan.EndDate = GetValue(loanData, "end_date");
+
+                        employeeLoans.Add(loan);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading loans: {ex.Message}");
+            }
+        }
+
+        private async Task LoadLeaveCredits()
+        {
+            try
+            {
+                var leaveData = await firebase
+                    .Child("Leave Credits")
+                    .Child(currentEmployeeId)
+                    .OnceSingleAsync<Dictionary<string, object>>();
+
+                if (leaveData != null)
+                {
+                    if (decimal.TryParse(GetValue(leaveData, "sick_leave"), out decimal sick))
+                        leaveCredits.SickLeave = sick;
+
+                    if (decimal.TryParse(GetValue(leaveData, "vacation_leave"), out decimal vacation))
+                        leaveCredits.VacationLeave = vacation;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading leave credits: {ex.Message}");
+            }
         }
 
         private void DisplayEmployeeInfo()
         {
-            labelIDInput.Text = "JAP-001";
-            labelNameInput.Text = "Franz Louies Deloritos";
-            labelDepartmentInput.Text = "Human Resource";
-            labelPositionInput.Text = "Head of HR";
-            labelDateCoveredInput.Text = "September 1 - 15, 2025";
+            labelIDInput.Text = employeeData.EmployeeId ?? "N/A";
+            labelNameInput.Text = employeeData.FullName ?? "N/A";
+            labelDepartmentInput.Text = employeeData.Department ?? "N/A";
+            labelPositionInput.Text = employeeData.Position ?? "N/A";
+            labelDateCoveredInput.Text = $"{cutoffStartDate:MMMM d} - {cutoffEndDate:d}, {cutoffStartDate:yyyy}";
         }
 
         private void CalculateAndDisplayPayroll()
         {
-            decimal dailyRate = 664.23m;
-            int workDays = 13;
-            decimal daysPresent = 12.5m;
-            decimal overtime = 0m;
-            decimal basicPay = 8302.88m;
-            decimal overtimePay = 0m;
+            // Calculate using the same logic as AdminPayroll
+            decimal grossPay = CalculateGrossPayFromAttendance();
+            decimal netPay = CalculateNetPay(grossPay);
 
+            // Calculate work days and hours
+            int totalWorkDays = CalculateWorkDays(cutoffStartDate, cutoffEndDate);
+            decimal daysPresent = CalculateDaysPresent();
+            decimal totalRegularHours = 0;
+            decimal totalOvertimeHours = 0;
+
+            foreach (var record in attendanceRecords)
+            {
+                if (record.Status != "Absent" && record.Status != "Day Off")
+                {
+                    totalRegularHours += record.HoursWorked - record.OvertimeHours;
+                    totalOvertimeHours += record.OvertimeHours;
+                }
+            }
+
+            // Get daily rate
+            decimal dailyRate = payrollEarnings.DailyRate > 0 ? payrollEarnings.DailyRate : 500m;
+            decimal hourlyRate = dailyRate / 8m;
+
+            // Calculate basic pay and overtime
+            decimal basicPay = totalRegularHours * hourlyRate;
+            decimal overtimePay = totalOvertimeHours * hourlyRate * 1.5m;
+
+            // Display basic calculations
             labelDailyRateInput.Text = dailyRate.ToString("0.00");
-            labelDaysInput.Text = workDays.ToString();
+            labelDaysInput.Text = totalWorkDays.ToString();
             labelDaysPresentInput.Text = daysPresent.ToString("0.0");
-            labelSalaryInput.Text = "8635.00";
-            labelBasicPayAmountBaseInput.Text = "8365.00";
+            labelSalaryInput.Text = (dailyRate * totalWorkDays).ToString("0.00");
+            labelBasicPayAmountBaseInput.Text = (dailyRate * daysPresent).ToString("0.00");
             labelBasicPayAmountCreditInput.Text = basicPay.ToString("0.00");
-            labelBasicPayCredit.Text = "12.50";
+            labelBasicPayCredit.Text = daysPresent.ToString("0.00");
 
-            labelOvertimeInput.Text = overtime.ToString("0.00");
-            labelOvertimePerHourAmountBaseInput.Text = "83.03";
+            // Display overtime
+            labelOvertimeInput.Text = totalOvertimeHours.ToString("0.00");
+            labelOvertimePerHourAmountBaseInput.Text = (hourlyRate * 1.5m).ToString("0.00");
             labelOvertimePerHourAmountCreditInput.Text = overtimePay.ToString("0.00");
-            labelOvertimePerMinuteAmountBaseInput.Text = "1.38";
+            labelOvertimePerMinuteAmountBaseInput.Text = ((hourlyRate * 1.5m) / 60).ToString("0.00");
             labelOvertimePerMinuteAmountCreditInput.Text = "0.00";
 
             DisplayEarnings();
             DisplayDeductions();
             DisplayLoanDeductions();
-            DisplayDetails();
-            CalculateTotals(basicPay, overtimePay);
+            DisplayLeaveCredits();
+            CalculateTotals(grossPay, basicPay, overtimePay);
+        }
+
+        private decimal CalculateGrossPayFromAttendance()
+        {
+            decimal totalRegularHours = 0;
+            decimal totalOvertimeHours = 0;
+            int daysPresent = 0;
+
+            foreach (var record in attendanceRecords)
+            {
+                if (record.Status != "Absent" && record.Status != "Day Off")
+                {
+                    if (record.HoursWorked > 0)
+                    {
+                        daysPresent++;
+                        totalRegularHours += record.HoursWorked - record.OvertimeHours;
+                        totalOvertimeHours += record.OvertimeHours;
+                    }
+                }
+            }
+
+            // Get daily rate (default to 500 if not found)
+            decimal dailyRate = payrollEarnings.DailyRate > 0 ? payrollEarnings.DailyRate : 500m;
+            decimal hourlyRate = dailyRate / 8m;
+
+            // Calculate gross pay - same logic as AdminPayroll
+            decimal regularPay = totalRegularHours * hourlyRate;
+            decimal overtimePay = totalOvertimeHours * hourlyRate * 1.5m;
+            decimal grossPay = regularPay + overtimePay +
+                              payrollEarnings.Commission +
+                              payrollEarnings.Incentives +
+                              payrollEarnings.FoodAllowance +
+                              payrollEarnings.GasAllowance +
+                              payrollEarnings.Communication +
+                              payrollEarnings.Gondola;
+
+            return grossPay;
+        }
+
+        private decimal CalculateNetPay(decimal grossPay)
+        {
+            decimal totalDeductions = 0;
+
+            // Add employee deductions
+            totalDeductions += employeeDeductions.CashAdvance;
+            totalDeductions += employeeDeductions.CoopContribution;
+            totalDeductions += employeeDeductions.OtherDeductions;
+
+            // Add government deductions
+            totalDeductions += governmentDeductions.SSS;
+            totalDeductions += governmentDeductions.Philhealth;
+            totalDeductions += governmentDeductions.Pagibig;
+            totalDeductions += governmentDeductions.WithholdingTax;
+
+            // Add loan deductions
+            foreach (var loan in employeeLoans)
+            {
+                totalDeductions += loan.BiMonthlyAmortization;
+            }
+
+            decimal netPay = grossPay - totalDeductions;
+            return netPay > 0 ? netPay : 0;
+        }
+
+        private int CalculateWorkDays(DateTime start, DateTime end)
+        {
+            int workDays = 0;
+            for (DateTime date = start; date <= end; date = date.AddDays(1))
+            {
+                if (date.DayOfWeek != DayOfWeek.Sunday)
+                    workDays++;
+            }
+            return workDays;
+        }
+
+        private decimal CalculateDaysPresent()
+        {
+            decimal daysPresent = 0;
+            foreach (var record in attendanceRecords)
+            {
+                if (record.Status != "Absent" && record.Status != "Day Off" && record.HoursWorked > 0)
+                {
+                    daysPresent += record.HoursWorked / 8m;
+                }
+            }
+            return daysPresent;
         }
 
         private void DisplayEarnings()
         {
-            labelCommissionAmountBaseInput.Text = "0.00";
-            labelCommissionAmountCreditInput.Text = "0.00";
-            labelIncentivesAmountBaseInput.Text = "0.00";
-            labelIncentivesAmountCreditInput.Text = "0.00";
-            labelFoodAllowanceAmountBaseInput.Text = "0.00";
-            labelFoodAllowanceAmountCreditInput.Text = "0.00";
-            labelGasAllowanceAmountBaseInput.Text = "0.00";
-            labelGasAllowanceAmountCreditInput.Text = "0.00";
-            labelCommunicationAmountBaseInput.Text = "0.00";
-            labelCommunicationAmountCreditInput.Text = "0.00";
-            labelGondolaAmountBaseInput.Text = "0.00";
-            labelGondolaAmountCreditInput.Text = "0.00";
+            labelCommissionAmountBaseInput.Text = payrollEarnings.Commission.ToString("0.00");
+            labelCommissionAmountCreditInput.Text = payrollEarnings.Commission.ToString("0.00");
+
+            labelIncentivesAmountBaseInput.Text = payrollEarnings.Incentives.ToString("0.00");
+            labelIncentivesAmountCreditInput.Text = payrollEarnings.Incentives.ToString("0.00");
+
+            labelFoodAllowanceAmountBaseInput.Text = payrollEarnings.FoodAllowance.ToString("0.00");
+            labelFoodAllowanceAmountCreditInput.Text = payrollEarnings.FoodAllowance.ToString("0.00");
+
+            labelGasAllowanceAmountBaseInput.Text = payrollEarnings.GasAllowance.ToString("0.00");
+            labelGasAllowanceAmountCreditInput.Text = payrollEarnings.GasAllowance.ToString("0.00");
+
+            labelCommunicationAmountBaseInput.Text = payrollEarnings.Communication.ToString("0.00");
+            labelCommunicationAmountCreditInput.Text = payrollEarnings.Communication.ToString("0.00");
+
+            labelGondolaAmountBaseInput.Text = payrollEarnings.Gondola.ToString("0.00");
+            labelGondolaAmountCreditInput.Text = payrollEarnings.Gondola.ToString("0.00");
         }
 
         private void DisplayDeductions()
         {
-            labelSSSAmountDebitInput.Text = "250.00";
-            labelPhilhealthAmountDebitInput.Text = "125.00";
-            labelPagIbigAmountDebitInput.Text = "100.00";
-            labelWithTaxAmountDebitInput.Text = "0.00";
+            labelSSSAmountDebitInput.Text = governmentDeductions.SSS.ToString("0.00");
+            labelPhilhealthAmountDebitInput.Text = governmentDeductions.Philhealth.ToString("0.00");
+            labelPagIbigAmountDebitInput.Text = governmentDeductions.Pagibig.ToString("0.00");
+            labelWithTaxAmountDebitInput.Text = governmentDeductions.WithholdingTax.ToString("0.00");
 
-            labelCashAdvanceAmountDebitInput.Text = "1000.00";
-            labelCoopContriAmountDebitInput.Text = "1000.00";
-            labelOthersAmountDebitInput.Text = "534.15";
-
-            DisplayLeaveCredits();
+            labelCashAdvanceAmountDebitInput.Text = employeeDeductions.CashAdvance.ToString("0.00");
+            labelCoopContriAmountDebitInput.Text = employeeDeductions.CoopContribution.ToString("0.00");
+            labelOthersAmountDebitInput.Text = employeeDeductions.OtherDeductions.ToString("0.00");
         }
 
         private void DisplayLoanDeductions()
         {
-            labelSSSLoanAmountDebitInput.Text = "230.00";
-            labelPagIbigLoanAmountDebitInput.Text = "386.62";
-            labelCarLoanAmountDebitInput.Text = "0.00";
-            labelHousingLoanAmountDebitInput.Text = "0.00";
-            labelCoopLoanAmountDebitInput.Text = "1287.00";
-        }
+            decimal sssLoan = 0, pagibigLoan = 0, carLoan = 0, housingLoan = 0, coopLoan = 0;
 
-        private void DisplayDetails()
-        {
-            labelWithTaxDetails.Text = "";
-            labelSSSDetails.Text = "";
-            labelPagIbigDetails.Text = "";
-            labelPhilhealthDetails.Text = "";
-            labelCarLoanDetails.Text = "";
-            labelHousingLoanDetails.Text = "";
-            labelCashAdvanceDetails.Text = "";
-            labelCoopContriDetails.Text = "";
+            foreach (var loan in employeeLoans)
+            {
+                switch (loan.LoanType)
+                {
+                    case "SSS Loan":
+                        sssLoan = loan.BiMonthlyAmortization;
+                        break;
+                    case "Pag-IBIG Loan":
+                        pagibigLoan = loan.BiMonthlyAmortization;
+                        break;
+                    case "Car Loan":
+                        carLoan = loan.BiMonthlyAmortization;
+                        break;
+                    case "Housing Loan":
+                        housingLoan = loan.BiMonthlyAmortization;
+                        break;
+                    case "Coop Loan":
+                        coopLoan = loan.BiMonthlyAmortization;
+                        break;
+                }
+            }
 
-            labelSSSLoanDetails.Text = "7/48";
-            labelPagIbigLoanDetails.Text = "16/48";
-            labelCoopLoanDetails.Text = "1/4";
-            labelOthersDetails.Text = "Late";
+            labelSSSLoanAmountDebitInput.Text = sssLoan.ToString("0.00");
+            labelPagIbigLoanAmountDebitInput.Text = pagibigLoan.ToString("0.00");
+            labelCarLoanAmountDebitInput.Text = carLoan.ToString("0.00");
+            labelHousingLoanAmountDebitInput.Text = housingLoan.ToString("0.00");
+            labelCoopLoanAmountDebitInput.Text = coopLoan.ToString("0.00");
         }
 
         private void DisplayLeaveCredits()
         {
-            labelSickLeaveCredit.Text = "6.00";
-            labelVacationLeaveCredit.Text = "6.00";
-            labelSickLeaveDebit.Text = "6.00";
-            labelVacationLeaveDebit.Text = "2.00";
-            labelSickLeaveBalance.Text = "0.00";
-            labelVacationLeaveBalance.Text = "4.00";
+            labelSickLeaveCredit.Text = leaveCredits.SickLeave.ToString("0.00");
+            labelVacationLeaveCredit.Text = leaveCredits.VacationLeave.ToString("0.00");
+            labelSickLeaveDebit.Text = "0.00";
+            labelVacationLeaveDebit.Text = "0.00";
+            labelSickLeaveBalance.Text = leaveCredits.SickLeave.ToString("0.00");
+            labelVacationLeaveBalance.Text = leaveCredits.VacationLeave.ToString("0.00");
         }
 
-        private void CalculateTotals(decimal basicPay, decimal overtimePay)
+        private void CalculateTotals(decimal grossPay, decimal basicPay, decimal overtimePay)
         {
-            decimal grossPay = 8302.88m;
+            decimal totalDeductions = governmentDeductions.SSS +
+                                     governmentDeductions.Philhealth +
+                                     governmentDeductions.Pagibig +
+                                     governmentDeductions.WithholdingTax +
+                                     employeeDeductions.CashAdvance +
+                                     employeeDeductions.CoopContribution +
+                                     employeeDeductions.OtherDeductions;
 
-            decimal totalDeductions = 250.00m + 125.00m + 100.00m + 0.00m +
-                                    230.00m + 386.62m + 0.00m + 0.00m +
-                                    1000.00m + 1000.00m + 534.15m;
+            // Add loan deductions
+            foreach (var loan in employeeLoans)
+            {
+                totalDeductions += loan.BiMonthlyAmortization;
+            }
 
             decimal netPay = grossPay - totalDeductions;
 
@@ -174,61 +697,131 @@ namespace HRIS_JAP_ATTPAY
             labelDeductionsInput.Text = totalDeductions.ToString("0.00");
             labelOverallTotalInput.Text = netPay.ToString("0.00");
 
-            PrepareExportData(grossPay, totalDeductions, netPay);
+            PrepareExportData(grossPay, totalDeductions, netPay, basicPay, overtimePay);
         }
 
-        private void PrepareExportData(decimal grossPay, decimal totalDeductions, decimal netPay)
+        private void PrepareExportData(decimal grossPay, decimal totalDeductions, decimal netPay, decimal basicPay, decimal overtimePay)
         {
             ExportData = new PayrollExportData
             {
-                EmployeeId = "JAP-001",
-                EmployeeName = "Franz Louies Deloritos",
-                Department = "Human Resource",
-                Position = "Head of HR",
-                DateCovered = "September 1 - 15, 2025",
-                Days = "13",
-                DaysPresent = "12.5",
-                DailyRate = "664.23",
-                Salary = "8635.00",
-                Overtime = "0",
-                BasicPay = "8302.88",
-                OvertimePerHour = "0.00",
-                Incentives = "0.00",
-                Commission = "0.00",
-                FoodAllowance = "0.00",
-                Communication = "0.00",
-                GasAllowance = "0.00",
-                Gondola = "0.00",
+                EmployeeId = employeeData.EmployeeId,
+                EmployeeName = employeeData.FullName,
+                Department = employeeData.Department,
+                Position = employeeData.Position,
+                DateCovered = labelDateCoveredInput.Text,
+                Days = labelDaysInput.Text,
+                DaysPresent = labelDaysPresentInput.Text,
+                DailyRate = labelDailyRateInput.Text,
+                Salary = labelSalaryInput.Text,
+                Overtime = labelOvertimeInput.Text,
+                BasicPay = basicPay.ToString("0.00"),
+                OvertimePerHour = labelOvertimePerHourAmountCreditInput.Text,
+                OvertimePerMinute = "0.00", // Set appropriate value if needed
+                Incentives = payrollEarnings.Incentives.ToString("0.00"),
+                Commission = payrollEarnings.Commission.ToString("0.00"),
+                FoodAllowance = payrollEarnings.FoodAllowance.ToString("0.00"),
+                Communication = payrollEarnings.Communication.ToString("0.00"),
+                GasAllowance = payrollEarnings.GasAllowance.ToString("0.00"),
+                Gondola = payrollEarnings.Gondola.ToString("0.00"),
                 GrossPay = grossPay.ToString("0.00"),
-                WithholdingTax = "0.00",
-                SSS = "250.00",
-                PagIbig = "100.00",
-                Philhealth = "125.00",
-                SSSLoan = "230.00",
-                PagIbigLoan = "386.62",
-                CarLoan = "0.00",
-                HousingLoan = "0.00",
-                CashAdvance = "1000.00",
-                CoopLoan = "1287.00",
-                CoopContribution = "1000.00",
-                Others = "534.15",
+                // ... rest of your existing properties
+                WithholdingTax = governmentDeductions.WithholdingTax.ToString("0.00"),
+                SSS = governmentDeductions.SSS.ToString("0.00"),
+                PagIbig = governmentDeductions.Pagibig.ToString("0.00"),
+                Philhealth = governmentDeductions.Philhealth.ToString("0.00"),
+                SSSLoan = labelSSSLoanAmountDebitInput.Text,
+                PagIbigLoan = labelPagIbigLoanAmountDebitInput.Text,
+                CarLoan = labelCarLoanAmountDebitInput.Text,
+                HousingLoan = labelHousingLoanAmountDebitInput.Text,
+                CashAdvance = employeeDeductions.CashAdvance.ToString("0.00"),
+                CoopLoan = labelCoopLoanAmountDebitInput.Text,
+                CoopContribution = employeeDeductions.CoopContribution.ToString("0.00"),
+                Others = employeeDeductions.OtherDeductions.ToString("0.00"),
                 TotalDeductions = totalDeductions.ToString("0.00"),
                 NetPay = netPay.ToString("0.00"),
-                VacationLeaveCredit = "6.00",
-                VacationLeaveDebit = "2.00",
-                VacationLeaveBalance = "4.00",
-                SickLeaveCredit = "6.00",
-                SickLeaveDebit = "6.00",
-                SickLeaveBalance = "0.00",
-                SSSLoanDetails = "7/48",
-                PagIbigLoanDetails = "16/48",
-                CarLoanDetails = "",
-                HousingLoanDetails = "",
-                CoopLoanDetails = "1/4",
-                OthersDetails = "Late"
+                VacationLeaveCredit = labelVacationLeaveCredit.Text,
+                VacationLeaveDebit = labelVacationLeaveDebit.Text,
+                VacationLeaveBalance = labelVacationLeaveBalance.Text,
+                SickLeaveCredit = labelSickLeaveCredit.Text,
+                SickLeaveDebit = labelSickLeaveDebit.Text,
+                SickLeaveBalance = labelSickLeaveBalance.Text
             };
         }
 
+        // Helper methods for data loading
+        private async Task LoadArrayBasedData(string childPath, Action<Dictionary<string, string>> processItem)
+        {
+            try
+            {
+                // Get raw JSON from Firebase
+                var jsonResponse = await firebase.Child(childPath).OnceAsJsonAsync();
+                string rawJson = jsonResponse.ToString();
+
+                // Parse the malformed JSON structure
+                var records = ParseMalformedJson(rawJson);
+                foreach (var record in records)
+                    processItem(record);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading {childPath}: {ex.Message}");
+            }
+        }
+
+        private List<Dictionary<string, string>> ParseMalformedJson(string rawJson)
+        {
+            var records = new List<Dictionary<string, string>>();
+            try
+            {
+                string cleanedJson = rawJson.Replace("\n", "").Replace("\r", "").Replace("\t", "")
+                    .Replace("'", "\"").Replace("(", "[").Replace(")", "]")
+                    .Replace("[null,", "[").Replace("], [", ",").Replace("}, {", "},{")
+                    .Replace("},(", "},{").Replace("),{", "},{");
+
+                var matches = Regex.Matches(cleanedJson, @"\{[^{}]*\}");
+                foreach (Match match in matches)
+                {
+                    var record = new Dictionary<string, string>();
+                    string objectStr = match.Value;
+
+                    var kvpMatches = Regex.Matches(objectStr, @"""([^""]+)""\s*:\s*(""[^""]*""|\d+\.?\d*|true|false|null)");
+                    foreach (Match kvpMatch in kvpMatches)
+                    {
+                        if (kvpMatch.Groups.Count >= 3)
+                        {
+                            string key = kvpMatch.Groups[1].Value;
+                            string value = kvpMatch.Groups[2].Value.Trim('"');
+                            record[key] = value;
+                        }
+                    }
+                    if (record.Count > 0) records.Add(record);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"JSON parsing error: {ex.Message}");
+            }
+            return records;
+        }
+
+        private string GetValue(Dictionary<string, object> data, string key)
+        {
+            try
+            {
+                if (data != null && data.ContainsKey(key) && data[key] != null)
+                {
+                    string value = data[key].ToString();
+                    return string.IsNullOrWhiteSpace(value) || value == "N/A" ? "" : value.Trim();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting value for key '{key}': {ex.Message}");
+            }
+            return "";
+        }
+
+        // Rest of your existing methods (button events, font setting, etc.)
         private void buttonCancel_Click(object sender, EventArgs e)
         {
             if (ExportData == null)
@@ -246,6 +839,14 @@ namespace HRIS_JAP_ATTPAY
         {
             Form parentForm = this.FindForm();
             PayrollSummaryEdit payrollSummaryEditForm = new PayrollSummaryEdit(currentEmployeeId);
+
+            // Show the edit form as a dialog so we can refresh after it closes
+            payrollSummaryEditForm.FormClosed += async (s, args) =>
+            {
+                // Refresh data when the edit form closes
+                await RefreshPayrollData();
+            };
+
             AttributesClass.ShowWithOverlay(parentForm, payrollSummaryEditForm);
         }
 
@@ -263,7 +864,40 @@ namespace HRIS_JAP_ATTPAY
         {
             this.Close();
         }
+        public async Task RefreshPayrollData()
+        {
+            try
+            {
+                // Clear ALL existing data
+                employeeData = null;
+                attendanceRecords.Clear();
+                employeeLoans.Clear();
+                payrollEarnings = new PayrollEarnings();
+                employeeDeductions = new PayrollDeductions();
+                governmentDeductions = new PayrollGovDeductions();
+                leaveCredits = new PayrollLeave();
 
+                // Reload ALL data from Firebase
+                await LoadEmployeeBasicInfo();
+                await LoadEmploymentInfo();
+                await LoadAttendanceRecords();
+                await LoadPayrollEarnings(); // This now loads the updated earnings
+                await LoadEmployeeDeductions();
+                await LoadGovernmentDeductions();
+                await LoadEmployeeLoans();
+                await LoadLeaveCredits();
+
+                DisplayEmployeeInfo();
+                CalculateAndDisplayPayroll();
+
+                // Force UI refresh
+                this.Refresh();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error refreshing payroll data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
         private void SetFont()
         {
             labelAmountBase.Font = AttributesClass.GetFont("Roboto-Regular", 10f);

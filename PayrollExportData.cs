@@ -31,6 +31,7 @@ namespace HRIS_JAP_ATTPAY
         public string Gondola { get; set; }
         public string GrossPay { get; set; }
 
+
         // Deductions
         public string WithholdingTax { get; set; }
         public string SSS { get; set; }
