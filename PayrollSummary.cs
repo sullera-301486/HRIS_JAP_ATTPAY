@@ -387,40 +387,45 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                var loans = await firebase.Child("EmployeeLoans").OnceAsync<Dictionary<string, object>>();
+                employeeLoans.Clear(); // Clear existing loans
 
-                foreach (var loanItem in loans)
+                // EmployeeLoans is stored as an array, so we need to load it differently
+                await LoadArrayBasedData("EmployeeLoans", (item) =>
                 {
-                    var loanData = loanItem.Object;
-                    var empId = GetValue(loanData, "employee_id");
-                    var status = GetValue(loanData, "status");
+                    var empId = item.ContainsKey("employee_id") ? item["employee_id"] : null;
+                    var status = item.ContainsKey("status") ? item["status"] : null;
 
-                    if (empId == currentEmployeeId && status.Equals("Active", StringComparison.OrdinalIgnoreCase))
+                    if (!string.IsNullOrEmpty(empId) && empId == currentEmployeeId &&
+                        status != null && status.Equals("Active", StringComparison.OrdinalIgnoreCase))
                     {
                         var loan = new PayrollLoan
                         {
-                            LoanType = GetValue(loanData, "loan_type"),
+                            LoanType = item.ContainsKey("loan_type") ? item["loan_type"] : "",
                             Status = status
                         };
 
-                        if (decimal.TryParse(GetValue(loanData, "bi_monthly_amortization"), out decimal biMonthly))
+                        if (decimal.TryParse(item.ContainsKey("bi_monthly_amortization") ? item["bi_monthly_amortization"] : "0", out decimal biMonthly))
                             loan.BiMonthlyAmortization = biMonthly;
 
-                        if (decimal.TryParse(GetValue(loanData, "monthly_amortization"), out decimal monthly))
+                        if (decimal.TryParse(item.ContainsKey("monthly_amortization") ? item["monthly_amortization"] : "0", out decimal monthly))
                             loan.MonthlyAmortization = monthly;
 
-                        if (decimal.TryParse(GetValue(loanData, "loan_amount"), out decimal amount))
+                        if (decimal.TryParse(item.ContainsKey("loan_amount") ? item["loan_amount"] : "0", out decimal amount))
                             loan.LoanAmount = amount;
 
-                        if (decimal.TryParse(GetValue(loanData, "balance"), out decimal balance))
+                        if (decimal.TryParse(item.ContainsKey("balance") ? item["balance"] : "0", out decimal balance))
                             loan.Balance = balance;
 
-                        loan.StartDate = GetValue(loanData, "start_date");
-                        loan.EndDate = GetValue(loanData, "end_date");
+                        loan.StartDate = item.ContainsKey("start_date") ? item["start_date"] : "";
+                        loan.EndDate = item.ContainsKey("end_date") ? item["end_date"] : "";
 
                         employeeLoans.Add(loan);
+
+                        System.Diagnostics.Debug.WriteLine($"Loaded loan for {currentEmployeeId}: {loan.LoanType}, BiMonthly: {loan.BiMonthlyAmortization}");
                     }
-                }
+                });
+
+                System.Diagnostics.Debug.WriteLine($"Total loans loaded for {currentEmployeeId}: {employeeLoans.Count}");
             }
             catch (Exception ex)
             {
@@ -636,8 +641,12 @@ namespace HRIS_JAP_ATTPAY
         {
             decimal sssLoan = 0, pagibigLoan = 0, carLoan = 0, housingLoan = 0, coopLoan = 0;
 
+            System.Diagnostics.Debug.WriteLine($"Displaying loans for {currentEmployeeId}, count: {employeeLoans.Count}");
+
             foreach (var loan in employeeLoans)
             {
+                System.Diagnostics.Debug.WriteLine($"Loan Type: {loan.LoanType}, BiMonthly: {loan.BiMonthlyAmortization}");
+
                 switch (loan.LoanType)
                 {
                     case "SSS Loan":
@@ -663,8 +672,9 @@ namespace HRIS_JAP_ATTPAY
             labelCarLoanAmountDebitInput.Text = carLoan.ToString("0.00");
             labelHousingLoanAmountDebitInput.Text = housingLoan.ToString("0.00");
             labelCoopLoanAmountDebitInput.Text = coopLoan.ToString("0.00");
-        }
 
+            System.Diagnostics.Debug.WriteLine($"Loan totals - SSS: {sssLoan}, PagIBIG: {pagibigLoan}, Car: {carLoan}, Housing: {housingLoan}, Coop: {coopLoan}");
+        }
         private void DisplayLeaveCredits()
         {
             labelSickLeaveCredit.Text = leaveCredits.SickLeave.ToString("0.00");
@@ -1015,7 +1025,7 @@ namespace HRIS_JAP_ATTPAY
             labelOvertimePerMinuteCredit.Font = AttributesClass.GetFont("Roboto-Light", 10f);
         }
     }
-
+    //hatdog
     public class PayrollEmployeeData
     {
         public string EmployeeId { get; set; }
