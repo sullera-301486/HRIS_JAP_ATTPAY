@@ -20,6 +20,7 @@ namespace HRIS_JAP_ATTPAY
 
     public class Employee
     {
+        public string FullName { get; set; }
         public string EmployeeId { get; set; }
         public string FirstName { get; set; }
         public string MiddleName { get; set; }

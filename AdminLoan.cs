@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Firebase.Database;
+using Firebase.Database.Query;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Firebase.Database;
-using Firebase.Database.Query;
-using Newtonsoft.Json.Linq;
 
 namespace HRIS_JAP_ATTPAY
 {
@@ -253,252 +254,175 @@ namespace HRIS_JAP_ATTPAY
 
         // Load Firebase Data - FIXED FOR LOAN DATA
         // Load Firebase Data - IMPROVED VERSION
+        // Replace the LoadFirebaseData method in AdminLoan.cs with this:
+
         private async void LoadFirebaseData()
         {
             try
             {
                 dataGridViewEmployee.Rows.Clear();
-                Console.WriteLine("=== STARTING FIREBASE DATA LOAD ===");
+                Console.WriteLine("=== STARTING LOAN DATA LOAD ===");
 
-                // Test Firebase connection first
-                await TestFirebaseConnection();
-
-                var employeeDetails = new Dictionary<string, Dictionary<string, object>>();
-                var loanRecords = new List<Dictionary<string, object>>();
-
-                // 1. Load EmployeeDetails with strong typing
-                Console.WriteLine("Loading EmployeeDetails...");
-                var empDetails = await firebase.Child("EmployeeDetails").OnceAsync<Dictionary<string, object>>();
-                foreach (var emp in empDetails)
+                using (var httpClient = new HttpClient())
                 {
-                    if (emp?.Object != null)
+                    // 1. Get EmployeeDetails
+                    string empDetailsUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/EmployeeDetails.json";
+                    var empResponse = await httpClient.GetAsync(empDetailsUrl);
+
+                    if (!empResponse.IsSuccessStatusCode)
                     {
-                        employeeDetails[emp.Key] = emp.Object;
-                        Console.WriteLine($"  Found employee: {emp.Key}");
+                        MessageBox.Show("Failed to load employee details", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
                     }
-                }
-                Console.WriteLine($"Total employees loaded: {employeeDetails.Count}");
 
-                // 2. Load EmployeeLoans with proper array handling
-                Console.WriteLine("Loading EmployeeLoans...");
-                await LoadEmployeeLoansImproved(loanRecords);
-
-                Console.WriteLine($"Data loaded: {employeeDetails.Count} employees, {loanRecords.Count} loans");
-
-                // 3. Populate DataGrid
-                await PopulateDataGrid(employeeDetails, loanRecords);
-
-                Console.WriteLine("=== DATA LOAD COMPLETED ===");
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to load Firebase data: {ex.Message}");
-                Console.WriteLine($"ERROR: {ex.Message}\n{ex.StackTrace}");
-                LoadTestData();
-            }
-        }
-
-        private async Task TestFirebaseConnection()
-        {
-            try
-            {
-                Console.WriteLine("Testing Firebase connection...");
-                var test = await firebase.Child("EmployeeDetails").OnceAsync<object>();
-                Console.WriteLine($"Firebase connection OK. Found {test.Count} employee records.");
-
-                // List all employees for debugging
-                foreach (var emp in test)
-                {
-                    Console.WriteLine($"  - {emp.Key}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Firebase connection FAILED: {ex.Message}");
-                throw;
-            }
-        }
-
-        private async Task LoadEmployeeLoansImproved(List<Dictionary<string, object>> loanRecords)
-        {
-            try
-            {
-                // Get the entire EmployeeLoans array
-                var loansData = await firebase.Child("EmployeeLoans").OnceSingleAsync<object>();
-
-                if (loansData != null)
-                {
-                    // Convert to JArray to handle array structure
-                    string json = Newtonsoft.Json.JsonConvert.SerializeObject(loansData);
-                    var jArray = Newtonsoft.Json.JsonConvert.DeserializeObject<JArray>(json);
-
-                    if (jArray != null)
+                    string empJson = await empResponse.Content.ReadAsStringAsync();
+                    if (string.IsNullOrWhiteSpace(empJson) || empJson == "null")
                     {
-                        Console.WriteLine($"Processing {jArray.Count} loan items...");
+                        MessageBox.Show("No employee data found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
 
-                        foreach (var item in jArray)
+                    JObject employeeDetails = JObject.Parse(empJson);
+                    Console.WriteLine($"Loaded {employeeDetails.Count} employees");
+
+                    // 2. Get EmployeeLoans array
+                    string loansUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/EmployeeLoans.json";
+                    var loansResponse = await httpClient.GetAsync(loansUrl);
+
+                    if (!loansResponse.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Failed to load loan data", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    string loansJson = await loansResponse.Content.ReadAsStringAsync();
+                    if (string.IsNullOrWhiteSpace(loansJson) || loansJson == "null")
+                    {
+                        MessageBox.Show("No loan data found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+
+                    // Parse the loans array
+                    List<JObject> loansList = new List<JObject>();
+                    var loansToken = JToken.Parse(loansJson);
+
+                    if (loansToken is JArray loansArray)
+                    {
+                        foreach (var item in loansArray)
                         {
-                            try
+                            if (item != null && item.Type != JTokenType.Null && item is JObject loanObj)
                             {
-                                // Skip null items
-                                if (item.Type == JTokenType.Null)
-                                {
-                                    continue;
-                                }
-
-                                // Convert JToken to dictionary
-                                var loanDict = new Dictionary<string, object>();
-                                foreach (JProperty property in item.Children<JProperty>())
-                                {
-                                    loanDict[property.Name] = property.Value?.ToString() ?? "";
-                                }
-
-                                if (loanDict.ContainsKey("employee_id"))
-                                {
-                                    loanRecords.Add(loanDict);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Error processing loan item: {ex.Message}");
+                                loansList.Add(loanObj);
                             }
                         }
                     }
-                }
-                Console.WriteLine($"Successfully loaded {loanRecords.Count} loan records");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading EmployeeLoans: {ex.Message}");
-            }
-        }
+                    else if (loansToken is JObject loansObj)
+                    {
+                        // Handle if it's stored as object instead of array
+                        foreach (var prop in loansObj.Properties())
+                        {
+                            if (prop.Value != null && prop.Value.Type != JTokenType.Null && prop.Value is JObject loanObj)
+                            {
+                                loansList.Add(loanObj);
+                            }
+                        }
+                    }
 
-        private async Task PopulateDataGrid(Dictionary<string, Dictionary<string, object>> employeeDetails, List<Dictionary<string, object>> loanRecords)
-        {
-            int counter = 1;
+                    Console.WriteLine($"Loaded {loansList.Count} loan records");
 
-            foreach (var loan in loanRecords)
-            {
-                string employeeId = loan.GetValueOrDefault("employee_id")?.ToString() ?? "";
+                    // 3. Populate DataGridView
+                    int counter = 1;
+                    foreach (var loan in loansList)
+                    {
+                        try
+                        {
+                            string employeeId = loan["employee_id"]?.ToString() ?? "";
 
-                if (string.IsNullOrEmpty(employeeId))
-                {
-                    Console.WriteLine($"Skipping loan with empty employee ID");
-                    continue;
-                }
+                            if (string.IsNullOrEmpty(employeeId))
+                            {
+                                Console.WriteLine("Skipping loan with empty employee ID");
+                                continue;
+                            }
 
-                Console.WriteLine($"Processing loan for employee: {employeeId}");
+                            Console.WriteLine($"Processing loan for employee: {employeeId}");
 
-                // Get employee details
-                string fullName = "Unknown Employee";
-                if (employeeDetails.ContainsKey(employeeId))
-                {
-                    var empData = employeeDetails[employeeId];
-                    string firstName = empData.GetValueOrDefault("first_name")?.ToString() ?? "";
-                    string middleName = empData.GetValueOrDefault("middle_name")?.ToString() ?? "";
-                    string lastName = empData.GetValueOrDefault("last_name")?.ToString() ?? "";
+                            // Get employee details
+                            string fullName = "Unknown Employee";
+                            if (employeeDetails[employeeId] != null)
+                            {
+                                var empObj = (JObject)employeeDetails[employeeId];
+                                string firstName = empObj["first_name"]?.ToString() ?? "";
+                                string middleName = empObj["middle_name"]?.ToString() ?? "";
+                                string lastName = empObj["last_name"]?.ToString() ?? "";
 
-                    fullName = $"{firstName} {middleName} {lastName}".Trim();
-                    if (string.IsNullOrEmpty(fullName)) fullName = "Unknown Employee";
+                                // Format full name
+                                fullName = $"{firstName} {middleName} {lastName}".Trim();
+                                while (fullName.Contains("  "))
+                                    fullName = fullName.Replace("  ", " ");
 
-                    Console.WriteLine($"  Employee found: {fullName}");
-                }
-                else
-                {
-                    Console.WriteLine($"  ❌ Employee NOT FOUND in database: {employeeId}");
-                }
+                                if (string.IsNullOrWhiteSpace(fullName))
+                                    fullName = "Unknown Employee";
 
-                // Get loan details
-                string loanType = loan.GetValueOrDefault("loan_type")?.ToString() ?? "Unknown";
-                string loanAmount = "₱ 0.00";
-                string balance = "₱ 0.00";
+                                Console.WriteLine($"  Employee found: {fullName}");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"  ❌ Employee NOT FOUND: {employeeId}");
+                            }
 
-                // Parse amounts
-                if (decimal.TryParse(loan.GetValueOrDefault("loan_amount")?.ToString(), out decimal amount))
-                    loanAmount = $"₱ {amount:N2}";
+                            // Get loan details
+                            string loanType = loan["loan_type"]?.ToString() ?? "Unknown";
+                            string loanAmount = "₱ 0.00";
+                            string balance = "₱ 0.00";
 
-                if (decimal.TryParse(loan.GetValueOrDefault("balance")?.ToString(), out decimal bal))
-                    balance = $"₱ {bal:N2}";
+                            // Parse amounts
+                            if (decimal.TryParse(loan["loan_amount"]?.ToString(), out decimal amount))
+                                loanAmount = $"₱ {amount:N2}";
 
-                // Calculate payment progress
-                string remarks = "N/A";
-                int totalPaymentDone = 0;
-                int totalPaymentTerms = 0;
+                            if (decimal.TryParse(loan["balance"]?.ToString(), out decimal bal))
+                                balance = $"₱ {bal:N2}";
 
-                if (int.TryParse(loan.GetValueOrDefault("total_payment_done")?.ToString(), out totalPaymentDone) &&
-                    int.TryParse(loan.GetValueOrDefault("total_payment_terms")?.ToString(), out totalPaymentTerms) &&
-                    totalPaymentTerms > 0)
-                {
-                    remarks = $"{totalPaymentDone}/{totalPaymentTerms}";
-                }
+                            // Calculate payment progress for remarks
+                            string remarks = "N/A";
+                            if (int.TryParse(loan["total_payment_done"]?.ToString(), out int paymentDone) &&
+                                int.TryParse(loan["total_payment_terms"]?.ToString(), out int paymentTerms) &&
+                                paymentTerms > 0)
+                            {
+                                remarks = $"{paymentDone}/{paymentTerms}";
+                            }
 
-                // Add row to grid
-                dataGridViewEmployee.Rows.Add(
-                    counter,
-                    employeeId,
-                    fullName,
-                    loanType,
-                    loanAmount,
-                    balance,
-                    remarks,
-                    Properties.Resources.ExpandRight
-                );
+                            // Add row to DataGridView
+                            dataGridViewEmployee.Rows.Add(
+                                counter,
+                                employeeId,
+                                fullName,
+                                loanType,
+                                loanAmount,
+                                balance,
+                                remarks,
+                                Properties.Resources.ExpandRight
+                            );
 
-                counter++;
-                Console.WriteLine($"  Added row for {employeeId}");
-            }
+                            counter++;
+                            Console.WriteLine($"  ✓ Added row for {employeeId} - {loanType}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error processing loan record: {ex.Message}");
+                            continue;
+                        }
+                    }
 
-            dataGridViewEmployee.Refresh();
-            Console.WriteLine($"Data grid populated with {counter - 1} rows");
-        }
-
-        private async Task LoadArrayBasedData(string childPath, Action<Dictionary<string, string>> processItem)
-        {
-            try
-            {
-                var jsonResponse = await firebase.Child(childPath).OnceAsJsonAsync();
-                string rawJson = jsonResponse.ToString();
-
-                // Check if the response is empty or null
-                if (string.IsNullOrEmpty(rawJson) || rawJson == "null")
-                {
-                    Console.WriteLine($"No data found for {childPath}");
-                    return;
-                }
-
-                var records = ParseMalformedJson(rawJson);
-                Console.WriteLine($"Found {records.Count} records in {childPath}");
-
-                foreach (var record in records)
-                {
-                    processItem(record);
+                    Console.WriteLine($"=== DATA LOAD COMPLETED: {counter - 1} loans displayed ===");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading {childPath}: {ex.Message}");
-            }
-        }
-
-        private void LoadTestData()
-        {
-            // Clear existing rows first
-            dataGridViewEmployee.Rows.Clear();
-
-            // Test data that matches the actual column structure
-            for (int i = 1; i <= 5; i++)
-            {
-                dataGridViewEmployee.Rows.Add(
-                    i,                          // RowNumber
-                    $"JAP-00{i}",               // EmployeeId
-                    $"Test Employee {i}",       // FullName
-                    $"Loan Type {i}",           // LoanType
-                    $"₱ {10000 + i * 5000:N2}", // LoanAmount
-                    $"₱ {5000 + i * 2500:N2}",  // Balance
-                    $"({i * 3}/48)",            // Remarks (payment progress)
-                    Properties.Resources.ExpandRight // Action
-                );
+                MessageBox.Show($"Failed to load Firebase data: {ex.Message}",
+                               "Data Load Error",
+                               MessageBoxButtons.OK,
+                               MessageBoxIcon.Error);
+                Console.WriteLine($"ERROR: {ex.Message}\n{ex.StackTrace}");
             }
         }
 
