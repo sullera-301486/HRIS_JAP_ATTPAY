@@ -339,11 +339,6 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewAdminLogs.ColumnHeadersHeight = 40;
             dataGridViewAdminLogs.DefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Light", 10f);
             dataGridViewAdminLogs.ColumnHeadersDefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-
-            for (int i = 1; i < 30; i++) //test code; will be replaced with actual data from database
-            {
-                dataGridViewAdminLogs.Rows.Add("6 - " + i + " - 25", "10:30 PM", "Updated Attendance", "Franz Louies Deloritos attendance updated.");
-            }
         }
 
         private void setDailyEmployeeLogsDataGridViewAttributes()
@@ -1159,19 +1154,33 @@ namespace HRIS_JAP_ATTPAY
 
                 if (payrollLogs != null && payrollLogs.Any())
                 {
-                    foreach (var log in payrollLogs.OrderByDescending(l => l.Key))
-                    {
-                        var logData = log.Object;
-                        if (logData != null)
+                    // Parse and order by date+time descending
+                    var orderedLogs = payrollLogs
+                        .Select(l =>
                         {
+                            var logData = l.Object;
                             string date = logData.ContainsKey("date") ? logData["date"]?.ToString() ?? "" : "";
                             string time = logData.ContainsKey("time") ? logData["time"]?.ToString() ?? "" : "";
-                            string action = logData.ContainsKey("action") ? logData["action"]?.ToString() ?? "" : "";
-                            string details = logData.ContainsKey("details") ? logData["details"]?.ToString() ?? "" : "";
 
-                            // Add to DataGridView
-                            dataGridViewPayrollLogs.Rows.Add(date, time, action, details);
-                        }
+                            // Try to parse combined date+time for sorting
+                            DateTime.TryParse($"{date} {time}", out DateTime parsedDateTime);
+
+                            return new
+                            {
+                                Date = date,
+                                Time = time,
+                                Action = logData.ContainsKey("action") ? logData["action"]?.ToString() ?? "" : "",
+                                Details = logData.ContainsKey("details") ? logData["details"]?.ToString() ?? "" : "",
+                                ParsedDateTime = parsedDateTime
+                            };
+                        })
+                        .OrderByDescending(l => l.ParsedDateTime)
+                        .ToList();
+
+                    // Add to DataGridView
+                    foreach (var log in orderedLogs)
+                    {
+                        dataGridViewPayrollLogs.Rows.Add(log.Date, log.Time, log.Action, log.Details);
                     }
                 }
 
@@ -1188,6 +1197,7 @@ namespace HRIS_JAP_ATTPAY
                 dataGridViewPayrollLogs.Rows.Add("Error loading logs", "", "", "");
             }
         }
+
         private async void LoadAdminLogs()
         {
             try
