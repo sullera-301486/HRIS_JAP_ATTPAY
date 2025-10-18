@@ -42,5 +42,10 @@ namespace HRIS_JAP_ATTPAY
                 MessageBox.Show("Font load failed: " + ex.Message);
             }
         }
+
+        private void buttonConfirm_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
