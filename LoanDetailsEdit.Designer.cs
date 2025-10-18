@@ -52,9 +52,9 @@
             this.labelSelected = new System.Windows.Forms.Label();
             this.panelDivider = new System.Windows.Forms.Panel();
             this.labelLoanDetails = new System.Windows.Forms.Label();
-            this.textBoxBalanceInput = new System.Windows.Forms.TextBox();
-            this.textBoxBimonthlyAmortizationInput = new System.Windows.Forms.TextBox();
             this.textBoxEndDateInput = new System.Windows.Forms.TextBox();
+            this.labelBalanceInput = new System.Windows.Forms.Label();
+            this.labelBimonthlyAmortizationInput = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -63,10 +63,10 @@
             this.XpictureBox.BackColor = System.Drawing.Color.White;
             this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
-            this.XpictureBox.Location = new System.Drawing.Point(459, 2);
+            this.XpictureBox.Location = new System.Drawing.Point(516, 2);
             this.XpictureBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.XpictureBox.Name = "XpictureBox";
-            this.XpictureBox.Size = new System.Drawing.Size(51, 50);
+            this.XpictureBox.Size = new System.Drawing.Size(57, 62);
             this.XpictureBox.TabIndex = 4;
             this.XpictureBox.TabStop = false;
             this.XpictureBox.Click += new System.EventHandler(this.XpictureBox_Click);
@@ -78,10 +78,10 @@
             this.buttonCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonCancel.ForeColor = System.Drawing.Color.White;
-            this.buttonCancel.Location = new System.Drawing.Point(275, 640);
-            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonCancel.Location = new System.Drawing.Point(309, 800);
+            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(180, 41);
+            this.buttonCancel.Size = new System.Drawing.Size(202, 51);
             this.buttonCancel.TabIndex = 60;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = false;
@@ -94,10 +94,10 @@
             this.buttonUpdate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonUpdate.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonUpdate.ForeColor = System.Drawing.Color.White;
-            this.buttonUpdate.Location = new System.Drawing.Point(50, 640);
-            this.buttonUpdate.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonUpdate.Location = new System.Drawing.Point(56, 800);
+            this.buttonUpdate.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonUpdate.Name = "buttonUpdate";
-            this.buttonUpdate.Size = new System.Drawing.Size(180, 41);
+            this.buttonUpdate.Size = new System.Drawing.Size(202, 51);
             this.buttonUpdate.TabIndex = 61;
             this.buttonUpdate.Text = "Update";
             this.buttonUpdate.UseVisualStyleBackColor = false;
@@ -106,10 +106,10 @@
             // labelTotalPaymentInput
             // 
             this.labelTotalPaymentInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTotalPaymentInput.Location = new System.Drawing.Point(272, 580);
+            this.labelTotalPaymentInput.Location = new System.Drawing.Point(306, 725);
             this.labelTotalPaymentInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelTotalPaymentInput.Name = "labelTotalPaymentInput";
-            this.labelTotalPaymentInput.Size = new System.Drawing.Size(221, 31);
+            this.labelTotalPaymentInput.Size = new System.Drawing.Size(249, 39);
             this.labelTotalPaymentInput.TabIndex = 107;
             this.labelTotalPaymentInput.Text = "N/A";
             this.labelTotalPaymentInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -117,10 +117,10 @@
             // labelStartDateInput
             // 
             this.labelStartDateInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelStartDateInput.Location = new System.Drawing.Point(272, 500);
+            this.labelStartDateInput.Location = new System.Drawing.Point(306, 625);
             this.labelStartDateInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelStartDateInput.Name = "labelStartDateInput";
-            this.labelStartDateInput.Size = new System.Drawing.Size(221, 31);
+            this.labelStartDateInput.Size = new System.Drawing.Size(249, 39);
             this.labelStartDateInput.TabIndex = 105;
             this.labelStartDateInput.Text = "N/A";
             this.labelStartDateInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -128,10 +128,10 @@
             // labelMonthlyAmortizationInput
             // 
             this.labelMonthlyAmortizationInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelMonthlyAmortizationInput.Location = new System.Drawing.Point(272, 460);
+            this.labelMonthlyAmortizationInput.Location = new System.Drawing.Point(306, 575);
             this.labelMonthlyAmortizationInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelMonthlyAmortizationInput.Name = "labelMonthlyAmortizationInput";
-            this.labelMonthlyAmortizationInput.Size = new System.Drawing.Size(221, 31);
+            this.labelMonthlyAmortizationInput.Size = new System.Drawing.Size(249, 39);
             this.labelMonthlyAmortizationInput.TabIndex = 104;
             this.labelMonthlyAmortizationInput.Text = "N/A";
             this.labelMonthlyAmortizationInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -139,10 +139,10 @@
             // labelAmountInput
             // 
             this.labelAmountInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelAmountInput.Location = new System.Drawing.Point(272, 340);
+            this.labelAmountInput.Location = new System.Drawing.Point(306, 425);
             this.labelAmountInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelAmountInput.Name = "labelAmountInput";
-            this.labelAmountInput.Size = new System.Drawing.Size(221, 31);
+            this.labelAmountInput.Size = new System.Drawing.Size(249, 39);
             this.labelAmountInput.TabIndex = 102;
             this.labelAmountInput.Text = "N/A";
             this.labelAmountInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -150,10 +150,10 @@
             // labelTypeInput
             // 
             this.labelTypeInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTypeInput.Location = new System.Drawing.Point(272, 300);
+            this.labelTypeInput.Location = new System.Drawing.Point(306, 375);
             this.labelTypeInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelTypeInput.Name = "labelTypeInput";
-            this.labelTypeInput.Size = new System.Drawing.Size(221, 31);
+            this.labelTypeInput.Size = new System.Drawing.Size(249, 39);
             this.labelTypeInput.TabIndex = 100;
             this.labelTypeInput.Text = "N/A";
             this.labelTypeInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -161,10 +161,10 @@
             // labelIDInput
             // 
             this.labelIDInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelIDInput.Location = new System.Drawing.Point(272, 260);
+            this.labelIDInput.Location = new System.Drawing.Point(306, 325);
             this.labelIDInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelIDInput.Name = "labelIDInput";
-            this.labelIDInput.Size = new System.Drawing.Size(221, 31);
+            this.labelIDInput.Size = new System.Drawing.Size(249, 39);
             this.labelIDInput.TabIndex = 99;
             this.labelIDInput.Text = "N/A";
             this.labelIDInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -172,10 +172,10 @@
             // labelNameInput
             // 
             this.labelNameInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelNameInput.Location = new System.Drawing.Point(272, 220);
+            this.labelNameInput.Location = new System.Drawing.Point(306, 275);
             this.labelNameInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelNameInput.Name = "labelNameInput";
-            this.labelNameInput.Size = new System.Drawing.Size(221, 31);
+            this.labelNameInput.Size = new System.Drawing.Size(249, 39);
             this.labelNameInput.TabIndex = 98;
             this.labelNameInput.Text = "N/A";
             this.labelNameInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -186,9 +186,9 @@
             this.labelTotalPayment.AutoSize = true;
             this.labelTotalPayment.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelTotalPayment.ForeColor = System.Drawing.Color.Black;
-            this.labelTotalPayment.Location = new System.Drawing.Point(33, 580);
+            this.labelTotalPayment.Location = new System.Drawing.Point(37, 725);
             this.labelTotalPayment.Name = "labelTotalPayment";
-            this.labelTotalPayment.Size = new System.Drawing.Size(138, 25);
+            this.labelTotalPayment.Size = new System.Drawing.Size(167, 29);
             this.labelTotalPayment.TabIndex = 97;
             this.labelTotalPayment.Text = "Total Payment";
             // 
@@ -198,9 +198,9 @@
             this.labelEndDate.AutoSize = true;
             this.labelEndDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelEndDate.ForeColor = System.Drawing.Color.Black;
-            this.labelEndDate.Location = new System.Drawing.Point(33, 540);
+            this.labelEndDate.Location = new System.Drawing.Point(37, 675);
             this.labelEndDate.Name = "labelEndDate";
-            this.labelEndDate.Size = new System.Drawing.Size(93, 25);
+            this.labelEndDate.Size = new System.Drawing.Size(112, 29);
             this.labelEndDate.TabIndex = 96;
             this.labelEndDate.Text = "End Date";
             // 
@@ -210,9 +210,9 @@
             this.labelStartDate.AutoSize = true;
             this.labelStartDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelStartDate.ForeColor = System.Drawing.Color.Black;
-            this.labelStartDate.Location = new System.Drawing.Point(33, 500);
+            this.labelStartDate.Location = new System.Drawing.Point(37, 625);
             this.labelStartDate.Name = "labelStartDate";
-            this.labelStartDate.Size = new System.Drawing.Size(99, 25);
+            this.labelStartDate.Size = new System.Drawing.Size(118, 29);
             this.labelStartDate.TabIndex = 95;
             this.labelStartDate.Text = "Start Date";
             // 
@@ -222,9 +222,9 @@
             this.labelMonthlyAmortization.AutoSize = true;
             this.labelMonthlyAmortization.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelMonthlyAmortization.ForeColor = System.Drawing.Color.Black;
-            this.labelMonthlyAmortization.Location = new System.Drawing.Point(33, 460);
+            this.labelMonthlyAmortization.Location = new System.Drawing.Point(37, 575);
             this.labelMonthlyAmortization.Name = "labelMonthlyAmortization";
-            this.labelMonthlyAmortization.Size = new System.Drawing.Size(194, 25);
+            this.labelMonthlyAmortization.Size = new System.Drawing.Size(234, 29);
             this.labelMonthlyAmortization.TabIndex = 94;
             this.labelMonthlyAmortization.Text = "Monthly Amortization";
             // 
@@ -234,9 +234,9 @@
             this.labelBimonthlyAmortization.AutoSize = true;
             this.labelBimonthlyAmortization.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelBimonthlyAmortization.ForeColor = System.Drawing.Color.Black;
-            this.labelBimonthlyAmortization.Location = new System.Drawing.Point(33, 420);
+            this.labelBimonthlyAmortization.Location = new System.Drawing.Point(37, 525);
             this.labelBimonthlyAmortization.Name = "labelBimonthlyAmortization";
-            this.labelBimonthlyAmortization.Size = new System.Drawing.Size(217, 25);
+            this.labelBimonthlyAmortization.Size = new System.Drawing.Size(264, 29);
             this.labelBimonthlyAmortization.TabIndex = 93;
             this.labelBimonthlyAmortization.Text = "Bi-monthly Amortization";
             // 
@@ -246,9 +246,9 @@
             this.labelBalance.AutoSize = true;
             this.labelBalance.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelBalance.ForeColor = System.Drawing.Color.Black;
-            this.labelBalance.Location = new System.Drawing.Point(33, 380);
+            this.labelBalance.Location = new System.Drawing.Point(37, 475);
             this.labelBalance.Name = "labelBalance";
-            this.labelBalance.Size = new System.Drawing.Size(83, 25);
+            this.labelBalance.Size = new System.Drawing.Size(100, 29);
             this.labelBalance.TabIndex = 92;
             this.labelBalance.Text = "Balance";
             // 
@@ -258,9 +258,9 @@
             this.labelAmount.AutoSize = true;
             this.labelAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelAmount.ForeColor = System.Drawing.Color.Black;
-            this.labelAmount.Location = new System.Drawing.Point(33, 340);
+            this.labelAmount.Location = new System.Drawing.Point(37, 425);
             this.labelAmount.Name = "labelAmount";
-            this.labelAmount.Size = new System.Drawing.Size(80, 25);
+            this.labelAmount.Size = new System.Drawing.Size(94, 29);
             this.labelAmount.TabIndex = 91;
             this.labelAmount.Text = "Amount";
             // 
@@ -270,9 +270,9 @@
             this.labelType.AutoSize = true;
             this.labelType.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelType.ForeColor = System.Drawing.Color.Black;
-            this.labelType.Location = new System.Drawing.Point(33, 300);
+            this.labelType.Location = new System.Drawing.Point(37, 375);
             this.labelType.Name = "labelType";
-            this.labelType.Size = new System.Drawing.Size(57, 25);
+            this.labelType.Size = new System.Drawing.Size(68, 29);
             this.labelType.TabIndex = 90;
             this.labelType.Text = "Type";
             // 
@@ -282,9 +282,9 @@
             this.labelID.AutoSize = true;
             this.labelID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelID.ForeColor = System.Drawing.Color.Black;
-            this.labelID.Location = new System.Drawing.Point(33, 260);
+            this.labelID.Location = new System.Drawing.Point(37, 325);
             this.labelID.Name = "labelID";
-            this.labelID.Size = new System.Drawing.Size(31, 25);
+            this.labelID.Size = new System.Drawing.Size(36, 29);
             this.labelID.TabIndex = 89;
             this.labelID.Text = "ID";
             // 
@@ -294,9 +294,9 @@
             this.labelName.AutoSize = true;
             this.labelName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelName.ForeColor = System.Drawing.Color.Black;
-            this.labelName.Location = new System.Drawing.Point(33, 220);
+            this.labelName.Location = new System.Drawing.Point(37, 275);
             this.labelName.Name = "labelName";
-            this.labelName.Size = new System.Drawing.Size(64, 25);
+            this.labelName.Size = new System.Drawing.Size(78, 29);
             this.labelName.TabIndex = 88;
             this.labelName.Text = "Name";
             // 
@@ -306,10 +306,10 @@
             this.comboBoxSelectedInput.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxSelectedInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxSelectedInput.FormattingEnabled = true;
-            this.comboBoxSelectedInput.Location = new System.Drawing.Point(223, 143);
+            this.comboBoxSelectedInput.Location = new System.Drawing.Point(251, 179);
             this.comboBoxSelectedInput.Margin = new System.Windows.Forms.Padding(0);
             this.comboBoxSelectedInput.Name = "comboBoxSelectedInput";
-            this.comboBoxSelectedInput.Size = new System.Drawing.Size(263, 37);
+            this.comboBoxSelectedInput.Size = new System.Drawing.Size(295, 40);
             this.comboBoxSelectedInput.TabIndex = 87;
             // 
             // labelSelected
@@ -318,18 +318,19 @@
             this.labelSelected.AutoSize = true;
             this.labelSelected.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelSelected.ForeColor = System.Drawing.Color.Black;
-            this.labelSelected.Location = new System.Drawing.Point(35, 149);
+            this.labelSelected.Location = new System.Drawing.Point(39, 186);
             this.labelSelected.Name = "labelSelected";
-            this.labelSelected.Size = new System.Drawing.Size(89, 25);
+            this.labelSelected.Size = new System.Drawing.Size(109, 29);
             this.labelSelected.TabIndex = 86;
             this.labelSelected.Text = "Selected";
             // 
             // panelDivider
             // 
             this.panelDivider.BackColor = System.Drawing.Color.Black;
-            this.panelDivider.Location = new System.Drawing.Point(-9, 194);
+            this.panelDivider.Location = new System.Drawing.Point(-10, 242);
+            this.panelDivider.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.panelDivider.Name = "panelDivider";
-            this.panelDivider.Size = new System.Drawing.Size(531, 3);
+            this.panelDivider.Size = new System.Drawing.Size(597, 4);
             this.panelDivider.TabIndex = 85;
             // 
             // labelLoanDetails
@@ -338,37 +339,11 @@
             this.labelLoanDetails.AutoSize = true;
             this.labelLoanDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelLoanDetails.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(34)))), ((int)(((byte)(31)))));
-            this.labelLoanDetails.Location = new System.Drawing.Point(27, 73);
+            this.labelLoanDetails.Location = new System.Drawing.Point(30, 91);
             this.labelLoanDetails.Name = "labelLoanDetails";
-            this.labelLoanDetails.Size = new System.Drawing.Size(207, 39);
+            this.labelLoanDetails.Size = new System.Drawing.Size(242, 46);
             this.labelLoanDetails.TabIndex = 84;
             this.labelLoanDetails.Text = "Loan Details";
-            // 
-            // textBoxBalanceInput
-            // 
-            this.textBoxBalanceInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxBalanceInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxBalanceInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxBalanceInput.ForeColor = System.Drawing.Color.White;
-            this.textBoxBalanceInput.Location = new System.Drawing.Point(287, 380);
-            this.textBoxBalanceInput.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxBalanceInput.Name = "textBoxBalanceInput";
-            this.textBoxBalanceInput.Size = new System.Drawing.Size(211, 30);
-            this.textBoxBalanceInput.TabIndex = 108;
-            this.textBoxBalanceInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxBimonthlyAmortizationInput
-            // 
-            this.textBoxBimonthlyAmortizationInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxBimonthlyAmortizationInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxBimonthlyAmortizationInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxBimonthlyAmortizationInput.ForeColor = System.Drawing.Color.White;
-            this.textBoxBimonthlyAmortizationInput.Location = new System.Drawing.Point(287, 420);
-            this.textBoxBimonthlyAmortizationInput.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxBimonthlyAmortizationInput.Name = "textBoxBimonthlyAmortizationInput";
-            this.textBoxBimonthlyAmortizationInput.Size = new System.Drawing.Size(211, 30);
-            this.textBoxBimonthlyAmortizationInput.TabIndex = 109;
-            this.textBoxBimonthlyAmortizationInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // textBoxEndDateInput
             // 
@@ -376,22 +351,44 @@
             this.textBoxEndDateInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxEndDateInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxEndDateInput.ForeColor = System.Drawing.Color.White;
-            this.textBoxEndDateInput.Location = new System.Drawing.Point(287, 535);
-            this.textBoxEndDateInput.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxEndDateInput.Location = new System.Drawing.Point(323, 669);
+            this.textBoxEndDateInput.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBoxEndDateInput.Name = "textBoxEndDateInput";
-            this.textBoxEndDateInput.Size = new System.Drawing.Size(211, 30);
+            this.textBoxEndDateInput.Size = new System.Drawing.Size(237, 35);
             this.textBoxEndDateInput.TabIndex = 110;
             this.textBoxEndDateInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
+            // labelBalanceInput
+            // 
+            this.labelBalanceInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelBalanceInput.Location = new System.Drawing.Point(306, 471);
+            this.labelBalanceInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelBalanceInput.Name = "labelBalanceInput";
+            this.labelBalanceInput.Size = new System.Drawing.Size(249, 39);
+            this.labelBalanceInput.TabIndex = 111;
+            this.labelBalanceInput.Text = "N/A";
+            this.labelBalanceInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelBimonthlyAmortizationInput
+            // 
+            this.labelBimonthlyAmortizationInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelBimonthlyAmortizationInput.Location = new System.Drawing.Point(306, 521);
+            this.labelBimonthlyAmortizationInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelBimonthlyAmortizationInput.Name = "labelBimonthlyAmortizationInput";
+            this.labelBimonthlyAmortizationInput.Size = new System.Drawing.Size(249, 39);
+            this.labelBimonthlyAmortizationInput.TabIndex = 112;
+            this.labelBimonthlyAmortizationInput.Text = "N/A";
+            this.labelBimonthlyAmortizationInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // LoanDetailsEdit
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(512, 720);
+            this.ClientSize = new System.Drawing.Size(576, 900);
+            this.Controls.Add(this.labelBimonthlyAmortizationInput);
+            this.Controls.Add(this.labelBalanceInput);
             this.Controls.Add(this.textBoxEndDateInput);
-            this.Controls.Add(this.textBoxBimonthlyAmortizationInput);
-            this.Controls.Add(this.textBoxBalanceInput);
             this.Controls.Add(this.labelTotalPaymentInput);
             this.Controls.Add(this.labelStartDateInput);
             this.Controls.Add(this.labelMonthlyAmortizationInput);
@@ -417,6 +414,7 @@
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.XpictureBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "LoanDetailsEdit";
             this.ShowInTaskbar = false;
             this.Text = "LoanDetailsEdit";
@@ -452,8 +450,8 @@
         private System.Windows.Forms.Label labelSelected;
         private System.Windows.Forms.Panel panelDivider;
         private System.Windows.Forms.Label labelLoanDetails;
-        private System.Windows.Forms.TextBox textBoxBalanceInput;
-        private System.Windows.Forms.TextBox textBoxBimonthlyAmortizationInput;
         private System.Windows.Forms.TextBox textBoxEndDateInput;
+        private System.Windows.Forms.Label labelBalanceInput;
+        private System.Windows.Forms.Label labelBimonthlyAmortizationInput;
     }
 }

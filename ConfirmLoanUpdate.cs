@@ -12,6 +12,8 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class ConfirmLoanUpdate : Form
     {
+        public bool UserConfirmed { get; private set; } = false;
+
         public ConfirmLoanUpdate()
         {
             InitializeComponent();
@@ -25,6 +27,13 @@ namespace HRIS_JAP_ATTPAY
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
+            UserConfirmed = false;
+            this.Close();
+        }
+
+        private void buttonConfirm_Click(object sender, EventArgs e)
+        {
+            UserConfirmed = true;
             this.Close();
         }
 
