@@ -19,6 +19,105 @@ namespace HRIS_JAP_ATTPAY
         private static readonly FirebaseClient firebase = new FirebaseClient(
             "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
         );
+        private static readonly Dictionary<string, PayrollPreset> payrollPresets = new Dictionary<string, PayrollPreset>
+{
+    {
+        "JAP-001",
+        new PayrollPreset
+        {
+            DailyRate = "500",
+            Salary = "15000",
+            Incentives = "1000",
+            Commission = "500",
+            FoodAllowance = "300",
+            Communication = "200",
+            GrossPay = "17000",
+            WithholdingTax = "1000",
+            SSS = "500",
+            PagIbig = "200",
+            Philhealth = "300",
+            TotalDeductions = "2000",
+            NetPay = "15000",
+            SSSLoan = "0",
+            PagIbigLoan = "0",
+            CarLoan = "0",
+            HousingLoan = "0",
+            CashAdvance = "0",
+            CoopLoan = "0",
+            CoopContribution = "0",
+            Others = "0",
+            TaxDetails = "N/A",
+            SSSDetails = "N/A",
+            PagIbigDetails = "N/A",
+            PhilhealthDetails = "N/A",
+            SSSLoanDetails = "N/A",
+            PagIbigLoanDetails = "N/A",
+            CarLoanDetails = "N/A",
+            HousingLoanDetails = "N/A",
+            CashAdvanceDetails = "N/A",
+            CoopLoanDetails = "N/A",
+            CoopContributionDetails = "N/A",
+            OthersDetails = "N/A",
+            VacationLeaveCredit = "0",
+            VacationLeaveDebit = "0",
+            VacationLeaveBalance = "0",
+            SickLeaveBalance = "6",
+            SickLeaveCredit = "6",
+            SickLeaveDebit = "0",
+            Gondola = "400",
+            GasAllowance = "300",
+        }
+    },
+    {
+        "JAP-002",
+        new PayrollPreset
+        {
+            DailyRate = "600",
+            Salary = "18000",
+            Incentives = "1500",
+            Commission = "600",
+            FoodAllowance = "400",
+            Communication = "250",
+            GrossPay = "20000",
+            WithholdingTax = "1200",
+            SSS = "600",
+            PagIbig = "250",
+            Philhealth = "350",
+            TotalDeductions = "2400",
+            NetPay = "17600",
+            // Optional details
+            SSSLoan = "0",
+            PagIbigLoan = "0",
+            CarLoan = "0",
+            HousingLoan = "0",
+            CashAdvance = "0",
+            CoopLoan = "0",
+            CoopContribution = "0",
+            Others = "0",
+            TaxDetails = "N/A",
+            SSSDetails = "N/A",
+            PagIbigDetails = "N/A",
+            PhilhealthDetails = "N/A",
+            SSSLoanDetails = "N/A",
+            PagIbigLoanDetails = "N/A",
+            CarLoanDetails = "N/A",
+            HousingLoanDetails = "N/A",
+            CashAdvanceDetails = "N/A",
+            CoopLoanDetails = "N/A",
+            CoopContributionDetails = "N/A",
+            OthersDetails = "N/A",
+            VacationLeaveCredit = "0",
+            VacationLeaveDebit = "0",
+            VacationLeaveBalance = "0",
+            SickLeaveBalance = "0",
+            SickLeaveCredit = "0",
+            SickLeaveDebit = "0",
+            Gondola = "400",
+            GasAllowance = "300",
+        }
+    },
+    // Add more employees here in the same multi-line style
+};
 
         // Main entry
         public static async Task GenerateAllPayrollsAsync(string savePath)
@@ -244,7 +343,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // Build one employee payroll record; uses global EmployeeDetails map as final lookup
         private static PayrollExportData BuildPayrollFromJson(
             JsonElement empEl,
             string idFallback,
@@ -256,11 +354,11 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // flatten properties for easy access
+                // Flatten properties for easy access
                 Dictionary<string, string> props = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 ExtractAllProperties(empEl, props);
 
-                // resolve employee id (fallback is property name e.g., "JAP-001")
+                // Resolve employee ID (fallback is property name e.g., "JAP-001")
                 string empId = idFallback;
                 if (props.ContainsKey("employee_id")) empId = props["employee_id"];
                 if (props.ContainsKey("employment_id") && string.IsNullOrEmpty(empId)) empId = props["employment_id"];
@@ -270,7 +368,7 @@ namespace HRIS_JAP_ATTPAY
                     return null;
                 }
 
-                // skip archived by id
+                // Skip archived by ID
                 if (archivedIds.Contains(empId))
                 {
                     skippedArchived++;
@@ -294,7 +392,7 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                // 2) If still null, check flattened props (maybe first_name directly present)
+                // 2) If still null, check flattened props
                 if (string.IsNullOrWhiteSpace(name))
                 {
                     string full = props.ContainsKey("full_name") ? props["full_name"] : null;
@@ -310,7 +408,7 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                // 3) FINAL FIX: look up in the top-level EmployeeDetails map by empId
+                // 3) Final fallback: look up in the top-level EmployeeDetails map
                 if (string.IsNullOrWhiteSpace(name) && employeeDetailsMap != null && employeeDetailsMap.ContainsKey(empId))
                 {
                     var map = employeeDetailsMap[empId];
@@ -326,7 +424,7 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                // 4) fallback
+                // 4) Fallback
                 if (string.IsNullOrWhiteSpace(name))
                 {
                     processedNoName++;
@@ -336,61 +434,78 @@ namespace HRIS_JAP_ATTPAY
                 string dept = props.ContainsKey("department") ? props["department"] : "";
                 string pos = props.ContainsKey("position") ? props["position"] : "";
 
+                // ---------- LOAD PRESET ----------
+                PayrollPreset preset = payrollPresets.ContainsKey(empId) ? payrollPresets[empId] : null;
+
                 return new PayrollExportData
                 {
                     EmployeeId = empId,
                     EmployeeName = name,
                     Department = dept,
                     Position = pos,
-                    DateCovered = string.Format("{0:MMM 1} - {0:MMM dd, yyyy}", DateTime.Now),
-                    Days = "0",
-                    DaysPresent = "0",
-                    DailyRate = "500.00",
-                    Salary = "15000.00",
-                    Overtime = "0.00",
-                    BasicPay = "15000",
-                    OvertimePerHour = "0.00",
-                    OvertimePerMinute = "0.00",
-                    Incentives = "1000",
-                    Commission = "500",
-                    FoodAllowance = "300",
-                    Communication = "200",
-                    GasAllowance = "0",
-                    Gondola = "0",
-                    GrossPay = "17000",
-                    WithholdingTax = "1000",
-                    SSS = "500",
-                    PagIbig = "200",
-                    Philhealth = "300",
-                    TotalDeductions = "2000",
-                    NetPay = "15000",
-                    SSSLoan = "0",
-                    PagIbigLoan = "0",
-                    CarLoan = "0",
-                    HousingLoan = "0",
-                    CashAdvance = "0",
-                    CoopLoan = "0",
-                    CoopContribution = "0",
-                    Others = "0",
-                    TaxDetails = "N/A",
-                    SSSDetails = "N/A",
-                    PagIbigDetails = "N/A",
-                    PhilhealthDetails = "N/A",
-                    SSSLoanDetails = "N/A",
-                    PagIbigLoanDetails = "N/A",
-                    CarLoanDetails = "N/A",
-                    HousingLoanDetails = "N/A",
-                    CashAdvanceDetails = "N/A",
-                    CoopLoanDetails = "N/A",
-                    CoopContributionDetails = "N/A",
-                    OthersDetails = "N/A"
-                }; //not all is final data; fix this by calling actual values from database
+                    DateCovered = string.Format("{0:MMM 1} - {0:MMM 15, yyyy}", DateTime.Now),
+
+                    // Payroll values from preset or defaults
+                    DailyRate = preset?.DailyRate ?? "0",
+                    Salary = preset?.Salary ?? "0",
+                    Incentives = preset?.Incentives ?? "0",
+                    Commission = preset?.Commission ?? "0",
+                    FoodAllowance = preset?.FoodAllowance ?? "0",
+                    Communication = preset?.Communication ?? "0",
+                    GrossPay = preset?.GrossPay ?? "0",
+                    WithholdingTax = preset?.WithholdingTax ?? "0",
+                    SSS = preset?.SSS ?? "0",
+                    PagIbig = preset?.PagIbig ?? "0",
+                    Philhealth = preset?.Philhealth ?? "0",
+                    TotalDeductions = preset?.TotalDeductions ?? "0",
+                    NetPay = preset?.NetPay ?? "0",
+
+                    Days = preset?.Days ?? "0",
+                    DaysPresent = preset?.DaysPresent ?? "0",
+                    BasicPay = preset?.BasicPay ?? "0",
+                    Overtime = preset?.Overtime ?? "0",
+                    OvertimePerHour = preset?.OvertimePerHour ?? "0",
+                    OvertimePerMinute = preset?.OvertimePerMinute ?? "0",
+
+                    SSSLoan = preset?.SSSLoan ?? "0",
+                    PagIbigLoan = preset?.PagIbigLoan ?? "0",
+                    CarLoan = preset?.CarLoan ?? "0",
+                    HousingLoan = preset?.HousingLoan ?? "0",
+                    CashAdvance = preset?.CashAdvance ?? "0",
+                    CoopLoan = preset?.CoopLoan ?? "0",
+                    CoopContribution = preset?.CoopContribution ?? "0",
+                    Others = preset?.Others ?? "0",
+
+                    TaxDetails = preset?.TaxDetails ?? "N/A",
+                    SSSDetails = preset?.SSSDetails ?? "N/A",
+                    PagIbigDetails = preset?.PagIbigDetails ?? "N/A",
+                    PhilhealthDetails = preset?.PhilhealthDetails ?? "N/A",
+                    SSSLoanDetails = preset?.SSSLoanDetails ?? "N/A",
+                    PagIbigLoanDetails = preset?.PagIbigLoanDetails ?? "N/A",
+                    CarLoanDetails = preset?.CarLoanDetails ?? "N/A",
+                    HousingLoanDetails = preset?.HousingLoanDetails ?? "N/A",
+                    CashAdvanceDetails = preset?.CashAdvanceDetails ?? "N/A",
+                    CoopLoanDetails = preset?.CoopLoanDetails ?? "N/A",
+                    CoopContributionDetails = preset?.CoopContributionDetails ?? "N/A",
+                    OthersDetails = preset?.OthersDetails ?? "N/A",
+
+                    VacationLeaveBalance = preset?.VacationLeaveBalance ?? "0",
+                    VacationLeaveCredit = preset?.VacationLeaveCredit ?? "0",
+                    VacationLeaveDebit = preset?.VacationLeaveDebit ?? "0",
+                    SickLeaveBalance = preset?.SickLeaveBalance ?? "0",
+                    SickLeaveCredit = preset?.SickLeaveCredit ?? "0",
+                    SickLeaveDebit = preset?.SickLeaveDebit ?? "0",
+
+                    Gondola = preset?.Gondola ?? "0",
+                    GasAllowance = preset?.GasAllowance ?? "0"
+                };
             }
             catch
             {
                 return null;
             }
         }
+
 
         // helper to extract name from a details JsonElement node
         private static string ExtractNameFromDetailsNode(JsonElement detailsNode)
@@ -479,6 +594,73 @@ namespace HRIS_JAP_ATTPAY
 
                 workbookPart.Workbook.Save();
             }
+        }
+
+        public class PayrollPreset
+        {
+            public string EmployeeId { get; set; }
+            public string EmployeeName { get; set; }
+            public string Department { get; set; }
+            public string Position { get; set; }
+            public string DateCovered { get; set; }
+            public string Days { get; set; }
+            public string DaysPresent { get; set; }
+            public string DailyRate { get; set; }
+            public string Salary { get; set; }
+            public string Overtime { get; set; }
+
+            // Earnings
+            public string BasicPay { get; set; }
+            public string OvertimePerHour { get; set; }
+            public string OvertimePerMinute { get; set; }
+            public string Incentives { get; set; }
+            public string Commission { get; set; }
+            public string FoodAllowance { get; set; }
+            public string Communication { get; set; }
+            public string GasAllowance { get; set; }
+            public string Gondola { get; set; }
+            public string GrossPay { get; set; }
+
+
+            // Deductions
+            public string WithholdingTax { get; set; }
+            public string SSS { get; set; }
+            public string PagIbig { get; set; }
+            public string Philhealth { get; set; }
+            public string SSSLoan { get; set; }
+            public string PagIbigLoan { get; set; }
+            public string CarLoan { get; set; }
+            public string HousingLoan { get; set; }
+            public string CashAdvance { get; set; }
+            public string CoopLoan { get; set; }
+            public string CoopContribution { get; set; }
+            public string Others { get; set; }
+            public string TotalDeductions { get; set; }
+
+            // Details
+            public string TaxDetails { get; set; }
+            public string SSSDetails { get; set; }
+            public string PagIbigDetails { get; set; }
+            public string PhilhealthDetails { get; set; }
+            public string SSSLoanDetails { get; set; }
+            public string PagIbigLoanDetails { get; set; }
+            public string CarLoanDetails { get; set; }
+            public string HousingLoanDetails { get; set; }
+            public string CashAdvanceDetails { get; set; }
+            public string CoopLoanDetails { get; set; }
+            public string CoopContributionDetails { get; set; }
+            public string OthersDetails { get; set; }
+
+
+            // Leave balances
+            public string VacationLeaveCredit { get; set; }
+            public string VacationLeaveDebit { get; set; }
+            public string VacationLeaveBalance { get; set; }
+            public string SickLeaveCredit { get; set; }
+            public string SickLeaveDebit { get; set; }
+            public string SickLeaveBalance { get; set; }
+
+            public string NetPay { get; set; }
         }
     }
 }
