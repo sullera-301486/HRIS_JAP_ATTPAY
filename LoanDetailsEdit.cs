@@ -20,7 +20,13 @@ namespace HRIS_JAP_ATTPAY
         private readonly FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
         private List<Dictionary<string, object>> allEmployeeLoans = new List<Dictionary<string, object>>();
         private Dictionary<string, string> loanKeys = new Dictionary<string, string>();
-
+        private class ExistingLoanInfo
+        {
+            public int LoanIndex { get; set; }
+            public string CreatedAt { get; set; }
+            public decimal CurrentBalance { get; set; }
+            public int CurrentPaymentDone { get; set; }
+        }
         public LoanDetailsEdit(string employeeId)
         {
             try
@@ -463,9 +469,9 @@ namespace HRIS_JAP_ATTPAY
                 decimal biMonthlyAmortization = monthlyAmortization / 2;
 
                 // Update UI with new calculations
-                SafeSetLabelText(labelTotalPaymentInput, totalPaymentTerms.ToString());
-                SafeSetLabelText(labelMonthlyAmortizationInput, $"₱{monthlyAmortization:N2}");
-                SafeSetLabelText(labelBimonthlyAmortizationInput, $"₱{biMonthlyAmortization:N2}");
+                SafeSetLabelText(labelTotalPaymentInput, $"0/{totalPaymentTerms}");
+                SafeSetLabelText(labelMonthlyAmortizationInput, $"₱ {monthlyAmortization:N2}");
+                SafeSetLabelText(labelBimonthlyAmortizationInput, $"₱ {biMonthlyAmortization:N2}");
 
                 System.Diagnostics.Debug.WriteLine($"Recalculated: Months={totalMonths}, Terms={totalPaymentTerms}, Monthly=₱{monthlyAmortization:N2}, BiMonthly=₱{biMonthlyAmortization:N2}");
             }
@@ -548,156 +554,81 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // Null check every control before setting font and set color to black
+                // Null check every control before setting font (same as your LoanDetails)
                 if (comboBoxSelectedInput != null)
-                {
                     comboBoxSelectedInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                    comboBoxSelectedInput.ForeColor = Color.Black;
-                }
 
                 if (labelAmount != null)
-                {
                     labelAmount.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                    labelAmount.ForeColor = Color.Black;
-                }
 
                 if (labelAmountInput != null)
-                {
                     labelAmountInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                    labelAmountInput.ForeColor = Color.Black;
-                }
 
                 if (labelBalance != null)
-                {
                     labelBalance.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                    labelBalance.ForeColor = Color.Black;
-                }
 
                 if (labelBalanceInput != null)
-                {
                     labelBalanceInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                    labelBalanceInput.ForeColor = Color.Black;
-                }
 
                 if (labelBimonthlyAmortization != null)
-                {
                     labelBimonthlyAmortization.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                    labelBimonthlyAmortization.ForeColor = Color.Black;
-                }
 
                 if (labelBimonthlyAmortizationInput != null)
-                {
                     labelBimonthlyAmortizationInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                    labelBimonthlyAmortizationInput.ForeColor = Color.Black;
-                }
 
                 if (labelEndDate != null)
-                {
                     labelEndDate.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                    labelEndDate.ForeColor = Color.Black;
-                }
 
                 if (textBoxEndDateInput != null)
-                {
                     textBoxEndDateInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                    textBoxEndDateInput.ForeColor = Color.Black;
-                }
 
                 if (labelID != null)
-                {
                     labelID.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                    labelID.ForeColor = Color.Black;
-                }
 
                 if (labelIDInput != null)
-                {
                     labelIDInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                    labelIDInput.ForeColor = Color.Black;
-                }
 
                 if (labelLoanDetails != null)
-                {
                     labelLoanDetails.Font = AttributesClass.GetFont("Roboto-Regular", 20f);
-                    labelLoanDetails.ForeColor = Color.Black;
-                }
 
                 if (labelMonthlyAmortization != null)
-                {
                     labelMonthlyAmortization.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                    labelMonthlyAmortization.ForeColor = Color.Black;
-                }
 
                 if (labelMonthlyAmortizationInput != null)
-                {
                     labelMonthlyAmortizationInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                    labelMonthlyAmortizationInput.ForeColor = Color.Black;
-                }
 
                 if (labelName != null)
-                {
                     labelName.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                    labelName.ForeColor = Color.Black;
-                }
 
                 if (labelNameInput != null)
-                {
                     labelNameInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                    labelNameInput.ForeColor = Color.Black;
-                }
 
                 if (labelSelected != null)
-                {
                     labelSelected.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                    labelSelected.ForeColor = Color.Black;
-                }
 
                 if (labelStartDate != null)
-                {
                     labelStartDate.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                    labelStartDate.ForeColor = Color.Black;
-                }
 
                 if (labelStartDateInput != null)
-                {
                     labelStartDateInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                    labelStartDateInput.ForeColor = Color.Black;
-                }
 
                 if (labelTotalPayment != null)
-                {
                     labelTotalPayment.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                    labelTotalPayment.ForeColor = Color.Black;
-                }
 
                 if (labelTotalPaymentInput != null)
-                {
                     labelTotalPaymentInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                    labelTotalPaymentInput.ForeColor = Color.Black;
-                }
 
                 if (labelType != null)
-                {
                     labelType.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                    labelType.ForeColor = Color.Black;
-                }
 
                 if (labelTypeInput != null)
-                {
                     labelTypeInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                    labelTypeInput.ForeColor = Color.Black;
-                }
 
                 if (buttonCancel != null)
-                {
                     buttonCancel.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                    buttonCancel.ForeColor = Color.Black;
-                }
 
                 if (buttonUpdate != null)
-                {
                     buttonUpdate.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                    buttonUpdate.ForeColor = Color.Black;
-                }
             }
             catch (Exception ex)
             {
@@ -714,52 +645,80 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                if (sender == null) return;
+                // Validate inputs
+                if (!ValidateInputs())
+                {
+                    return;
+                }
 
+                // Get selected loan
                 if (comboBoxSelectedInput?.SelectedItem == null)
                 {
                     MessageBox.Show("Please select a loan to update.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                if (!ValidateEndDate())
-                {
-                    return;
-                }
-
                 int index = comboBoxSelectedInput.SelectedIndex;
                 if (index < 0 || index >= allEmployeeLoans.Count)
                 {
-                    MessageBox.Show("Invalid loan selection.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Invalid loan selection.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
                 var selectedLoan = allEmployeeLoans[index];
                 string loanType = GetSafeValue(selectedLoan, "loan_type");
 
-                if (string.IsNullOrEmpty(loanType))
+                // Get updated values from the form
+                string endDate = textBoxEndDateInput.Text;
+
+                // Parse payment terms from the label
+                string paymentText = labelTotalPaymentInput.Text;
+                int totalPaymentTerms = 0;
+                if (paymentText.Contains("/"))
                 {
-                    MessageBox.Show("Invalid loan type selected.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    string[] parts = paymentText.Split('/');
+                    if (parts.Length == 2 && int.TryParse(parts[1], out int terms))
+                    {
+                        totalPaymentTerms = terms;
+                    }
                 }
 
-                // Show confirmation dialog
-                using (ConfirmLoanUpdate confirmLoanUpdate = new ConfirmLoanUpdate())
+                // Parse amortizations from labels
+                decimal monthlyAmortization = 0;
+                decimal biMonthlyAmortization = 0;
+
+                string monthlyText = labelMonthlyAmortizationInput.Text.Replace("₱", "").Replace(",", "").Trim();
+                if (decimal.TryParse(monthlyText, out monthlyAmortization))
                 {
-                    if (confirmLoanUpdate == null)
-                    {
-                        MessageBox.Show("Error creating confirmation dialog.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
+                    // Successfully parsed
+                }
 
-                    confirmLoanUpdate.StartPosition = FormStartPosition.CenterParent;
-                    var result = confirmLoanUpdate.ShowDialog(this);
+                string biMonthlyText = labelBimonthlyAmortizationInput.Text.Replace("₱", "").Replace(",", "").Trim();
+                if (decimal.TryParse(biMonthlyText, out biMonthlyAmortization))
+                {
+                    // Successfully parsed
+                }
 
-                    // If user confirms, update the existing loan
-                    if (result == DialogResult.OK && confirmLoanUpdate.UserConfirmed)
+                string employeeName = labelNameInput.Text;
+                string employeeId = labelIDInput.Text;
+
+                // Show confirmation dialog with full details
+                using (ConfirmLoanUpdate confirmUpdate = new ConfirmLoanUpdate())
+                {
+                    confirmUpdate.StartPosition = FormStartPosition.CenterParent;
+                    var result = confirmUpdate.ShowDialog(this);
+
+                    // If user confirms, THEN update cloud
+                    if (result == DialogResult.OK)
                     {
-                        await UpdateExistingLoan(selectedLoan, loanType);
-                        MessageBox.Show("Loan updated successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        // Update cloud here, not in ConfirmLoanUpdate
+                        await UpdateLoanInFirebaseAsync(employeeId, employeeName, loanType, endDate,
+                            totalPaymentTerms, monthlyAmortization, biMonthlyAmortization);
+
+                        // Show success message and close
+                        MessageBox.Show("Loan successfully updated in cloud database!", "Success",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                         this.DialogResult = DialogResult.OK;
                         this.Close();
                     }
@@ -767,110 +726,158 @@ namespace HRIS_JAP_ATTPAY
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Update button error: {ex.Message}");
-                MessageBox.Show($"Error updating loan: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error in loan update process: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private bool ValidateEndDate()
+        private bool ValidateInputs()
+        {
+            // Validate end date
+            if (string.IsNullOrWhiteSpace(textBoxEndDateInput.Text) || !DateTime.TryParse(textBoxEndDateInput.Text, out DateTime endDate))
+            {
+                MessageBox.Show("Please enter a valid end date.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                textBoxEndDateInput.Focus();
+                return false;
+            }
+
+            // Validate that a loan is selected
+            if (comboBoxSelectedInput?.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a loan to update.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            int index = comboBoxSelectedInput.SelectedIndex;
+            if (index < 0 || index >= allEmployeeLoans.Count)
+            {
+                MessageBox.Show("Invalid loan selection.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            // Validate that end date is after start date
+            var selectedLoan = allEmployeeLoans[index];
+            if (DateTime.TryParse(GetSafeValue(selectedLoan, "start_date"), out DateTime startDate))
+            {
+                if (endDate <= startDate)
+                {
+                    MessageBox.Show("End date must be after start date.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    textBoxEndDateInput.Focus();
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private async Task UpdateLoanInFirebaseAsync(string employeeId, string employeeName, string loanType,
+            string endDate, int totalPaymentTerms, decimal monthlyAmortization, decimal biMonthlyAmortization)
         {
             try
             {
-                if (textBoxEndDateInput?.Text == null || !DateTime.TryParse(textBoxEndDateInput.Text, out DateTime endDate))
+                // Find the existing loan to update
+                var existingLoan = await FindExistingLoan(employeeId, loanType);
+
+                if (existingLoan == null)
                 {
-                    MessageBox.Show("Please enter a valid end date.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    textBoxEndDateInput?.Focus();
-                    return false;
+                    MessageBox.Show("Could not find existing loan to update.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
 
-                if (comboBoxSelectedInput?.SelectedItem != null)
+                // Get the current loan data to preserve important fields
+                int index = comboBoxSelectedInput.SelectedIndex;
+                var currentLoanData = allEmployeeLoans[index];
+
+                // Create updated loan object for cloud storage (PRESERVE balance and payment progress)
+                var updatedLoan = new
                 {
-                    int index = comboBoxSelectedInput.SelectedIndex;
-                    if (index >= 0 && index < allEmployeeLoans.Count)
+                    employee_id = employeeId,
+                    employee_name = employeeName,
+                    loan_type = loanType,
+                    loan_amount = decimal.Parse(GetSafeValue(currentLoanData, "loan_amount")),
+                    balance = decimal.Parse(GetSafeValue(currentLoanData, "balance")), // PRESERVE existing balance
+                    start_date = GetSafeValue(currentLoanData, "start_date"),
+                    end_date = endDate,
+                    total_payment_terms = totalPaymentTerms,
+                    monthly_amortization = monthlyAmortization,
+                    bi_monthly_amortization = biMonthlyAmortization,
+                    total_payment_done = int.Parse(GetSafeValue(currentLoanData, "total_payment_done")), // PRESERVE existing payment progress
+                    status = "Active",
+                    created_at = GetSafeValue(currentLoanData, "created_at") ?? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), // Keep original creation date
+                    updated_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                };
+
+                // OVERWRITE the existing loan in Firebase
+                await firebase
+                    .Child("EmployeeLoans")
+                    .Child(existingLoan.LoanIndex.ToString())
+                    .PutAsync(updatedLoan);
+
+                // Add admin log to cloud
+                await AddAdminLog("Loan Updated", employeeId, employeeName,
+                    $"Updated {loanType} terms for {employeeName} (Balance: ₱{existingLoan.CurrentBalance:N2})");
+
+                Console.WriteLine($"Loan successfully updated in cloud at index: {existingLoan.LoanIndex}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error updating loan in Firebase: {ex.Message}");
+            }
+        }
+
+        private async Task<ExistingLoanInfo> FindExistingLoan(string employeeId, string loanType)
+        {
+            try
+            {
+                var loansData = await firebase.Child("EmployeeLoans").OnceSingleAsync<object>();
+                if (loansData == null) return null;
+
+                string json = Newtonsoft.Json.JsonConvert.SerializeObject(loansData);
+
+                if (json.Trim().StartsWith("["))
+                {
+                    var jArray = Newtonsoft.Json.JsonConvert.DeserializeObject<JArray>(json);
+                    if (jArray != null)
                     {
-                        var loan = allEmployeeLoans[index];
-                        if (DateTime.TryParse(GetSafeValue(loan, "start_date"), out DateTime startDate))
+                        for (int i = 0; i < jArray.Count; i++)
                         {
-                            if (endDate <= startDate)
+                            var item = jArray[i];
+                            if (item.Type == JTokenType.Null) continue;
+
+                            var loanDict = new Dictionary<string, object>();
+                            foreach (JProperty property in item.Children<JProperty>())
+                                loanDict[property.Name] = property.Value?.ToString() ?? "";
+
+                            string loanEmployeeId = loanDict.GetValueOrDefault("employee_id")?.ToString();
+                            string currentLoanType = loanDict.GetValueOrDefault("loan_type")?.ToString();
+
+                            if (!string.IsNullOrEmpty(loanEmployeeId) &&
+                                loanEmployeeId.Trim().Equals(employeeId.Trim(), StringComparison.OrdinalIgnoreCase) &&
+                                currentLoanType?.Equals(loanType, StringComparison.OrdinalIgnoreCase) == true)
                             {
-                                MessageBox.Show("End date must be after start date.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                textBoxEndDateInput?.Focus();
-                                return false;
+                                decimal currentBalance = 0;
+                                int currentPaymentDone = 0;
+
+                                decimal.TryParse(loanDict.GetValueOrDefault("balance")?.ToString(), out currentBalance);
+                                int.TryParse(loanDict.GetValueOrDefault("total_payment_done")?.ToString(), out currentPaymentDone);
+
+                                return new ExistingLoanInfo
+                                {
+                                    LoanIndex = i,
+                                    CreatedAt = loanDict.GetValueOrDefault("created_at")?.ToString() ?? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                                    CurrentBalance = currentBalance,
+                                    CurrentPaymentDone = currentPaymentDone
+                                };
                             }
                         }
                     }
                 }
-
-                return true;
+                return null;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Validate end date error: {ex.Message}");
-                return false;
-            }
-        }
-
-        private async Task UpdateExistingLoan(Dictionary<string, object> loanData, string loanType)
-        {
-            try
-            {
-                if (loanData == null || string.IsNullOrEmpty(loanType) || !loanKeys.ContainsKey(loanType))
-                {
-                    throw new Exception("Loan data not found for updating.");
-                }
-
-                string firebaseKey = loanKeys[loanType];
-
-                // Update the loan data with new values
-                loanData["end_date"] = textBoxEndDateInput?.Text ?? string.Empty;
-
-                // Update payment terms and amortizations from recalculated values
-                if (labelTotalPaymentInput?.Text != null)
-                {
-                    string paymentText = labelTotalPaymentInput.Text;
-                    if (paymentText.Contains("/"))
-                    {
-                        string[] parts = paymentText.Split('/');
-                        if (parts.Length == 2 && int.TryParse(parts[1], out int totalTerms))
-                        {
-                            loanData["total_payment_terms"] = totalTerms;
-                        }
-                    }
-                }
-
-                // Parse and update monetary values (remove currency symbols)
-                if (labelMonthlyAmortizationInput?.Text != null)
-                {
-                    string monthlyAmortizationText = labelMonthlyAmortizationInput.Text.Replace("₱", "").Replace(",", "").Trim();
-                    if (decimal.TryParse(monthlyAmortizationText, out decimal monthlyAmortization))
-                        loanData["monthly_amortization"] = monthlyAmortization;
-                }
-
-                if (labelBimonthlyAmortizationInput?.Text != null)
-                {
-                    string biMonthlyAmortizationText = labelBimonthlyAmortizationInput.Text.Replace("₱", "").Replace(",", "").Trim();
-                    if (decimal.TryParse(biMonthlyAmortizationText, out decimal biMonthlyAmortization))
-                        loanData["bi_monthly_amortization"] = biMonthlyAmortization;
-                }
-
-                loanData["updated_at"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                // Overwrite the existing loan in Firebase
-                await firebase
-                    .Child("EmployeeLoans")
-                    .Child(firebaseKey)
-                    .PutAsync(loanData);
-
-                // Add admin log for the update
-                await AddAdminLog("Loan Updated", employeeId, labelNameInput?.Text ?? "Unknown",
-                    $"Updated {loanType} loan - New end date: {textBoxEndDateInput?.Text}");
-
-                System.Diagnostics.Debug.WriteLine($"Loan successfully overwritten at key: {firebaseKey}");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error updating existing loan: {ex.Message}");
-                throw new Exception($"Error updating existing loan in Firebase: {ex.Message}");
+                Console.WriteLine($"Error finding existing loan: {ex.Message}");
+                return null;
             }
         }
 
@@ -878,20 +885,19 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // Default admin info with null checks
                 string adminEmployeeId = "JAP-001";
                 string adminName = "System Administrator";
                 string adminUserId = "101";
 
                 var adminLog = new
                 {
-                    action_type = actionType ?? "Unknown Action",
+                    action_type = actionType,
                     admin_employee_id = adminEmployeeId,
                     admin_name = adminName,
                     admin_user_id = adminUserId,
-                    description = description ?? "No description",
-                    details = $"Employee ID: {targetEmployeeId ?? "Unknown"}, Employee Name: {targetEmployeeName ?? "Unknown"}",
-                    target_employee_id = targetEmployeeId ?? "Unknown",
+                    description = description,
+                    details = $"Employee ID: {targetEmployeeId}, Employee Name: {targetEmployeeName}",
+                    target_employee_id = targetEmployeeId,
                     timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
                 };
 
@@ -915,7 +921,5 @@ namespace HRIS_JAP_ATTPAY
                 System.Diagnostics.Debug.WriteLine($"Form closing error: {ex.Message}");
             }
         }
-
-        
     }
 }
