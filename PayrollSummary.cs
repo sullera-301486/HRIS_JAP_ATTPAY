@@ -514,7 +514,7 @@ namespace HRIS_JAP_ATTPAY
             labelNameInput.Text = employeeData.FullName ?? "N/A";
             labelDepartmentInput.Text = employeeData.Department ?? "N/A";
             labelPositionInput.Text = employeeData.Position ?? "N/A";
-            labelDateCoveredInput.Text = $"{cutoffStartDate:MMMM d} - {cutoffEndDate:d}, {cutoffStartDate:yyyy}";
+            labelDateCoveredInput.Text = $"{cutoffStartDate:MMMM d} - {cutoffEndDate:d}";
         }
 
         private void CalculateAndDisplayPayroll()
@@ -590,13 +590,13 @@ namespace HRIS_JAP_ATTPAY
             // Basic information
             labelDailyRateInput.Text = dailyRate.ToString("0.00");
             labelDaysInput.Text = totalWorkDays.ToString();
-            labelDaysPresentInput.Text = $"{actualDaysWorked} days ({daysPresent:0.00} equivalent)";
+            labelDaysPresentInput.Text = $"{actualDaysWorked}";
             labelSalaryInput.Text = (dailyRate * totalWorkDays).ToString("0.00");
 
             // Basic pay breakdown
             labelBasicPayAmountBaseInput.Text = (dailyRate * daysPresent).ToString("0.00");
             labelBasicPayAmountCreditInput.Text = basicPay.ToString("0.00");
-            labelBasicPayCredit.Text = $"{totalRegularHours:0.00} hours";
+            labelBasicPayCredit.Text = $"{totalRegularHours:0.00}";
 
             // Overtime breakdown
             labelOvertimeInput.Text = totalOvertimeHours.ToString("0.00");
