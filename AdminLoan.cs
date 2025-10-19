@@ -15,6 +15,7 @@ namespace HRIS_JAP_ATTPAY
     //UPDATED
     public partial class AdminLoan : UserControl
     {
+        private LoanFilterCriteria currentLoanFilters = new LoanFilterCriteria();
         private AttributesClassAlt panelLoaderAdminPayroll;
         public Panel AdminViewPanel;
         private string currentEmployeeId;
@@ -442,7 +443,274 @@ namespace HRIS_JAP_ATTPAY
         {
             Form parentForm = this.FindForm();
             FilterAdminLoan filterAdminLoan = new FilterAdminLoan();
+
+            // Subscribe to filter events
+            filterAdminLoan.FiltersApplied += ApplyLoanFilters;
+            filterAdminLoan.FiltersReset += ResetLoanFilters;
+
             AttributesClass.ShowWithOverlay(parentForm, filterAdminLoan);
+        }
+        private void ApplyLoanFilters(LoanFilterCriteria filters)
+        {
+            System.Diagnostics.Debug.WriteLine($"ApplyLoanFilters called with SortBy: '{filters?.SortBy}'");
+            currentLoanFilters = filters ?? new LoanFilterCriteria();
+            ApplyLoanFilterAndSort();
+        }
+
+        private void ResetLoanFilters()
+        {
+            System.Diagnostics.Debug.WriteLine("=== RESETTING LOAN FILTERS ===");
+
+            // Reset the filter criteria
+            currentLoanFilters = new LoanFilterCriteria();
+
+            // Clear the search text
+            if (textBoxSearchEmployee.InvokeRequired)
+            {
+                textBoxSearchEmployee.Invoke((MethodInvoker)delegate
+                {
+                    textBoxSearchEmployee.Text = "";
+                });
+            }
+            else
+            {
+                textBoxSearchEmployee.Text = "";
+            }
+
+            // Reload the data
+            LoadFirebaseData();
+
+            System.Diagnostics.Debug.WriteLine("=== LOAN FILTERS RESET COMPLETE ===");
+        }
+
+        private void ApplyLoanFilterAndSort()
+        {
+            dataGridViewEmployee.SuspendLayout();
+
+            try
+            {
+                // Get all visible rows
+                var visibleRows = new List<DataGridViewRow>();
+                foreach (DataGridViewRow row in dataGridViewEmployee.Rows)
+                {
+                    if (!row.IsNewRow && row.Visible)
+                    {
+                        visibleRows.Add(row);
+                    }
+                }
+
+                // Apply filters
+                foreach (DataGridViewRow row in visibleRows)
+                {
+                    bool shouldShow = MatchesLoanFilters(row);
+                    row.Visible = shouldShow;
+                }
+
+                // Apply sorting if specified
+                if (!string.IsNullOrEmpty(currentLoanFilters?.SortBy))
+                {
+                    ApplySortingToLoanGrid();
+                }
+
+                // Update row numbers
+                UpdateLoanRowNumbers();
+            }
+            finally
+            {
+                dataGridViewEmployee.ResumeLayout();
+                dataGridViewEmployee.Refresh();
+            }
+        }
+
+        private bool MatchesLoanFilters(DataGridViewRow row)
+        {
+            string employeeId = row.Cells["EmployeeId"].Value?.ToString() ?? "";
+            string fullName = row.Cells["FullName"].Value?.ToString() ?? "";
+            string loanType = row.Cells["LoanType"].Value?.ToString() ?? "";
+            string loanAmountStr = row.Cells["LoanAmount"].Value?.ToString() ?? "₱ 0.00";
+            string balanceStr = row.Cells["Balance"].Value?.ToString() ?? "₱ 0.00";
+
+            // Remove currency symbol and parse
+            decimal loanAmount = ParseCurrency(loanAmountStr);
+            decimal balance = ParseCurrency(balanceStr);
+
+            // Employee ID filter
+            if (!string.IsNullOrEmpty(currentLoanFilters.EmployeeId) &&
+                currentLoanFilters.EmployeeId.Trim().ToLower() != "search id")
+            {
+                if (!employeeId.ToLower().Contains(currentLoanFilters.EmployeeId.ToLower()))
+                    return false;
+            }
+
+            // Name filter
+            if (!string.IsNullOrEmpty(currentLoanFilters.Name) &&
+                currentLoanFilters.Name.Trim().ToLower() != "search name")
+            {
+                if (!fullName.ToLower().Contains(currentLoanFilters.Name.ToLower()))
+                    return false;
+            }
+
+            // Loan Type filter
+            if (!string.IsNullOrEmpty(currentLoanFilters.LoanType) &&
+                !currentLoanFilters.LoanType.Equals("Select loan type", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!loanType.Equals(currentLoanFilters.LoanType, StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+
+            // Note: Department and Position filters would require additional employee data
+            // For now, skipping those since they're not directly in the loan grid
+
+            // Amount range filter
+            if (!string.IsNullOrEmpty(currentLoanFilters.AmountMinimum) &&
+                currentLoanFilters.AmountMinimum.Trim().ToLower() != "minimum")
+            {
+                if (decimal.TryParse(currentLoanFilters.AmountMinimum, out decimal minAmount))
+                {
+                    if (loanAmount < minAmount)
+                        return false;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(currentLoanFilters.AmountMaximum) &&
+                currentLoanFilters.AmountMaximum.Trim().ToLower() != "maximum")
+            {
+                if (decimal.TryParse(currentLoanFilters.AmountMaximum, out decimal maxAmount))
+                {
+                    if (loanAmount > maxAmount)
+                        return false;
+                }
+            }
+
+            // Balance range filter
+            if (!string.IsNullOrEmpty(currentLoanFilters.BalanceMinimum) &&
+                currentLoanFilters.BalanceMinimum.Trim().ToLower() != "minimum")
+            {
+                if (decimal.TryParse(currentLoanFilters.BalanceMinimum, out decimal minBalance))
+                {
+                    if (balance < minBalance)
+                        return false;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(currentLoanFilters.BalanceMaximum) &&
+                currentLoanFilters.BalanceMaximum.Trim().ToLower() != "maximum")
+            {
+                if (decimal.TryParse(currentLoanFilters.BalanceMaximum, out decimal maxBalance))
+                {
+                    if (balance > maxBalance)
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void ApplySortingToLoanGrid()
+        {
+            string sort = currentLoanFilters.SortBy.ToLower().Trim();
+            System.Diagnostics.Debug.WriteLine($"Sorting by: '{sort}'");
+
+            // Get visible rows with their data
+            var rowDataList = new List<LoanRowData>();
+
+            foreach (DataGridViewRow row in dataGridViewEmployee.Rows)
+            {
+                if (!row.IsNewRow && row.Visible)
+                {
+                    rowDataList.Add(new LoanRowData
+                    {
+                        EmployeeId = row.Cells["EmployeeId"].Value?.ToString() ?? "",
+                        FullName = row.Cells["FullName"].Value?.ToString() ?? "",
+                        LoanType = row.Cells["LoanType"].Value?.ToString() ?? "",
+                        LoanAmount = row.Cells["LoanAmount"].Value?.ToString() ?? "",
+                        Balance = row.Cells["Balance"].Value?.ToString() ?? "",
+                        Remarks = row.Cells["Remarks"].Value?.ToString() ?? ""
+                    });
+                }
+            }
+
+            // Sort the data
+            List<LoanRowData> sortedData = null;
+
+            switch (sort)
+            {
+                case "a-z":
+                    sortedData = rowDataList.OrderBy(d => d.FullName, StringComparer.OrdinalIgnoreCase).ToList();
+                    break;
+
+                case "z-a":
+                    sortedData = rowDataList.OrderByDescending(d => d.FullName, StringComparer.OrdinalIgnoreCase).ToList();
+                    break;
+
+                default:
+                    return; // No sorting
+            }
+
+            if (sortedData == null) return;
+
+            // Clear and re-add rows in sorted order
+            dataGridViewEmployee.SuspendLayout();
+            try
+            {
+                dataGridViewEmployee.Rows.Clear();
+
+                int counter = 1;
+                foreach (var data in sortedData)
+                {
+                    dataGridViewEmployee.Rows.Add(
+                        counter,
+                        data.EmployeeId,
+                        data.FullName,
+                        data.LoanType,
+                        data.LoanAmount,
+                        data.Balance,
+                        data.Remarks,
+                        Properties.Resources.ExpandRight
+                    );
+                    counter++;
+                }
+            }
+            finally
+            {
+                dataGridViewEmployee.ResumeLayout();
+            }
+        }
+
+        private decimal ParseCurrency(string currencyStr)
+        {
+            // Remove currency symbol (₱), spaces, and commas
+            string cleaned = currencyStr.Replace("₱", "").Replace(",", "").Trim();
+
+            if (decimal.TryParse(cleaned, out decimal value))
+            {
+                return value;
+            }
+
+            return 0m;
+        }
+
+        private void UpdateLoanRowNumbers()
+        {
+            int counter = 1;
+            foreach (DataGridViewRow row in dataGridViewEmployee.Rows)
+            {
+                if (!row.IsNewRow && row.Visible)
+                {
+                    if (row.Cells["RowNumber"] != null)
+                    {
+                        row.Cells["RowNumber"].Value = counter;
+                    }
+                    counter++;
+                }
+                else if (!row.IsNewRow)
+                {
+                    if (row.Cells["RowNumber"] != null)
+                    {
+                        row.Cells["RowNumber"].Value = "";
+                    }
+                }
+            }
         }
     }
 }

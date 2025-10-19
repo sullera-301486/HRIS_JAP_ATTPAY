@@ -14,6 +14,7 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class AdminPayroll : UserControl
     {
+        private PayrollFilterCriteria currentPayrollFilters = new PayrollFilterCriteria();
         private AttributesClassAlt panelLoaderAdminLoan;
         public Panel AdminViewPanel;
         private FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
@@ -246,8 +247,292 @@ namespace HRIS_JAP_ATTPAY
         {
             Form parentForm = this.FindForm();
             FilterAdminPayroll filterAdminPayrollform = new FilterAdminPayroll();
+
+            // Subscribe to filter events
+            filterAdminPayrollform.FiltersApplied += ApplyPayrollFilters;
+            filterAdminPayrollform.FiltersReset += ResetPayrollFilters;
+
             AttributesClass.ShowWithOverlay(parentForm, filterAdminPayrollform);
         }
+        private void ApplyPayrollFilters(PayrollFilterCriteria filters)
+        {
+            System.Diagnostics.Debug.WriteLine($"ApplyPayrollFilters called with SortBy: '{filters?.SortBy}'");
+            currentPayrollFilters = filters ?? new PayrollFilterCriteria();
+            ApplyPayrollFilterAndSort();
+        }
+        private void ResetPayrollFilters()
+        {
+            System.Diagnostics.Debug.WriteLine("=== RESETTING PAYROLL FILTERS ===");
+
+            // Reset the filter criteria
+            currentPayrollFilters = new PayrollFilterCriteria();
+
+            // Clear the search text
+            if (textBoxSearchEmployee.InvokeRequired)
+            {
+                textBoxSearchEmployee.Invoke((MethodInvoker)delegate
+                {
+                    textBoxSearchEmployee.Text = "";
+                });
+            }
+            else
+            {
+                textBoxSearchEmployee.Text = "";
+            }
+
+            // Reload the data
+            LoadFirebaseData();
+
+            System.Diagnostics.Debug.WriteLine("=== PAYROLL FILTERS RESET COMPLETE ===");
+        }
+
+        private void ApplyPayrollFilterAndSort()
+        {
+            dataGridViewEmployee.SuspendLayout();
+
+            try
+            {
+                // Get all visible rows
+                var visibleRows = new List<DataGridViewRow>();
+                foreach (DataGridViewRow row in dataGridViewEmployee.Rows)
+                {
+                    if (!row.IsNewRow && row.Visible)
+                    {
+                        visibleRows.Add(row);
+                    }
+                }
+
+                // Apply filters
+                foreach (DataGridViewRow row in visibleRows)
+                {
+                    bool shouldShow = MatchesPayrollFilters(row);
+                    row.Visible = shouldShow;
+                }
+
+                // Apply sorting if specified
+                if (!string.IsNullOrEmpty(currentPayrollFilters?.SortBy))
+                {
+                    ApplySortingToGrid();
+                }
+
+                // Update row numbers
+                UpdatePayrollRowNumbers();
+            }
+            finally
+            {
+                dataGridViewEmployee.ResumeLayout();
+                dataGridViewEmployee.Refresh();
+            }
+        }
+
+        private bool MatchesPayrollFilters(DataGridViewRow row)
+        {
+            string employeeId = row.Cells["EmployeeId"].Value?.ToString() ?? "";
+            string fullName = row.Cells["FullName"].Value?.ToString() ?? "";
+            string department = row.Cells["Department"].Value?.ToString() ?? "";
+            string position = row.Cells["Position"].Value?.ToString() ?? "";
+            string grossPayStr = row.Cells["GrossPay"].Value?.ToString() ?? "₱ 0.00";
+            string netPayStr = row.Cells["NetPay"].Value?.ToString() ?? "₱ 0.00";
+
+            // Remove currency symbol and parse
+            decimal grossPay = ParseCurrency(grossPayStr);
+            decimal netPay = ParseCurrency(netPayStr);
+
+            // Employee ID filter
+            if (!string.IsNullOrEmpty(currentPayrollFilters.EmployeeId) &&
+                currentPayrollFilters.EmployeeId.Trim().ToLower() != "search id")
+            {
+                if (!employeeId.ToLower().Contains(currentPayrollFilters.EmployeeId.ToLower()))
+                    return false;
+            }
+
+            // Name filter
+            if (!string.IsNullOrEmpty(currentPayrollFilters.Name) &&
+                currentPayrollFilters.Name.Trim().ToLower() != "search name")
+            {
+                if (!fullName.ToLower().Contains(currentPayrollFilters.Name.ToLower()))
+                    return false;
+            }
+
+            // Department filter
+            if (!string.IsNullOrEmpty(currentPayrollFilters.Department) &&
+                !currentPayrollFilters.Department.Equals("Select department", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!department.Equals(currentPayrollFilters.Department, StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+
+            // Position filter
+            if (!string.IsNullOrEmpty(currentPayrollFilters.Position) &&
+                !currentPayrollFilters.Position.Equals("Select position", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!position.Equals(currentPayrollFilters.Position, StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+
+            // Gross Pay range filter
+            if (!string.IsNullOrEmpty(currentPayrollFilters.GrossPayMinimum) &&
+                currentPayrollFilters.GrossPayMinimum.Trim().ToLower() != "minimum")
+            {
+                if (decimal.TryParse(currentPayrollFilters.GrossPayMinimum, out decimal minGross))
+                {
+                    if (grossPay < minGross)
+                        return false;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(currentPayrollFilters.GrossPayMaximum) &&
+                currentPayrollFilters.GrossPayMaximum.Trim().ToLower() != "maximum")
+            {
+                if (decimal.TryParse(currentPayrollFilters.GrossPayMaximum, out decimal maxGross))
+                {
+                    if (grossPay > maxGross)
+                        return false;
+                }
+            }
+
+            // Net Pay range filter
+            if (!string.IsNullOrEmpty(currentPayrollFilters.NetPayMinimum) &&
+                currentPayrollFilters.NetPayMinimum.Trim().ToLower() != "minimum")
+            {
+                if (decimal.TryParse(currentPayrollFilters.NetPayMinimum, out decimal minNet))
+                {
+                    if (netPay < minNet)
+                        return false;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(currentPayrollFilters.NetPayMaximum) &&
+                currentPayrollFilters.NetPayMaximum.Trim().ToLower() != "maximum")
+            {
+                if (decimal.TryParse(currentPayrollFilters.NetPayMaximum, out decimal maxNet))
+                {
+                    if (netPay > maxNet)
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void ApplySortingToGrid()
+        {
+            string sort = currentPayrollFilters.SortBy.ToLower().Trim();
+            System.Diagnostics.Debug.WriteLine($"Sorting by: '{sort}'");
+
+            // Get visible rows with their data
+            var rowDataList = new List<RowData>();
+
+            foreach (DataGridViewRow row in dataGridViewEmployee.Rows)
+            {
+                if (!row.IsNewRow && row.Visible)
+                {
+                    rowDataList.Add(new RowData
+                    {
+                        EmployeeId = row.Cells["EmployeeId"].Value?.ToString() ?? "",
+                        FullName = row.Cells["FullName"].Value?.ToString() ?? "",
+                        Department = row.Cells["Department"].Value?.ToString() ?? "",
+                        Position = row.Cells["Position"].Value?.ToString() ?? "",
+                        GrossPay = row.Cells["GrossPay"].Value?.ToString() ?? "",
+                        NetPay = row.Cells["NetPay"].Value?.ToString() ?? ""
+                    });
+                }
+            }
+
+            // Sort the data
+            List<RowData> sortedData = null;
+
+            switch (sort)
+            {
+                case "a-z":
+                    sortedData = rowDataList.OrderBy(d => d.FullName, StringComparer.OrdinalIgnoreCase).ToList();
+                    break;
+
+                case "z-a":
+                    sortedData = rowDataList.OrderByDescending(d => d.FullName, StringComparer.OrdinalIgnoreCase).ToList();
+                    break;
+
+                default:
+                    return; // No sorting
+            }
+
+            if (sortedData == null) return;
+
+            // Clear and re-add rows in sorted order
+            dataGridViewEmployee.SuspendLayout();
+            try
+            {
+                dataGridViewEmployee.Rows.Clear();
+
+                int counter = 1;
+                foreach (var data in sortedData)
+                {
+                    dataGridViewEmployee.Rows.Add(
+                        counter,
+                        data.EmployeeId,
+                        data.FullName,
+                        data.Department,
+                        data.Position,
+                        data.GrossPay,
+                        data.NetPay,
+                        Properties.Resources.ExpandRight
+                    );
+                    counter++;
+                }
+            }
+            finally
+            {
+                dataGridViewEmployee.ResumeLayout();
+            }
+        }
+
+        // Helper class for sorting
+        private class RowData
+        {
+            public string EmployeeId { get; set; }
+            public string FullName { get; set; }
+            public string Department { get; set; }
+            public string Position { get; set; }
+            public string GrossPay { get; set; }
+            public string NetPay { get; set; }
+        }
+
+        private decimal ParseCurrency(string currencyStr)
+        {
+            // Remove currency symbol (₱), spaces, and commas
+            string cleaned = currencyStr.Replace("₱", "").Replace(",", "").Trim();
+
+            if (decimal.TryParse(cleaned, out decimal value))
+            {
+                return value;
+            }
+
+            return 0m;
+        }
+
+        private void UpdatePayrollRowNumbers()
+        {
+            int counter = 1;
+            foreach (DataGridViewRow row in dataGridViewEmployee.Rows)
+            {
+                if (!row.IsNewRow && row.Visible)
+                {
+                    if (row.Cells["RowNumber"] != null)
+                    {
+                        row.Cells["RowNumber"].Value = counter;
+                    }
+                    counter++;
+                }
+                else if (!row.IsNewRow)
+                {
+                    if (row.Cells["RowNumber"] != null)
+                    {
+                        row.Cells["RowNumber"].Value = "";
+                    }
+                }
+            }
+        }
+
 
         private void setDataGridViewAttributes()
         {

@@ -500,6 +500,7 @@
             this.buttonApply.TabIndex = 90;
             this.buttonApply.Text = "Apply";
             this.buttonApply.UseVisualStyleBackColor = false;
+            this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click_1);
             // 
             // FilterAdminPayroll
             // 
