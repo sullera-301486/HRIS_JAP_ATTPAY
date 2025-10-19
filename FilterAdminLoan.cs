@@ -409,6 +409,38 @@ namespace HRIS_JAP_ATTPAY
             FiltersApplied?.Invoke(filters);
             this.Close();
         }
+
+        private void buttonReset_Click_1(object sender, EventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("Reset button clicked in loan filter form");
+
+            // Reset all filter controls
+            textBoxID.Text = "";
+            textBoxName.Text = "";
+            textBoxStartDate.Text = "";
+            textBoxEndDate.Text = "";
+            textBoxAmountMinimum.Text = "";
+            textBoxAmountMaximum.Text = "";
+            textBoxBalanceMinimum.Text = "";
+            textBoxBalanceMaximum.Text = "";
+
+            // Reset ComboBoxes
+            if (comboBoxDepartment.Items.Count > 0)
+                comboBoxDepartment.SelectedIndex = 0;
+
+            if (comboBoxPosition.Items.Count > 0)
+                comboBoxPosition.SelectedIndex = 0;
+
+            if (comboBoxLoanTypeInput.Items.Count > 0)
+                comboBoxLoanTypeInput.SelectedIndex = 0;
+
+            // Clear sort selection
+            comboBoxSort.SelectedIndex = -1;
+
+            // Trigger the reset event
+            FiltersReset?.Invoke();
+            this.Close();
+        }
     }
 
     // Filter criteria class for loans

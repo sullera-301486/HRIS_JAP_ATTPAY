@@ -367,6 +367,41 @@ namespace HRIS_JAP_ATTPAY
             FiltersApplied?.Invoke(filters);
             this.Close();
         }
+
+        private void buttonReset_Click_1(object sender, EventArgs e)
+        {
+            // Reset all filter controls
+            textBoxID.Text = "";
+            textBoxName.Text = "";
+            textBoxStartDate.Text = "";
+            textBoxEndDate.Text = "";
+            textBoxSalaryMinimum.Text = "";
+            textBoxSalaryMaximum.Text = "";
+            textBoxGrossPayMinimum.Text = "";
+            textBoxGrossPayMaximum.Text = "";
+            textBoxNetPayMinimum.Text = "";
+            textBoxNetPayMaximum.Text = "";
+
+            // Reset ComboBoxes
+            if (comboBoxDepartment.Items.Count > 0)
+                comboBoxDepartment.SelectedIndex = 0;
+
+            if (comboBoxPosition.Items.Count > 0)
+                comboBoxPosition.SelectedIndex = 0;
+
+            if (comboBoxOvertimeHours.Items.Count > 0)
+                comboBoxOvertimeHours.SelectedIndex = -1;
+
+            if (comboBoxUnusedLeave.Items.Count > 0)
+                comboBoxUnusedLeave.SelectedIndex = -1;
+
+            // Clear sort selection
+            comboBoxSort.SelectedIndex = -1;
+
+            // Trigger the reset event
+            FiltersReset?.Invoke();
+            this.Close();
+        }
     }
 
     // Filter criteria class for payroll
