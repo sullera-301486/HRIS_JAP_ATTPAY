@@ -15,6 +15,8 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class PayrollSummaryEdit : Form
     {
+        private List<PayrollLoan> employeeLoans = new List<PayrollLoan>();
+
         private readonly FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
         private string currentEmployeeId;
         private string payrollPeriod;
@@ -115,6 +117,7 @@ namespace HRIS_JAP_ATTPAY
                 govDeductions.Clear();
                 loanDeductions.Clear();
                 payrollSummary.Clear();
+                employeeLoans.Clear(); // Clear loans
 
                 // Load payroll data
                 await LoadArrayBasedData("Payroll", (item) =>
@@ -124,42 +127,66 @@ namespace HRIS_JAP_ATTPAY
                     {
                         payrollData[employeeId] = item;
                         payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : "";
+                        System.Diagnostics.Debug.WriteLine($"Found payroll record for {employeeId}, payroll_id: {payrollId}");
                     }
                 });
+
+                if (string.IsNullOrEmpty(payrollId))
+                {
+                    MessageBox.Show("No payroll data found for this employee.", "Information",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
 
                 // Load payroll earnings
                 await LoadArrayBasedData("PayrollEarnings", (item) =>
                 {
-                    var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
-                    if (!string.IsNullOrEmpty(payrollId))
-                        payrollEarnings[payrollId] = item;
+                    var pId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
+                    if (!string.IsNullOrEmpty(pId) && pId == payrollId)
+                    {
+                        payrollEarnings[pId] = item;
+                        System.Diagnostics.Debug.WriteLine($"Found earnings for payroll_id: {pId}");
+                    }
                 });
 
                 // Load government deductions
                 await LoadArrayBasedData("GovernmentDeductions", (item) =>
                 {
-                    var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
-                    if (!string.IsNullOrEmpty(payrollId))
-                        govDeductions[payrollId] = item;
+                    var pId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
+                    if (!string.IsNullOrEmpty(pId) && pId == payrollId)
+                    {
+                        govDeductions[pId] = item;
+                        System.Diagnostics.Debug.WriteLine($"Found gov deductions for payroll_id: {pId}");
+                    }
                 });
 
                 // Load loan deductions
                 await LoadArrayBasedData("LoansAndOtherDeductions", (item) =>
                 {
-                    var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
-                    if (!string.IsNullOrEmpty(payrollId))
-                        loanDeductions[payrollId] = item;
+                    var pId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
+                    if (!string.IsNullOrEmpty(pId) && pId == payrollId)
+                    {
+                        loanDeductions[pId] = item;
+                        System.Diagnostics.Debug.WriteLine($"Found loans/deductions for payroll_id: {pId}");
+                    }
                 });
 
                 // Load payroll summary
                 await LoadArrayBasedData("PayrollSummary", (item) =>
                 {
-                    var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
-                    if (!string.IsNullOrEmpty(payrollId))
-                        payrollSummary[payrollId] = item;
+                    var pId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
+                    if (!string.IsNullOrEmpty(pId) && pId == payrollId)
+                    {
+                        payrollSummary[pId] = item;
+                        System.Diagnostics.Debug.WriteLine($"Found summary for payroll_id: {pId}");
+                    }
                 });
 
-                if (!string.IsNullOrEmpty(payrollId) && payrollData.ContainsKey(currentEmployeeId))
+                // Load employee loans from EmployeeLoans table
+                await LoadEmployeeLoans();
+
+                // Now populate the UI with loaded data
+                if (payrollData.ContainsKey(currentEmployeeId))
                 {
                     var payroll = payrollData[currentEmployeeId];
                     var earnings = payrollEarnings.ContainsKey(payrollId) ? payrollEarnings[payrollId] : null;
@@ -167,11 +194,38 @@ namespace HRIS_JAP_ATTPAY
                     var loanDeduction = loanDeductions.ContainsKey(payrollId) ? loanDeductions[payrollId] : null;
                     var summary = payrollSummary.ContainsKey(payrollId) ? payrollSummary[payrollId] : null;
 
+                    // Load Employee Basic Info
+                    await LoadEmployeeBasicInfo();
+
                     // Basic Information
                     if (earnings != null)
                     {
                         textBoxDailyRateInput.Text = earnings.ContainsKey("daily_rate") ? earnings["daily_rate"] : "0.00";
                         labelDaysPresentInput.Text = earnings.ContainsKey("days_present") ? earnings["days_present"] : "0";
+                    }
+                    if (payrollData.ContainsKey(currentEmployeeId))
+                    {
+                        payroll = payrollData[currentEmployeeId];
+                        if (payroll.ContainsKey("cutoff_start") && payroll.ContainsKey("cutoff_end"))
+                        {
+                            DateTime startDate = DateTime.Parse(payroll["cutoff_start"]);
+                            DateTime endDate = DateTime.Parse(payroll["cutoff_end"]);
+
+                            // Calculate work days (excluding Sundays)
+                            int totalWorkDays = 0;
+                            for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
+                            {
+                                if (date.DayOfWeek != DayOfWeek.Sunday)
+                                    totalWorkDays++;
+                            }
+
+                            labelDaysInput.Text = totalWorkDays.ToString();
+
+                            // Calculate salary
+                            decimal dailyRate = SafeParseDecimal(textBoxDailyRateInput.Text);
+                            decimal salary = dailyRate * totalWorkDays;
+                            labelSalaryInput.Text = salary.ToString("0.00");
+                        }
                     }
 
                     // Allowances (Base Amounts)
@@ -186,7 +240,8 @@ namespace HRIS_JAP_ATTPAY
                     }
 
                     // Overtime - Calculate from attendance
-                    decimal overtimeHours = await CalculateOvertimeForEmployee(currentEmployeeId, payroll["cutoff_start"], payroll["cutoff_end"]);
+                    decimal overtimeHours = await CalculateOvertimeForEmployee(currentEmployeeId,
+                                            payroll["cutoff_start"], payroll["cutoff_end"]);
                     labelOvertimeInput.Text = overtimeHours.ToString("0.00");
 
                     // Government Deductions
@@ -198,18 +253,11 @@ namespace HRIS_JAP_ATTPAY
                         labelPhilhealthAmountDebitInput.Text = govDeduction.ContainsKey("philhealth") ? govDeduction["philhealth"] : "0.00";
                     }
 
-                    // Loans and Other Deductions
-                    if (loanDeduction != null)
-                    {
-                        labelSSSLoanAmountDebitInput.Text = loanDeduction.ContainsKey("sss_loan") ? loanDeduction["sss_loan"] : "0.00";
-                        labelPagIbigLoanAmountDebitInput.Text = loanDeduction.ContainsKey("pagibig_loan") ? loanDeduction["pagibig_loan"] : "0.00";
-                        labelCarLoanAmountDebitInput.Text = loanDeduction.ContainsKey("car_loan") ? loanDeduction["car_loan"] : "0.00";
-                        labelHousingLoanAmountDebitInput.Text = loanDeduction.ContainsKey("housing_loan") ? loanDeduction["housing_loan"] : "0.00";
-                        textBoxCashAdvanceAmountDebitInput.Text = loanDeduction.ContainsKey("cash_advance") ? loanDeduction["cash_advance"] : "0.00";
-                        labelCoopLoanAmountDebitInput.Text = loanDeduction.ContainsKey("coop_loan") ? loanDeduction["coop_loan"] : "0.00";
-                        textBoxCoopContriAmountDebitInput.Text = loanDeduction.ContainsKey("coop_contribution") ? loanDeduction["coop_contribution"] : "0.00";
-                        textBoxOthersAmountDebitInput.Text = loanDeduction.ContainsKey("other_deduction") ? loanDeduction["other_deduction"] : "0.00";
-                    }
+                    // Other Deductions (non-loan items) - Load from EmployeeDeductions if available
+                    await LoadEmployeeDeductions();
+
+                    // Display loan details from EmployeeLoans table (this will populate loan amounts and details)
+                    DisplayLoanDetails();
 
                     // Totals from PayrollSummary
                     if (summary != null)
@@ -221,15 +269,93 @@ namespace HRIS_JAP_ATTPAY
 
                     // Set date covered
                     labelDateCoveredInput.Text = $"{payroll["cutoff_start"]} to {payroll["cutoff_end"]}";
+
+                    // Trigger initial calculation
+                    RecalculateTotals();
                 }
                 else
                 {
-                    MessageBox.Show("No payroll data found for this employee.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("No payroll data found for this employee.", "Information",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading payroll data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error loading payroll data: " + ex.Message, "Error",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                System.Diagnostics.Debug.WriteLine($"LoadPayrollDataAsync Error: {ex.Message}\n{ex.StackTrace}");
+            }
+        }
+        private async Task LoadEmployeeDeductions()
+        {
+            try
+            {
+                await LoadArrayBasedData("EmployeeDeductions", (item) =>
+                {
+                    var empId = item.ContainsKey("employee_id") ? item["employee_id"] : null;
+                    if (!string.IsNullOrEmpty(empId) && empId == currentEmployeeId)
+                    {
+                        // Load Cash Advance
+                        if (item.ContainsKey("cash_advance"))
+                        {
+                            textBoxCashAdvanceAmountDebitInput.Text = item["cash_advance"];
+                        }
+
+                        // Load Coop Contribution
+                        if (item.ContainsKey("coop_contribution"))
+                        {
+                            textBoxCoopContriAmountDebitInput.Text = item["coop_contribution"];
+                        }
+
+                        // Load Other Deductions
+                        if (item.ContainsKey("other_deductions"))
+                        {
+                            textBoxOthersAmountDebitInput.Text = item["other_deductions"];
+                        }
+
+                        System.Diagnostics.Debug.WriteLine($"Loaded employee deductions for {currentEmployeeId}");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading employee deductions: {ex.Message}");
+            }
+        }
+
+        private async Task LoadEmployeeBasicInfo()
+        {
+            try
+            {
+                var empData = await firebase
+                    .Child("EmployeeDetails")
+                    .Child(currentEmployeeId)
+                    .OnceSingleAsync<Dictionary<string, object>>();
+
+                if (empData != null)
+                {
+                    string firstName = empData.ContainsKey("first_name") ? empData["first_name"]?.ToString() ?? "" : "";
+                    string middleName = empData.ContainsKey("middle_name") ? empData["middle_name"]?.ToString() ?? "" : "";
+                    string lastName = empData.ContainsKey("last_name") ? empData["last_name"]?.ToString() ?? "" : "";
+
+                    labelIDInput.Text = empData.ContainsKey("employee_id") ? empData["employee_id"]?.ToString() ?? currentEmployeeId : currentEmployeeId;
+                    labelNameInput.Text = $"{lastName}, {firstName} {middleName}".Trim().Replace("  ", " ");
+                }
+
+                // Load department and position from EmploymentInfo
+                await LoadArrayBasedData("EmploymentInfo", (item) =>
+                {
+                    var empId = item.ContainsKey("employee_id") ? item["employee_id"] : null;
+                    if (!string.IsNullOrEmpty(empId) && empId == currentEmployeeId)
+                    {
+                        labelDepartmentInput.Text = item.ContainsKey("department") ? item["department"] : "N/A";
+                        labelPositionInput.Text = item.ContainsKey("position") ? item["position"] : "N/A";
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading employee basic info: {ex.Message}");
             }
         }
 
@@ -278,6 +404,97 @@ namespace HRIS_JAP_ATTPAY
             catch
             {
                 return false;
+            }
+        }
+        private async Task LoadEmployeeLoans()
+        {
+            try
+            {
+                employeeLoans.Clear();
+
+                await LoadArrayBasedData("EmployeeLoans", (item) =>
+                {
+                    var empId = item.ContainsKey("employee_id") ? item["employee_id"] : null;
+                    var status = item.ContainsKey("status") ? item["status"] : null;
+
+                    if (!string.IsNullOrEmpty(empId) && empId == currentEmployeeId &&
+                        status != null && status.Equals("Active", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var loan = new PayrollLoan
+                        {
+                            LoanType = item.ContainsKey("loan_type") ? item["loan_type"] : "",
+                            Status = status
+                        };
+
+                        if (decimal.TryParse(item.ContainsKey("loan_amount") ? item["loan_amount"] : "0", out decimal amount))
+                            loan.LoanAmount = amount;
+
+                        if (decimal.TryParse(item.ContainsKey("balance") ? item["balance"] : "0", out decimal balance))
+                            loan.Balance = balance;
+
+                        if (int.TryParse(item.ContainsKey("total_payment_terms") ? item["total_payment_terms"] : "0", out int totalTerms))
+                            loan.TotalPaymentTerms = totalTerms;
+
+                        if (int.TryParse(item.ContainsKey("total_payment_done") ? item["total_payment_done"] : "0", out int paymentDone))
+                            loan.TotalPaymentDone = paymentDone;
+
+                        loan.StartDate = item.ContainsKey("start_date") ? item["start_date"] : "";
+                        loan.EndDate = item.ContainsKey("end_date") ? item["end_date"] : "";
+
+                        // Calculate bi-monthly amortization
+                        loan.BiMonthlyAmortization = CalculateLoanAmortization(loan);
+
+                        if (decimal.TryParse(item.ContainsKey("monthly_amortization") ? item["monthly_amortization"] : "0", out decimal monthlyAmort))
+                            loan.MonthlyAmortization = monthlyAmort;
+
+                        employeeLoans.Add(loan);
+
+                        System.Diagnostics.Debug.WriteLine($"Loaded loan for {currentEmployeeId}: {loan.LoanType}, " +
+                            $"TotalTerms: {loan.TotalPaymentTerms}, Paid: {loan.TotalPaymentDone}, " +
+                            $"BiMonthly: {loan.BiMonthlyAmortization}");
+                    }
+                });
+
+                System.Diagnostics.Debug.WriteLine($"Total loans loaded for {currentEmployeeId}: {employeeLoans.Count}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading loans: {ex.Message}");
+            }
+        }
+
+
+        private decimal CalculateLoanAmortization(PayrollLoan loan)
+        {
+            try
+            {
+                if (loan.TotalPaymentDone >= loan.TotalPaymentTerms || loan.Balance <= 0)
+                    return 0;
+
+                if (loan.MonthlyAmortization > 0)
+                {
+                    return loan.MonthlyAmortization / 2;
+                }
+
+                int remainingTerms = loan.TotalPaymentTerms - loan.TotalPaymentDone;
+                if (remainingTerms > 0 && loan.Balance > 0)
+                {
+                    decimal monthlyPayment = loan.Balance / remainingTerms;
+                    return monthlyPayment / 2;
+                }
+
+                if (loan.TotalPaymentTerms > 0 && loan.LoanAmount > 0)
+                {
+                    decimal monthlyPayment = loan.LoanAmount / loan.TotalPaymentTerms;
+                    return monthlyPayment / 2;
+                }
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error calculating loan amortization: {ex.Message}");
+                return 0;
             }
         }
 
@@ -390,7 +607,69 @@ namespace HRIS_JAP_ATTPAY
                 Cursor.Current = Cursors.Default;
             }
         }
+        private void DisplayLoanDetails()
+        {
+            // Reset all loan displays first
+            labelSSSLoanAmountDebitInput.Text = "0.00";
+            labelPagIbigLoanAmountDebitInput.Text = "0.00";
+            labelCarLoanAmountDebitInput.Text = "0.00";
+            labelHousingLoanAmountDebitInput.Text = "0.00";
+            labelCoopLoanAmountDebitInput.Text = "0.00";
 
+            // Clear details labels
+            if (this.Controls.Find("textBoxSSSLoanDetails", true).Length > 0)
+                ((TextBox)this.Controls.Find("textBoxSSSLoanDetails", true)[0]).Text = "";
+            if (this.Controls.Find("textBoxPagIbigLoanDetails", true).Length > 0)
+                ((TextBox)this.Controls.Find("textBoxPagIbigLoanDetails", true)[0]).Text = "";
+            if (this.Controls.Find("textBoxCarLoanDetails", true).Length > 0)
+                ((TextBox)this.Controls.Find("textBoxCarLoanDetails", true)[0]).Text = "";
+            if (this.Controls.Find("textBoxHousingLoanDetails", true).Length > 0)
+                ((TextBox)this.Controls.Find("textBoxHousingLoanDetails", true)[0]).Text = "";
+            if (this.Controls.Find("textBoxCoopLoanDetails", true).Length > 0)
+                ((TextBox)this.Controls.Find("textBoxCoopLoanDetails", true)[0]).Text = "";
+
+            System.Diagnostics.Debug.WriteLine($"Displaying loans for {currentEmployeeId}, count: {employeeLoans.Count}");
+
+            foreach (var loan in employeeLoans)
+            {
+                if (loan.Status.Equals("Active", StringComparison.OrdinalIgnoreCase) &&
+                    loan.TotalPaymentDone < loan.TotalPaymentTerms)
+                {
+                    string progressText = $"{loan.TotalPaymentDone}/{loan.TotalPaymentTerms} (₱{loan.BiMonthlyAmortization:0.00}/cutoff)";
+
+                    switch (loan.LoanType)
+                    {
+                        case "SSS Loan":
+                            labelSSSLoanAmountDebitInput.Text = loan.BiMonthlyAmortization.ToString("0.00");
+                            if (this.Controls.Find("textBoxSSSLoanDetails", true).Length > 0)
+                                ((TextBox)this.Controls.Find("textBoxSSSLoanDetails", true)[0]).Text = progressText;
+                            break;
+                        case "Pag-IBIG Loan":
+                            labelPagIbigLoanAmountDebitInput.Text = loan.BiMonthlyAmortization.ToString("0.00");
+                            if (this.Controls.Find("textBoxPagIbigLoanDetails", true).Length > 0)
+                                ((TextBox)this.Controls.Find("textBoxPagIbigLoanDetails", true)[0]).Text = progressText;
+                            break;
+                        case "Car Loan":
+                            labelCarLoanAmountDebitInput.Text = loan.BiMonthlyAmortization.ToString("0.00");
+                            if (this.Controls.Find("textBoxCarLoanDetails", true).Length > 0)
+                                ((TextBox)this.Controls.Find("textBoxCarLoanDetails", true)[0]).Text = progressText;
+                            break;
+                        case "Housing Loan":
+                            labelHousingLoanAmountDebitInput.Text = loan.BiMonthlyAmortization.ToString("0.00");
+                            if (this.Controls.Find("textBoxHousingLoanDetails", true).Length > 0)
+                                ((TextBox)this.Controls.Find("textBoxHousingLoanDetails", true)[0]).Text = progressText;
+                            break;
+                        case "Coop Loan":
+                            labelCoopLoanAmountDebitInput.Text = loan.BiMonthlyAmortization.ToString("0.00");
+                            if (this.Controls.Find("textBoxCoopLoanDetails", true).Length > 0)
+                                ((TextBox)this.Controls.Find("textBoxCoopLoanDetails", true)[0]).Text = progressText;
+                            break;
+                    }
+
+                    System.Diagnostics.Debug.WriteLine($"Loan displayed - Type: {loan.LoanType}, Amount: {loan.BiMonthlyAmortization}");
+                }
+            }
+        }
         private async Task UpdateFirebaseRecord(string childPath, string idField, string idValue, Dictionary<string, string> updatedData)
         {
             try
@@ -436,6 +715,14 @@ namespace HRIS_JAP_ATTPAY
                 decimal dailyRate = SafeParseDecimal(textBoxDailyRateInput.Text);
                 decimal daysPresent = SafeParseDecimal(labelDaysPresentInput.Text);
                 decimal overtimeHours = SafeParseDecimal(labelOvertimeInput.Text);
+
+                // Update salary display
+                int totalWorkDays = 0;
+                if (int.TryParse(labelDaysInput.Text, out totalWorkDays))
+                {
+                    decimal salary = dailyRate * totalWorkDays;
+                    labelSalaryInput.Text = salary.ToString("0.00");
+                }
 
                 // Calculate basic pay
                 decimal basicPay = dailyRate * daysPresent;
@@ -507,6 +794,8 @@ namespace HRIS_JAP_ATTPAY
         // REAL-TIME EVENT HANDLERS
         private void textBoxDailyRateInput_TextChanged(object sender, EventArgs e)
         {
+            // Update salary in real-time based on daily rate
+            UpdateSalaryDisplay();
             RecalculateTotals();
         }
 
@@ -626,6 +915,45 @@ namespace HRIS_JAP_ATTPAY
         private void buttonCancel_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+        private void UpdateSalaryDisplay()
+        {
+            try
+            {
+                decimal dailyRate = SafeParseDecimal(textBoxDailyRateInput.Text);
+                int totalWorkDays = 0;
+
+                // Calculate total work days from the payroll period
+                if (payrollData.ContainsKey(currentEmployeeId))
+                {
+                    var payroll = payrollData[currentEmployeeId];
+                    if (payroll.ContainsKey("cutoff_start") && payroll.ContainsKey("cutoff_end"))
+                    {
+                        DateTime startDate = DateTime.Parse(payroll["cutoff_start"]);
+                        DateTime endDate = DateTime.Parse(payroll["cutoff_end"]);
+
+                        // Calculate work days (excluding Sundays)
+                        for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
+                        {
+                            if (date.DayOfWeek != DayOfWeek.Sunday)
+                                totalWorkDays++;
+                        }
+                    }
+                }
+
+                // Update the Days label
+                labelDaysInput.Text = totalWorkDays.ToString();
+
+                // Calculate and update salary
+                decimal salary = dailyRate * totalWorkDays;
+                labelSalaryInput.Text = salary.ToString("0.00");
+
+                System.Diagnostics.Debug.WriteLine($"Updated Salary: Daily Rate={dailyRate}, Work Days={totalWorkDays}, Salary={salary}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating salary: {ex.Message}");
+            }
         }
 
         private void setFont()
