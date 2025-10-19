@@ -879,7 +879,21 @@ namespace HRIS_JAP_ATTPAY
                 VacationLeaveBalance = labelVacationLeaveBalance.Text,
                 SickLeaveCredit = labelSickLeaveCredit.Text,
                 SickLeaveDebit = labelSickLeaveDebit.Text,
-                SickLeaveBalance = labelSickLeaveBalance.Text
+                SickLeaveBalance = labelSickLeaveBalance.Text,
+                //details
+                TaxDetails = labelWithTaxDetails.Text,
+                SSSDetails = labelSSSDetails.Text,
+                PhilhealthDetails = labelPhilhealthDetails.Text,
+                SSSLoanDetails = labelSSSLoanDetails.Text,
+                PagIbigLoanDetails = labelPagIbigLoanDetails.Text,
+                PagIbigDetails = labelPagIbigDetails.Text,
+                CarLoanDetails = labelCarLoanDetails.Text,
+                HousingLoanDetails = labelHousingLoanDetails.Text,
+                CoopLoanDetails = labelCoopLoanDetails.Text,
+                CoopContributionDetails = labelCoopContriDetails.Text,
+                CashAdvanceDetails = labelCashAdvanceDetails.Text,
+                OthersDetails = labelOthersDetails.Text
+
             };
         }
 
