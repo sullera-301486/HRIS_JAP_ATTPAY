@@ -35,7 +35,7 @@ namespace HRIS_JAP_ATTPAY
             textBoxSearchEmployee.TextChanged += textBoxSearchEmployee_TextChanged;
             comboBoxSelectPayDate.SelectedIndexChanged += comboBoxSelectPayDate_SelectedIndexChanged;
 
-            LoadFirebaseData();
+
 
             AdminViewPanel = targetPanel;
             panelLoaderAdminLoan = new AttributesClassAlt(AdminViewPanel);
@@ -334,8 +334,7 @@ namespace HRIS_JAP_ATTPAY
                     ParseDateRange(comboBoxSelectPayDate.SelectedItem?.ToString(), out startDate, out endDate);
 
                     Form parentForm = this.FindForm();
-                    PayrollSummary payrollSummaryForm = new PayrollSummary(currentEmployeeId, null, startDate, endDate);
-                    payrollSummaryForm.SetEmployeeId(selectedEmployeeId);
+                    PayrollSummary payrollSummaryForm = new PayrollSummary(selectedEmployeeId, null, startDate, endDate);
                     AttributesClass.ShowWithOverlay(parentForm, payrollSummaryForm);
                 }
             }
@@ -357,6 +356,7 @@ namespace HRIS_JAP_ATTPAY
                 var dailyRates = new Dictionary<string, decimal>();
                 var employeeDeductions = new Dictionary<string, Dictionary<string, decimal>>();
                 var governmentDeductions = new Dictionary<string, Dictionary<string, decimal>>();
+                var employeeLoans = new Dictionary<string, List<Dictionary<string, string>>>();
 
                 // Load EmployeeDetails
                 var empDetails = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
@@ -390,13 +390,42 @@ namespace HRIS_JAP_ATTPAY
                     }
                 });
 
-                // Load Daily Rates from PayrollEarnings
+                // Load Employee Loans - FILTER BY START DATE (only include loans that started before or during the period)
+                await LoadArrayBasedData("EmployeeLoans", (item) =>
+                {
+                    var employeeId = item.ContainsKey("employee_id") ? item["employee_id"] : null;
+                    var status = item.ContainsKey("status") ? item["status"] : null;
+
+                    if (!string.IsNullOrEmpty(employeeId) &&
+                        status != null && status.Equals("Active", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Check if loan start date is before or during the selected period
+                        if (DateTime.TryParse(item.ContainsKey("start_date") ? item["start_date"] : "", out DateTime loanStartDate))
+                        {
+                            if (loanStartDate <= endDate) // Loan started before or during the period
+                            {
+                                if (!employeeLoans.ContainsKey(employeeId))
+                                    employeeLoans[employeeId] = new List<Dictionary<string, string>>();
+                                employeeLoans[employeeId].Add(item);
+                            }
+                        }
+                        else
+                        {
+                            // If no start date, include the loan
+                            if (!employeeLoans.ContainsKey(employeeId))
+                                employeeLoans[employeeId] = new List<Dictionary<string, string>>();
+                            employeeLoans[employeeId].Add(item);
+                        }
+                    }
+                });
+
+                // Load Daily Rates from PayrollEarnings - Use most recent record within the period
                 await LoadArrayBasedData("PayrollEarnings", (item) =>
                 {
                     var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
                     if (!string.IsNullOrEmpty(payrollId))
                     {
-                        // Get employee ID from Payroll table
+                        // Get employee ID from Payroll table and check if it's within our period
                         var payrollTask = firebase.Child("Payroll").Child(payrollId).OnceSingleAsync<Dictionary<string, object>>();
                         payrollTask.Wait();
                         var payroll = payrollTask.Result;
@@ -404,45 +433,65 @@ namespace HRIS_JAP_ATTPAY
                         if (payroll != null && payroll.ContainsKey("employee_id"))
                         {
                             string employeeId = payroll["employee_id"].ToString();
-                            if (decimal.TryParse(item.ContainsKey("daily_rate") ? item["daily_rate"] : "0", out decimal rate) && rate > 0)
+
+                            // Check if payroll period overlaps with our selected period
+                            if (IsPayrollInPeriod(payroll, startDate, endDate))
                             {
-                                dailyRates[employeeId] = rate;
+                                if (decimal.TryParse(item.ContainsKey("daily_rate") ? item["daily_rate"] : "0", out decimal rate) && rate > 0)
+                                {
+                                    // Only update if we don't have a rate yet or if this is more recent
+                                    if (!dailyRates.ContainsKey(employeeId) ||
+                                        (payroll.ContainsKey("last_updated") &&
+                                         DateTime.TryParse(payroll["last_updated"].ToString(), out DateTime lastUpdated) &&
+                                         lastUpdated > startDate))
+                                    {
+                                        dailyRates[employeeId] = rate;
+                                    }
+                                }
                             }
                         }
                     }
                 });
 
-                // Load Employee Deductions
+                // Load Employee Deductions - Use most recent record within the period
                 await LoadArrayBasedData("EmployeeDeductions", (item) =>
                 {
                     var employeeId = item.ContainsKey("employee_id") ? item["employee_id"] : null;
                     if (!string.IsNullOrEmpty(employeeId))
                     {
-                        employeeDeductions[employeeId] = new Dictionary<string, decimal>();
+                        // Check last updated date to see if it's within our period
+                        if (DateTime.TryParse(item.ContainsKey("last_updated") ? item["last_updated"] : "", out DateTime lastUpdated))
+                        {
+                            if (lastUpdated >= startDate && lastUpdated <= endDate)
+                            {
+                                if (!employeeDeductions.ContainsKey(employeeId))
+                                    employeeDeductions[employeeId] = new Dictionary<string, decimal>();
 
-                        if (decimal.TryParse(item.ContainsKey("cash_advance") ? item["cash_advance"] : "0", out decimal cashAdvance))
-                            employeeDeductions[employeeId]["cash_advance"] = cashAdvance;
+                                if (decimal.TryParse(item.ContainsKey("cash_advance") ? item["cash_advance"] : "0", out decimal cashAdvance))
+                                    employeeDeductions[employeeId]["cash_advance"] = cashAdvance;
 
-                        if (decimal.TryParse(item.ContainsKey("coop_contribution") ? item["coop_contribution"] : "0", out decimal coop))
-                            employeeDeductions[employeeId]["coop_contribution"] = coop;
+                                if (decimal.TryParse(item.ContainsKey("coop_contribution") ? item["coop_contribution"] : "0", out decimal coop))
+                                    employeeDeductions[employeeId]["coop_contribution"] = coop;
 
-                        if (decimal.TryParse(item.ContainsKey("other_deductions") ? item["other_deductions"] : "0", out decimal other))
-                            employeeDeductions[employeeId]["other_deductions"] = other;
+                                if (decimal.TryParse(item.ContainsKey("other_deductions") ? item["other_deductions"] : "0", out decimal other))
+                                    employeeDeductions[employeeId]["other_deductions"] = other;
+                            }
+                        }
                     }
                 });
 
-                // Load Government Deductions
+                // Load Government Deductions - Use most recent record within the period
                 await LoadArrayBasedData("GovernmentDeductions", (item) =>
                 {
                     var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
                     if (!string.IsNullOrEmpty(payrollId))
                     {
-                        // Get employee ID from Payroll table
+                        // Get employee ID from Payroll table and check period
                         var payrollTask = firebase.Child("Payroll").Child(payrollId).OnceSingleAsync<Dictionary<string, object>>();
                         payrollTask.Wait();
                         var payroll = payrollTask.Result;
 
-                        if (payroll != null && payroll.ContainsKey("employee_id"))
+                        if (payroll != null && payroll.ContainsKey("employee_id") && IsPayrollInPeriod(payroll, startDate, endDate))
                         {
                             string employeeId = payroll["employee_id"].ToString();
                             governmentDeductions[employeeId] = new Dictionary<string, decimal>();
@@ -456,15 +505,13 @@ namespace HRIS_JAP_ATTPAY
                             if (decimal.TryParse(item.ContainsKey("pagibig") ? item["pagibig"] : "0", out decimal pagibig))
                                 governmentDeductions[employeeId]["pagibig"] = pagibig;
 
-                            if (decimal.TryParse(item.ContainsKey("withholding_tax") ? item["withholding_tax"] : "0", out decimal tax))
-                                governmentDeductions[employeeId]["withholding_tax"] = tax;
+                            // Calculate withholding tax dynamically based on taxable income for the period
+                            decimal taxableIncome = CalculateTaxableIncome(employeeId, startDate, endDate, attendanceRecords, dailyRates);
+                            decimal withholdingTax = CalculateWithholdingTax(taxableIncome);
+                            governmentDeductions[employeeId]["withholding_tax"] = withholdingTax;
                         }
                     }
                 });
-
-                // Get selected date range
-                
-                ParseDateRange(comboBoxSelectPayDate.SelectedItem?.ToString(), out startDate, out endDate);
 
                 int counter = 1;
                 foreach (var empEntry in employeeDetails)
@@ -484,26 +531,166 @@ namespace HRIS_JAP_ATTPAY
 
                     // Calculate payroll for the SPECIFIC date range
                     decimal grossPay = CalculateGrossPayFromAttendance(employeeId, startDate, endDate, attendanceRecords, dailyRates);
-                    decimal netPay = CalculateNetPay(grossPay, employeeId, employeeDeductions, governmentDeductions);
+                    decimal netPay = CalculateNetPay(grossPay, employeeId, employeeDeductions, governmentDeductions, employeeLoans);
 
-                    dataGridViewEmployee.Rows.Add(
-                        counter,
-                        employeeId,
-                        fullName,
-                        department,
-                        position,
-                        $"₱ {grossPay:N2}",
-                        $"₱ {netPay:N2}",
-                        Properties.Resources.ExpandRight
-                    );
+                    // Only show employees who have data in this period (attendance, loans, or deductions)
+                    if (attendanceRecords.ContainsKey(employeeId) ||
+                        employeeDeductions.ContainsKey(employeeId) ||
+                        governmentDeductions.ContainsKey(employeeId) ||
+                        employeeLoans.ContainsKey(employeeId))
+                    {
+                        dataGridViewEmployee.Rows.Add(
+                            counter,
+                            employeeId,
+                            fullName,
+                            department,
+                            position,
+                            $"₱ {grossPay:N2}",
+                            $"₱ {netPay:N2}",
+                            Properties.Resources.ExpandRight
+                        );
 
-                    counter++;
+                        counter++;
+                    }
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to load Firebase data: " + ex.Message);
             }
+        }
+        private bool IsPayrollInPeriod(Dictionary<string, object> payroll, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                if (payroll.ContainsKey("cutoff_start") && payroll.ContainsKey("cutoff_end"))
+                {
+                    DateTime payrollStart = DateTime.Parse(payroll["cutoff_start"].ToString());
+                    DateTime payrollEnd = DateTime.Parse(payroll["cutoff_end"].ToString());
+
+                    // Check if payroll period overlaps with our selected period
+                    return (payrollStart <= endDate) && (payrollEnd >= startDate);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error checking payroll period: {ex.Message}");
+            }
+
+            // If we can't determine, include it
+            return true;
+        }
+
+        private decimal CalculateTaxableIncome(string employeeId, DateTime startDate, DateTime endDate,
+            Dictionary<string, List<Dictionary<string, string>>> attendanceRecords,
+            Dictionary<string, decimal> dailyRates)
+        {
+            decimal totalRegularHours = 0;
+            decimal totalOvertimeHours = 0;
+
+            if (attendanceRecords.ContainsKey(employeeId))
+            {
+                var employeeAttendance = attendanceRecords[employeeId];
+
+                foreach (var record in employeeAttendance)
+                {
+                    string status = record.ContainsKey("status") ? record["status"] : "";
+
+                    if (status != "Absent" && status != "Day Off")
+                    {
+                        if (decimal.TryParse(record.ContainsKey("hours_worked") ? record["hours_worked"] : "0", out decimal hoursWorked) && hoursWorked > 0)
+                        {
+                            decimal overtimeHours = 0;
+                            if (decimal.TryParse(record.ContainsKey("overtime_hours") ? record["overtime_hours"] : "0", out overtimeHours))
+                            {
+                                totalRegularHours += hoursWorked - overtimeHours;
+                                totalOvertimeHours += overtimeHours;
+                            }
+                            else
+                            {
+                                totalRegularHours += hoursWorked;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Get daily rate (default to 500 if not found)
+            decimal dailyRate = dailyRates.ContainsKey(employeeId) ? dailyRates[employeeId] : 500m;
+            decimal hourlyRate = dailyRate / 8m;
+
+            // Calculate taxable income (basic pay + overtime)
+            decimal regularPay = totalRegularHours * hourlyRate;
+            decimal overtimePay = totalOvertimeHours * hourlyRate * 1.5m;
+
+            return regularPay + overtimePay;
+        }
+
+        private decimal CalculateWithholdingTax(decimal taxableIncome)
+        {
+            // Philippine Tax Brackets for 2025 (Monthly)
+            // Convert to monthly equivalent for tax calculation
+            decimal monthlyIncome = taxableIncome * 2;
+
+            if (monthlyIncome <= 20833.33m)
+                return 0.0m;
+            else if (monthlyIncome <= 33333.33m)
+                return ((monthlyIncome - 20833.33m) * 0.20m) / 2;
+            else if (monthlyIncome <= 66666.67m)
+                return (2500.0m + (monthlyIncome - 33333.33m) * 0.25m) / 2;
+            else if (monthlyIncome <= 166666.67m)
+                return (10833.33m + (monthlyIncome - 66666.67m) * 0.30m) / 2;
+            else if (monthlyIncome <= 666666.67m)
+                return (40833.33m + (monthlyIncome - 166666.67m) * 0.32m) / 2;
+            else
+                return (200833.33m + (monthlyIncome - 666666.67m) * 0.35m) / 2;
+        }
+
+        private decimal CalculateNetPay(decimal grossPay, string employeeId,
+            Dictionary<string, Dictionary<string, decimal>> employeeDeductions,
+            Dictionary<string, Dictionary<string, decimal>> governmentDeductions,
+            Dictionary<string, List<Dictionary<string, string>>> employeeLoans)
+        {
+            decimal totalDeductions = 0;
+
+            // Add employee deductions
+            if (employeeDeductions.ContainsKey(employeeId))
+            {
+                var deductions = employeeDeductions[employeeId];
+                totalDeductions += deductions.ContainsKey("cash_advance") ? deductions["cash_advance"] : 0;
+                totalDeductions += deductions.ContainsKey("coop_contribution") ? deductions["coop_contribution"] : 0;
+                totalDeductions += deductions.ContainsKey("other_deductions") ? deductions["other_deductions"] : 0;
+            }
+
+            // Add government deductions
+            if (governmentDeductions.ContainsKey(employeeId))
+            {
+                var govDeductions = governmentDeductions[employeeId];
+                totalDeductions += govDeductions.ContainsKey("sss") ? govDeductions["sss"] : 0;
+                totalDeductions += govDeductions.ContainsKey("philhealth") ? govDeductions["philhealth"] : 0;
+                totalDeductions += govDeductions.ContainsKey("pagibig") ? govDeductions["pagibig"] : 0;
+                totalDeductions += govDeductions.ContainsKey("withholding_tax") ? govDeductions["withholding_tax"] : 0;
+            }
+
+            // Add loan deductions (only for active loans within the period)
+            if (employeeLoans.ContainsKey(employeeId))
+            {
+                foreach (var loan in employeeLoans[employeeId])
+                {
+                    // Use bi-monthly amortization if available, otherwise monthly divided by 2
+                    if (decimal.TryParse(loan.ContainsKey("bi_monthly_amortization") ? loan["bi_monthly_amortization"] : "0", out decimal biMonthly) && biMonthly > 0)
+                    {
+                        totalDeductions += biMonthly;
+                    }
+                    else if (decimal.TryParse(loan.ContainsKey("monthly_amortization") ? loan["monthly_amortization"] : "0", out decimal monthly) && monthly > 0)
+                    {
+                        totalDeductions += monthly / 2; // Convert to semi-monthly
+                    }
+                }
+            }
+
+            decimal netPay = grossPay - totalDeductions;
+            return netPay > 0 ? netPay : 0;
         }
         private decimal CalculateGrossPayFromAttendance(string employeeId, DateTime startDate, DateTime endDate,
     Dictionary<string, List<Dictionary<string, string>>> attendanceRecords, Dictionary<string, decimal> dailyRates)

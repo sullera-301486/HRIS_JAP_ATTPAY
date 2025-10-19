@@ -348,40 +348,41 @@ namespace HRIS_JAP_ATTPAY
         }
 
         private async Task LoadGovernmentDeductions()
+{
+    try
+    {
+        await LoadArrayBasedData("GovernmentDeductions", (item) =>
         {
-            try
+            var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
+            if (!string.IsNullOrEmpty(payrollId))
             {
-                await LoadArrayBasedData("GovernmentDeductions", (item) =>
+                var payrollTask = firebase.Child("Payroll").Child(payrollId).OnceSingleAsync<Dictionary<string, object>>();
+                payrollTask.Wait();
+                var payroll = payrollTask.Result;
+
+                if (payroll != null && payroll.ContainsKey("employee_id") && payroll["employee_id"].ToString() == currentEmployeeId)
                 {
-                    var payrollId = item.ContainsKey("payroll_id") ? item["payroll_id"] : null;
-                    if (!string.IsNullOrEmpty(payrollId))
-                    {
-                        var payrollTask = firebase.Child("Payroll").Child(payrollId).OnceSingleAsync<Dictionary<string, object>>();
-                        payrollTask.Wait();
-                        var payroll = payrollTask.Result;
+                    if (decimal.TryParse(item.ContainsKey("sss") ? item["sss"] : "0", out decimal sss))
+                        governmentDeductions.SSS = sss;
 
-                        if (payroll != null && payroll.ContainsKey("employee_id") && payroll["employee_id"].ToString() == currentEmployeeId)
-                        {
-                            if (decimal.TryParse(item.ContainsKey("sss") ? item["sss"] : "0", out decimal sss))
-                                governmentDeductions.SSS = sss;
+                    if (decimal.TryParse(item.ContainsKey("philhealth") ? item["philhealth"] : "0", out decimal philhealth))
+                        governmentDeductions.Philhealth = philhealth;
 
-                            if (decimal.TryParse(item.ContainsKey("philhealth") ? item["philhealth"] : "0", out decimal philhealth))
-                                governmentDeductions.Philhealth = philhealth;
+                    if (decimal.TryParse(item.ContainsKey("pagibig") ? item["pagibig"] : "0", out decimal pagibig))
+                        governmentDeductions.Pagibig = pagibig;
 
-                            if (decimal.TryParse(item.ContainsKey("pagibig") ? item["pagibig"] : "0", out decimal pagibig))
-                                governmentDeductions.Pagibig = pagibig;
-
-                            if (decimal.TryParse(item.ContainsKey("withholding_tax") ? item["withholding_tax"] : "0", out decimal tax))
-                                governmentDeductions.WithholdingTax = tax;
-                        }
-                    }
-                });
+                    // REMOVE THIS LINE - We calculate withholding tax dynamically
+                    // if (decimal.TryParse(item.ContainsKey("withholding_tax") ? item["withholding_tax"] : "0", out decimal tax))
+                    //     governmentDeductions.WithholdingTax = tax;
+                }
             }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error loading government deductions: {ex.Message}");
-            }
-        }
+        });
+    }
+    catch (Exception ex)
+    {
+        System.Diagnostics.Debug.WriteLine($"Error loading government deductions: {ex.Message}");
+    }
+}
 
         private async Task LoadEmployeeLoans()
         {
@@ -404,24 +405,34 @@ namespace HRIS_JAP_ATTPAY
                             Status = status
                         };
 
-                        if (decimal.TryParse(item.ContainsKey("bi_monthly_amortization") ? item["bi_monthly_amortization"] : "0", out decimal biMonthly))
-                            loan.BiMonthlyAmortization = biMonthly;
-
-                        if (decimal.TryParse(item.ContainsKey("monthly_amortization") ? item["monthly_amortization"] : "0", out decimal monthly))
-                            loan.MonthlyAmortization = monthly;
-
+                        // Load basic loan information
                         if (decimal.TryParse(item.ContainsKey("loan_amount") ? item["loan_amount"] : "0", out decimal amount))
                             loan.LoanAmount = amount;
 
                         if (decimal.TryParse(item.ContainsKey("balance") ? item["balance"] : "0", out decimal balance))
                             loan.Balance = balance;
 
+                        if (int.TryParse(item.ContainsKey("total_payment_terms") ? item["total_payment_terms"] : "0", out int totalTerms))
+                            loan.TotalPaymentTerms = totalTerms;
+
+                        if (int.TryParse(item.ContainsKey("total_payment_done") ? item["total_payment_done"] : "0", out int paymentDone))
+                            loan.TotalPaymentDone = paymentDone;
+
                         loan.StartDate = item.ContainsKey("start_date") ? item["start_date"] : "";
                         loan.EndDate = item.ContainsKey("end_date") ? item["end_date"] : "";
 
+                        // Calculate the current period's amortization based on months paid vs total months
+                        loan.BiMonthlyAmortization = CalculateCurrentAmortization(loan);
+
+                        // Still load monthly for reference, but use calculated bi-monthly for payroll
+                        if (decimal.TryParse(item.ContainsKey("monthly_amortization") ? item["monthly_amortization"] : "0", out decimal monthlyAmort))
+                            loan.MonthlyAmortization = monthlyAmort;
+
                         employeeLoans.Add(loan);
 
-                        System.Diagnostics.Debug.WriteLine($"Loaded loan for {currentEmployeeId}: {loan.LoanType}, BiMonthly: {loan.BiMonthlyAmortization}");
+                        System.Diagnostics.Debug.WriteLine($"Loaded loan for {currentEmployeeId}: {loan.LoanType}, " +
+                            $"TotalTerms: {loan.TotalPaymentTerms}, Paid: {loan.TotalPaymentDone}, " +
+                            $"BiMonthly: {loan.BiMonthlyAmortization}");
                     }
                 });
 
@@ -430,6 +441,46 @@ namespace HRIS_JAP_ATTPAY
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error loading loans: {ex.Message}");
+            }
+        }
+        private decimal CalculateCurrentAmortization(PayrollLoan loan)
+        {
+            try
+            {
+                // If loan is already paid off, return 0
+                if (loan.TotalPaymentDone >= loan.TotalPaymentTerms || loan.Balance <= 0)
+                    return 0;
+
+                // If we have the original amortization values, use them
+                if (loan.MonthlyAmortization > 0)
+                {
+                    // For bi-monthly payroll, divide monthly by 2
+                    return loan.MonthlyAmortization / 2;
+                }
+
+                // Calculate based on remaining balance and remaining terms
+                int remainingTerms = loan.TotalPaymentTerms - loan.TotalPaymentDone;
+                if (remainingTerms > 0 && loan.Balance > 0)
+                {
+                    // Calculate monthly payment based on remaining balance and terms
+                    decimal monthlyPayment = loan.Balance / remainingTerms;
+                    // For bi-monthly payroll, divide by 2
+                    return monthlyPayment / 2;
+                }
+
+                // Fallback: try to calculate from loan amount and total terms
+                if (loan.TotalPaymentTerms > 0 && loan.LoanAmount > 0)
+                {
+                    decimal monthlyPayment = loan.LoanAmount / loan.TotalPaymentTerms;
+                    return monthlyPayment / 2;
+                }
+
+                return 0; // Default to 0 if we can't calculate
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error calculating loan amortization: {ex.Message}");
+                return 0;
             }
         }
 
@@ -468,54 +519,104 @@ namespace HRIS_JAP_ATTPAY
 
         private void CalculateAndDisplayPayroll()
         {
-            // Calculate using the same logic as AdminPayroll
-            decimal grossPay = CalculateGrossPayFromAttendance();
-            decimal netPay = CalculateNetPay(grossPay);
-
-            // Calculate work days and hours
-            int totalWorkDays = CalculateWorkDays(cutoffStartDate, cutoffEndDate);
-            decimal daysPresent = CalculateDaysPresent();
-            decimal totalRegularHours = 0;
-            decimal totalOvertimeHours = 0;
-
-            foreach (var record in attendanceRecords)
+            try
             {
-                if (record.Status != "Absent" && record.Status != "Day Off")
+                // Calculate work days and hours
+                int totalWorkDays = CalculateWorkDays(cutoffStartDate, cutoffEndDate);
+                decimal daysPresent = CalculateDaysPresent();
+                decimal totalRegularHours = 0;
+                decimal totalOvertimeHours = 0;
+                int actualDaysWorked = 0;
+
+                // Calculate actual attendance
+                foreach (var record in attendanceRecords)
                 {
-                    totalRegularHours += record.HoursWorked - record.OvertimeHours;
-                    totalOvertimeHours += record.OvertimeHours;
+                    if (record.Status != "Absent" && record.Status != "Day Off" && record.HoursWorked > 0)
+                    {
+                        actualDaysWorked++;
+                        totalRegularHours += record.HoursWorked - record.OvertimeHours;
+                        totalOvertimeHours += record.OvertimeHours;
+                    }
                 }
+
+                // Get rates
+                decimal dailyRate = payrollEarnings.DailyRate > 0 ? payrollEarnings.DailyRate : 500m;
+                decimal hourlyRate = dailyRate / 8m;
+
+                // Calculate earnings
+                decimal basicPay = totalRegularHours * hourlyRate;
+                decimal overtimePay = totalOvertimeHours * hourlyRate * 1.5m;
+
+                // Calculate taxable income for withholding tax
+                decimal taxableIncome = basicPay + overtimePay + payrollEarnings.Commission + payrollEarnings.Incentives;
+                decimal withholdingTax = CalculateWithholdingTax(taxableIncome);
+                governmentDeductions.WithholdingTax = withholdingTax;
+
+                // Calculate gross pay (include all earnings)
+                decimal grossPay = basicPay + overtimePay +
+                                  payrollEarnings.Commission +
+                                  payrollEarnings.Incentives +
+                                  payrollEarnings.FoodAllowance +
+                                  payrollEarnings.GasAllowance +
+                                  payrollEarnings.Communication +
+                                  payrollEarnings.Gondola;
+
+                // Display basic info with detailed breakdown
+                DisplayBasicCalculations(dailyRate, totalWorkDays, daysPresent, actualDaysWorked,
+                                       totalRegularHours, totalOvertimeHours, basicPay, overtimePay);
+
+                DisplayEarnings();
+                DisplayDeductions();
+                DisplayLoanDeductions();
+                DisplayLeaveCredits();
+
+                // Show computation breakdown
+                DisplayComputationBreakdown(dailyRate, hourlyRate, totalRegularHours, totalOvertimeHours,
+                                          basicPay, overtimePay, grossPay);
+
+                CalculateTotals(grossPay, basicPay, overtimePay);
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error calculating payroll: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
-            // Get daily rate
-            decimal dailyRate = payrollEarnings.DailyRate > 0 ? payrollEarnings.DailyRate : 500m;
-            decimal hourlyRate = dailyRate / 8m;
-
-            // Calculate basic pay and overtime
-            decimal basicPay = totalRegularHours * hourlyRate;
-            decimal overtimePay = totalOvertimeHours * hourlyRate * 1.5m;
-
-            // Display basic calculations
+        private void DisplayBasicCalculations(decimal dailyRate, int totalWorkDays, decimal daysPresent,
+                                    int actualDaysWorked, decimal totalRegularHours,
+                                    decimal totalOvertimeHours, decimal basicPay, decimal overtimePay)
+        {
+            // Basic information
             labelDailyRateInput.Text = dailyRate.ToString("0.00");
             labelDaysInput.Text = totalWorkDays.ToString();
-            labelDaysPresentInput.Text = daysPresent.ToString("0.0");
+            labelDaysPresentInput.Text = $"{actualDaysWorked} days ({daysPresent:0.00} equivalent)";
             labelSalaryInput.Text = (dailyRate * totalWorkDays).ToString("0.00");
+
+            // Basic pay breakdown
             labelBasicPayAmountBaseInput.Text = (dailyRate * daysPresent).ToString("0.00");
             labelBasicPayAmountCreditInput.Text = basicPay.ToString("0.00");
-            labelBasicPayCredit.Text = daysPresent.ToString("0.00");
+            labelBasicPayCredit.Text = $"{totalRegularHours:0.00} hours";
 
-            // Display overtime
+            // Overtime breakdown
             labelOvertimeInput.Text = totalOvertimeHours.ToString("0.00");
-            labelOvertimePerHourAmountBaseInput.Text = (hourlyRate * 1.5m).ToString("0.00");
+            decimal overtimeHourlyRate = (dailyRate / 8m) * 1.5m;
+            labelOvertimePerHourAmountBaseInput.Text = overtimeHourlyRate.ToString("0.00");
             labelOvertimePerHourAmountCreditInput.Text = overtimePay.ToString("0.00");
-            labelOvertimePerMinuteAmountBaseInput.Text = ((hourlyRate * 1.5m) / 60).ToString("0.00");
-            labelOvertimePerMinuteAmountCreditInput.Text = "0.00";
+        }
 
-            DisplayEarnings();
-            DisplayDeductions();
-            DisplayLoanDeductions();
-            DisplayLeaveCredits();
-            CalculateTotals(grossPay, basicPay, overtimePay);
+        private void DisplayComputationBreakdown(decimal dailyRate, decimal hourlyRate,
+                                               decimal totalRegularHours, decimal totalOvertimeHours,
+                                               decimal basicPay, decimal overtimePay, decimal grossPay)
+        {
+            // You can add labels to show this breakdown or use Debug output
+            System.Diagnostics.Debug.WriteLine("=== PAYROLL COMPUTATION BREAKDOWN ===");
+            System.Diagnostics.Debug.WriteLine($"Daily Rate: ₱{dailyRate:0.00}");
+            System.Diagnostics.Debug.WriteLine($"Hourly Rate: ₱{hourlyRate:0.00}");
+            System.Diagnostics.Debug.WriteLine($"Regular Hours: {totalRegularHours:0.00} = ₱{basicPay:0.00}");
+            System.Diagnostics.Debug.WriteLine($"Overtime Hours: {totalOvertimeHours:0.00} = ₱{overtimePay:0.00}");
+            System.Diagnostics.Debug.WriteLine($"Basic + Overtime: ₱{basicPay + overtimePay:0.00}");
+            System.Diagnostics.Debug.WriteLine($"Gross Pay: ₱{grossPay:0.00}");
         }
 
         private decimal CalculateGrossPayFromAttendance()
@@ -640,38 +741,62 @@ namespace HRIS_JAP_ATTPAY
         private void DisplayLoanDeductions()
         {
             decimal sssLoan = 0, pagibigLoan = 0, carLoan = 0, housingLoan = 0, coopLoan = 0;
+            string sssDetails = "", pagibigDetails = "", carDetails = "", housingDetails = "", coopDetails = "";
 
             System.Diagnostics.Debug.WriteLine($"Displaying loans for {currentEmployeeId}, count: {employeeLoans.Count}");
 
             foreach (var loan in employeeLoans)
             {
-                System.Diagnostics.Debug.WriteLine($"Loan Type: {loan.LoanType}, BiMonthly: {loan.BiMonthlyAmortization}");
+                System.Diagnostics.Debug.WriteLine($"Loan Type: {loan.LoanType}, " +
+                    $"BiMonthly: {loan.BiMonthlyAmortization}, " +
+                    $"Paid: {loan.TotalPaymentDone}/{loan.TotalPaymentTerms}, " +
+                    $"Balance: {loan.Balance}");
 
-                switch (loan.LoanType)
+                // Only include active loans that aren't fully paid
+                if (loan.Status.Equals("Active", StringComparison.OrdinalIgnoreCase) &&
+                    loan.TotalPaymentDone < loan.TotalPaymentTerms)
                 {
-                    case "SSS Loan":
-                        sssLoan = loan.BiMonthlyAmortization;
-                        break;
-                    case "Pag-IBIG Loan":
-                        pagibigLoan = loan.BiMonthlyAmortization;
-                        break;
-                    case "Car Loan":
-                        carLoan = loan.BiMonthlyAmortization;
-                        break;
-                    case "Housing Loan":
-                        housingLoan = loan.BiMonthlyAmortization;
-                        break;
-                    case "Coop Loan":
-                        coopLoan = loan.BiMonthlyAmortization;
-                        break;
+                    string progressText = $"{loan.TotalPaymentDone}/{loan.TotalPaymentTerms}  (₱{loan.BiMonthlyAmortization:0.00}/cutoff)";
+
+                    switch (loan.LoanType)
+                    {
+                        case "SSS Loan":
+                            sssLoan = loan.BiMonthlyAmortization;
+                            sssDetails = progressText;
+                            break;
+                        case "Pag-IBIG Loan":
+                            pagibigLoan = loan.BiMonthlyAmortization;
+                            pagibigDetails = progressText;
+                            break;
+                        case "Car Loan":
+                            carLoan = loan.BiMonthlyAmortization;
+                            carDetails = progressText;
+                            break;
+                        case "Housing Loan":
+                            housingLoan = loan.BiMonthlyAmortization;
+                            housingDetails = progressText;
+                            break;
+                        case "Coop Loan":
+                            coopLoan = loan.BiMonthlyAmortization;
+                            coopDetails = progressText;
+                            break;
+                    }
                 }
             }
 
+            // Set the amortization amounts
             labelSSSLoanAmountDebitInput.Text = sssLoan.ToString("0.00");
             labelPagIbigLoanAmountDebitInput.Text = pagibigLoan.ToString("0.00");
             labelCarLoanAmountDebitInput.Text = carLoan.ToString("0.00");
             labelHousingLoanAmountDebitInput.Text = housingLoan.ToString("0.00");
             labelCoopLoanAmountDebitInput.Text = coopLoan.ToString("0.00");
+
+            // SET THE DETAILS TEXT - THIS IS WHAT YOU'RE MISSING
+            labelSSSLoanDetails.Text = sssDetails;
+            labelPagIbigLoanDetails.Text = pagibigDetails;
+            labelCarLoanDetails.Text = carDetails;
+            labelHousingLoanDetails.Text = housingDetails;
+            labelCoopLoanDetails.Text = coopDetails;
 
             System.Diagnostics.Debug.WriteLine($"Loan totals - SSS: {sssLoan}, PagIBIG: {pagibigLoan}, Car: {carLoan}, Housing: {housingLoan}, Coop: {coopLoan}");
         }
@@ -908,8 +1033,35 @@ namespace HRIS_JAP_ATTPAY
                 MessageBox.Show($"Error refreshing payroll data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        private decimal CalculateWithholdingTax(decimal taxableIncome)
+        {
+            // Philippine Tax Brackets for 2025 (Monthly)
+            // Note: Since your payroll appears to be semi-monthly (cutoff periods), 
+            // we need to adjust the brackets accordingly
+
+            // Convert to monthly equivalent for tax calculation
+            decimal monthlyIncome = taxableIncome * 2;
+
+            if (monthlyIncome <= 20833.33m)
+                return 0.0m;
+            else if (monthlyIncome <= 33333.33m)
+                return ((monthlyIncome - 20833.33m) * 0.20m) / 2; // Divide by 2 for semi-monthly
+            else if (monthlyIncome <= 66666.67m)
+                return (2500.0m + (monthlyIncome - 33333.33m) * 0.25m) / 2;
+            else if (monthlyIncome <= 166666.67m)
+                return (10833.33m + (monthlyIncome - 66666.67m) * 0.30m) / 2;
+            else if (monthlyIncome <= 666666.67m)
+                return (40833.33m + (monthlyIncome - 166666.67m) * 0.32m) / 2;
+            else
+                return (200833.33m + (monthlyIncome - 666666.67m) * 0.35m) / 2;
+        }
         private void SetFont()
         {
+            labelSSSLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+            labelPagIbigLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+            labelCarLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+            labelHousingLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+            labelCoopLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
             labelAmountBase.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
             labelAmountCredit.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
             labelAmountDebit.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
@@ -1061,6 +1213,11 @@ namespace HRIS_JAP_ATTPAY
         public decimal Balance { get; set; }
         public string StartDate { get; set; }
         public string EndDate { get; set; }
+        public int TotalPaymentTerms { get; set; }
+        public int TotalPaymentDone { get; set; }
+        public string PaymentProgress => $"{TotalPaymentDone}/{TotalPaymentTerms}";
+        public int MonthsLeft => TotalPaymentTerms - TotalPaymentDone;
+        public bool IsFullyPaid => TotalPaymentDone >= TotalPaymentTerms;
     }
 
     public class PayrollEarnings

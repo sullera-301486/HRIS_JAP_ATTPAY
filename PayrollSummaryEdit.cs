@@ -27,6 +27,9 @@ namespace HRIS_JAP_ATTPAY
         private Dictionary<string, Dictionary<string, string>> loanDeductions = new Dictionary<string, Dictionary<string, string>>();
         private Dictionary<string, Dictionary<string, string>> payrollSummary = new Dictionary<string, Dictionary<string, string>>();
 
+        // Track if we're currently recalculating to avoid infinite loops
+        private bool isRecalculating = false;
+
         public PayrollSummaryEdit(string employeeId)
         {
             InitializeComponent();
@@ -288,7 +291,7 @@ namespace HRIS_JAP_ATTPAY
                 if (confirmForm.UserConfirmed)
                 {
                     await ExecutePayrollUpdate();
-                    this.DialogResult = DialogResult.OK; // Set dialog result
+                    this.DialogResult = DialogResult.OK;
                     this.Close();
                 }
                 else
@@ -325,6 +328,7 @@ namespace HRIS_JAP_ATTPAY
                     earningsUpdate["communication"] = textBoxCommunicationAmountBaseInput.Text;
                     earningsUpdate["gondola"] = textBoxGondolaAmountBaseInput.Text;
 
+
                     await UpdateFirebaseRecord("PayrollEarnings", "payroll_id", payrollId, earningsUpdate);
                 }
 
@@ -353,6 +357,7 @@ namespace HRIS_JAP_ATTPAY
                     loansUpdate["coop_contribution"] = textBoxCoopContriAmountDebitInput.Text;
                     loansUpdate["other_deduction"] = textBoxOthersAmountDebitInput.Text;
 
+                   
                     await UpdateFirebaseRecord("LoansAndOtherDeductions", "payroll_id", payrollId, loansUpdate);
                 }
 
@@ -367,7 +372,13 @@ namespace HRIS_JAP_ATTPAY
                     await UpdateFirebaseRecord("PayrollSummary", "payroll_id", payrollId, summaryUpdate);
                 }
 
+                // Force a final recalculation to ensure all displays are updated
+                RecalculateTotals();
+
                 MessageBox.Show("Payroll updated successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Set dialog result to OK so the parent form knows to refresh
+                this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             catch (Exception ex)
@@ -413,6 +424,200 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
+        // REAL-TIME CALCULATION METHODS
+        private void RecalculateTotals()
+        {
+            if (isRecalculating) return;
+
+            isRecalculating = true;
+            try
+            {
+                // Parse all values safely
+                decimal dailyRate = SafeParseDecimal(textBoxDailyRateInput.Text);
+                decimal daysPresent = SafeParseDecimal(labelDaysPresentInput.Text);
+                decimal overtimeHours = SafeParseDecimal(labelOvertimeInput.Text);
+
+                // Calculate basic pay
+                decimal basicPay = dailyRate * daysPresent;
+                labelBasicPayAmountBaseInput.Text = basicPay.ToString("0.00");
+                labelBasicPayAmountCreditInput.Text = basicPay.ToString("0.00");
+
+                // Calculate overtime pay
+                decimal overtimeRatePerHour = (dailyRate / 8m) * 1.5m;
+                decimal overtimePay = overtimeHours * overtimeRatePerHour;
+                labelOvertimePerHourAmountBaseInput.Text = overtimeRatePerHour.ToString("0.00");
+                labelOvertimePerHourAmountCreditInput.Text = overtimePay.ToString("0.00");
+
+                // Sum allowances
+                decimal incentives = SafeParseDecimal(textBoxIncentivesAmountBaseInput.Text);
+                decimal commission = SafeParseDecimal(textBoxCommissionAmountBaseInput.Text);
+                decimal gasAllowance = SafeParseDecimal(textBoxGasAllowanceAmountBaseInput.Text);
+                decimal foodAllowance = SafeParseDecimal(textBoxFoodAllowanceAmountBaseInput.Text);
+                decimal communication = SafeParseDecimal(textBoxCommunicationAmountBaseInput.Text);
+                decimal gondola = SafeParseDecimal(textBoxGondolaAmountBaseInput.Text);
+
+                decimal totalAllowances = incentives + commission + gasAllowance + foodAllowance + communication + gondola;
+
+                // Calculate gross pay
+                decimal grossPay = basicPay + overtimePay + totalAllowances;
+                labelGrossPayInput.Text = grossPay.ToString("0.00");
+
+                // Sum deductions
+                decimal withholdingTax = SafeParseDecimal(labelWithTaxAmountDebitInput.Text);
+                decimal sss = SafeParseDecimal(labelSSSAmountDebitInput.Text);
+                decimal pagibig = SafeParseDecimal(labelPagIbigAmountDebitInput.Text);
+                decimal philhealth = SafeParseDecimal(labelPhilhealthAmountDebitInput.Text);
+                decimal sssLoan = SafeParseDecimal(labelSSSLoanAmountDebitInput.Text);
+                decimal pagibigLoan = SafeParseDecimal(labelPagIbigLoanAmountDebitInput.Text);
+                decimal carLoan = SafeParseDecimal(labelCarLoanAmountDebitInput.Text);
+                decimal housingLoan = SafeParseDecimal(labelHousingLoanAmountDebitInput.Text);
+                decimal cashAdvance = SafeParseDecimal(textBoxCashAdvanceAmountDebitInput.Text);
+                decimal coopLoan = SafeParseDecimal(labelCoopLoanAmountDebitInput.Text);
+                decimal coopContribution = SafeParseDecimal(textBoxCoopContriAmountDebitInput.Text);
+                decimal otherDeductions = SafeParseDecimal(textBoxOthersAmountDebitInput.Text);
+
+                decimal totalDeductions = withholdingTax + sss + pagibig + philhealth +
+                                         sssLoan + pagibigLoan + carLoan + housingLoan +
+                                         cashAdvance + coopLoan + coopContribution + otherDeductions;
+
+                labelDeductionsInput.Text = totalDeductions.ToString("0.00");
+
+                // Calculate net pay
+                decimal netPay = grossPay - totalDeductions;
+                labelOverallTotalInput.Text = netPay > 0 ? netPay.ToString("0.00") : "0.00";
+            }
+            catch (Exception ex)
+            {
+                // Silent fail for calculation errors during typing
+                System.Diagnostics.Debug.WriteLine($"Calculation error: {ex.Message}");
+            }
+            finally
+            {
+                isRecalculating = false;
+            }
+        }
+
+        private decimal SafeParseDecimal(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return 0m;
+            if (decimal.TryParse(text, out decimal result)) return result;
+            return 0m;
+        }
+
+        // REAL-TIME EVENT HANDLERS
+        private void textBoxDailyRateInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void textBoxIncentivesAmountBaseInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void textBoxCommissionAmountBaseInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void textBoxGasAllowanceAmountBaseInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void textBoxFoodAllowanceAmountBaseInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void textBoxCommunicationAmountBaseInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void textBoxGondolaAmountBaseInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void textBoxCashAdvanceAmountDebitInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void textBoxCoopContriAmountDebitInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void textBoxOthersAmountDebitInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        // For government deductions that are labels but might need to be editable
+        // You might want to change these to textboxes for full editing capability
+        private void labelWithTaxAmountDebitInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void labelSSSAmountDebitInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void labelPagIbigAmountDebitInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void labelPhilhealthAmountDebitInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void labelSSSLoanAmountDebitInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void labelPagIbigLoanAmountDebitInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void labelCarLoanAmountDebitInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void labelHousingLoanAmountDebitInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        private void labelCoopLoanAmountDebitInput_TextChanged(object sender, EventArgs e)
+        {
+            RecalculateTotals();
+        }
+
+        // Empty event handlers for details fields (not used in calculations)
+        private void textBoxWithTaxDetails_TextChanged(object sender, EventArgs e) { }
+        private void textBoxSSSDetails_TextChanged(object sender, EventArgs e) { }
+        private void textBoxPagIbigDetails_TextChanged(object sender, EventArgs e) { }
+        private void textBoxPhilhealthDetails_TextChanged(object sender, EventArgs e) { }
+        private void textBoxSSSLoanDetails_TextChanged(object sender, EventArgs e) { }
+        private void textBoxPagIbigLoanDetails_TextChanged(object sender, EventArgs e) { }
+        private void textBoxCarLoanDetails_TextChanged(object sender, EventArgs e) { }
+        private void textBoxHousingLoanDetails_TextChanged(object sender, EventArgs e) { }
+        private void textBoxCashAdvanceDetails_TextChanged(object sender, EventArgs e) { }
+        private void textBoxCoopLoanDetails_TextChanged(object sender, EventArgs e) { }
+        private void textBoxCoopContriDetails_TextChanged(object sender, EventArgs e) { }
+        private void textBoxOthersDetails_TextChanged(object sender, EventArgs e) { }
+        private void textBoxVacationLeaveCredit_TextChanged(object sender, EventArgs e) { }
+        private void textBoxSickLeaveCredit_TextChanged(object sender, EventArgs e) { }
+
         private void XpictureBox_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -422,65 +627,6 @@ namespace HRIS_JAP_ATTPAY
         {
             this.Close();
         }
-
-        // Empty event handlers - no calculations, just editing
-        private void textBoxDailyRateInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxWithTaxDetails_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxSSSDetails_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxPagIbigDetails_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxPhilhealthDetails_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxSSSLoanDetails_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxPagIbigLoanDetails_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxCarLoanDetails_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxHousingLoanDetails_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxCashAdvanceDetails_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxCoopLoanDetails_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxCoopContriDetails_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxOthersDetails_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxSSSLoanAmountDebitInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxPagIbigLoanAmountDebitInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxCarLoanAmountDebitInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxHousingLoanAmountDebitInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxCashAdvanceAmountDebitInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxCoopLoanAmountDebitInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxCoopContriAmountDebitInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxOthersAmountDebitInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxIncentivesAmountBaseInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxCommissionAmountBaseInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxGasAllowanceAmountBaseInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxFoodAllowanceAmountBaseInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxCommunicationAmountBaseInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxGondolaAmountBaseInput_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxVacationLeaveCredit_TextChanged(object sender, EventArgs e) { }
-
-        private void textBoxSickLeaveCredit_TextChanged(object sender, EventArgs e) { }
 
         private void setFont()
         {
@@ -674,4 +820,3 @@ namespace HRIS_JAP_ATTPAY
         public string updated_at { get; set; }
     }
 }
-
