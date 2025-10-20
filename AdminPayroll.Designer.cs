@@ -37,7 +37,6 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AdminPayroll));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.comboBoxSelectPayDate = new System.Windows.Forms.ComboBox();
             this.buttonExportAll = new System.Windows.Forms.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panelLoanAndExport = new System.Windows.Forms.Panel();
@@ -64,6 +63,7 @@
             this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column8 = new System.Windows.Forms.DataGridViewImageColumn();
             this.dataGridViewImageColumn1 = new System.Windows.Forms.DataGridViewImageColumn();
+            this.dtpSelectCutoffDate = new System.Windows.Forms.DateTimePicker();
             this.tableLayoutPanel1.SuspendLayout();
             this.panelLoanAndExport.SuspendLayout();
             this.panelFilter.SuspendLayout();
@@ -74,18 +74,6 @@
             this.tableLayoutPanelEmployee.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewEmployee)).BeginInit();
             this.SuspendLayout();
-            // 
-            // comboBoxSelectPayDate
-            // 
-            this.comboBoxSelectPayDate.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.comboBoxSelectPayDate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxSelectPayDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBoxSelectPayDate.FormattingEnabled = true;
-            this.comboBoxSelectPayDate.Location = new System.Drawing.Point(0, 1);
-            this.comboBoxSelectPayDate.Margin = new System.Windows.Forms.Padding(0);
-            this.comboBoxSelectPayDate.Name = "comboBoxSelectPayDate";
-            this.comboBoxSelectPayDate.Size = new System.Drawing.Size(283, 37);
-            this.comboBoxSelectPayDate.TabIndex = 9;
             // 
             // buttonExportAll
             // 
@@ -197,7 +185,7 @@
             // panelDate
             // 
             this.panelDate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelDate.Controls.Add(this.comboBoxSelectPayDate);
+            this.panelDate.Controls.Add(this.dtpSelectCutoffDate);
             this.panelDate.Location = new System.Drawing.Point(539, 22);
             this.panelDate.Margin = new System.Windows.Forms.Padding(0);
             this.panelDate.Name = "panelDate";
@@ -475,6 +463,13 @@
             this.dataGridViewImageColumn1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             this.dataGridViewImageColumn1.Width = 34;
             // 
+            // dtpSelectCutoffDate
+            // 
+            this.dtpSelectCutoffDate.Location = new System.Drawing.Point(-4, 14);
+            this.dtpSelectCutoffDate.Name = "dtpSelectCutoffDate";
+            this.dtpSelectCutoffDate.Size = new System.Drawing.Size(296, 22);
+            this.dtpSelectCutoffDate.TabIndex = 0;
+            // 
             // AdminPayroll
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -503,7 +498,6 @@
         }
 
         #endregion
-        private System.Windows.Forms.ComboBox comboBoxSelectPayDate;
         private System.Windows.Forms.Button buttonExportAll;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Panel panelDate;
@@ -530,5 +524,6 @@
         private System.Windows.Forms.Panel panelLoan;
         private System.Windows.Forms.Label labelMoveLoan;
         private System.Windows.Forms.Panel panelLoanAndExport;
+        private System.Windows.Forms.DateTimePicker dtpSelectCutoffDate;
     }
 }
