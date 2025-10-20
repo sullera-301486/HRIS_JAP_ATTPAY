@@ -626,7 +626,6 @@ namespace HRIS_JAP_ATTPAY
                     Columns columns = ConfirmPayrollExportIndividualShared.CreateColumnStructure();
                     worksheet.Append(columns);
                     worksheet.Append(sheetData);
-                    worksheetPart.Worksheet = worksheet;
 
                     string sheetName = $"{data.EmployeeId} - {data.EmployeeName}";
                     if (sheetName.Length > 31)
@@ -641,8 +640,40 @@ namespace HRIS_JAP_ATTPAY
                     sheets.Append(sheet);
 
                     ConfirmPayrollExportIndividualShared.CreatePayrollSummary(sheetData, data);
+
+                    //  ADD WORKSHEET PROTECTION HERE
+                    SheetProtection sheetProtection = new SheetProtection()
+                    {
+                        Sheet = true,
+                        Objects = true,
+                        Scenarios = true,
+                        SelectLockedCells = true,
+                        SelectUnlockedCells = true,
+                        FormatCells = false,
+                        FormatColumns = false,
+                        FormatRows = false,
+                        InsertColumns = false,
+                        InsertRows = false,
+                        InsertHyperlinks = false,
+                        DeleteColumns = false,
+                        DeleteRows = false,
+                        Sort = false,
+                        AutoFilter = false,
+                        PivotTables = false
+                    };
+
+                    worksheet.Append(sheetProtection);
+                    worksheetPart.Worksheet = worksheet;
                     worksheetPart.Worksheet.Save();
                 }
+
+                //  OPTIONAL: Protect the workbook structure (prevent adding/deleting/renaming sheets)
+                WorkbookProtection workbookProtection = new WorkbookProtection()
+                {
+                    LockStructure = true,
+                    LockWindows = false
+                };
+                workbookPart.Workbook.InsertBefore(workbookProtection, sheets);
 
                 workbookPart.Workbook.Save();
             }

@@ -1,21 +1,63 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
+using System;
 using System.Reflection;
 
 namespace HRIS_JAP_ATTPAY
 {
     public static class ConfirmPayrollExportIndividualShared
     {
-        // Reuse CreateStylesheet() from ConfirmPayrollExportIndividual
-        public static Stylesheet CreateStylesheet()
+        // Cache the form instance and method info to avoid repeated reflection
+        private static ConfirmPayrollExportIndividual _cachedForm = null;
+        private static MethodInfo _stylesheetMethod = null;
+        private static MethodInfo _buildContentMethod = null;
+
+        private static void EnsureFormInitialized()
         {
-            var form = new ConfirmPayrollExportIndividual(null);
-            return form.GetType()
-                .GetMethod("CreateStylesheet", BindingFlags.NonPublic | BindingFlags.Instance)
-                .Invoke(form, null) as Stylesheet;
+            if (_cachedForm == null)
+            {
+                _cachedForm = new ConfirmPayrollExportIndividual(null);
+                var formType = _cachedForm.GetType();
+
+                // Look for CreateSimpleStylesheet method
+                _stylesheetMethod = formType.GetMethod("CreateSimpleStylesheet",
+                    BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+
+                // Look for BuildPayrollContent method (NOT CreatePayrollSummary!)
+                _buildContentMethod = formType.GetMethod("BuildPayrollContent",
+                    BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+
+                if (_stylesheetMethod == null)
+                {
+                    throw new Exception("CreateSimpleStylesheet method not found in ConfirmPayrollExportIndividual");
+                }
+
+                if (_buildContentMethod == null)
+                {
+                    throw new Exception("BuildPayrollContent method not found in ConfirmPayrollExportIndividual");
+                }
+            }
         }
 
-        // Same column widths as your individual export
+        /// <summary>
+        /// Creates the stylesheet by calling CreateSimpleStylesheet from ConfirmPayrollExportIndividual
+        /// </summary>
+        public static Stylesheet CreateStylesheet()
+        {
+            try
+            {
+                EnsureFormInitialized();
+                return _stylesheetMethod.Invoke(_cachedForm, null) as Stylesheet;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error creating stylesheet: {ex.InnerException?.Message ?? ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Creates the column structure with predefined widths
+        /// </summary>
         public static Columns CreateColumnStructure()
         {
             Columns columns = new Columns();
@@ -31,13 +73,20 @@ namespace HRIS_JAP_ATTPAY
             return columns;
         }
 
-        // Reuse CreatePayrollSummary() for each employee sheet
+        /// <summary>
+        /// Creates the payroll summary by calling BuildPayrollContent from ConfirmPayrollExportIndividual
+        /// </summary>
         public static void CreatePayrollSummary(SheetData sheetData, PayrollExportData data)
         {
-            var form = new ConfirmPayrollExportIndividual(null);
-            form.GetType()
-                .GetMethod("CreatePayrollSummary", BindingFlags.NonPublic | BindingFlags.Instance)
-                .Invoke(form, new object[] { sheetData, data });
+            try
+            {
+                EnsureFormInitialized();
+                _buildContentMethod.Invoke(_cachedForm, new object[] { sheetData, data });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error creating payroll summary: {ex.InnerException?.Message ?? ex.Message}", ex);
+            }
         }
     }
 }
