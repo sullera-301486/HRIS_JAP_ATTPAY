@@ -58,6 +58,8 @@
             this.checkBoxAboveTwoHours = new System.Windows.Forms.CheckBox();
             this.buttonApply = new System.Windows.Forms.Button();
             this.buttonReset = new System.Windows.Forms.Button();
+            this.dtpCutOffSelector = new System.Windows.Forms.DateTimePicker();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSortLogo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
             this.SuspendLayout();
@@ -65,7 +67,7 @@
             // pictureBoxSortLogo
             // 
             this.pictureBoxSortLogo.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.Filter;
-            this.pictureBoxSortLogo.Location = new System.Drawing.Point(305, 79);
+            this.pictureBoxSortLogo.Location = new System.Drawing.Point(280, 22);
             this.pictureBoxSortLogo.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBoxSortLogo.Name = "pictureBoxSortLogo";
             this.pictureBoxSortLogo.Size = new System.Drawing.Size(32, 33);
@@ -100,7 +102,7 @@
             // 
             this.labelSort.AutoSize = true;
             this.labelSort.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelSort.Location = new System.Drawing.Point(253, 79);
+            this.labelSort.Location = new System.Drawing.Point(228, 22);
             this.labelSort.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelSort.Name = "labelSort";
             this.labelSort.Size = new System.Drawing.Size(52, 25);
@@ -160,7 +162,7 @@
             this.comboBoxSort.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxSort.ForeColor = System.Drawing.Color.White;
             this.comboBoxSort.FormattingEnabled = true;
-            this.comboBoxSort.Location = new System.Drawing.Point(343, 79);
+            this.comboBoxSort.Location = new System.Drawing.Point(318, 22);
             this.comboBoxSort.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxSort.Name = "comboBoxSort";
             this.comboBoxSort.Size = new System.Drawing.Size(113, 28);
@@ -451,12 +453,32 @@
             this.buttonReset.UseVisualStyleBackColor = false;
             this.buttonReset.Click += new System.EventHandler(this.buttonReset_Click);
             // 
+            // dtpCutOffSelector
+            // 
+            this.dtpCutOffSelector.Location = new System.Drawing.Point(202, 78);
+            this.dtpCutOffSelector.Name = "dtpCutOffSelector";
+            this.dtpCutOffSelector.Size = new System.Drawing.Size(250, 22);
+            this.dtpCutOffSelector.TabIndex = 51;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(32, 75);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(121, 25);
+            this.label1.TabIndex = 52;
+            this.label1.Text = "Date Cutoff";
+            // 
             // FilterAdminAttendance
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(493, 661);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.dtpCutOffSelector);
             this.Controls.Add(this.buttonReset);
             this.Controls.Add(this.buttonApply);
             this.Controls.Add(this.checkBoxAboveTwoHours);
@@ -531,5 +553,7 @@
         private System.Windows.Forms.CheckBox checkBoxAboveTwoHours;
         private System.Windows.Forms.Button buttonApply;
         private System.Windows.Forms.Button buttonReset;
+        private System.Windows.Forms.DateTimePicker dtpCutOffSelector;
+        private System.Windows.Forms.Label label1;
     }
 }

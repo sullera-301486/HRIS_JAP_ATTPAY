@@ -26,26 +26,26 @@ namespace HRIS_JAP_ATTPAY
         private Dictionary<string, List<EmployeeSchedule>> employeeSchedules = new Dictionary<string, List<EmployeeSchedule>>();
         private List<AttendanceRowData> allAttendanceData = new List<AttendanceRowData>();  
         private bool isLoading = false;
-        
+
 
         public HRAttendance()
         {
             InitializeComponent();
 
-            // FIXED: Remove existing event handlers BEFORE adding new ones
-            comboBoxSelectDate.SelectedIndexChanged -= comboBoxSelectDate_SelectedIndexChanged;
-            textBoxSearchEmployee.TextChanged -= textBoxSearchEmployee_TextChanged;
+            // REMOVE: ComboBox event handlers
+            // comboBoxSelectDate.SelectedIndexChanged -= comboBoxSelectDate_SelectedIndexChanged;
 
-            // Add event handlers
-            comboBoxSelectDate.SelectedIndexChanged += comboBoxSelectDate_SelectedIndexChanged;
+            // ADD: DateTimePicker event handler
+            dtpSingleDateSelector.ValueChanged -= dtpSingleDateSelector_ValueChanged;
+            dtpSingleDateSelector.ValueChanged += dtpSingleDateSelector_ValueChanged;
+
+            textBoxSearchEmployee.TextChanged -= textBoxSearchEmployee_TextChanged;
             textBoxSearchEmployee.TextChanged += textBoxSearchEmployee_TextChanged;
 
             setFont();
             setTextBoxAttributes();
             setDataGridViewAttributes();
-            comboBoxSelectDate.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboBoxSelectDate.IntegralHeight = false;
-            comboBoxSelectDate.MaxDropDownItems = 5;
+
             LoadDataAsync();
         }
 
@@ -53,7 +53,7 @@ namespace HRIS_JAP_ATTPAY
         {
             currentAttendanceFilters = new AttendanceFilterCriteria();
             await LoadEmployeeDepartmentMap();
-            PopulateDateComboBox();
+            InitializeDateSelector(); 
         }
 
         private async Task LoadEmployeeDepartmentMap()
@@ -71,19 +71,31 @@ namespace HRIS_JAP_ATTPAY
         // FILTER HANDLERS
         private void ApplyAttendanceFilters(AttendanceFilterCriteria filters)
         {
-            System.Diagnostics.Debug.WriteLine($"ApplyAttendanceFilters called with SortBy: '{filters?.SortBy}'");
+            System.Diagnostics.Debug.WriteLine($"HR ApplyAttendanceFilters called with SortBy: '{filters?.SortBy}', UseCutOffDate: {filters?.UseCutOffDate}");
             currentAttendanceFilters = filters ?? new AttendanceFilterCriteria();
-            ApplyAllAttendanceFilters();
+
+            // CRITICAL: If cut-off date is selected in filter, reload ALL data with date range
+            if (currentAttendanceFilters.UseCutOffDate && currentAttendanceFilters.CutOffDate.HasValue)
+            {
+                System.Diagnostics.Debug.WriteLine($"HR Loading with cut-off date range: {currentAttendanceFilters.CutOffDate.Value}, First Half: {currentAttendanceFilters.IsFirstHalf}");
+                LoadFirebaseAttendanceData(null); // null = use cut-off range instead of single date
+            }
+            else
+            {
+                // No cut-off date filter, just apply filters to currently loaded data (single date remains active)
+                System.Diagnostics.Debug.WriteLine("HR No cut-off date, applying filters to current view with single date selector");
+                ApplyAllAttendanceFilters();
+            }
         }
 
-        // REPLACE: ResetAttendanceFilters
         private void ResetAttendanceFilters()
         {
-            System.Diagnostics.Debug.WriteLine("=== RESETTING FILTERS ===");
+            System.Diagnostics.Debug.WriteLine("=== HR RESETTING FILTERS ===");
 
+            // Reset the filter criteria
             currentAttendanceFilters = new AttendanceFilterCriteria();
 
-            // Clear search text WITHOUT triggering reload
+            // Clear the search text WITHOUT triggering reload
             if (textBoxSearchEmployee.InvokeRequired)
             {
                 textBoxSearchEmployee.Invoke((MethodInvoker)delegate
@@ -96,23 +108,13 @@ namespace HRIS_JAP_ATTPAY
                 textBoxSearchEmployee.Text = "";
             }
 
-            // Get current date selection
-            string selectedText = comboBoxSelectDate.SelectedItem?.ToString();
-            DateTime? selectedDate = null;
+            // CRITICAL: Get the CURRENTLY selected date from DateTimePicker
+            DateTime selectedDate = dtpSingleDateSelector.Value;
 
-            if (!string.IsNullOrEmpty(selectedText) && selectedText != "All Dates")
-            {
-                DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
-                    System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None,
-                    out DateTime parsedDate);
-                selectedDate = parsedDate;
-            }
-
-            // Reload Firebase data with current date selection
+            // Reload the Firebase data with the CURRENT date selection (single date selector takes priority)
             LoadFirebaseAttendanceData(selectedDate);
 
-            System.Diagnostics.Debug.WriteLine("=== FILTERS RESET COMPLETE ===");
+            System.Diagnostics.Debug.WriteLine("=== HR FILTERS RESET COMPLETE ===");
         }
 
         private void ApplyAllAttendanceFilters()
@@ -129,13 +131,14 @@ namespace HRIS_JAP_ATTPAY
                     searchText = "";
                 }
 
-                System.Diagnostics.Debug.WriteLine($"ApplyAllAttendanceFilters: SearchText='{searchText}', SortBy='{currentAttendanceFilters?.SortBy}'");
+                System.Diagnostics.Debug.WriteLine($"HR ApplyAllAttendanceFilters: SearchText='{searchText}', SortBy='{currentAttendanceFilters?.SortBy}'");
 
-                // Start with ALL loaded data
+                // FIXED: Start with ALL loaded data, not just visible rows
                 var filteredData = new List<AttendanceRowData>();
 
                 foreach (var rowData in allAttendanceData)
                 {
+                    // Check if this row matches search and filters
                     bool matchesSearch = MatchesSearchText(rowData, searchText);
                     bool matchesFilters = MatchesAttendanceFilters(rowData);
 
@@ -145,24 +148,24 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                System.Diagnostics.Debug.WriteLine($"Matching rows count before sorting: {filteredData.Count}");
+                System.Diagnostics.Debug.WriteLine($"HR Matching rows count before sorting: {filteredData.Count}");
 
                 // Apply sorting if specified
                 List<AttendanceRowData> sortedData;
                 if (!string.IsNullOrEmpty(currentAttendanceFilters?.SortBy))
                 {
-                    System.Diagnostics.Debug.WriteLine($"Applying sorting: {currentAttendanceFilters.SortBy}");
+                    System.Diagnostics.Debug.WriteLine($"HR Applying sorting: {currentAttendanceFilters.SortBy}");
                     sortedData = ApplySortingToData(filteredData);
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("No sorting - using natural order");
+                    System.Diagnostics.Debug.WriteLine("HR No sorting - using natural order");
                     sortedData = filteredData;
                 }
 
-                System.Diagnostics.Debug.WriteLine($"Final rows count: {sortedData.Count}");
+                System.Diagnostics.Debug.WriteLine($"HR Final rows count: {sortedData.Count}");
 
-                // Clear grid and re-add rows
+                // Clear the grid and re-add rows
                 dataGridViewAttendance.Rows.Clear();
                 attendanceKeyMap.Clear();
 
@@ -629,22 +632,19 @@ namespace HRIS_JAP_ATTPAY
             AttributesClass.ShowWithOverlay(parentForm, filterAdminAttendanceForm);
         }
 
-        private void comboBoxSelectDate_SelectedIndexChanged(object sender, EventArgs e)
+        private void dtpSingleDateSelector_ValueChanged(object sender, EventArgs e)
         {
-            string selectedText = comboBoxSelectDate.SelectedItem?.ToString();
-            DateTime? selectedDate = null;
+            DateTime selectedDate = dtpSingleDateSelector.Value;
 
-            if (!string.IsNullOrEmpty(selectedText) && selectedText != "All Dates")
+            // CRITICAL: Clear the cut-off date filter when user manually changes the date
+            if (currentAttendanceFilters.UseCutOffDate)
             {
-                if (DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
-                    System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None,
-                    out DateTime parsedDate))
-                {
-                    selectedDate = parsedDate;
-                }
+                System.Diagnostics.Debug.WriteLine("HR DateTimePicker changed - clearing cut-off filter");
+                currentAttendanceFilters.UseCutOffDate = false;
+                currentAttendanceFilters.CutOffDate = null;
             }
 
+            // Refresh attendance with selected date
             LoadFirebaseAttendanceData(selectedDate);
         }
 
@@ -792,108 +792,103 @@ namespace HRIS_JAP_ATTPAY
                 editAttendanceForm.FormClosed += (s, args) => {
                     if (editAttendanceForm.DataUpdated)
                     {
-                        string selectedText = comboBoxSelectDate.SelectedItem?.ToString();
-                        DateTime? selectedDate = null;
-
-                        if (!string.IsNullOrEmpty(selectedText) && selectedText != "All Dates")
-                        {
-                            DateTime.TryParseExact(selectedText, "yyyy-MM-dd",
-                                System.Globalization.CultureInfo.InvariantCulture,
-                                System.Globalization.DateTimeStyles.None,
-                                out DateTime parsedDate);
-                            selectedDate = parsedDate;
-                        }
-
+                        // UPDATED: Use DateTimePicker instead of ComboBox
+                        DateTime selectedDate = dtpSingleDateSelector.Value;
                         LoadFirebaseAttendanceData(selectedDate);
                     }
                 };
             }
         }
 
-        private async void PopulateDateComboBox()
+        private async void InitializeDateSelector()
         {
             try
             {
-                comboBoxSelectDate.Items.Clear();
-                comboBoxSelectDate.Items.Add("All Dates");
+                // Set default to today's date
+                dtpSingleDateSelector.Value = DateTime.Today;
 
+                // Optional: Set custom format
+                dtpSingleDateSelector.Format = DateTimePickerFormat.Custom;
+                dtpSingleDateSelector.CustomFormat = "yyyy-MM-dd";
+
+                // Optional: Set min and max dates based on available attendance data
                 var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
-                var uniqueDates = new HashSet<string>();
 
-                foreach (var record in attendanceRecords)
+                if (attendanceRecords != null && attendanceRecords.Any())
                 {
-                    if (record?.Object != null)
+                    DateTime minDate = DateTime.Today;
+                    DateTime maxDate = DateTime.Today;
+                    bool datesSet = false;
+
+                    foreach (var record in attendanceRecords)
                     {
-                        try
+                        if (record?.Object != null)
                         {
                             string dateStr = ExtractDateFromAnyRecordType(record.Object, record.Key);
-
-                            if (!string.IsNullOrEmpty(dateStr))
+                            if (!string.IsNullOrEmpty(dateStr) && DateTime.TryParse(dateStr, out DateTime recordDate))
                             {
-                                DateTime parsedDate;
-                                if (DateTime.TryParse(dateStr, out parsedDate) ||
-                                    DateTime.TryParseExact(dateStr, "yyyy-MM-dd",
-                                         System.Globalization.CultureInfo.InvariantCulture,
-                                         System.Globalization.DateTimeStyles.None, out parsedDate))
+                                if (!datesSet)
                                 {
-                                    uniqueDates.Add(parsedDate.ToString("yyyy-MM-dd"));
+                                    minDate = recordDate;
+                                    maxDate = recordDate;
+                                    datesSet = true;
+                                }
+                                else
+                                {
+                                    if (recordDate < minDate) minDate = recordDate;
+                                    if (recordDate > maxDate) maxDate = recordDate;
                                 }
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"Error processing record {record.Key}: {ex.Message}");
-                        }
                     }
-                }
 
-                if (uniqueDates.Count == 0)
-                {
-                    for (int i = 0; i < 30; i++)
+                    if (datesSet)
                     {
-                        uniqueDates.Add(DateTime.Today.AddDays(-i).ToString("yyyy-MM-dd"));
+                        dtpSingleDateSelector.MinDate = minDate;
+                        dtpSingleDateSelector.MaxDate = maxDate;
                     }
                 }
 
-                var sortedDates = uniqueDates.Select(d => DateTime.Parse(d))
-                                     .OrderByDescending(d => d)
-                                     .Select(d => d.ToString("yyyy-MM-dd"))
-                                     .ToList();
-
-                foreach (var date in sortedDates)
-                {
-                    comboBoxSelectDate.Items.Add(date);
-                }
-
-                string todayString = DateTime.Today.ToString("yyyy-MM-dd");
-
-                if (comboBoxSelectDate.Items.Contains(todayString))
-                {
-                    comboBoxSelectDate.SelectedItem = todayString;
-                    LoadFirebaseAttendanceData(DateTime.Today);
-                }
-                else if (comboBoxSelectDate.Items.Count > 1)
-                {
-                    comboBoxSelectDate.SelectedIndex = 1;
-                    string firstDate = comboBoxSelectDate.SelectedItem.ToString();
-                    LoadFirebaseAttendanceData(DateTime.Parse(firstDate));
-                }
-                else
-                {
-                    comboBoxSelectDate.SelectedIndex = 0;
-                    LoadFirebaseAttendanceData(null);
-                }
+                // Load data for today's date initially
+                LoadFirebaseAttendanceData(DateTime.Today);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("Error populating date combo box: " + ex.Message);
-
-                comboBoxSelectDate.Items.Clear();
-                comboBoxSelectDate.Items.Add("All Dates");
-                comboBoxSelectDate.Items.Add(DateTime.Today.ToString("yyyy-MM-dd"));
-                comboBoxSelectDate.SelectedIndex = 1;
+                System.Diagnostics.Debug.WriteLine("Error initializing date selector: " + ex.Message);
+                // Fallback
+                dtpSingleDateSelector.Value = DateTime.Today;
                 LoadFirebaseAttendanceData(DateTime.Today);
             }
+        }
+
+        private bool IsInBiMonthlyRange(string attendanceDateStr, DateTime cutOffDate, bool isFirstHalf)
+        {
+            if (string.IsNullOrEmpty(attendanceDateStr) || attendanceDateStr == "N/A")
+                return false;
+
+            if (DateTime.TryParse(attendanceDateStr, out DateTime attendanceDate))
+            {
+                if (isFirstHalf)
+                {
+                    // First half: 1st to 15th of the SAME MONTH as cut-off date
+                    DateTime startDate = new DateTime(cutOffDate.Year, cutOffDate.Month, 1);
+                    DateTime endDate = new DateTime(cutOffDate.Year, cutOffDate.Month, 15);
+                    bool inRange = attendanceDate.Date >= startDate && attendanceDate.Date <= endDate;
+                    System.Diagnostics.Debug.WriteLine($"HR First Half Check: {attendanceDate:yyyy-MM-dd} between {startDate:yyyy-MM-dd} and {endDate:yyyy-MM-dd} = {inRange}");
+                    return inRange;
+                }
+                else
+                {
+                    // Second half: 16th to end of month of the SAME MONTH as cut-off date
+                    DateTime startDate = new DateTime(cutOffDate.Year, cutOffDate.Month, 16);
+                    DateTime endDate = new DateTime(cutOffDate.Year, cutOffDate.Month, DateTime.DaysInMonth(cutOffDate.Year, cutOffDate.Month));
+                    bool inRange = attendanceDate.Date >= startDate && attendanceDate.Date <= endDate;
+                    System.Diagnostics.Debug.WriteLine($"HR Second Half Check: {attendanceDate:yyyy-MM-dd} between {startDate:yyyy-MM-dd} and {endDate:yyyy-MM-dd} = {inRange}");
+                    return inRange;
+                }
+            }
+
+            return false;
         }
 
         private string ExtractDateFromAnyRecordType(dynamic record, string recordKey)
@@ -951,12 +946,12 @@ namespace HRIS_JAP_ATTPAY
 
             try
             {
-                // Clear the data collection
+                // Clear the data collection (not the grid yet)
                 allAttendanceData.Clear();
 
                 Cursor.Current = Cursors.WaitCursor;
 
-                System.Diagnostics.Debug.WriteLine($"Loading attendance data. Selected date: {selectedDate}");
+                System.Diagnostics.Debug.WriteLine($"HR Loading attendance data. Selected date: {selectedDate}");
 
                 // Load employee data
                 var firebaseEmployees = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
@@ -964,15 +959,22 @@ namespace HRIS_JAP_ATTPAY
                 foreach (var emp in firebaseEmployees)
                     employeeDict[emp.Key] = emp.Object;
 
-                System.Diagnostics.Debug.WriteLine($"Loaded {employeeDict.Count} employees");
+                System.Diagnostics.Debug.WriteLine($"HR Loaded {employeeDict.Count} employees");
 
                 var attendanceRecords = await firebase.Child("Attendance").OnceAsync<dynamic>();
 
-                System.Diagnostics.Debug.WriteLine($"Found {attendanceRecords?.Count()} attendance records");
+                System.Diagnostics.Debug.WriteLine($"HR Found {attendanceRecords?.Count()} attendance records");
 
                 if (attendanceRecords == null || !attendanceRecords.Any())
                 {
-                    System.Diagnostics.Debug.WriteLine("No attendance records found in Firebase");
+                    System.Diagnostics.Debug.WriteLine("HR No attendance records found in Firebase");
+                    if (this.InvokeRequired)
+                    {
+                        this.Invoke((MethodInvoker)delegate
+                        {
+                            MessageBox.Show("No attendance records found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        });
+                    }
                     return;
                 }
 
@@ -985,13 +987,9 @@ namespace HRIS_JAP_ATTPAY
                     {
                         string firebaseKey = attendanceRecord.Key;
 
-                        var rowData = await ProcessAttendanceRecordToData(
-                            attendanceRecord.Object,
-                            employeeDict,
-                            selectedDate,
-                            firebaseKey
-                        );
+                        System.Diagnostics.Debug.WriteLine($"HR Processing record {firebaseKey}");
 
+                        var rowData = await ProcessAttendanceRecordToData(attendanceRecord.Object, employeeDict, selectedDate, firebaseKey);
                         if (rowData != null)
                         {
                             allAttendanceData.Add(rowData);
@@ -1000,7 +998,7 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                System.Diagnostics.Debug.WriteLine($"Successfully loaded {processedCount} records into memory");
+                System.Diagnostics.Debug.WriteLine($"HR Successfully loaded {processedCount} records into memory");
 
                 UpdateStatusLabel(selectedDate);
 
@@ -1009,7 +1007,7 @@ namespace HRIS_JAP_ATTPAY
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error in LoadFirebaseAttendanceData: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"HR Error in LoadFirebaseAttendanceData: {ex.Message}");
                 MessageBox.Show($"Error loading attendance data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -1268,7 +1266,12 @@ namespace HRIS_JAP_ATTPAY
             {
                 labelAttendanceDate.Invoke((MethodInvoker)delegate
                 {
-                    if (selectedDate.HasValue)
+                    if (currentAttendanceFilters.UseCutOffDate && currentAttendanceFilters.CutOffDate.HasValue)
+                    {
+                        string half = currentAttendanceFilters.IsFirstHalf ? "First Half" : "Second Half";
+                        labelAttendanceDate.Text = $"Attendance for {half} of {currentAttendanceFilters.CutOffDate.Value:MMMM yyyy}";
+                    }
+                    else if (selectedDate.HasValue)
                     {
                         labelAttendanceDate.Text = $"Attendance for {selectedDate.Value.ToString("yyyy-MM-dd")}";
                     }
@@ -1280,7 +1283,12 @@ namespace HRIS_JAP_ATTPAY
             }
             else
             {
-                if (selectedDate.HasValue)
+                if (currentAttendanceFilters.UseCutOffDate && currentAttendanceFilters.CutOffDate.HasValue)
+                {
+                    string half = currentAttendanceFilters.IsFirstHalf ? "First Half" : "Second Half";
+                    labelAttendanceDate.Text = $"Attendance for {half} of {currentAttendanceFilters.CutOffDate.Value:MMMM yyyy}";
+                }
+                else if (selectedDate.HasValue)
                 {
                     labelAttendanceDate.Text = $"Attendance for {selectedDate.Value.ToString("yyyy-MM-dd")}";
                 }
@@ -1298,7 +1306,7 @@ namespace HRIS_JAP_ATTPAY
             labelAddLeave.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
             labelFiltersName.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
             textBoxSearchEmployee.Font = AttributesClass.GetFont("Roboto-Light", 15f);
-            comboBoxSelectDate.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
+            dtpSingleDateSelector.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
         }
 
         private void setTextBoxAttributes()
@@ -1500,55 +1508,64 @@ namespace HRIS_JAP_ATTPAY
 
             return false;
         }
-        private async Task<AttendanceRowData> ProcessAttendanceRecordToData(
-    dynamic attendance,
-    Dictionary<string, dynamic> employeeDict,
-    DateTime? selectedDate,
-    string firebaseKey)
+        private async Task<AttendanceRowData> ProcessAttendanceRecordToData(dynamic attendance, Dictionary<string, dynamic> 
+            employeeDict,DateTime? selectedDate,string firebaseKey)
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine($"=== Processing record {firebaseKey} ===");
+                System.Diagnostics.Debug.WriteLine($"HR === Processing record {firebaseKey} ===");
 
                 Dictionary<string, object> attendanceDict = new Dictionary<string, object>();
 
                 if (attendance == null)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Record {firebaseKey} is NULL");
+                    System.Diagnostics.Debug.WriteLine($"HR Record {firebaseKey} is NULL");
                     return null;
                 }
 
-                // Extract attendance data (use your existing logic)
+                // Try multiple approaches to extract the data
                 try
                 {
                     if (attendance is IDictionary<string, object> directDict)
                     {
                         attendanceDict = new Dictionary<string, object>(directDict);
+                        System.Diagnostics.Debug.WriteLine("HR Used direct dictionary cast");
                     }
                     else
                     {
                         string json = Newtonsoft.Json.JsonConvert.SerializeObject(attendance);
                         attendanceDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                        System.Diagnostics.Debug.WriteLine("HR Used JSON serialization approach");
                     }
                 }
                 catch (Exception serializationEx)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Serialization failed: {serializationEx.Message}");
-                    // Try reflection approach
-                    var properties = attendance.GetType().GetProperties();
-                    foreach (var prop in properties)
+                    System.Diagnostics.Debug.WriteLine($"HR Serialization failed: {serializationEx.Message}");
+
+                    try
                     {
-                        try
+                        var properties = attendance.GetType().GetProperties();
+                        foreach (var prop in properties)
                         {
-                            var value = prop.GetValue(attendance);
-                            attendanceDict[prop.Name] = value;
+                            try
+                            {
+                                var value = prop.GetValue(attendance);
+                                attendanceDict[prop.Name] = value;
+                            }
+                            catch { }
                         }
-                        catch { }
+                        System.Diagnostics.Debug.WriteLine("HR Used reflection approach");
+                    }
+                    catch (Exception reflectionEx)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"HR Reflection also failed: {reflectionEx.Message}");
+                        return null;
                     }
                 }
 
                 if (attendanceDict == null || !attendanceDict.Any())
                 {
+                    System.Diagnostics.Debug.WriteLine($"HR Record {firebaseKey} resulted in empty dictionary");
                     return null;
                 }
 
@@ -1561,26 +1578,49 @@ namespace HRIS_JAP_ATTPAY
                 string hoursWorked = GetSafeString(attendanceDict, "hours_worked", "0.00");
                 string verification = GetSafeString(attendanceDict, "verification_method", "Manual");
                 string overtimeHoursStr = GetSafeString(attendanceDict, "overtime_hours", "0.00");
+                bool shouldInclude = true;
 
-                // Apply date filter
-                if (selectedDate.HasValue)
+                System.Diagnostics.Debug.WriteLine($"HR Extracted - Employee: {employeeId}, Date: {attendanceDateStr}, TimeIn: {timeInStr}");
+
+                // 🔹 PRIORITY 1: Check if CUT-OFF DATE FILTER is active
+                if (currentAttendanceFilters.UseCutOffDate && currentAttendanceFilters.CutOffDate.HasValue)
                 {
-                    bool shouldInclude = false;
+                    System.Diagnostics.Debug.WriteLine($"HR Using CUT-OFF DATE filter: {currentAttendanceFilters.CutOffDate.Value}, First Half: {currentAttendanceFilters.IsFirstHalf}");
+                    shouldInclude = IsInBiMonthlyRange(attendanceDateStr,
+                        currentAttendanceFilters.CutOffDate.Value,
+                        currentAttendanceFilters.IsFirstHalf);
 
-                    if (!string.IsNullOrEmpty(attendanceDateStr) &&
-                        DateTime.TryParse(attendanceDateStr, out DateTime attendanceDate))
+                    System.Diagnostics.Debug.WriteLine($"HR Record {firebaseKey} date {attendanceDateStr}: shouldInclude = {shouldInclude}");
+                }
+                // 🔹 PRIORITY 2: If NO cut-off filter, use SINGLE DATE from DateTimePicker (default behavior)
+                else if (!currentAttendanceFilters.UseCutOffDate && selectedDate.HasValue)
+                {
+                    System.Diagnostics.Debug.WriteLine($"HR Using SINGLE DATE filter: {selectedDate.Value}");
+                    if (!string.IsNullOrEmpty(attendanceDateStr) && DateTime.TryParse(attendanceDateStr, out DateTime attendanceDate))
                     {
-                        if (attendanceDate.Date == selectedDate.Value.Date)
-                            shouldInclude = true;
+                        shouldInclude = attendanceDate.Date == selectedDate.Value.Date;
+                    }
+                    else
+                    {
+                        shouldInclude = false;
                     }
 
-                    if (!shouldInclude)
-                    {
-                        return null;
-                    }
+                    System.Diagnostics.Debug.WriteLine($"HR Record {firebaseKey} date {attendanceDateStr}: shouldInclude = {shouldInclude}");
+                }
+                // 🔹 FALLBACK: If neither filter is active, include everything
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("HR No date filter active, including all records");
+                    shouldInclude = true;
                 }
 
-                // Process the data (use your existing methods)
+                // If this record doesn't match the date filter, skip it
+                if (!shouldInclude)
+                {
+                    return null;
+                }
+
+                // Process the data
                 string timeIn = FormatFirebaseTime(timeInStr);
                 string timeOut = FormatFirebaseTime(timeOutStr);
                 string status = await CalculateStatusWithSchedule(timeInStr, timeOutStr, employeeId, attendanceDateStr, existingStatus);
@@ -1602,7 +1642,7 @@ namespace HRIS_JAP_ATTPAY
                     fullName = $"{firstName} {middleName} {lastName}".Trim();
                 }
 
-                // Return data object instead of adding to grid
+                // Return data object
                 return new AttendanceRowData
                 {
                     EmployeeId = employeeId,
@@ -1619,7 +1659,7 @@ namespace HRIS_JAP_ATTPAY
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"=== ERROR processing record {firebaseKey}: {ex.Message} ===");
+                System.Diagnostics.Debug.WriteLine($"HR === ERROR processing record {firebaseKey}: {ex.Message} ===");
                 return null;
             }
         }

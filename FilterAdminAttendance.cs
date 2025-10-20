@@ -20,6 +20,7 @@ namespace HRIS_JAP_ATTPAY
         public event Action<AttendanceFilterCriteria> FiltersApplied;
         public event Action FiltersReset;
 
+
         // Firebase client for ComboBox population
         private FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
 
@@ -32,8 +33,11 @@ namespace HRIS_JAP_ATTPAY
             // Load departments and positions from Firebase
             LoadDepartmentsAndPositions();
 
-            // FIXED: Initialize sorting options with only A-Z and Z-A based on first name
+            // Initialize sorting options with only A-Z and Z-A based on first name
             InitializeSortingOptions();
+
+            // ADD THIS: Initialize bi-monthly range
+            InitializeBiMonthlyRange();
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
@@ -73,6 +77,7 @@ namespace HRIS_JAP_ATTPAY
                 checkBoxLate.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 checkBoxOneHour.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 checkBoxPresent.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                dtpCutOffSelector.Font = AttributesClass.GetFont("Roboto-Light", 12f);
             }
             catch (Exception ex)
             {
@@ -269,6 +274,9 @@ namespace HRIS_JAP_ATTPAY
 
         private void buttonApply_Click(object sender, EventArgs e)
         {
+            // Check if user actually selected a cut-off date (format changed from blank)
+            bool hasCutOffDate = dtpCutOffSelector.CustomFormat != " ";
+
             var filters = new AttendanceFilterCriteria
             {
                 EmployeeId = textBoxID.Text.Trim(),
@@ -291,16 +299,15 @@ namespace HRIS_JAP_ATTPAY
 
                 // Overtime filters
                 OvertimeOneHour = checkBoxOneHour.Checked,
-                OvertimeTwoHoursPlus = checkBoxAboveTwoHours.Checked
+                OvertimeTwoHoursPlus = checkBoxAboveTwoHours.Checked,
+
+                // Cut-off date - ONLY set if user selected one
+                UseCutOffDate = hasCutOffDate,
+                CutOffDate = hasCutOffDate ? (DateTime?)dtpCutOffSelector.Value : null,
+                IsFirstHalf = hasCutOffDate && dtpCutOffSelector.Value.Day <= 15
             };
 
-            // Ensure sort value is properly set
-            if (string.IsNullOrEmpty(filters.SortBy) && comboBoxSort.SelectedItem != null)
-            {
-                filters.SortBy = comboBoxSort.SelectedItem.ToString();
-            }
-
-            System.Diagnostics.Debug.WriteLine($"Filter Apply: SortBy = '{filters.SortBy}'");
+            System.Diagnostics.Debug.WriteLine($"Filter Apply: UseCutOffDate = {filters.UseCutOffDate}, CutOffDate = {filters.CutOffDate}");
             FiltersApplied?.Invoke(filters);
             this.Close();
         }
@@ -309,24 +316,21 @@ namespace HRIS_JAP_ATTPAY
         {
             System.Diagnostics.Debug.WriteLine("Reset button clicked in filter form");
 
-            // Reset all filter controls in the form
+            // Reset all filter controls
             textBoxID.Text = "";
             textBoxName.Text = "";
 
-            // Safely reset ComboBoxes - only set SelectedIndex if there are items
             if (comboBoxDepartment.Items.Count > 0)
                 comboBoxDepartment.SelectedIndex = 0;
 
             if (comboBoxPosition.Items.Count > 0)
                 comboBoxPosition.SelectedIndex = 0;
 
-            // FIXED: Clear sort selection completely (matching FilterAdminEmployee pattern)
             comboBoxSort.SelectedIndex = -1;
 
             textBoxTimeIn.Text = "";
             textBoxTimeOut.Text = "";
 
-            // Reset all checkboxes
             checkBoxPresent.Checked = false;
             checkBoxAbsent.Checked = false;
             checkBoxLate.Checked = false;
@@ -336,7 +340,11 @@ namespace HRIS_JAP_ATTPAY
             checkBoxOneHour.Checked = false;
             checkBoxAboveTwoHours.Checked = false;
 
-            // FIXED: Trigger the reset event EXACTLY like FilterAdminEmployee
+            // Reset DateTimePicker back to blank
+            dtpCutOffSelector.Format = DateTimePickerFormat.Custom;
+            dtpCutOffSelector.CustomFormat = " ";
+            dtpCutOffSelector.Value = DateTime.Today;
+
             FiltersReset?.Invoke();
             this.Close();
         }
@@ -353,6 +361,22 @@ namespace HRIS_JAP_ATTPAY
             });
 
             // Don't set default selection - let it be empty initially
+        }
+        private void InitializeBiMonthlyRange()
+        {
+            // Leave the DateTimePicker empty/null by default
+            dtpCutOffSelector.Format = DateTimePickerFormat.Custom;
+            dtpCutOffSelector.CustomFormat = " "; // Shows as blank
+            dtpCutOffSelector.Value = DateTime.Today;
+
+            // Show date format when user clicks/selects
+            dtpCutOffSelector.ValueChanged += (s, e) => {
+                if (dtpCutOffSelector.Focused || dtpCutOffSelector.CustomFormat == " ")
+                {
+                    dtpCutOffSelector.Format = DateTimePickerFormat.Custom;
+                    dtpCutOffSelector.CustomFormat = "yyyy-MM-dd";
+                }
+            };
         }
     }
 
@@ -381,6 +405,9 @@ namespace HRIS_JAP_ATTPAY
         // Overtime filters
         public bool OvertimeOneHour { get; set; } = false;
         public bool OvertimeTwoHoursPlus { get; set; } = false;
+        public bool UseCutOffDate { get; set; } = false;
+        public DateTime? CutOffDate { get; set; } = null;
+        public bool IsFirstHalf { get; set; } = true;
     }
     public class AttendanceRowData
     {
