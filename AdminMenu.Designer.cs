@@ -38,11 +38,13 @@
             this.pictureBoxNotification = new System.Windows.Forms.PictureBox();
             this.pictureBoxUserProfile = new System.Windows.Forms.PictureBox();
             this.pictureBoxMenuLogo = new System.Windows.Forms.PictureBox();
+            this.pictureBoxSave = new System.Windows.Forms.PictureBox();
             this.AdminOptionsTableLayoutPanel.SuspendLayout();
             this.AdminMiscTableLayoutPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxNotification)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxUserProfile)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMenuLogo)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSave)).BeginInit();
             this.SuspendLayout();
             // 
             // AdminOptionsTableLayoutPanel
@@ -163,6 +165,7 @@
             this.AdminMiscTableLayoutPanel.Controls.Add(this.pictureBoxNotification, 4, 0);
             this.AdminMiscTableLayoutPanel.Controls.Add(this.pictureBoxUserProfile, 6, 0);
             this.AdminMiscTableLayoutPanel.Controls.Add(this.pictureBoxMenuLogo, 0, 0);
+            this.AdminMiscTableLayoutPanel.Controls.Add(this.pictureBoxSave, 2, 0);
             this.AdminMiscTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.AdminMiscTableLayoutPanel.Location = new System.Drawing.Point(0, 0);
             this.AdminMiscTableLayoutPanel.Name = "AdminMiscTableLayoutPanel";
@@ -206,6 +209,18 @@
             this.pictureBoxMenuLogo.TabIndex = 4;
             this.pictureBoxMenuLogo.TabStop = false;
             // 
+            // pictureBoxSave
+            // 
+            this.pictureBoxSave.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pictureBoxSave.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pictureBoxSave.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.Save;
+            this.pictureBoxSave.Location = new System.Drawing.Point(1133, 24);
+            this.pictureBoxSave.Name = "pictureBoxSave";
+            this.pictureBoxSave.Size = new System.Drawing.Size(37, 63);
+            this.pictureBoxSave.TabIndex = 5;
+            this.pictureBoxSave.TabStop = false;
+            this.pictureBoxSave.Click += new System.EventHandler(this.pictureBoxSave_Click);
+            // 
             // AdminMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -223,6 +238,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxNotification)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxUserProfile)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMenuLogo)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSave)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -239,5 +255,6 @@
         private System.Windows.Forms.PictureBox pictureBoxNotification;
         private System.Windows.Forms.PictureBox pictureBoxUserProfile;
         private System.Windows.Forms.PictureBox pictureBoxMenuLogo;
+        private System.Windows.Forms.PictureBox pictureBoxSave;
     }
 }

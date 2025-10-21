@@ -121,5 +121,12 @@ namespace HRIS_JAP_ATTPAY
             AdminNotification AdminNotificationForm = new AdminNotification();
             AttributesClass.ShowWithOverlay(parentForm, AdminNotificationForm);
         }
+
+        private void pictureBoxSave_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            ConfirmBackup confirmBackup = new ConfirmBackup();
+            AttributesClass.ShowWithOverlay(parentForm, confirmBackup);
+        }
     }
 }

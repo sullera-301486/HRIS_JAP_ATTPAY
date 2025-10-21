@@ -10,15 +10,20 @@ using System.Windows.Forms;
 
 namespace HRIS_JAP_ATTPAY
 {
-    public partial class ConfirmExportDTR : Form
+    public partial class ConfirmBackup : Form
     {
-        public ConfirmExportDTR()
+        public ConfirmBackup()
         {
             InitializeComponent();
             setFont();
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void buttonCancel_Click(object sender, EventArgs e)
         {
             this.Close();
         }
@@ -36,16 +41,6 @@ namespace HRIS_JAP_ATTPAY
             {
                 MessageBox.Show("Font load failed: " + ex.Message);
             }
-        }
-
-        private void buttonCancel_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void buttonConfirm_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }
