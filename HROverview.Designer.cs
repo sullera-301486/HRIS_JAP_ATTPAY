@@ -173,9 +173,9 @@
             this.labelHROverview.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelHROverview.Location = new System.Drawing.Point(40, 37);
             this.labelHROverview.Name = "labelHROverview";
-            this.labelHROverview.Size = new System.Drawing.Size(433, 39);
+            this.labelHROverview.Size = new System.Drawing.Size(458, 39);
             this.labelHROverview.TabIndex = 14;
-            this.labelHROverview.Text = "Human Resource Overview";
+            this.labelHROverview.Text = "Human Resource Dashboard";
             // 
             // panelAttendanceSummary
             // 

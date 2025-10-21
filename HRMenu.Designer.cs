@@ -33,15 +33,15 @@
             this.buttonEmployee = new System.Windows.Forms.Button();
             this.buttonOverview = new System.Windows.Forms.Button();
             this.HRMiscTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.pictureBoxMenuLogo = new System.Windows.Forms.PictureBox();
             this.pictureBoxNotification = new System.Windows.Forms.PictureBox();
             this.pictureBoxUserProfile = new System.Windows.Forms.PictureBox();
             this.labelLogOut = new System.Windows.Forms.Label();
-            this.pictureBoxMenuLogo = new System.Windows.Forms.PictureBox();
             this.HROptionsTableLayoutPanel.SuspendLayout();
             this.HRMiscTableLayoutPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMenuLogo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxNotification)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxUserProfile)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMenuLogo)).BeginInit();
             this.SuspendLayout();
             // 
             // HROptionsTableLayoutPanel
@@ -109,7 +109,7 @@
             this.buttonOverview.Name = "buttonOverview";
             this.buttonOverview.Size = new System.Drawing.Size(479, 63);
             this.buttonOverview.TabIndex = 1;
-            this.buttonOverview.Text = "OVERVIEW";
+            this.buttonOverview.Text = "DASHBOARD";
             this.buttonOverview.UseVisualStyleBackColor = false;
             this.buttonOverview.Click += new System.EventHandler(this.buttonOverview_Click);
             // 
@@ -135,6 +135,17 @@
             this.HRMiscTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.HRMiscTableLayoutPanel.Size = new System.Drawing.Size(1440, 90);
             this.HRMiscTableLayoutPanel.TabIndex = 3;
+            // 
+            // pictureBoxMenuLogo
+            // 
+            this.pictureBoxMenuLogo.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pictureBoxMenuLogo.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.AltMenuLogo;
+            this.pictureBoxMenuLogo.Location = new System.Drawing.Point(3, 3);
+            this.pictureBoxMenuLogo.Name = "pictureBoxMenuLogo";
+            this.pictureBoxMenuLogo.Size = new System.Drawing.Size(540, 84);
+            this.pictureBoxMenuLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxMenuLogo.TabIndex = 5;
+            this.pictureBoxMenuLogo.TabStop = false;
             // 
             // pictureBoxNotification
             // 
@@ -174,17 +185,6 @@
             this.labelLogOut.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.labelLogOut.Click += new System.EventHandler(this.labelLogOut_Click);
             // 
-            // pictureBoxMenuLogo
-            // 
-            this.pictureBoxMenuLogo.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pictureBoxMenuLogo.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.AltMenuLogo;
-            this.pictureBoxMenuLogo.Location = new System.Drawing.Point(3, 3);
-            this.pictureBoxMenuLogo.Name = "pictureBoxMenuLogo";
-            this.pictureBoxMenuLogo.Size = new System.Drawing.Size(540, 84);
-            this.pictureBoxMenuLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBoxMenuLogo.TabIndex = 5;
-            this.pictureBoxMenuLogo.TabStop = false;
-            // 
             // HRMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -198,9 +198,9 @@
             this.HROptionsTableLayoutPanel.ResumeLayout(false);
             this.HRMiscTableLayoutPanel.ResumeLayout(false);
             this.HRMiscTableLayoutPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMenuLogo)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxNotification)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxUserProfile)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMenuLogo)).EndInit();
             this.ResumeLayout(false);
 
         }

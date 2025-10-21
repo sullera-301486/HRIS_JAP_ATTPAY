@@ -38,13 +38,12 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panelSearch = new System.Windows.Forms.Panel();
             this.textBoxSearchEmployee = new System.Windows.Forms.TextBox();
-            this.pictureBoxSearch = new System.Windows.Forms.PictureBox();
             this.panelFilter = new System.Windows.Forms.Panel();
             this.labelFiltersName = new System.Windows.Forms.Label();
-            this.pictureBoxFilters = new System.Windows.Forms.PictureBox();
             this.labelAdminAttendance = new System.Windows.Forms.Label();
             this.labelAttendanceDate = new System.Windows.Forms.Label();
             this.panelDate = new System.Windows.Forms.Panel();
+            this.dtpSingleDateSelector = new System.Windows.Forms.DateTimePicker();
             this.tableLayoutPanelAttendance = new System.Windows.Forms.TableLayoutPanel();
             this.dataGridViewAttendance = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -57,27 +56,30 @@
             this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column11 = new System.Windows.Forms.DataGridViewImageColumn();
+            this.panelLoanAndExport = new System.Windows.Forms.Panel();
+            this.buttonExportDTR = new System.Windows.Forms.Button();
             this.dataGridViewImageColumn1 = new System.Windows.Forms.DataGridViewImageColumn();
-            this.dtpSingleDateSelector = new System.Windows.Forms.DateTimePicker();
+            this.Column11 = new System.Windows.Forms.DataGridViewImageColumn();
+            this.pictureBoxSearch = new System.Windows.Forms.PictureBox();
+            this.pictureBoxFilters = new System.Windows.Forms.PictureBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.panelSearch.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).BeginInit();
             this.panelFilter.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFilters)).BeginInit();
             this.panelDate.SuspendLayout();
             this.tableLayoutPanelAttendance.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAttendance)).BeginInit();
+            this.panelLoanAndExport.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFilters)).BeginInit();
             this.SuspendLayout();
             // 
             // labelManageLeave
             // 
-            this.labelManageLeave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.labelManageLeave.AutoSize = true;
             this.labelManageLeave.Cursor = System.Windows.Forms.Cursors.Hand;
             this.labelManageLeave.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelManageLeave.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(23)))), ((int)(((byte)(112)))));
-            this.labelManageLeave.Location = new System.Drawing.Point(1264, 89);
+            this.labelManageLeave.Location = new System.Drawing.Point(4, 14);
             this.labelManageLeave.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelManageLeave.Name = "labelManageLeave";
             this.labelManageLeave.Size = new System.Drawing.Size(155, 25);
@@ -99,9 +101,9 @@
             this.tableLayoutPanel1.Controls.Add(this.panelSearch, 6, 0);
             this.tableLayoutPanel1.Controls.Add(this.panelFilter, 4, 0);
             this.tableLayoutPanel1.Controls.Add(this.labelAdminAttendance, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.labelManageLeave, 6, 1);
             this.tableLayoutPanel1.Controls.Add(this.labelAttendanceDate, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.panelDate, 2, 0);
+            this.tableLayoutPanel1.Controls.Add(this.panelLoanAndExport, 6, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
@@ -139,19 +141,6 @@
             this.textBoxSearchEmployee.TabIndex = 2;
             this.textBoxSearchEmployee.Text = "Find Employee";
             // 
-            // pictureBoxSearch
-            // 
-            this.pictureBoxSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.pictureBoxSearch.BackgroundImage = global::HRIS_JAP_ATTPAY.Properties.Resources.search;
-            this.pictureBoxSearch.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pictureBoxSearch.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pictureBoxSearch.Location = new System.Drawing.Point(331, 0);
-            this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(0);
-            this.pictureBoxSearch.Name = "pictureBoxSearch";
-            this.pictureBoxSearch.Size = new System.Drawing.Size(57, 52);
-            this.pictureBoxSearch.TabIndex = 3;
-            this.pictureBoxSearch.TabStop = false;
-            // 
             // panelFilter
             // 
             this.panelFilter.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -175,18 +164,6 @@
             this.labelFiltersName.Size = new System.Drawing.Size(80, 29);
             this.labelFiltersName.TabIndex = 10;
             this.labelFiltersName.Text = "Filters";
-            // 
-            // pictureBoxFilters
-            // 
-            this.pictureBoxFilters.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pictureBoxFilters.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.filter__1__1;
-            this.pictureBoxFilters.Location = new System.Drawing.Point(97, 0);
-            this.pictureBoxFilters.Margin = new System.Windows.Forms.Padding(4);
-            this.pictureBoxFilters.Name = "pictureBoxFilters";
-            this.pictureBoxFilters.Size = new System.Drawing.Size(49, 46);
-            this.pictureBoxFilters.TabIndex = 7;
-            this.pictureBoxFilters.TabStop = false;
-            this.pictureBoxFilters.Click += new System.EventHandler(this.pictureBoxFilters_Click);
             // 
             // labelAdminAttendance
             // 
@@ -216,11 +193,19 @@
             // 
             this.panelDate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.panelDate.Controls.Add(this.dtpSingleDateSelector);
-            this.panelDate.Location = new System.Drawing.Point(609, 22);
+            this.panelDate.Location = new System.Drawing.Point(599, 17);
             this.panelDate.Margin = new System.Windows.Forms.Padding(0);
             this.panelDate.Name = "panelDate";
-            this.panelDate.Size = new System.Drawing.Size(226, 47);
+            this.panelDate.Size = new System.Drawing.Size(236, 52);
             this.panelDate.TabIndex = 19;
+            // 
+            // dtpSingleDateSelector
+            // 
+            this.dtpSingleDateSelector.Location = new System.Drawing.Point(0, 14);
+            this.dtpSingleDateSelector.Name = "dtpSingleDateSelector";
+            this.dtpSingleDateSelector.Size = new System.Drawing.Size(224, 22);
+            this.dtpSingleDateSelector.TabIndex = 0;
+            this.dtpSingleDateSelector.ValueChanged += new System.EventHandler(this.dtpSingleDateSelector_ValueChanged);
             // 
             // tableLayoutPanelAttendance
             // 
@@ -401,6 +386,48 @@
             this.Column10.ReadOnly = true;
             this.Column10.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
+            // panelLoanAndExport
+            // 
+            this.panelLoanAndExport.Controls.Add(this.buttonExportDTR);
+            this.panelLoanAndExport.Controls.Add(this.labelManageLeave);
+            this.panelLoanAndExport.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelLoanAndExport.Location = new System.Drawing.Point(1038, 72);
+            this.panelLoanAndExport.Name = "panelLoanAndExport";
+            this.panelLoanAndExport.Size = new System.Drawing.Size(382, 39);
+            this.panelLoanAndExport.TabIndex = 23;
+            // 
+            // buttonExportDTR
+            // 
+            this.buttonExportDTR.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonExportDTR.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(135)))), ((int)(((byte)(57)))));
+            this.buttonExportDTR.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.buttonExportDTR.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.buttonExportDTR.FlatAppearance.BorderSize = 0;
+            this.buttonExportDTR.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonExportDTR.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonExportDTR.ForeColor = System.Drawing.Color.White;
+            this.buttonExportDTR.Location = new System.Drawing.Point(239, 4);
+            this.buttonExportDTR.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonExportDTR.Name = "buttonExportDTR";
+            this.buttonExportDTR.Size = new System.Drawing.Size(143, 33);
+            this.buttonExportDTR.TabIndex = 24;
+            this.buttonExportDTR.Text = "Export DTR";
+            this.buttonExportDTR.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.buttonExportDTR.UseVisualStyleBackColor = false;
+            this.buttonExportDTR.Click += new System.EventHandler(this.buttonExportDTR_Click);
+            // 
+            // dataGridViewImageColumn1
+            // 
+            this.dataGridViewImageColumn1.FillWeight = 17F;
+            this.dataGridViewImageColumn1.HeaderText = "";
+            this.dataGridViewImageColumn1.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.VerticalThreeDots;
+            this.dataGridViewImageColumn1.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Zoom;
+            this.dataGridViewImageColumn1.MinimumWidth = 6;
+            this.dataGridViewImageColumn1.Name = "dataGridViewImageColumn1";
+            this.dataGridViewImageColumn1.ReadOnly = true;
+            this.dataGridViewImageColumn1.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewImageColumn1.Width = 23;
+            // 
             // Column11
             // 
             this.Column11.FillWeight = 17F;
@@ -412,24 +439,30 @@
             this.Column11.ReadOnly = true;
             this.Column11.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             // 
-            // dataGridViewImageColumn1
+            // pictureBoxSearch
             // 
-            this.dataGridViewImageColumn1.FillWeight = 17F;
-            this.dataGridViewImageColumn1.HeaderText = "";
-            this.dataGridViewImageColumn1.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.VerticalThreeDots;
-            this.dataGridViewImageColumn1.MinimumWidth = 6;
-            this.dataGridViewImageColumn1.Name = "dataGridViewImageColumn1";
-            this.dataGridViewImageColumn1.ReadOnly = true;
-            this.dataGridViewImageColumn1.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewImageColumn1.Width = 23;
+            this.pictureBoxSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.pictureBoxSearch.BackgroundImage = global::HRIS_JAP_ATTPAY.Properties.Resources.search;
+            this.pictureBoxSearch.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pictureBoxSearch.Dock = System.Windows.Forms.DockStyle.Right;
+            this.pictureBoxSearch.Location = new System.Drawing.Point(331, 0);
+            this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxSearch.Name = "pictureBoxSearch";
+            this.pictureBoxSearch.Size = new System.Drawing.Size(57, 52);
+            this.pictureBoxSearch.TabIndex = 3;
+            this.pictureBoxSearch.TabStop = false;
             // 
-            // dtpSingleDateSelector
+            // pictureBoxFilters
             // 
-            this.dtpSingleDateSelector.Location = new System.Drawing.Point(0, 14);
-            this.dtpSingleDateSelector.Name = "dtpSingleDateSelector";
-            this.dtpSingleDateSelector.Size = new System.Drawing.Size(224, 22);
-            this.dtpSingleDateSelector.TabIndex = 0;
-            this.dtpSingleDateSelector.ValueChanged += new System.EventHandler(this.dtpSingleDateSelector_ValueChanged);
+            this.pictureBoxFilters.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pictureBoxFilters.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.filter__1__1;
+            this.pictureBoxFilters.Location = new System.Drawing.Point(97, 0);
+            this.pictureBoxFilters.Margin = new System.Windows.Forms.Padding(4);
+            this.pictureBoxFilters.Name = "pictureBoxFilters";
+            this.pictureBoxFilters.Size = new System.Drawing.Size(49, 46);
+            this.pictureBoxFilters.TabIndex = 7;
+            this.pictureBoxFilters.TabStop = false;
+            this.pictureBoxFilters.Click += new System.EventHandler(this.pictureBoxFilters_Click);
             // 
             // AdminAttendance
             // 
@@ -445,13 +478,15 @@
             this.tableLayoutPanel1.PerformLayout();
             this.panelSearch.ResumeLayout(false);
             this.panelSearch.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).EndInit();
             this.panelFilter.ResumeLayout(false);
             this.panelFilter.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFilters)).EndInit();
             this.panelDate.ResumeLayout(false);
             this.tableLayoutPanelAttendance.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAttendance)).EndInit();
+            this.panelLoanAndExport.ResumeLayout(false);
+            this.panelLoanAndExport.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFilters)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -483,5 +518,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column10;
         private System.Windows.Forms.DataGridViewImageColumn Column11;
         private System.Windows.Forms.DateTimePicker dtpSingleDateSelector;
+        private System.Windows.Forms.Panel panelLoanAndExport;
+        private System.Windows.Forms.Button buttonExportDTR;
     }
 }

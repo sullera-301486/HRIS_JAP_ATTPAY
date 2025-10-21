@@ -642,6 +642,7 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
+                buttonExportDTR.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelAdminAttendance.Font = AttributesClass.GetFont("Roboto-Light", 20f);
                 labelAttendanceDate.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelManageLeave.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
@@ -1908,6 +1909,13 @@ namespace HRIS_JAP_ATTPAY
             }
 
             return false;
+        }
+
+        private void buttonExportDTR_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            ConfirmExportDTR confirmExportDTR = new ConfirmExportDTR();
+            AttributesClass.ShowWithOverlay(parentForm, confirmExportDTR);
         }
     }
 

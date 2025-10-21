@@ -78,7 +78,7 @@
             this.buttonOverview.Name = "buttonOverview";
             this.buttonOverview.Size = new System.Drawing.Size(360, 63);
             this.buttonOverview.TabIndex = 0;
-            this.buttonOverview.Text = "OVERVIEW";
+            this.buttonOverview.Text = "DASHBOARD";
             this.buttonOverview.UseVisualStyleBackColor = false;
             this.buttonOverview.Click += new System.EventHandler(this.buttonOverview_Click);
             // 
@@ -149,17 +149,19 @@
             // 
             // AdminMiscTableLayoutPanel
             // 
-            this.AdminMiscTableLayoutPanel.ColumnCount = 7;
+            this.AdminMiscTableLayoutPanel.ColumnCount = 9;
             this.AdminMiscTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 46F));
-            this.AdminMiscTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 37F));
+            this.AdminMiscTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 32.5F));
+            this.AdminMiscTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 3F));
+            this.AdminMiscTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 1.5F));
             this.AdminMiscTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 3F));
             this.AdminMiscTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 1.5F));
             this.AdminMiscTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 3F));
             this.AdminMiscTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 1.5F));
             this.AdminMiscTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8F));
-            this.AdminMiscTableLayoutPanel.Controls.Add(this.labelLogOut, 6, 0);
-            this.AdminMiscTableLayoutPanel.Controls.Add(this.pictureBoxNotification, 2, 0);
-            this.AdminMiscTableLayoutPanel.Controls.Add(this.pictureBoxUserProfile, 4, 0);
+            this.AdminMiscTableLayoutPanel.Controls.Add(this.labelLogOut, 8, 0);
+            this.AdminMiscTableLayoutPanel.Controls.Add(this.pictureBoxNotification, 4, 0);
+            this.AdminMiscTableLayoutPanel.Controls.Add(this.pictureBoxUserProfile, 6, 0);
             this.AdminMiscTableLayoutPanel.Controls.Add(this.pictureBoxMenuLogo, 0, 0);
             this.AdminMiscTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.AdminMiscTableLayoutPanel.Location = new System.Drawing.Point(0, 0);

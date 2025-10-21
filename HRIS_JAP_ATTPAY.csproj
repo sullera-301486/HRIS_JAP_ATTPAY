@@ -286,6 +286,18 @@
     <Compile Include="ConfirmAdminLeaveEntry.Designer.cs">
       <DependentUpon>ConfirmAdminLeaveEntry.cs</DependentUpon>
     </Compile>
+    <Compile Include="ConfirmExportDTR.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmExportDTR.Designer.cs">
+      <DependentUpon>ConfirmExportDTR.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfirmRecoverEmployee.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmRecoverEmployee.Designer.cs">
+      <DependentUpon>ConfirmRecoverEmployee.cs</DependentUpon>
+    </Compile>
     <Compile Include="EmployeeSchedules.cs" />
     <Compile Include="Calendar.cs">
       <SubType>UserControl</SubType>
@@ -654,6 +666,9 @@
     <EmbeddedResource Include="ConfirmArchive.resx">
       <DependentUpon>ConfirmArchive.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmExportDTR.resx">
+      <DependentUpon>ConfirmExportDTR.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ConfirmLeaveEntry.resx">
       <DependentUpon>ConfirmLeaveEntry.cs</DependentUpon>
     </EmbeddedResource>
@@ -671,6 +686,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ConfirmProfileUpdate.resx">
       <DependentUpon>ConfirmProfileUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmRecoverEmployee.resx">
+      <DependentUpon>ConfirmRecoverEmployee.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EditAttendance.resx">
       <DependentUpon>EditAttendance.cs</DependentUpon>

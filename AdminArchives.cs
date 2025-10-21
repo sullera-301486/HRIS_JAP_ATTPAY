@@ -168,5 +168,12 @@ namespace HRIS_JAP_ATTPAY
                 }
             }
         }
+
+        private void buttonRestoreSelected_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            ConfirmRecoverEmployee confirmRecoverEmployee = new ConfirmRecoverEmployee();
+            AttributesClass.ShowWithOverlay(parentForm, confirmRecoverEmployee);
+        }
     }
 }

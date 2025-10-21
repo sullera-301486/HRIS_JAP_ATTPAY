@@ -163,18 +163,24 @@ namespace HRIS_JAP_ATTPAY
 
         private void ApplyTooltipIfTruncated(Label label)
         {
-            using (Graphics g = label.CreateGraphics())
+            try
             {
-                SizeF textSize = g.MeasureString(label.Text, label.Font);
-                if (textSize.Width > label.Width)
-                    infoToolTip.SetToolTip(label, label.Text);
-                else
-                    infoToolTip.SetToolTip(label, null);
+                using (Graphics g = label.CreateGraphics())
+                {
+                    SizeF textSize = g.MeasureString(label.Text, label.Font);
+                    if (textSize.Width > label.Width)
+                        infoToolTip.SetToolTip(label, label.Text);
+                    else
+                        infoToolTip.SetToolTip(label, null);
+                }
             }
-        }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error applying tooltip: " + ex.Message);
+            }
+            }
 
-        // 🟢 When revoke is clicked, restore leave + delete record from Firebase
-        // 🟢 When revoke is clicked, restore leave + delete record from Firebase
+        //  When revoke is clicked, restore leave + delete record from Firebase
         private async void btnRevoke_Click(object sender, EventArgs e)
         {
             try
