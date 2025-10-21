@@ -26,8 +26,8 @@ namespace HRIS_JAP_ATTPAY
             setFont();
             firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
             InitializeDepartmentComboBox();
+            InitializeOtherComboBoxes();
             UpdateAlternateTextboxAccessibility();
-            UpdatePasswordFieldAccessibility();
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
@@ -62,6 +62,7 @@ namespace HRIS_JAP_ATTPAY
                 }
             }
         }
+
         private async Task CreateDefaultLeaveCredits(string employeeId, string fullName)
         {
             try
@@ -186,7 +187,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-
         private async Task FixExistingLeaveCredits()
         {
             try
@@ -259,6 +259,7 @@ namespace HRIS_JAP_ATTPAY
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private async Task SyncAllEmployeesToLeaveCredits()
         {
             try
@@ -314,7 +315,7 @@ namespace HRIS_JAP_ATTPAY
                         string lastName = empObj["last_name"]?.ToString() ?? "";
                         string fullName = $"{firstName} {middleName} {lastName}".Trim();
 
-                        // ✅ If record already exists → skip it (don’t overwrite existing balances)
+                        // ✅ If record already exists → skip it (don't overwrite existing balances)
                         if (existingLeave.ContainsKey(empId))
                         {
                             skipped++;
@@ -463,8 +464,6 @@ namespace HRIS_JAP_ATTPAY
                         if (response.IsSuccessStatusCode)
                             added++;
                     }
-
-                    
                 }
             }
             catch (Exception ex)
@@ -472,9 +471,6 @@ namespace HRIS_JAP_ATTPAY
                 MessageBox.Show("❌ Error syncing Leave Credits:\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-
-
 
         private async void AddNewEmployee_Load(object sender, EventArgs e)
         {
@@ -607,7 +603,6 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // [⚠ All original font assignments kept here exactly as before]
                 buttonScanRFID.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 buttonAdd.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
                 buttonCancel.Font = AttributesClass.GetFont("Roboto-Light", 14f);
@@ -635,7 +630,6 @@ namespace HRIS_JAP_ATTPAY
                 labelMaritalStatus.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
                 labelMiddleName.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
                 labelNationality.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
-                labelPassword.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
                 labelPersonalInformation.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
                 labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
                 labelRFIDTag.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
@@ -647,23 +641,34 @@ namespace HRIS_JAP_ATTPAY
                 textBoxAltWorkHoursA.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxAltWorkHoursB.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxContact.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxContractType.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxDateOfBirth.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxDateOfExit.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxDateOfJoining.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxEmail.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 lblempID.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxFirstName.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxGender.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxLastName.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxManager.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxMaritalStatus.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxMiddleName.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxNationality.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxPassword.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxPosition.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxWorkHoursA.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxWorkHoursB.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+
+                // Updated controls font
+                cbGender.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                cbMaritalStatus.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                cbContractType.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                cbPosition.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                cbManager.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                dtpDateOfBirth.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
+                dtpDateStarted.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
+                dtpDatePeriod.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
+
+                // Set custom format to match AdminAttendance (yyyy-MM-dd)
+                dtpDateOfBirth.Format = DateTimePickerFormat.Custom;
+                dtpDateOfBirth.CustomFormat = "yyyy-MM-dd";
+
+                dtpDateStarted.Format = DateTimePickerFormat.Custom;
+                dtpDateStarted.CustomFormat = "yyyy-MM-dd";
+
+                dtpDatePeriod.Format = DateTimePickerFormat.Custom;
+                dtpDatePeriod.CustomFormat = "yyyy-MM-dd";
             }
             catch (Exception ex)
             {
@@ -698,20 +703,20 @@ namespace HRIS_JAP_ATTPAY
                 string lastName = textBoxLastName.Text.Trim();
                 string fullName = $"{firstName} {middleName} {lastName}".Trim();
 
-                string gender = textBoxGender.Text.Trim();
-                string dateOfBirth = textBoxDateOfBirth.Text.Trim();
-                string maritalStatus = textBoxMaritalStatus.Text.Trim();
+                // Get values from updated controls
+                string gender = cbGender.SelectedItem?.ToString() ?? "";
+                string dateOfBirth = dtpDateOfBirth.Value.ToString("yyyy-MM-dd");
+                string maritalStatus = cbMaritalStatus.SelectedItem?.ToString() ?? "";
                 string nationality = textBoxNationality.Text.Trim();
                 string contact = textBoxContact.Text.Trim();
                 string email = textBoxEmail.Text.Trim();
                 string address = textBoxAddress.Text.Trim();
-                string position = textBoxPosition.Text.Trim();
+                string position = cbPosition.SelectedItem?.ToString() ?? "";
                 string department = comboBoxDepartment.Text.Trim();
-                string contractType = textBoxContractType.Text.Trim();
-                string dateOfJoining = textBoxDateOfJoining.Text.Trim();
-                string dateOfExit = textBoxDateOfExit.Text.Trim();
-                string managerName = textBoxManager.Text.Trim();
-                string password = textBoxPassword.Text.Trim();
+                string contractType = cbContractType.SelectedItem?.ToString() ?? "";
+                string dateOfJoining = dtpDateStarted.Value.ToString("yyyy-MM-dd");
+                string dateOfExit = dtpDatePeriod.Value.ToString("yyyy-MM-dd");
+                string managerName = cbManager.SelectedItem?.ToString() ?? "";
 
                 string rfidTag = !string.IsNullOrEmpty(labelRFIDTagInput.Text) && labelRFIDTagInput.Text != "Scan RFID Tag"
                     ? labelRFIDTagInput.Text
@@ -761,29 +766,6 @@ namespace HRIS_JAP_ATTPAY
                 // ✅ ADD LEAVE CREDITS SECTION
                 await CreateDefaultLeaveCredits(employeeId, fullName);
 
-                // ✅ ONLY CREATE USER IF DEPARTMENT IS HUMAN RESOURCE
-                if (department == "Human Resource" && !string.IsNullOrEmpty(password))
-                {
-                    string userId = (100 + int.Parse(numericPart)).ToString();
-                    string salt = "RANDOMSALT" + numericPart;
-                    string passwordHash = HashPassword(password, salt);
-
-                    var userObj = new
-                    {
-                        user_id = userId,
-                        employee_id = employeeId,
-                        password_hash = passwordHash,
-                        salt = salt,
-                        isAdmin = "False",
-                        created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
-                    };
-
-                    await firebase.Child("Users").Child(userObj.user_id).PutAsync(userObj);
-
-                    // ✅ ADD ADMIN LOG FOR USER CREATION
-                    await AddAdminLog("User Created", employeeId, fullName, $"User account created for {fullName} in HR department");
-                }
-
                 // ✅ ADD ADMIN LOG FOR EMPLOYEE CREATION
                 await AddAdminLog("Employee Created", employeeId, fullName, $"{fullName} added new employee: {fullName}");
 
@@ -823,17 +805,6 @@ namespace HRIS_JAP_ATTPAY
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error adding admin log: {ex.Message}");
-            }
-        }
-
-        private string HashPassword(string password, string salt)
-        {
-            using (var sha256 = System.Security.Cryptography.SHA256.Create())
-            {
-                byte[] passwordBytes = System.Text.Encoding.UTF8.GetBytes(password + salt);
-                byte[] hashBytes = sha256.ComputeHash(passwordBytes);
-                // Return uppercase hash to match JAP-002 format
-                return BitConverter.ToString(hashBytes).Replace("-", "").ToUpper();
             }
         }
 
@@ -935,17 +906,64 @@ namespace HRIS_JAP_ATTPAY
         {
             labelRFIDTagInput.Text = tag;
         }
+
         private void InitializeDepartmentComboBox()
         {
             // Add departments to combobox
             comboBoxDepartment.Items.AddRange(new string[] {
-                    "Engineering",
-                    "Purchasing",
-                    "Operations",
-                    "Finance",
-                    "Human Resource"
+                "Engineering",
+                "Purchasing",
+                "Operations",
+                "Finance",
+                "Human Resource"
             });
         }
+
+        private void InitializeOtherComboBoxes()
+        {
+            // Initialize Gender ComboBox
+            cbGender.Items.AddRange(new string[] {
+                "Male",
+                "Female",
+                "Other"
+            });
+
+            // Initialize Marital Status ComboBox
+            cbMaritalStatus.Items.AddRange(new string[] {
+                "Single",
+                "Married",
+                "Widowed"
+            });
+
+            // Initialize Contract Type ComboBox
+            cbContractType.Items.AddRange(new string[] {
+                "Regular",
+                "Contractual"
+                
+            });
+
+            // Initialize Position ComboBox
+            cbPosition.Items.AddRange(new string[] {
+                "Analyst",
+                "HR Manager",
+                "Accountanting Manager",
+                "Operations Manager",
+                "Assistant",
+                "Staff"
+            });
+
+            // Initialize Manager ComboBox
+            cbManager.Items.AddRange(new string[] {
+                "Franz Louies Deloritos",
+                "Charles Macaraig"
+            });
+
+            // Set default dates
+            dtpDateOfBirth.Value = DateTime.Now.AddYears(-25);
+            dtpDateStarted.Value = DateTime.Now;
+            dtpDatePeriod.Value = DateTime.Now.AddYears(1);
+        }
+
         private async Task<string> GetNextEmployeeId()
         {
             try
@@ -1016,36 +1034,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private void comboBoxDepartment_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            UpdatePasswordFieldAccessibility();
-        }
-        private void UpdatePasswordFieldAccessibility()
-        {
-            string selectedDepartment = comboBoxDepartment.SelectedItem?.ToString();
-
-            if (selectedDepartment == "Human Resource")
-            {
-                // Enable password field for HR department
-                textBoxPassword.Enabled = true;
-                textBoxPassword.BackColor = SystemColors.Window;
-                textBoxPassword.ForeColor = SystemColors.WindowText;
-
-                // Clear any placeholder text and set actual text if needed
-                if (textBoxPassword.Text == "HR department only" || textBoxPassword.Text == "Select HR department to enable")
-                {
-                    textBoxPassword.Text = "";
-                }
-            }
-            else
-            {
-                // Disable password field for other departments
-                textBoxPassword.Enabled = false;
-                textBoxPassword.BackColor = SystemColors.Control;
-                textBoxPassword.ForeColor = SystemColors.GrayText;
-                textBoxPassword.Text = "HR department only"; // Use Text instead of PlaceholderText
-            }
-        }
         private async Task<int> GetNextScheduleId()
         {
             try
@@ -1093,7 +1081,6 @@ namespace HRIS_JAP_ATTPAY
                 return 1;
             }
         }
-
 
         private bool ValidateWorkSchedule()
         {
@@ -1160,6 +1147,7 @@ namespace HRIS_JAP_ATTPAY
 
             return true;
         }
+
         private async Task AddWorkSchedulesAsync(string employeeId)
         {
             try
@@ -1241,6 +1229,7 @@ namespace HRIS_JAP_ATTPAY
                 return 0;
             }
         }
+
         private async Task GenerateNextEmployeeId()
         {
             try
