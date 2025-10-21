@@ -172,17 +172,20 @@ namespace HRIS_JAP_ATTPAY
                 string lastName = employeeData.last_name?.ToString() ?? "";
                 string fullName = $"{firstName} {middleName} {lastName}".Replace("  ", " ").Trim();
 
-                // 2. Get all related data
+                // 2. Get all related data based on ACTUAL JSON structure
                 var employmentData = await GetEmploymentInfo();
                 var leaveCredits = await GetLeaveCredits();
-                var leaveNotifications = await GetLeaveNotifications();
                 var attendanceRecords = await GetAttendanceRecords();
+                var employeeLoans = await GetEmployeeLoans();
+                var workSchedule = await GetWorkSchedule();
+                var userData = await GetUserData();
+                var hrNotifications = await GetHRNotifications();
+                var payrollData = await GetPayrollData();
+                var payrollEarnings = await GetPayrollEarnings();
+                var payrollSummary = await GetPayrollSummary();
                 var employeeDeductions = await GetEmployeeDeductions();
                 var governmentDeductions = await GetGovernmentDeductions();
-                var employeeLoans = await GetEmployeeLoans();
-                var payrollRecords = await GetPayrollRecords();
-                var payrollEarnings = await GetPayrollEarnings();
-                var payrollSummaries = await GetPayrollSummaries();
+                var manageLeaveRecords = await GetManageLeaveRecords();
                 var todos = await GetTodos();
 
                 // 3. Create comprehensive archived employee record
@@ -191,17 +194,20 @@ namespace HRIS_JAP_ATTPAY
                     employee_data = employeeData,
                     employment_info = employmentData,
                     leave_credits = leaveCredits,
-                    leave_notifications = leaveNotifications,
                     attendance_records = attendanceRecords,
+                    employee_loans = employeeLoans,
+                    work_schedule = workSchedule,
+                    user_data = userData,
+                    hr_notifications = hrNotifications,
+                    payroll_data = payrollData,
+                    payroll_earnings = payrollEarnings,
+                    payroll_summary = payrollSummary,
                     employee_deductions = employeeDeductions,
                     government_deductions = governmentDeductions,
-                    employee_loans = employeeLoans,
-                    payroll_records = payrollRecords,
-                    payroll_earnings = payrollEarnings,
-                    payroll_summaries = payrollSummaries,
+                    manage_leave_records = manageLeaveRecords,
                     todos = todos,
                     archived_date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    archived_by = SessionClass.CurrentEmployeeName, // Changed from "System"
+                    archived_by = SessionClass.CurrentEmployeeName,
                     is_archived = true
                 };
 
@@ -211,7 +217,7 @@ namespace HRIS_JAP_ATTPAY
                     .Child(employeeId)
                     .PutAsync(archivedEmployee);
 
-                // 5. Remove from all active tables
+                // 5. Remove from all active tables (logs remain untouched)
                 await RemoveFromAllActiveTables();
 
                 // 6. Log the archive action
@@ -224,34 +230,35 @@ namespace HRIS_JAP_ATTPAY
                 // Trigger the event to notify that employee was archived
                 EmployeeArchived?.Invoke();
 
+                MessageBox.Show($"Employee {fullName} has been successfully archived.", "Archive Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error archiving employee: " + ex.Message);
+                MessageBox.Show($"Error archiving employee: {ex.Message}", "Archive Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.UserConfirmed = false;
             }
         }
 
-        // Existing methods (GetEmploymentInfo, GetLeaveCredits, GetLeaveNotifications)
+        // CORRECTED METHODS BASED ON ACTUAL JSON STRUCTURE
         private async Task<dynamic> GetEmploymentInfo()
         {
             try
             {
                 var employmentData = await firebase
                     .Child("EmploymentInfo")
-                    .OnceSingleAsync<Dictionary<string, dynamic>>();
+                    .OnceSingleAsync<List<dynamic>>();
 
                 if (employmentData != null)
                 {
-                    foreach (var kvp in employmentData)
+                    foreach (var item in employmentData)
                     {
-                        if (kvp.Value != null)
+                        if (item != null)
                         {
-                            var empId = kvp.Value.employee_id?.ToString();
+                            var empId = item.employee_id?.ToString();
                             if (empId == employeeId)
                             {
-                                return kvp.Value;
+                                return item;
                             }
                         }
                     }
@@ -283,41 +290,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private async Task<Dictionary<string, dynamic>> GetLeaveNotifications()
-        {
-            try
-            {
-                var allNotifications = await firebase
-                    .Child("LeaveNotifications")
-                    .OnceAsync<dynamic>();
-
-                var employeeNotifications = new Dictionary<string, dynamic>();
-
-                if (allNotifications != null)
-                {
-                    foreach (var notification in allNotifications)
-                    {
-                        if (notification.Object != null)
-                        {
-                            var notificationEmployee = notification.Object.Employee?.ToString();
-                            if (!string.IsNullOrEmpty(notificationEmployee) &&
-                                notificationEmployee.Contains(employeeId))
-                            {
-                                employeeNotifications[notification.Key] = notification.Object;
-                            }
-                        }
-                    }
-                }
-                return employeeNotifications;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error getting leave notifications: {ex.Message}");
-                return new Dictionary<string, dynamic>();
-            }
-        }
-
-        // NEW METHODS TO GET ADDITIONAL DATA
         private async Task<Dictionary<string, dynamic>> GetAttendanceRecords()
         {
             try
@@ -347,73 +319,6 @@ namespace HRIS_JAP_ATTPAY
             catch (Exception ex)
             {
                 Console.WriteLine($"Error getting attendance records: {ex.Message}");
-                return new Dictionary<string, dynamic>();
-            }
-        }
-
-        private async Task<Dictionary<string, dynamic>> GetEmployeeDeductions()
-        {
-            try
-            {
-                var allDeductions = await firebase
-                    .Child("EmployeeDeductions")
-                    .OnceAsync<dynamic>();
-
-                var employeeDeductions = new Dictionary<string, dynamic>();
-
-                if (allDeductions != null)
-                {
-                    foreach (var deduction in allDeductions)
-                    {
-                        if (deduction.Object != null)
-                        {
-                            var empId = deduction.Object.employee_id?.ToString();
-                            if (empId == employeeId)
-                            {
-                                employeeDeductions[deduction.Key] = deduction.Object;
-                            }
-                        }
-                    }
-                }
-                return employeeDeductions;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error getting employee deductions: {ex.Message}");
-                return new Dictionary<string, dynamic>();
-            }
-        }
-
-        private async Task<Dictionary<string, dynamic>> GetGovernmentDeductions()
-        {
-            try
-            {
-                var allGovDeductions = await firebase
-                    .Child("GovernmentDeductions")
-                    .OnceAsync<dynamic>();
-
-                var employeeGovDeductions = new Dictionary<string, dynamic>();
-
-                if (allGovDeductions != null)
-                {
-                    foreach (var deduction in allGovDeductions)
-                    {
-                        if (deduction.Object != null)
-                        {
-                            // Government deductions are linked via payroll_id, so we need to find matching payroll records
-                            var payrollId = deduction.Key.ToString();
-                            if (await IsPayrollForEmployee(payrollId))
-                            {
-                                employeeGovDeductions[deduction.Key] = deduction.Object;
-                            }
-                        }
-                    }
-                }
-                return employeeGovDeductions;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error getting government deductions: {ex.Message}");
                 return new Dictionary<string, dynamic>();
             }
         }
@@ -451,101 +356,292 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private async Task<Dictionary<string, dynamic>> GetPayrollRecords()
+        private async Task<List<dynamic>> GetWorkSchedule()
+        {
+            try
+            {
+                var allSchedules = await firebase
+                    .Child("Work_Schedule")
+                    .OnceSingleAsync<List<dynamic>>();
+
+                var employeeSchedules = new List<dynamic>();
+
+                if (allSchedules != null)
+                {
+                    foreach (var schedule in allSchedules)
+                    {
+                        if (schedule != null)
+                        {
+                            var empId = schedule.employee_id?.ToString();
+                            if (empId == employeeId)
+                            {
+                                employeeSchedules.Add(schedule);
+                            }
+                        }
+                    }
+                }
+                return employeeSchedules;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting work schedule: {ex.Message}");
+                return new List<dynamic>();
+            }
+        }
+
+        private async Task<dynamic> GetUserData()
+        {
+            try
+            {
+                var allUsers = await firebase
+                    .Child("Users")
+                    .OnceAsync<dynamic>();
+
+                if (allUsers != null)
+                {
+                    foreach (var user in allUsers)
+                    {
+                        if (user.Object != null)
+                        {
+                            var empId = user.Object.employee_id?.ToString();
+                            if (empId == employeeId)
+                            {
+                                return user.Object;
+                            }
+                        }
+                    }
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting user data: {ex.Message}");
+                return null;
+            }
+        }
+
+        private async Task<Dictionary<string, dynamic>> GetHRNotifications()
+        {
+            try
+            {
+                var allNotifications = await firebase
+                    .Child("HRNotifications")
+                    .OnceAsync<dynamic>();
+
+                var employeeNotifications = new Dictionary<string, dynamic>();
+
+                if (allNotifications != null)
+                {
+                    foreach (var notification in allNotifications)
+                    {
+                        if (notification.Object != null)
+                        {
+                            var message = notification.Object.message?.ToString();
+                            if (!string.IsNullOrEmpty(message) && message.Contains(employeeId))
+                            {
+                                employeeNotifications[notification.Key] = notification.Object;
+                            }
+                        }
+                    }
+                }
+                return employeeNotifications;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting HR notifications: {ex.Message}");
+                return new Dictionary<string, dynamic>();
+            }
+        }
+
+        // NEW METHODS FOR ADDITIONAL DATA
+        private async Task<dynamic> GetPayrollData()
         {
             try
             {
                 var allPayroll = await firebase
                     .Child("Payroll")
-                    .OnceAsync<dynamic>();
-
-                var employeePayroll = new Dictionary<string, dynamic>();
+                    .OnceSingleAsync<List<dynamic>>();
 
                 if (allPayroll != null)
                 {
                     foreach (var payroll in allPayroll)
                     {
-                        if (payroll.Object != null)
+                        if (payroll != null)
                         {
-                            var empId = payroll.Object.employee_id?.ToString();
+                            var empId = payroll.employee_id?.ToString();
                             if (empId == employeeId)
                             {
-                                employeePayroll[payroll.Key] = payroll.Object;
+                                return payroll;
                             }
                         }
                     }
                 }
-                return employeePayroll;
+                return null;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting payroll records: {ex.Message}");
-                return new Dictionary<string, dynamic>();
+                Console.WriteLine($"Error getting payroll data: {ex.Message}");
+                return null;
             }
         }
 
-        private async Task<Dictionary<string, dynamic>> GetPayrollEarnings()
+        private async Task<dynamic> GetPayrollEarnings()
         {
             try
             {
                 var allEarnings = await firebase
                     .Child("PayrollEarnings")
-                    .OnceAsync<dynamic>();
-
-                var employeeEarnings = new Dictionary<string, dynamic>();
+                    .OnceSingleAsync<List<dynamic>>();
 
                 if (allEarnings != null)
                 {
-                    foreach (var earning in allEarnings)
+                    var payrollData = await GetPayrollData();
+                    if (payrollData != null)
                     {
-                        if (earning.Object != null)
+                        var payrollId = payrollData.payroll_id?.ToString();
+                        foreach (var earning in allEarnings)
                         {
-                            var payrollId = earning.Object.payroll_id?.ToString();
-                            if (await IsPayrollForEmployee(payrollId))
+                            if (earning != null && earning.payroll_id?.ToString() == payrollId)
                             {
-                                employeeEarnings[earning.Key] = earning.Object;
+                                return earning;
                             }
                         }
                     }
                 }
-                return employeeEarnings;
+                return null;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error getting payroll earnings: {ex.Message}");
-                return new Dictionary<string, dynamic>();
+                return null;
             }
         }
 
-        private async Task<Dictionary<string, dynamic>> GetPayrollSummaries()
+        private async Task<dynamic> GetPayrollSummary()
         {
             try
             {
                 var allSummaries = await firebase
                     .Child("PayrollSummary")
-                    .OnceAsync<dynamic>();
-
-                var employeeSummaries = new Dictionary<string, dynamic>();
+                    .OnceSingleAsync<List<dynamic>>();
 
                 if (allSummaries != null)
                 {
-                    foreach (var summary in allSummaries)
+                    var payrollData = await GetPayrollData();
+                    if (payrollData != null)
                     {
-                        if (summary.Object != null)
+                        var payrollId = payrollData.payroll_id?.ToString();
+                        foreach (var summary in allSummaries)
                         {
-                            var payrollId = summary.Object.payroll_id?.ToString();
-                            if (await IsPayrollForEmployee(payrollId))
+                            if (summary != null && summary.payroll_id?.ToString() == payrollId)
                             {
-                                employeeSummaries[summary.Key] = summary.Object;
+                                return summary;
                             }
                         }
                     }
                 }
-                return employeeSummaries;
+                return null;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting payroll summaries: {ex.Message}");
+                Console.WriteLine($"Error getting payroll summary: {ex.Message}");
+                return null;
+            }
+        }
+
+        private async Task<dynamic> GetEmployeeDeductions()
+        {
+            try
+            {
+                var allDeductions = await firebase
+                    .Child("EmployeeDeductions")
+                    .OnceSingleAsync<List<dynamic>>();
+
+                if (allDeductions != null)
+                {
+                    foreach (var deduction in allDeductions)
+                    {
+                        if (deduction != null)
+                        {
+                            var empId = deduction.employee_id?.ToString();
+                            if (empId == employeeId)
+                            {
+                                return deduction;
+                            }
+                        }
+                    }
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting employee deductions: {ex.Message}");
+                return null;
+            }
+        }
+
+        private async Task<dynamic> GetGovernmentDeductions()
+        {
+            try
+            {
+                var allGovDeductions = await firebase
+                    .Child("GovernmentDeductions")
+                    .OnceSingleAsync<List<dynamic>>();
+
+                if (allGovDeductions != null)
+                {
+                    var payrollData = await GetPayrollData();
+                    if (payrollData != null)
+                    {
+                        var payrollId = payrollData.payroll_id?.ToString();
+                        foreach (var deduction in allGovDeductions)
+                        {
+                            if (deduction != null && deduction.payroll_id?.ToString() == payrollId)
+                            {
+                                return deduction;
+                            }
+                        }
+                    }
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting government deductions: {ex.Message}");
+                return null;
+            }
+        }
+
+        private async Task<Dictionary<string, dynamic>> GetManageLeaveRecords()
+        {
+            try
+            {
+                var allLeaveRequests = await firebase
+                    .Child("ManageLeave")
+                    .OnceAsync<dynamic>();
+
+                var employeeLeaveRequests = new Dictionary<string, dynamic>();
+
+                if (allLeaveRequests != null)
+                {
+                    foreach (var leaveRequest in allLeaveRequests)
+                    {
+                        if (leaveRequest.Object != null)
+                        {
+                            var employeeName = leaveRequest.Object.employee?.ToString();
+                            if (!string.IsNullOrEmpty(employeeName) &&
+                                await IsEmployeeNameMatch(employeeName, employeeId))
+                            {
+                                employeeLeaveRequests[leaveRequest.Key] = leaveRequest.Object;
+                            }
+                        }
+                    }
+                }
+                return employeeLeaveRequests;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting manage leave records: {ex.Message}");
                 return new Dictionary<string, dynamic>();
             }
         }
@@ -562,14 +658,20 @@ namespace HRIS_JAP_ATTPAY
 
                 if (allTodos != null)
                 {
-                    foreach (var todo in allTodos)
+                    var userData = await GetUserData();
+                    if (userData != null)
                     {
-                        if (todo.Object != null)
+                        var userId = userData.user_id?.ToString();
+                        foreach (var todo in allTodos)
                         {
-                            var assignedTo = todo.Object.assignedTo?.ToString();
-                            if (assignedTo != null && await IsUserForEmployee(assignedTo))
+                            if (todo.Object != null)
                             {
-                                employeeTodos[todo.Key] = todo.Object;
+                                var assignedTo = todo.Object.assignedTo?.ToString();
+                                var createdBy = todo.Object.createdBy?.ToString();
+                                if (assignedTo == userId || createdBy == userId)
+                                {
+                                    employeeTodos[todo.Key] = todo.Object;
+                                }
                             }
                         }
                     }
@@ -583,62 +685,53 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private async Task<bool> IsPayrollForEmployee(string payrollId)
+        private async Task<bool> IsEmployeeNameMatch(string leaveRequestName, string employeeId)
         {
-            if (string.IsNullOrEmpty(payrollId)) return false;
-
             try
             {
-                var payroll = await firebase
-                    .Child("Payroll")
-                    .Child(payrollId)
+                var employee = await firebase
+                    .Child("EmployeeDetails")
+                    .Child(employeeId)
                     .OnceSingleAsync<dynamic>();
 
-                return payroll?.employee_id?.ToString() == employeeId;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+                if (employee != null)
+                {
+                    string firstName = employee.first_name?.ToString() ?? "";
+                    string lastName = employee.last_name?.ToString() ?? "";
+                    string fullName = $"{firstName} {lastName}".Trim();
 
-        private async Task<bool> IsUserForEmployee(string userId)
-        {
-            if (string.IsNullOrEmpty(userId)) return false;
-
-            try
-            {
-                var user = await firebase
-                    .Child("Users")
-                    .Child(userId)
-                    .OnceSingleAsync<dynamic>();
-
-                return user?.employee_id?.ToString() == employeeId;
+                    return leaveRequestName.Contains(firstName) ||
+                           leaveRequestName.Contains(lastName) ||
+                           leaveRequestName.Contains(fullName);
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return false;
+                Console.WriteLine($"Error matching employee name: {ex.Message}");
             }
+            return false;
         }
 
         private async Task RemoveFromAllActiveTables()
         {
             try
             {
-                // Remove from all tables
+                // Remove from all tables based on actual JSON structure
+                // Logs (ActivityLogs, AdminLogs, PayrollLogs) remain untouched and active
                 await RemoveFromEmployeeDetails();
                 await RemoveFromEmploymentInfo();
                 await RemoveFromWorkSchedule();
                 await RemoveUserAccess();
                 await RemoveLeaveCredits();
-                await RemoveLeaveNotifications();
                 await RemoveAttendanceRecords();
+                await RemoveEmployeeLoans();
+                await RemoveHRNotifications();
+                await RemovePayrollData();
+                await RemovePayrollEarnings();
+                await RemovePayrollSummary();
                 await RemoveEmployeeDeductions();
                 await RemoveGovernmentDeductions();
-                await RemoveEmployeeLoans();
-                await RemovePayrollRecords();
-                await RemovePayrollEarnings();
-                await RemovePayrollSummaries();
+                await RemoveManageLeaveRecords();
                 await RemoveTodos();
             }
             catch (Exception ex)
@@ -647,7 +740,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // Existing removal methods
         private async Task RemoveFromEmployeeDetails()
         {
             try
@@ -669,31 +761,25 @@ namespace HRIS_JAP_ATTPAY
             {
                 var employmentData = await firebase
                     .Child("EmploymentInfo")
-                    .OnceSingleAsync<Dictionary<string, dynamic>>();
+                    .OnceSingleAsync<List<dynamic>>();
 
                 if (employmentData != null)
                 {
-                    string employmentKeyToRemove = null;
-                    foreach (var kvp in employmentData)
+                    var newEmploymentList = new List<dynamic>();
+                    foreach (var item in employmentData)
                     {
-                        if (kvp.Value != null)
+                        if (item != null)
                         {
-                            var empId = kvp.Value.employee_id?.ToString();
-                            if (empId == employeeId)
+                            var empId = item.employee_id?.ToString();
+                            if (empId != employeeId)
                             {
-                                employmentKeyToRemove = kvp.Key;
-                                break;
+                                newEmploymentList.Add(item);
                             }
                         }
                     }
-
-                    if (!string.IsNullOrEmpty(employmentKeyToRemove))
-                    {
-                        await firebase
-                            .Child("EmploymentInfo")
-                            .Child(employmentKeyToRemove)
-                            .DeleteAsync();
-                    }
+                    await firebase
+                        .Child("EmploymentInfo")
+                        .PutAsync(newEmploymentList);
                 }
             }
             catch (Exception ex)
@@ -741,19 +827,19 @@ namespace HRIS_JAP_ATTPAY
             {
                 var usersData = await firebase
                     .Child("Users")
-                    .OnceSingleAsync<Dictionary<string, dynamic>>();
+                    .OnceAsync<dynamic>();
 
                 if (usersData != null)
                 {
                     string userKeyToRemove = null;
-                    foreach (var kvp in usersData)
+                    foreach (var user in usersData)
                     {
-                        if (kvp.Value != null)
+                        if (user.Object != null)
                         {
-                            var empId = kvp.Value.employee_id?.ToString();
+                            var empId = user.Object.employee_id?.ToString();
                             if (empId == employeeId)
                             {
-                                userKeyToRemove = kvp.Key;
+                                userKeyToRemove = user.Key;
                                 break;
                             }
                         }
@@ -789,40 +875,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private async Task RemoveLeaveNotifications()
-        {
-            try
-            {
-                var allNotifications = await firebase
-                    .Child("LeaveNotifications")
-                    .OnceAsync<dynamic>();
-
-                if (allNotifications != null)
-                {
-                    foreach (var notification in allNotifications)
-                    {
-                        if (notification.Object != null)
-                        {
-                            var notificationEmployee = notification.Object.Employee?.ToString();
-                            if (!string.IsNullOrEmpty(notificationEmployee) &&
-                                notificationEmployee.Contains(employeeId))
-                            {
-                                await firebase
-                                    .Child("LeaveNotifications")
-                                    .Child(notification.Key)
-                                    .DeleteAsync();
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error removing leave notifications: {ex.Message}");
-            }
-        }
-
-        // NEW REMOVAL METHODS
         private async Task RemoveAttendanceRecords()
         {
             try
@@ -852,70 +904,6 @@ namespace HRIS_JAP_ATTPAY
             catch (Exception ex)
             {
                 Console.WriteLine($"Error removing attendance records: {ex.Message}");
-            }
-        }
-
-        private async Task RemoveEmployeeDeductions()
-        {
-            try
-            {
-                var allDeductions = await firebase
-                    .Child("EmployeeDeductions")
-                    .OnceAsync<dynamic>();
-
-                if (allDeductions != null)
-                {
-                    foreach (var deduction in allDeductions)
-                    {
-                        if (deduction.Object != null)
-                        {
-                            var empId = deduction.Object.employee_id?.ToString();
-                            if (empId == employeeId)
-                            {
-                                await firebase
-                                    .Child("EmployeeDeductions")
-                                    .Child(deduction.Key)
-                                    .DeleteAsync();
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error removing employee deductions: {ex.Message}");
-            }
-        }
-
-        private async Task RemoveGovernmentDeductions()
-        {
-            try
-            {
-                var allGovDeductions = await firebase
-                    .Child("GovernmentDeductions")
-                    .OnceAsync<dynamic>();
-
-                if (allGovDeductions != null)
-                {
-                    foreach (var deduction in allGovDeductions)
-                    {
-                        if (deduction.Object != null)
-                        {
-                            var payrollId = deduction.Key.ToString();
-                            if (await IsPayrollForEmployee(payrollId))
-                            {
-                                await firebase
-                                    .Child("GovernmentDeductions")
-                                    .Child(deduction.Key)
-                                    .DeleteAsync();
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error removing government deductions: {ex.Message}");
             }
         }
 
@@ -952,26 +940,26 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private async Task RemovePayrollRecords()
+        private async Task RemoveHRNotifications()
         {
             try
             {
-                var allPayroll = await firebase
-                    .Child("Payroll")
+                var allNotifications = await firebase
+                    .Child("HRNotifications")
                     .OnceAsync<dynamic>();
 
-                if (allPayroll != null)
+                if (allNotifications != null)
                 {
-                    foreach (var payroll in allPayroll)
+                    foreach (var notification in allNotifications)
                     {
-                        if (payroll.Object != null)
+                        if (notification.Object != null)
                         {
-                            var empId = payroll.Object.employee_id?.ToString();
-                            if (empId == employeeId)
+                            var message = notification.Object.message?.ToString();
+                            if (!string.IsNullOrEmpty(message) && message.Contains(employeeId))
                             {
                                 await firebase
-                                    .Child("Payroll")
-                                    .Child(payroll.Key)
+                                    .Child("HRNotifications")
+                                    .Child(notification.Key)
                                     .DeleteAsync();
                             }
                         }
@@ -980,7 +968,41 @@ namespace HRIS_JAP_ATTPAY
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error removing payroll records: {ex.Message}");
+                Console.WriteLine($"Error removing HR notifications: {ex.Message}");
+            }
+        }
+
+        // NEW REMOVAL METHODS
+        private async Task RemovePayrollData()
+        {
+            try
+            {
+                var allPayroll = await firebase
+                    .Child("Payroll")
+                    .OnceSingleAsync<List<dynamic>>();
+
+                if (allPayroll != null)
+                {
+                    var newPayrollList = new List<dynamic>();
+                    foreach (var payroll in allPayroll)
+                    {
+                        if (payroll != null)
+                        {
+                            var empId = payroll.employee_id?.ToString();
+                            if (empId != employeeId)
+                            {
+                                newPayrollList.Add(payroll);
+                            }
+                        }
+                    }
+                    await firebase
+                        .Child("Payroll")
+                        .PutAsync(newPayrollList);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error removing payroll data: {ex.Message}");
             }
         }
 
@@ -990,23 +1012,25 @@ namespace HRIS_JAP_ATTPAY
             {
                 var allEarnings = await firebase
                     .Child("PayrollEarnings")
-                    .OnceAsync<dynamic>();
+                    .OnceSingleAsync<List<dynamic>>();
 
                 if (allEarnings != null)
                 {
-                    foreach (var earning in allEarnings)
+                    var payrollData = await GetPayrollData();
+                    if (payrollData != null)
                     {
-                        if (earning.Object != null)
+                        var payrollId = payrollData.payroll_id?.ToString();
+                        var newEarningsList = new List<dynamic>();
+                        foreach (var earning in allEarnings)
                         {
-                            var payrollId = earning.Object.payroll_id?.ToString();
-                            if (await IsPayrollForEmployee(payrollId))
+                            if (earning != null && earning.payroll_id?.ToString() != payrollId)
                             {
-                                await firebase
-                                    .Child("PayrollEarnings")
-                                    .Child(earning.Key)
-                                    .DeleteAsync();
+                                newEarningsList.Add(earning);
                             }
                         }
+                        await firebase
+                            .Child("PayrollEarnings")
+                            .PutAsync(newEarningsList);
                     }
                 }
             }
@@ -1016,26 +1040,128 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private async Task RemovePayrollSummaries()
+        private async Task RemovePayrollSummary()
         {
             try
             {
                 var allSummaries = await firebase
                     .Child("PayrollSummary")
-                    .OnceAsync<dynamic>();
+                    .OnceSingleAsync<List<dynamic>>();
 
                 if (allSummaries != null)
                 {
-                    foreach (var summary in allSummaries)
+                    var payrollData = await GetPayrollData();
+                    if (payrollData != null)
                     {
-                        if (summary.Object != null)
+                        var payrollId = payrollData.payroll_id?.ToString();
+                        var newSummaryList = new List<dynamic>();
+                        foreach (var summary in allSummaries)
                         {
-                            var payrollId = summary.Object.payroll_id?.ToString();
-                            if (await IsPayrollForEmployee(payrollId))
+                            if (summary != null && summary.payroll_id?.ToString() != payrollId)
+                            {
+                                newSummaryList.Add(summary);
+                            }
+                        }
+                        await firebase
+                            .Child("PayrollSummary")
+                            .PutAsync(newSummaryList);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error removing payroll summary: {ex.Message}");
+            }
+        }
+
+        private async Task RemoveEmployeeDeductions()
+        {
+            try
+            {
+                var allDeductions = await firebase
+                    .Child("EmployeeDeductions")
+                    .OnceSingleAsync<List<dynamic>>();
+
+                if (allDeductions != null)
+                {
+                    var newDeductionsList = new List<dynamic>();
+                    foreach (var deduction in allDeductions)
+                    {
+                        if (deduction != null)
+                        {
+                            var empId = deduction.employee_id?.ToString();
+                            if (empId != employeeId)
+                            {
+                                newDeductionsList.Add(deduction);
+                            }
+                        }
+                    }
+                    await firebase
+                        .Child("EmployeeDeductions")
+                        .PutAsync(newDeductionsList);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error removing employee deductions: {ex.Message}");
+            }
+        }
+
+        private async Task RemoveGovernmentDeductions()
+        {
+            try
+            {
+                var allGovDeductions = await firebase
+                    .Child("GovernmentDeductions")
+                    .OnceSingleAsync<List<dynamic>>();
+
+                if (allGovDeductions != null)
+                {
+                    var payrollData = await GetPayrollData();
+                    if (payrollData != null)
+                    {
+                        var payrollId = payrollData.payroll_id?.ToString();
+                        var newGovDeductionsList = new List<dynamic>();
+                        foreach (var deduction in allGovDeductions)
+                        {
+                            if (deduction != null && deduction.payroll_id?.ToString() != payrollId)
+                            {
+                                newGovDeductionsList.Add(deduction);
+                            }
+                        }
+                        await firebase
+                            .Child("GovernmentDeductions")
+                            .PutAsync(newGovDeductionsList);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error removing government deductions: {ex.Message}");
+            }
+        }
+
+        private async Task RemoveManageLeaveRecords()
+        {
+            try
+            {
+                var allLeaveRequests = await firebase
+                    .Child("ManageLeave")
+                    .OnceAsync<dynamic>();
+
+                if (allLeaveRequests != null)
+                {
+                    foreach (var leaveRequest in allLeaveRequests)
+                    {
+                        if (leaveRequest.Object != null)
+                        {
+                            var employeeName = leaveRequest.Object.employee?.ToString();
+                            if (!string.IsNullOrEmpty(employeeName) &&
+                                await IsEmployeeNameMatch(employeeName, employeeId))
                             {
                                 await firebase
-                                    .Child("PayrollSummary")
-                                    .Child(summary.Key)
+                                    .Child("ManageLeave")
+                                    .Child(leaveRequest.Key)
                                     .DeleteAsync();
                             }
                         }
@@ -1044,7 +1170,7 @@ namespace HRIS_JAP_ATTPAY
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error removing payroll summaries: {ex.Message}");
+                Console.WriteLine($"Error removing manage leave records: {ex.Message}");
             }
         }
 
@@ -1058,17 +1184,23 @@ namespace HRIS_JAP_ATTPAY
 
                 if (allTodos != null)
                 {
-                    foreach (var todo in allTodos)
+                    var userData = await GetUserData();
+                    if (userData != null)
                     {
-                        if (todo.Object != null)
+                        var userId = userData.user_id?.ToString();
+                        foreach (var todo in allTodos)
                         {
-                            var assignedTo = todo.Object.assignedTo?.ToString();
-                            if (assignedTo != null && await IsUserForEmployee(assignedTo))
+                            if (todo.Object != null)
                             {
-                                await firebase
-                                    .Child("Todos")
-                                    .Child(todo.Key)
-                                    .DeleteAsync();
+                                var assignedTo = todo.Object.assignedTo?.ToString();
+                                var createdBy = todo.Object.createdBy?.ToString();
+                                if (assignedTo == userId || createdBy == userId)
+                                {
+                                    await firebase
+                                        .Child("Todos")
+                                        .Child(todo.Key)
+                                        .DeleteAsync();
+                                }
                             }
                         }
                     }
@@ -1106,6 +1238,7 @@ namespace HRIS_JAP_ATTPAY
         {
             base.OnHandleCreated(e);
         }
+
         private async Task LogArchiveAction(string employeeName)
         {
             try
