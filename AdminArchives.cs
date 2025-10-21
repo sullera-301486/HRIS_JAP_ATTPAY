@@ -242,7 +242,7 @@ namespace HRIS_JAP_ATTPAY
                 Name = "CB",
                 HeaderText = "",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                FillWeight = 84,
+                FillWeight = 24,
                 TrueValue = true,
                 FalseValue = false,
             };

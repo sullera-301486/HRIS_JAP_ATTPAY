@@ -209,6 +209,12 @@
     <Compile Include="AddNewTask.Designer.cs">
       <DependentUpon>AddNewTask.cs</DependentUpon>
     </Compile>
+    <Compile Include="AddNewUser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddNewUser.Designer.cs">
+      <DependentUpon>AddNewUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="AdminArchives.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -298,11 +304,23 @@
     <Compile Include="ConfirmExportDTR.Designer.cs">
       <DependentUpon>ConfirmExportDTR.cs</DependentUpon>
     </Compile>
+    <Compile Include="ConfirmLeaveUpdate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmLeaveUpdate.Designer.cs">
+      <DependentUpon>ConfirmLeaveUpdate.cs</DependentUpon>
+    </Compile>
     <Compile Include="ConfirmRecoverEmployee.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ConfirmRecoverEmployee.Designer.cs">
       <DependentUpon>ConfirmRecoverEmployee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditLeaveCredits.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditLeaveCredits.Designer.cs">
+      <DependentUpon>EditLeaveCredits.cs</DependentUpon>
     </Compile>
     <Compile Include="EmployeeSchedules.cs" />
     <Compile Include="Calendar.cs">
@@ -371,6 +389,12 @@
     </Compile>
     <Compile Include="ConfirmProfileUpdate.Designer.cs">
       <DependentUpon>ConfirmProfileUpdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ManageLeaveCredits.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ManageLeaveCredits.Designer.cs">
+      <DependentUpon>ManageLeaveCredits.cs</DependentUpon>
     </Compile>
     <Compile Include="ReliableAttendanceService.cs" />
     <Compile Include="EditAttendance.cs">
@@ -621,6 +645,9 @@
     <EmbeddedResource Include="AddNewTask.resx">
       <DependentUpon>AddNewTask.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="AddNewUser.resx">
+      <DependentUpon>AddNewUser.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AdminArchives.resx">
       <DependentUpon>AdminArchives.cs</DependentUpon>
     </EmbeddedResource>
@@ -681,6 +708,9 @@
     <EmbeddedResource Include="ConfirmLeaveEntry.resx">
       <DependentUpon>ConfirmLeaveEntry.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmLeaveUpdate.resx">
+      <DependentUpon>ConfirmLeaveUpdate.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ConfirmLoanUpdate.resx">
       <DependentUpon>ConfirmLoanUpdate.cs</DependentUpon>
     </EmbeddedResource>
@@ -708,6 +738,9 @@
     <EmbeddedResource Include="EditEmployeeProfileHR.resx">
       <DependentUpon>EditEmployeeProfileHR.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="EditLeaveCredits.resx">
+      <DependentUpon>EditLeaveCredits.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="EmployeeProfile.resx">
       <DependentUpon>EmployeeProfile.cs</DependentUpon>
     </EmbeddedResource>
@@ -734,6 +767,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ManageLeave.resx">
       <DependentUpon>ManageLeave.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ManageLeaveCredits.resx">
+      <DependentUpon>ManageLeaveCredits.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ManualAttendanceRequest.resx">
       <DependentUpon>ManualAttendanceRequest.cs</DependentUpon>
