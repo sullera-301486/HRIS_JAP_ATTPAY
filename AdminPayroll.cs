@@ -1174,22 +1174,5 @@ namespace HRIS_JAP_ATTPAY
         {
             panelLoaderAdminLoan.LoadUserControl(new AdminLoan(AdminViewPanel, currentEmployeeId));
         }
-        private Dictionary<string, decimal> GetEmployeeDailyRates()
-        {
-            var dailyRates = new Dictionary<string, decimal>();
-
-            // From PayrollEarnings data in JSON
-            var payrollEarnings = new Dictionary<string, decimal>
-    {
-        {"JAP-001", 500m},
-        {"JAP-002", 644.23m},
-        {"JAP-003", 644.23m},
-        {"JAP-004", 0m}, // Not in current data - would need default
-        {"JAP-005", 0m},
-        {"JAP-006", 0m}
-    };
-
-            return dailyRates;
-        }
     }
 }

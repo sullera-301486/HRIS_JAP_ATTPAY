@@ -408,6 +408,7 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
+                labelMoveArchive.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Underline);
                 labelAdminEmployee.Font = AttributesClass.GetFont("Roboto-Light", 20f);
                 labelEmployeeDesc.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelFiltersName.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
@@ -1121,6 +1122,12 @@ namespace HRIS_JAP_ATTPAY
             _instance?.RefreshData();
         }
 
+        private void labelMoveArchive_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            AdminArchives adminArchives = new AdminArchives();
+            AttributesClass.ShowWithOverlay(parentForm, adminArchives);
+        }
     }
 
     public class FilterCriteria

@@ -209,6 +209,12 @@
     <Compile Include="AddNewTask.Designer.cs">
       <DependentUpon>AddNewTask.cs</DependentUpon>
     </Compile>
+    <Compile Include="AdminArchives.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AdminArchives.Designer.cs">
+      <DependentUpon>AdminArchives.cs</DependentUpon>
+    </Compile>
     <Compile Include="AdminAttendance.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -596,6 +602,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="AddNewTask.resx">
       <DependentUpon>AddNewTask.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdminArchives.resx">
+      <DependentUpon>AdminArchives.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="AdminAttendance.resx">
       <DependentUpon>AdminAttendance.cs</DependentUpon>
