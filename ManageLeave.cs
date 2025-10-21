@@ -15,7 +15,7 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class ManageLeave : Form
     {
-        // 🔹 Firebase client
+        // Firebase client
         private static FirebaseClient firebase = new FirebaseClient(
             "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
         );
@@ -34,6 +34,7 @@ namespace HRIS_JAP_ATTPAY
                 labelAddLeave.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 label1.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
                 label2.Font = AttributesClass.GetFont("Roboto-Regular", 18f);
+                labelLeaveCredits.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
             }
             catch (Exception ex)
             {
@@ -64,14 +65,14 @@ namespace HRIS_JAP_ATTPAY
                 MessageBox.Show($"Revoked {employee}'s {leaveType} ({period})");
                 flowLayoutPanel1.Controls.Remove(item);
 
-                // 🟢 After revoking, refresh ManageLeave list
+                // After revoking, refresh ManageLeave list
                 await LoadManageLeaveDataAsync();
             };
 
             flowLayoutPanel1.Controls.Add(item);
         }
 
-        // 🟢 Load ManageLeave data from Firebase with sorting by most recent
+        // Load ManageLeave data from Firebase with sorting by most recent
         public async Task LoadManageLeaveDataAsync()
         {
             try
@@ -109,13 +110,13 @@ namespace HRIS_JAP_ATTPAY
                     leaveItems.Add((submittedBy, employee, date, leaveType, period, sortDate));
                 }
 
-                // 🟢 Sort by most recent first (descending order)
+                //  Sort by most recent first (descending order)
                 var sortedLeaves = leaveItems.OrderByDescending(x => x.sortDate).ToList();
 
-                // 🟢 Add items to flowLayoutPanel in sorted order
+                //  Add items to flowLayoutPanel in sorted order
                 foreach (var leave in sortedLeaves)
                 {
-                    // 🖼 Try to load employee image from EmployeeDetails
+                    // Try to load employee image from EmployeeDetails
                     Image employeePhoto = await GetEmployeeImageAsync(leave.employee);
                     AddLeaveItem(leave.submittedBy, leave.employee, leave.date, leave.leaveType, leave.period, employeePhoto);
                 }
@@ -127,7 +128,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🖼 Helper to get employee image from EmployeeDetails
+        // Helper to get employee image from EmployeeDetails
         private async Task<Image> GetEmployeeImageAsync(string employeeName)
         {
             try
@@ -167,7 +168,14 @@ namespace HRIS_JAP_ATTPAY
 
         private async void ManageLeave_Load(object sender, EventArgs e)
         {
-            await LoadManageLeaveDataAsync(); // 🟢 Load real data from Firebase
+            await LoadManageLeaveDataAsync(); // Load real data from Firebase
+        }
+
+        private void labelLeaveCredits_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            ManageLeaveCredits manageLeaveCredits = new ManageLeaveCredits();
+            AttributesClass.ShowWithOverlay(parentForm, manageLeaveCredits);
         }
     }
 }

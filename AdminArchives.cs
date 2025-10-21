@@ -53,7 +53,6 @@ namespace HRIS_JAP_ATTPAY
             dataGridViewEmployee.DefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Light", 10f);
             dataGridViewEmployee.ColumnHeadersDefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
 
-
             // Ensure columns exist
             dataGridViewEmployee.Columns.Clear();
 
@@ -63,7 +62,7 @@ namespace HRIS_JAP_ATTPAY
                 Name = "CB",
                 HeaderText = "",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                FillWeight = 84,
+                FillWeight = 24,
                 TrueValue = true,
                 FalseValue = false,
             };
