@@ -34,20 +34,30 @@ namespace HRIS_JAP_ATTPAY
             LoadDateRanges();
 
             textBoxSearchEmployee.TextChanged += textBoxSearchEmployee_TextChanged;
-            comboBoxSelectPayDate.SelectedIndexChanged += comboBoxSelectPayDate_SelectedIndexChanged;
-
-
+            // Remove comboBox event and add DateTimePicker event
+            dtpSelectCutoffDate.ValueChanged += dtpSelectCutoffDate_ValueChanged;
 
             AdminViewPanel = targetPanel;
             panelLoaderAdminLoan = new AttributesClassAlt(AdminViewPanel);
         }
 
-
         private async void LoadDateRanges()
         {
             try
             {
-                comboBoxSelectPayDate.Items.Clear();
+                // Initialize DateTimePicker with blank format
+                dtpSelectCutoffDate.Format = DateTimePickerFormat.Custom;
+                dtpSelectCutoffDate.CustomFormat = " "; // Shows as blank initially
+                dtpSelectCutoffDate.Value = DateTime.Today;
+
+                // Show date format when user clicks/selects
+                dtpSelectCutoffDate.ValueChanged += (s, e) => {
+                    if (dtpSelectCutoffDate.Focused || dtpSelectCutoffDate.CustomFormat == " ")
+                    {
+                        dtpSelectCutoffDate.Format = DateTimePickerFormat.Custom;
+                        dtpSelectCutoffDate.CustomFormat = "yyyy-MM-dd";
+                    }
+                };
 
                 // Get available date ranges from attendance records
                 var availablePeriods = await GetAvailableDateRangesFromAttendance();
@@ -59,16 +69,11 @@ namespace HRIS_JAP_ATTPAY
                     return;
                 }
 
-                // Add available periods to combobox
-                foreach (var period in availablePeriods)
-                {
-                    comboBoxSelectPayDate.Items.Add(period);
-                }
-
                 // Set default to most recent period
-                if (comboBoxSelectPayDate.Items.Count > 0)
+                if (availablePeriods.Count > 0)
                 {
-                    comboBoxSelectPayDate.SelectedIndex = comboBoxSelectPayDate.Items.Count - 1;
+                    string mostRecentPeriod = availablePeriods.Last();
+                    SetDateTimePickerFromPeriod(mostRecentPeriod);
                 }
             }
             catch (Exception ex)
@@ -142,36 +147,22 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                comboBoxSelectPayDate.Items.Clear();
-
-                // Fallback: Add current year periods
-                int currentYear = DateTime.Now.Year;
-
-                for (int month = 1; month <= 12; month++)
+                // Set DateTimePicker to current period
+                DateTime now = DateTime.Now;
+                if (now.Day <= 15)
                 {
-                    string monthName = new DateTime(currentYear, month, 1).ToString("MMMM");
-                    int daysInMonth = DateTime.DaysInMonth(currentYear, month);
-
                     // First half: 1st to 15th
-                    comboBoxSelectPayDate.Items.Add($"{monthName} 1 - 15, {currentYear}");
-
-                    // Second half: 16th to end of month
-                    comboBoxSelectPayDate.Items.Add($"{monthName} 16 - {daysInMonth}, {currentYear}");
-                }
-
-                // Set default to current period
-                int currentMonth = DateTime.Now.Month;
-                int currentDay = DateTime.Now.Day;
-                int currentIndex = (currentMonth - 1) * 2 + (currentDay > 15 ? 1 : 0);
-
-                if (currentIndex < comboBoxSelectPayDate.Items.Count)
-                {
-                    comboBoxSelectPayDate.SelectedIndex = currentIndex;
+                    dtpSelectCutoffDate.Value = new DateTime(now.Year, now.Month, 1);
                 }
                 else
                 {
-                    comboBoxSelectPayDate.SelectedIndex = 0;
+                    // Second half: 16th to end of month
+                    dtpSelectCutoffDate.Value = new DateTime(now.Year, now.Month, 16);
                 }
+
+                // Ensure format is set
+                dtpSelectCutoffDate.Format = DateTimePickerFormat.Custom;
+                dtpSelectCutoffDate.CustomFormat = "yyyy-MM-dd";
             }
             catch (Exception ex)
             {
@@ -179,19 +170,65 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private void comboBoxSelectPayDate_SelectedIndexChanged(object sender, EventArgs e)
+        private void dtpSelectCutoffDate_ValueChanged(object sender, EventArgs e)
         {
-            if (comboBoxSelectPayDate.SelectedItem != null)
+            if (dtpSelectCutoffDate.CustomFormat != " ") // Only trigger if a date is actually selected
             {
-                string selectedDateRange = comboBoxSelectPayDate.SelectedItem.ToString();
-                labelPayrollDate.Text = selectedDateRange;
+                DateTime selectedDate = dtpSelectCutoffDate.Value;
+                string dateRange = GetDateRangeFromDateTime(selectedDate);
+                labelPayrollDate.Text = dateRange;
 
                 // Reload data to recalculate for new date range
                 LoadFirebaseData();
             }
         }
 
+        private string GetDateRangeFromDateTime(DateTime date)
+        {
+            int year = date.Year;
+            int month = date.Month;
+            string monthName = new DateTime(year, month, 1).ToString("MMMM");
+            int daysInMonth = DateTime.DaysInMonth(year, month);
 
+            if (date.Day <= 15)
+            {
+                // First half: 1st to 15th
+                return $"{monthName} 1 - 15, {year}";
+            }
+            else
+            {
+                // Second half: 16th to end of month
+                return $"{monthName} 16 - {daysInMonth}, {year}";
+            }
+        }
+
+        private void SetDateTimePickerFromPeriod(string period)
+        {
+            try
+            {
+                // Parse period like "September 1 - 15, 2025" or "September 16 - 30, 2025"
+                var match = Regex.Match(period, @"(\w+) (\d+) - (\d+), (\d{4})");
+                if (match.Success)
+                {
+                    string month = match.Groups[1].Value;
+                    int startDay = int.Parse(match.Groups[2].Value);
+                    int year = int.Parse(match.Groups[4].Value);
+
+                    int monthNumber = DateTime.ParseExact(month, "MMMM", CultureInfo.InvariantCulture).Month;
+
+                    // Set the DateTimePicker to the start date of the period
+                    dtpSelectCutoffDate.Value = new DateTime(year, monthNumber, startDay);
+                    dtpSelectCutoffDate.Format = DateTimePickerFormat.Custom;
+                    dtpSelectCutoffDate.CustomFormat = "yyyy-MM-dd";
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error setting DateTimePicker from period: {ex.Message}");
+            }
+        }
+
+        // Rest of your existing methods remain the same...
         private void textBoxSearchEmployee_TextChanged(object sender, EventArgs e)
         {
             searchTimer?.Dispose();
@@ -254,12 +291,14 @@ namespace HRIS_JAP_ATTPAY
 
             AttributesClass.ShowWithOverlay(parentForm, filterAdminPayrollform);
         }
+
         private void ApplyPayrollFilters(PayrollFilterCriteria filters)
         {
             System.Diagnostics.Debug.WriteLine($"ApplyPayrollFilters called with SortBy: '{filters?.SortBy}'");
             currentPayrollFilters = filters ?? new PayrollFilterCriteria();
             ApplyPayrollFilterAndSort();
         }
+
         private void ResetPayrollFilters()
         {
             System.Diagnostics.Debug.WriteLine("=== RESETTING PAYROLL FILTERS ===");
@@ -533,7 +572,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-
         private void setDataGridViewAttributes()
         {
             dataGridViewEmployee.ReadOnly = true;
@@ -583,7 +621,7 @@ namespace HRIS_JAP_ATTPAY
                 labelFiltersName.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
                 buttonExportAll.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 textBoxSearchEmployee.Font = AttributesClass.GetFont("Roboto-Light", 15f);
-                comboBoxSelectPayDate.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
+                dtpSelectCutoffDate.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
             }
             catch (Exception ex)
             {
@@ -614,9 +652,9 @@ namespace HRIS_JAP_ATTPAY
                 string selectedEmployeeId = dataGridViewEmployee.Rows[e.RowIndex].Cells["EmployeeId"].Value?.ToString();
                 if (!string.IsNullOrEmpty(selectedEmployeeId))
                 {
-                    // Get the current selected date range
+                    // Get the current selected date range from DateTimePicker
                     DateTime startDate, endDate;
-                    ParseDateRange(comboBoxSelectPayDate.SelectedItem?.ToString(), out startDate, out endDate);
+                    ParseDateRangeFromDateTime(dtpSelectCutoffDate.Value, out startDate, out endDate);
 
                     Form parentForm = this.FindForm();
                     PayrollSummary payrollSummaryForm = new PayrollSummary(selectedEmployeeId, null, startDate, endDate);
@@ -631,9 +669,9 @@ namespace HRIS_JAP_ATTPAY
             {
                 dataGridViewEmployee.Rows.Clear();
 
-                // Get selected date range FIRST
+                // Get selected date range from DateTimePicker
                 DateTime startDate, endDate;
-                ParseDateRange(comboBoxSelectPayDate.SelectedItem?.ToString(), out startDate, out endDate);
+                ParseDateRangeFromDateTime(dtpSelectCutoffDate.Value, out startDate, out endDate);
 
                 var employeeDetails = new Dictionary<string, dynamic>();
                 var employmentInfo = new Dictionary<string, Dictionary<string, string>>();
@@ -844,6 +882,27 @@ namespace HRIS_JAP_ATTPAY
                 MessageBox.Show("Failed to load Firebase data: " + ex.Message);
             }
         }
+
+        private void ParseDateRangeFromDateTime(DateTime selectedDate, out DateTime startDate, out DateTime endDate)
+        {
+            int year = selectedDate.Year;
+            int month = selectedDate.Month;
+
+            if (selectedDate.Day <= 15)
+            {
+                // First half: 1st to 15th
+                startDate = new DateTime(year, month, 1);
+                endDate = new DateTime(year, month, 15);
+            }
+            else
+            {
+                // Second half: 16th to end of month
+                startDate = new DateTime(year, month, 16);
+                endDate = new DateTime(year, month, DateTime.DaysInMonth(year, month));
+            }
+        }
+
+        // Rest of your existing helper methods remain unchanged...
         private bool IsPayrollInPeriod(Dictionary<string, object> payroll, DateTime startDate, DateTime endDate)
         {
             try
@@ -977,6 +1036,7 @@ namespace HRIS_JAP_ATTPAY
             decimal netPay = grossPay - totalDeductions;
             return netPay > 0 ? netPay : 0;
         }
+
         private decimal CalculateGrossPayFromAttendance(string employeeId, DateTime startDate, DateTime endDate,
     Dictionary<string, List<Dictionary<string, string>>> attendanceRecords, Dictionary<string, decimal> dailyRates)
         {
@@ -1034,82 +1094,6 @@ namespace HRIS_JAP_ATTPAY
             decimal grossPay = regularPay + overtimePay;
 
             return grossPay;
-        }
-        private decimal CalculateNetPay(decimal grossPay, string employeeId,
-    Dictionary<string, Dictionary<string, decimal>> employeeDeductions,
-    Dictionary<string, Dictionary<string, decimal>> governmentDeductions)
-        {
-            decimal totalDeductions = 0;
-
-            // Add employee deductions
-            if (employeeDeductions.ContainsKey(employeeId))
-            {
-                var deductions = employeeDeductions[employeeId];
-                totalDeductions += deductions.ContainsKey("cash_advance") ? deductions["cash_advance"] : 0;
-                totalDeductions += deductions.ContainsKey("coop_contribution") ? deductions["coop_contribution"] : 0;
-                totalDeductions += deductions.ContainsKey("other_deductions") ? deductions["other_deductions"] : 0;
-            }
-
-            // Add government deductions
-            if (governmentDeductions.ContainsKey(employeeId))
-            {
-                var govDeductions = governmentDeductions[employeeId];
-                totalDeductions += govDeductions.ContainsKey("sss") ? govDeductions["sss"] : 0;
-                totalDeductions += govDeductions.ContainsKey("philhealth") ? govDeductions["philhealth"] : 0;
-                totalDeductions += govDeductions.ContainsKey("pagibig") ? govDeductions["pagibig"] : 0;
-                totalDeductions += govDeductions.ContainsKey("withholding_tax") ? govDeductions["withholding_tax"] : 0;
-            }
-
-            decimal netPay = grossPay - totalDeductions;
-            return netPay > 0 ? netPay : 0; // Ensure non-negative net pay
-        }
-        private void ParseDateRange(string dateRange, out DateTime startDate, out DateTime endDate)
-        {
-            if (string.IsNullOrEmpty(dateRange))
-            {
-                // Default to current period
-                DateTime now = DateTime.Now;
-                if (now.Day <= 15)
-                {
-                    startDate = new DateTime(now.Year, now.Month, 1);
-                    endDate = new DateTime(now.Year, now.Month, 15);
-                }
-                else
-                {
-                    startDate = new DateTime(now.Year, now.Month, 16);
-                    endDate = new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
-                }
-                return;
-            }
-
-            // Handle formats like "September 1 - 15, 2025" or "September 16 - 30, 2025"
-            var match = Regex.Match(dateRange, @"(\w+) (\d+) - (\d+), (\d{4})");
-            if (match.Success)
-            {
-                string month = match.Groups[1].Value;
-                int startDay = int.Parse(match.Groups[2].Value);
-                int endDay = int.Parse(match.Groups[3].Value);
-                int year = int.Parse(match.Groups[4].Value);
-
-                int monthNumber = DateTime.ParseExact(month, "MMMM", CultureInfo.InvariantCulture).Month;
-                startDate = new DateTime(year, monthNumber, startDay);
-                endDate = new DateTime(year, monthNumber, endDay);
-            }
-            else
-            {
-                // Fallback to current period
-                DateTime now = DateTime.Now;
-                if (now.Day <= 15)
-                {
-                    startDate = new DateTime(now.Year, now.Month, 1);
-                    endDate = new DateTime(now.Year, now.Month, 15);
-                }
-                else
-                {
-                    startDate = new DateTime(now.Year, now.Month, 16);
-                    endDate = new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
-                }
-            }
         }
 
         private async Task LoadArrayBasedData(string childPath, Action<Dictionary<string, string>> processItem)
@@ -1173,6 +1157,23 @@ namespace HRIS_JAP_ATTPAY
         private void labelMoveLoan_Click(object sender, EventArgs e)
         {
             panelLoaderAdminLoan.LoadUserControl(new AdminLoan(AdminViewPanel, currentEmployeeId));
+        }
+        private Dictionary<string, decimal> GetEmployeeDailyRates()
+        {
+            var dailyRates = new Dictionary<string, decimal>();
+
+            // From PayrollEarnings data in JSON
+            var payrollEarnings = new Dictionary<string, decimal>
+    {
+        {"JAP-001", 500m},
+        {"JAP-002", 644.23m},
+        {"JAP-003", 644.23m},
+        {"JAP-004", 0m}, // Not in current data - would need default
+        {"JAP-005", 0m},
+        {"JAP-006", 0m}
+    };
+
+            return dailyRates;
         }
     }
 }
