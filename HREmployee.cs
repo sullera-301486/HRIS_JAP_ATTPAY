@@ -281,6 +281,7 @@ namespace HRIS_JAP_ATTPAY
             labelEmployeeDesc.Font = AttributesClass.GetFont("Roboto-Light", 12f);
             labelFiltersName.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
             textBoxSearchEmployee.Font = AttributesClass.GetFont("Roboto-Light", 15f);
+            labelAddEmployee.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
         }
 
         private void pictureBoxFilters_Click(object sender, EventArgs e)
@@ -684,6 +685,13 @@ namespace HRIS_JAP_ATTPAY
                 System.Diagnostics.Debug.WriteLine($"Error formatting full name: {ex.Message}");
                 return "Unknown";
             }
+        }
+
+        private void labelAddEmployee_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            AddNewEmployee addNewEmployeeForm = new AddNewEmployee();
+            AttributesClass.ShowWithOverlay(parentForm, addNewEmployeeForm);
         }
     }
 
