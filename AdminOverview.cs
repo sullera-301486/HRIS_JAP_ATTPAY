@@ -27,7 +27,6 @@ namespace HRIS_JAP_ATTPAY
             InitializeComponent();
             currentUserId = userId;
             setFont();
-            setPayrollLogsDataGridViewAttributes();
             setAdminLogsDataGridViewAttributes();
             setDailyEmployeeLogsDataGridViewAttributes();
             setTodoDataGridViewAttributes();
@@ -40,7 +39,6 @@ namespace HRIS_JAP_ATTPAY
             LoadAttendanceSummary(DateTime.Today);
             LoadAdminLogs();
             LoadTodoList();
-            LoadPayrollLogs();
             comboBoxSelectDate.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxSelectDate.IntegralHeight = false;
             comboBoxSelectDate.MaxDropDownItems = 5;
@@ -53,8 +51,7 @@ namespace HRIS_JAP_ATTPAY
             {
                 labelAdminOverview.Font = AttributesClass.GetFont("Roboto-Light", 20f);
                 labelOverviewDesc.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                labelPayrollLog.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
-                labelAdminLog.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
+                labelAuditTrails.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
                 labelDailyEmployeeLog.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
                 labelAttendanceSummary.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
                 comboBoxSelectDate.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
@@ -323,22 +320,14 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private void setPayrollLogsDataGridViewAttributes()
-        {
-            dataGridViewPayrollLogs.GridColor = Color.White;
-            dataGridViewPayrollLogs.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dataGridViewPayrollLogs.ColumnHeadersHeight = 40;
-            dataGridViewPayrollLogs.DefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Light", 10f);
-            dataGridViewPayrollLogs.ColumnHeadersDefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-        }
 
         private void setAdminLogsDataGridViewAttributes()
         {
-            dataGridViewAdminLogs.GridColor = Color.White;
-            dataGridViewAdminLogs.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dataGridViewAdminLogs.ColumnHeadersHeight = 40;
-            dataGridViewAdminLogs.DefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Light", 10f);
-            dataGridViewAdminLogs.ColumnHeadersDefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
+            dataGridViewAuditTrails.GridColor = Color.White;
+            dataGridViewAuditTrails.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            dataGridViewAuditTrails.ColumnHeadersHeight = 40;
+            dataGridViewAuditTrails.DefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+            dataGridViewAuditTrails.ColumnHeadersDefaultCellStyle.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
         }
 
         private void setDailyEmployeeLogsDataGridViewAttributes()
@@ -831,31 +820,11 @@ namespace HRIS_JAP_ATTPAY
 
         private void setPanelAttributes()
         {
-            panelPayrollLog.Paint += panelPayrollLog_Paint;
-            panelAdminLog.Paint += panelAdminLog_Paint;
+            panelAuditTrails.Paint += panelAdminLog_Paint;
             panelDailyEmployeeLog.Paint += panelDailyEmployeeLog_Paint;
             panelAttendanceSummary.Paint += panelAttendanceSummary_Paint;
             panelCalendar.Paint += panelCalendar_Paint;
             panelTodo.Paint += panelTodo_Paint;
-        }
-
-        private void panelPayrollLog_Paint(object sender, PaintEventArgs e)
-        {
-            //border design
-            Color borderColor = Color.FromArgb(96, 81, 148);
-            int borderWidth = 1;
-
-            //draw the border
-            ControlPaint.DrawBorder(e.Graphics, panelPayrollLog.ClientRectangle,
-                borderColor, borderWidth, ButtonBorderStyle.Solid,
-                borderColor, borderWidth, ButtonBorderStyle.Solid,
-                borderColor, borderWidth, ButtonBorderStyle.Solid,
-                borderColor, borderWidth, ButtonBorderStyle.Solid);
-        }
-
-        private void panelPayrollLog_Resize(object sender, EventArgs e)
-        {
-            panelPayrollLog.Invalidate();
         }
 
         private void panelAdminLog_Paint(object sender, PaintEventArgs e)
@@ -865,7 +834,7 @@ namespace HRIS_JAP_ATTPAY
             int borderWidth = 1;
 
             //draw the border
-            ControlPaint.DrawBorder(e.Graphics, panelAdminLog.ClientRectangle,
+            ControlPaint.DrawBorder(e.Graphics, panelAuditTrails.ClientRectangle,
                 borderColor, borderWidth, ButtonBorderStyle.Solid,
                 borderColor, borderWidth, ButtonBorderStyle.Solid,
                 borderColor, borderWidth, ButtonBorderStyle.Solid,
@@ -874,7 +843,7 @@ namespace HRIS_JAP_ATTPAY
 
         private void panelAdminLog_Resize(object sender, EventArgs e)
         {
-            panelAdminLog.Invalidate();
+            panelAuditTrails.Invalidate();
         }
 
         private void panelDailyEmployeeLog_Paint(object sender, PaintEventArgs e)
@@ -1141,69 +1110,13 @@ namespace HRIS_JAP_ATTPAY
                 Console.WriteLine($"Error loading todos: {ex.Message}");
             }
         }
-        private async void LoadPayrollLogs()
-        {
-            try
-            {
-                dataGridViewPayrollLogs.Rows.Clear();
-
-                // Load payroll logs from Firebase
-                var payrollLogs = await firebase
-                    .Child("PayrollLogs")
-                    .OnceAsync<Dictionary<string, object>>();
-
-                if (payrollLogs != null && payrollLogs.Any())
-                {
-                    // Parse and order by date+time descending
-                    var orderedLogs = payrollLogs
-                        .Select(l =>
-                        {
-                            var logData = l.Object;
-                            string date = logData.ContainsKey("date") ? logData["date"]?.ToString() ?? "" : "";
-                            string time = logData.ContainsKey("time") ? logData["time"]?.ToString() ?? "" : "";
-
-                            // Try to parse combined date+time for sorting
-                            DateTime.TryParse($"{date} {time}", out DateTime parsedDateTime);
-
-                            return new
-                            {
-                                Date = date,
-                                Time = time,
-                                Action = logData.ContainsKey("action") ? logData["action"]?.ToString() ?? "" : "",
-                                Details = logData.ContainsKey("details") ? logData["details"]?.ToString() ?? "" : "",
-                                ParsedDateTime = parsedDateTime
-                            };
-                        })
-                        .OrderByDescending(l => l.ParsedDateTime)
-                        .ToList();
-
-                    // Add to DataGridView
-                    foreach (var log in orderedLogs)
-                    {
-                        dataGridViewPayrollLogs.Rows.Add(log.Date, log.Time, log.Action, log.Details);
-                    }
-                }
-
-                // If no logs found, show message
-                if (dataGridViewPayrollLogs.Rows.Count == 0)
-                {
-                    dataGridViewPayrollLogs.Rows.Add("No payroll logs found", "", "", "");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading payroll logs: {ex.Message}", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                dataGridViewPayrollLogs.Rows.Add("Error loading logs", "", "", "");
-            }
-        }
 
         private async void LoadAdminLogs()
         {
             try
             {
                 // Clear existing rows
-                dataGridViewAdminLogs.Rows.Clear();
+                dataGridViewAuditTrails.Rows.Clear();
 
                 // Load admin logs from Firebase
                 var adminLogs = await firebase
@@ -1265,15 +1178,15 @@ namespace HRIS_JAP_ATTPAY
 
                     foreach (var entry in sortedLogs)
                     {
-                        dataGridViewAdminLogs.Rows.Add(entry.date, entry.time, entry.action, entry.details);
+                        dataGridViewAuditTrails.Rows.Add(entry.date, entry.time, entry.action, entry.details);
                     }
                 }
 
                 // Show placeholder if no logs
-                if (dataGridViewAdminLogs.Rows.Count == 0)
+                if (dataGridViewAuditTrails.Rows.Count == 0)
                 {
                     // Add sample data matching your required format
-                    dataGridViewAdminLogs.Rows.Add("N/A", "N/A", "N/A", "N/A.");
+                    dataGridViewAuditTrails.Rows.Add("N/A", "N/A", "N/A", "N/A.");
                 }
             }
             catch (Exception ex)
@@ -1282,7 +1195,7 @@ namespace HRIS_JAP_ATTPAY
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 // Add sample data on error for testing
-                dataGridViewAdminLogs.Rows.Add("Error", "Error", "Error", "Error");
+                dataGridViewAuditTrails.Rows.Add("Error", "Error", "Error", "Error");
             }
         }
 

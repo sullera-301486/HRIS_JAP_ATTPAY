@@ -622,6 +622,7 @@ namespace HRIS_JAP_ATTPAY
                 buttonExportAll.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 textBoxSearchEmployee.Font = AttributesClass.GetFont("Roboto-Light", 15f);
                 dtpSelectCutoffDate.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
+                labelDeductionMatrix.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Underline);
             }
             catch (Exception ex)
             {
@@ -1174,6 +1175,13 @@ namespace HRIS_JAP_ATTPAY
     };
 
             return dailyRates;
+        }
+
+        private void labelDeductionMatrix_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            DeductionMatrix deductionMatrix = new DeductionMatrix();
+            AttributesClass.ShowWithOverlay(parentForm, deductionMatrix);
         }
     }
 }

@@ -48,10 +48,6 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tableLayoutPanelLeft = new System.Windows.Forms.TableLayoutPanel();
             this.labelOverviewDesc = new System.Windows.Forms.Label();
             this.labelAdminOverview = new System.Windows.Forms.Label();
@@ -79,16 +75,9 @@
             this.labelTotalNumber = new System.Windows.Forms.Label();
             this.comboBoxSelectDate = new System.Windows.Forms.ComboBox();
             this.labelAttendanceSummary = new System.Windows.Forms.Label();
-            this.panelPayrollLog = new System.Windows.Forms.Panel();
-            this.labelPayrollLog = new System.Windows.Forms.Label();
-            this.dataGridViewPayrollLogs = new System.Windows.Forms.DataGridView();
-            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.panelAdminLog = new System.Windows.Forms.Panel();
-            this.labelAdminLog = new System.Windows.Forms.Label();
-            this.dataGridViewAdminLogs = new System.Windows.Forms.DataGridView();
+            this.panelAuditTrails = new System.Windows.Forms.Panel();
+            this.labelAuditTrails = new System.Windows.Forms.Label();
+            this.dataGridViewAuditTrails = new System.Windows.Forms.DataGridView();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -100,6 +89,7 @@
             this.dataGridViewTodo = new System.Windows.Forms.DataGridView();
             this.ColumnActivity = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnDueDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColumnTrash = new System.Windows.Forms.DataGridViewImageColumn();
             this.labelTodoDesc = new System.Windows.Forms.Label();
             this.panelAlert = new System.Windows.Forms.Panel();
             this.tableLayoutPanelAlert = new System.Windows.Forms.TableLayoutPanel();
@@ -119,7 +109,6 @@
             this.dataGridViewDayOffLogs = new System.Windows.Forms.DataGridView();
             this.dataGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewImageColumn1 = new System.Windows.Forms.DataGridViewImageColumn();
-            this.ColumnTrash = new System.Windows.Forms.DataGridViewImageColumn();
             this.tableLayoutPanelLeft.SuspendLayout();
             this.panelAttendanceSummary.SuspendLayout();
             this.tableLayoutPanelAttendanceSummary.SuspendLayout();
@@ -127,10 +116,8 @@
             this.panelOnTime.SuspendLayout();
             this.panelAbsent.SuspendLayout();
             this.panelTotal.SuspendLayout();
-            this.panelPayrollLog.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewPayrollLogs)).BeginInit();
-            this.panelAdminLog.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAdminLogs)).BeginInit();
+            this.panelAuditTrails.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAuditTrails)).BeginInit();
             this.tableLayoutPanelRight.SuspendLayout();
             this.panelTodo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewTodo)).BeginInit();
@@ -152,21 +139,20 @@
             this.tableLayoutPanelLeft.Controls.Add(this.labelOverviewDesc, 1, 2);
             this.tableLayoutPanelLeft.Controls.Add(this.labelAdminOverview, 1, 0);
             this.tableLayoutPanelLeft.Controls.Add(this.panelAttendanceSummary, 1, 4);
-            this.tableLayoutPanelLeft.Controls.Add(this.panelPayrollLog, 1, 6);
-            this.tableLayoutPanelLeft.Controls.Add(this.panelAdminLog, 1, 8);
+            this.tableLayoutPanelLeft.Controls.Add(this.panelAuditTrails, 1, 6);
             this.tableLayoutPanelLeft.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanelLeft.Name = "tableLayoutPanelLeft";
-            this.tableLayoutPanelLeft.RowCount = 10;
+            this.tableLayoutPanelLeft.RowCount = 8;
             this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5F));
             this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 2F));
             this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 2F));
             this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5F));
             this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 26F));
             this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 3F));
-            this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 26F));
-            this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 3F));
-            this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 26F));
+            this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 55F));
             this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 2F));
+            this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanelLeft.Size = new System.Drawing.Size(916, 1394);
             this.tableLayoutPanelLeft.TabIndex = 1;
             // 
@@ -529,44 +515,45 @@
             this.labelAttendanceSummary.TabIndex = 18;
             this.labelAttendanceSummary.Text = "Attendance Summary";
             // 
-            // panelPayrollLog
+            // panelAuditTrails
             // 
-            this.panelPayrollLog.BackColor = System.Drawing.Color.White;
-            this.panelPayrollLog.Controls.Add(this.labelPayrollLog);
-            this.panelPayrollLog.Controls.Add(this.dataGridViewPayrollLogs);
-            this.panelPayrollLog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelPayrollLog.Location = new System.Drawing.Point(39, 598);
-            this.panelPayrollLog.Name = "panelPayrollLog";
-            this.panelPayrollLog.Size = new System.Drawing.Size(874, 356);
-            this.panelPayrollLog.TabIndex = 16;
-            this.panelPayrollLog.Paint += new System.Windows.Forms.PaintEventHandler(this.panelPayrollLog_Paint);
-            this.panelPayrollLog.Resize += new System.EventHandler(this.panelPayrollLog_Resize);
+            this.panelAuditTrails.BackColor = System.Drawing.Color.White;
+            this.panelAuditTrails.Controls.Add(this.labelAuditTrails);
+            this.panelAuditTrails.Controls.Add(this.dataGridViewAuditTrails);
+            this.panelAuditTrails.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelAuditTrails.Location = new System.Drawing.Point(39, 598);
+            this.panelAuditTrails.Name = "panelAuditTrails";
+            this.panelAuditTrails.Size = new System.Drawing.Size(874, 760);
+            this.panelAuditTrails.TabIndex = 17;
+            this.panelAuditTrails.Paint += new System.Windows.Forms.PaintEventHandler(this.panelAdminLog_Paint);
+            this.panelAuditTrails.Resize += new System.EventHandler(this.panelAdminLog_Resize);
             // 
-            // labelPayrollLog
+            // labelAuditTrails
             // 
-            this.labelPayrollLog.AutoSize = true;
-            this.labelPayrollLog.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelPayrollLog.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(23)))), ((int)(((byte)(112)))));
-            this.labelPayrollLog.Location = new System.Drawing.Point(22, 17);
-            this.labelPayrollLog.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.labelPayrollLog.Name = "labelPayrollLog";
-            this.labelPayrollLog.Size = new System.Drawing.Size(163, 31);
-            this.labelPayrollLog.TabIndex = 18;
-            this.labelPayrollLog.Text = "Payroll Logs";
+            this.labelAuditTrails.AutoSize = true;
+            this.labelAuditTrails.BackColor = System.Drawing.Color.White;
+            this.labelAuditTrails.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelAuditTrails.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(23)))), ((int)(((byte)(112)))));
+            this.labelAuditTrails.Location = new System.Drawing.Point(22, 22);
+            this.labelAuditTrails.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelAuditTrails.Name = "labelAuditTrails";
+            this.labelAuditTrails.Size = new System.Drawing.Size(150, 31);
+            this.labelAuditTrails.TabIndex = 19;
+            this.labelAuditTrails.Text = "Audit Trails";
             // 
-            // dataGridViewPayrollLogs
+            // dataGridViewAuditTrails
             // 
-            this.dataGridViewPayrollLogs.AllowUserToAddRows = false;
-            this.dataGridViewPayrollLogs.AllowUserToDeleteRows = false;
-            this.dataGridViewPayrollLogs.AllowUserToResizeColumns = false;
-            this.dataGridViewPayrollLogs.AllowUserToResizeRows = false;
-            this.dataGridViewPayrollLogs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.dataGridViewAuditTrails.AllowUserToAddRows = false;
+            this.dataGridViewAuditTrails.AllowUserToDeleteRows = false;
+            this.dataGridViewAuditTrails.AllowUserToResizeColumns = false;
+            this.dataGridViewAuditTrails.AllowUserToResizeRows = false;
+            this.dataGridViewAuditTrails.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridViewPayrollLogs.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dataGridViewPayrollLogs.BackgroundColor = System.Drawing.Color.White;
-            this.dataGridViewPayrollLogs.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dataGridViewPayrollLogs.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.dataGridViewPayrollLogs.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            this.dataGridViewAuditTrails.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridViewAuditTrails.BackgroundColor = System.Drawing.Color.White;
+            this.dataGridViewAuditTrails.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dataGridViewAuditTrails.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+            this.dataGridViewAuditTrails.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle1.BackColor = System.Drawing.Color.White;
             dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -574,13 +561,13 @@
             dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.White;
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.Black;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewPayrollLogs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            this.dataGridViewPayrollLogs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewPayrollLogs.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Column2,
-            this.Column3,
-            this.Column4,
-            this.Column5});
+            this.dataGridViewAuditTrails.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.dataGridViewAuditTrails.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewAuditTrails.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewTextBoxColumn1,
+            this.dataGridViewTextBoxColumn2,
+            this.dataGridViewTextBoxColumn3,
+            this.dataGridViewTextBoxColumn4});
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
             dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
@@ -588,13 +575,13 @@
             dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.White;
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewPayrollLogs.DefaultCellStyle = dataGridViewCellStyle2;
-            this.dataGridViewPayrollLogs.EnableHeadersVisualStyles = false;
-            this.dataGridViewPayrollLogs.GridColor = System.Drawing.Color.White;
-            this.dataGridViewPayrollLogs.Location = new System.Drawing.Point(8, 70);
-            this.dataGridViewPayrollLogs.Margin = new System.Windows.Forms.Padding(0);
-            this.dataGridViewPayrollLogs.Name = "dataGridViewPayrollLogs";
-            this.dataGridViewPayrollLogs.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
+            this.dataGridViewAuditTrails.DefaultCellStyle = dataGridViewCellStyle2;
+            this.dataGridViewAuditTrails.EnableHeadersVisualStyles = false;
+            this.dataGridViewAuditTrails.GridColor = System.Drawing.Color.White;
+            this.dataGridViewAuditTrails.Location = new System.Drawing.Point(10, 70);
+            this.dataGridViewAuditTrails.Margin = new System.Windows.Forms.Padding(0);
+            this.dataGridViewAuditTrails.Name = "dataGridViewAuditTrails";
+            this.dataGridViewAuditTrails.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
             dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -602,143 +589,19 @@
             dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewPayrollLogs.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            this.dataGridViewPayrollLogs.RowHeadersVisible = false;
-            this.dataGridViewPayrollLogs.RowHeadersWidth = 51;
+            this.dataGridViewAuditTrails.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            this.dataGridViewAuditTrails.RowHeadersVisible = false;
+            this.dataGridViewAuditTrails.RowHeadersWidth = 51;
             dataGridViewCellStyle4.BackColor = System.Drawing.Color.White;
             dataGridViewCellStyle4.ForeColor = System.Drawing.Color.Black;
             dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.White;
             dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Black;
-            this.dataGridViewPayrollLogs.RowsDefaultCellStyle = dataGridViewCellStyle4;
-            this.dataGridViewPayrollLogs.RowTemplate.DividerHeight = 10;
-            this.dataGridViewPayrollLogs.RowTemplate.Height = 40;
-            this.dataGridViewPayrollLogs.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.dataGridViewPayrollLogs.Size = new System.Drawing.Size(855, 272);
-            this.dataGridViewPayrollLogs.TabIndex = 1;
-            // 
-            // Column2
-            // 
-            this.Column2.FillWeight = 104F;
-            this.Column2.HeaderText = "Date";
-            this.Column2.MinimumWidth = 6;
-            this.Column2.Name = "Column2";
-            this.Column2.ReadOnly = true;
-            this.Column2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // Column3
-            // 
-            this.Column3.FillWeight = 168F;
-            this.Column3.HeaderText = "Time";
-            this.Column3.MinimumWidth = 6;
-            this.Column3.Name = "Column3";
-            this.Column3.ReadOnly = true;
-            this.Column3.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // Column4
-            // 
-            this.Column4.FillWeight = 148F;
-            this.Column4.HeaderText = "Action";
-            this.Column4.MinimumWidth = 6;
-            this.Column4.Name = "Column4";
-            this.Column4.ReadOnly = true;
-            this.Column4.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // Column5
-            // 
-            this.Column5.FillWeight = 188F;
-            this.Column5.HeaderText = "Details";
-            this.Column5.MinimumWidth = 6;
-            this.Column5.Name = "Column5";
-            this.Column5.ReadOnly = true;
-            this.Column5.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // panelAdminLog
-            // 
-            this.panelAdminLog.BackColor = System.Drawing.Color.White;
-            this.panelAdminLog.Controls.Add(this.labelAdminLog);
-            this.panelAdminLog.Controls.Add(this.dataGridViewAdminLogs);
-            this.panelAdminLog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelAdminLog.Location = new System.Drawing.Point(39, 1001);
-            this.panelAdminLog.Name = "panelAdminLog";
-            this.panelAdminLog.Size = new System.Drawing.Size(874, 356);
-            this.panelAdminLog.TabIndex = 17;
-            this.panelAdminLog.Paint += new System.Windows.Forms.PaintEventHandler(this.panelAdminLog_Paint);
-            this.panelAdminLog.Resize += new System.EventHandler(this.panelAdminLog_Resize);
-            // 
-            // labelAdminLog
-            // 
-            this.labelAdminLog.AutoSize = true;
-            this.labelAdminLog.BackColor = System.Drawing.Color.White;
-            this.labelAdminLog.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelAdminLog.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(23)))), ((int)(((byte)(112)))));
-            this.labelAdminLog.Location = new System.Drawing.Point(22, 22);
-            this.labelAdminLog.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.labelAdminLog.Name = "labelAdminLog";
-            this.labelAdminLog.Size = new System.Drawing.Size(156, 31);
-            this.labelAdminLog.TabIndex = 19;
-            this.labelAdminLog.Text = "Admin Logs";
-            // 
-            // dataGridViewAdminLogs
-            // 
-            this.dataGridViewAdminLogs.AllowUserToAddRows = false;
-            this.dataGridViewAdminLogs.AllowUserToDeleteRows = false;
-            this.dataGridViewAdminLogs.AllowUserToResizeColumns = false;
-            this.dataGridViewAdminLogs.AllowUserToResizeRows = false;
-            this.dataGridViewAdminLogs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridViewAdminLogs.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dataGridViewAdminLogs.BackgroundColor = System.Drawing.Color.White;
-            this.dataGridViewAdminLogs.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dataGridViewAdminLogs.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.dataGridViewAdminLogs.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle5.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewAdminLogs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
-            this.dataGridViewAdminLogs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewAdminLogs.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.dataGridViewTextBoxColumn1,
-            this.dataGridViewTextBoxColumn2,
-            this.dataGridViewTextBoxColumn3,
-            this.dataGridViewTextBoxColumn4});
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle6.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            dataGridViewCellStyle6.ForeColor = System.Drawing.Color.Coral;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewAdminLogs.DefaultCellStyle = dataGridViewCellStyle6;
-            this.dataGridViewAdminLogs.EnableHeadersVisualStyles = false;
-            this.dataGridViewAdminLogs.GridColor = System.Drawing.Color.White;
-            this.dataGridViewAdminLogs.Location = new System.Drawing.Point(10, 72);
-            this.dataGridViewAdminLogs.Margin = new System.Windows.Forms.Padding(0);
-            this.dataGridViewAdminLogs.Name = "dataGridViewAdminLogs";
-            this.dataGridViewAdminLogs.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewAdminLogs.RowHeadersDefaultCellStyle = dataGridViewCellStyle7;
-            this.dataGridViewAdminLogs.RowHeadersVisible = false;
-            this.dataGridViewAdminLogs.RowHeadersWidth = 51;
-            dataGridViewCellStyle8.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle8.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.Black;
-            this.dataGridViewAdminLogs.RowsDefaultCellStyle = dataGridViewCellStyle8;
-            this.dataGridViewAdminLogs.RowTemplate.DividerHeight = 10;
-            this.dataGridViewAdminLogs.RowTemplate.Height = 40;
-            this.dataGridViewAdminLogs.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.dataGridViewAdminLogs.Size = new System.Drawing.Size(855, 272);
-            this.dataGridViewAdminLogs.TabIndex = 2;
+            this.dataGridViewAuditTrails.RowsDefaultCellStyle = dataGridViewCellStyle4;
+            this.dataGridViewAuditTrails.RowTemplate.DividerHeight = 10;
+            this.dataGridViewAuditTrails.RowTemplate.Height = 40;
+            this.dataGridViewAuditTrails.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.dataGridViewAuditTrails.Size = new System.Drawing.Size(855, 678);
+            this.dataGridViewAuditTrails.TabIndex = 2;
             // 
             // dataGridViewTextBoxColumn1
             // 
@@ -853,27 +716,27 @@
             this.dataGridViewTodo.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridViewTodo.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dataGridViewTodo.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewTodo.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewTodo.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.dataGridViewTodo.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewTodo.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ColumnActivity,
             this.ColumnDueDate,
             this.ColumnTrash});
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle10.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            dataGridViewCellStyle10.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewTodo.DefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            dataGridViewCellStyle6.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewTodo.DefaultCellStyle = dataGridViewCellStyle6;
             this.dataGridViewTodo.EnableHeadersVisualStyles = false;
             this.dataGridViewTodo.GridColor = System.Drawing.Color.White;
             this.dataGridViewTodo.Location = new System.Drawing.Point(16, 79);
@@ -881,21 +744,21 @@
             this.dataGridViewTodo.Name = "dataGridViewTodo";
             this.dataGridViewTodo.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.dataGridViewTodo.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewTodo.RowHeadersDefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewTodo.RowHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this.dataGridViewTodo.RowHeadersVisible = false;
             this.dataGridViewTodo.RowHeadersWidth = 51;
-            dataGridViewCellStyle12.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle12.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.Color.Black;
-            this.dataGridViewTodo.RowsDefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle8.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle8.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.Black;
+            this.dataGridViewTodo.RowsDefaultCellStyle = dataGridViewCellStyle8;
             this.dataGridViewTodo.RowTemplate.DividerHeight = 10;
             this.dataGridViewTodo.RowTemplate.Height = 40;
             this.dataGridViewTodo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -918,6 +781,17 @@
             this.ColumnDueDate.MinimumWidth = 6;
             this.ColumnDueDate.Name = "ColumnDueDate";
             this.ColumnDueDate.ReadOnly = true;
+            // 
+            // ColumnTrash
+            // 
+            this.ColumnTrash.FillWeight = 20F;
+            this.ColumnTrash.HeaderText = "";
+            this.ColumnTrash.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.TrashBin;
+            this.ColumnTrash.MinimumWidth = 6;
+            this.ColumnTrash.Name = "ColumnTrash";
+            this.ColumnTrash.ReadOnly = true;
+            this.ColumnTrash.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.ColumnTrash.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             // 
             // labelTodoDesc
             // 
@@ -1008,47 +882,47 @@
             this.dataGridViewAlertLate.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridViewAlertLate.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dataGridViewAlertLate.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle13.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle13.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewAlertLate.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle9.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewAlertLate.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle9;
             this.dataGridViewAlertLate.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewAlertLate.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewTextBoxColumn7,
             this.dataGridViewTextBoxColumn8});
-            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle14.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            dataGridViewCellStyle14.ForeColor = System.Drawing.Color.Coral;
-            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewAlertLate.DefaultCellStyle = dataGridViewCellStyle14;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle10.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            dataGridViewCellStyle10.ForeColor = System.Drawing.Color.Coral;
+            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewAlertLate.DefaultCellStyle = dataGridViewCellStyle10;
             this.dataGridViewAlertLate.EnableHeadersVisualStyles = false;
             this.dataGridViewAlertLate.GridColor = System.Drawing.Color.White;
             this.dataGridViewAlertLate.Location = new System.Drawing.Point(0, 213);
             this.dataGridViewAlertLate.Margin = new System.Windows.Forms.Padding(0);
             this.dataGridViewAlertLate.Name = "dataGridViewAlertLate";
             this.dataGridViewAlertLate.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewAlertLate.RowHeadersDefaultCellStyle = dataGridViewCellStyle15;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewAlertLate.RowHeadersDefaultCellStyle = dataGridViewCellStyle11;
             this.dataGridViewAlertLate.RowHeadersVisible = false;
             this.dataGridViewAlertLate.RowHeadersWidth = 51;
-            dataGridViewCellStyle16.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle16.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.Color.Black;
-            this.dataGridViewAlertLate.RowsDefaultCellStyle = dataGridViewCellStyle16;
+            dataGridViewCellStyle12.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle12.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.Color.Black;
+            this.dataGridViewAlertLate.RowsDefaultCellStyle = dataGridViewCellStyle12;
             this.dataGridViewAlertLate.RowTemplate.DividerHeight = 10;
             this.dataGridViewAlertLate.RowTemplate.Height = 40;
             this.dataGridViewAlertLate.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -1086,47 +960,47 @@
             this.dataGridViewAlertAbsent.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridViewAlertAbsent.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dataGridViewAlertAbsent.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle17.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle17.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle17.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewAlertAbsent.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle17;
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle13.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle13.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewAlertAbsent.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
             this.dataGridViewAlertAbsent.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewAlertAbsent.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewTextBoxColumn11,
             this.dataGridViewTextBoxColumn12});
-            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle18.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle18.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            dataGridViewCellStyle18.ForeColor = System.Drawing.Color.Coral;
-            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewAlertAbsent.DefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle14.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            dataGridViewCellStyle14.ForeColor = System.Drawing.Color.Coral;
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewAlertAbsent.DefaultCellStyle = dataGridViewCellStyle14;
             this.dataGridViewAlertAbsent.EnableHeadersVisualStyles = false;
             this.dataGridViewAlertAbsent.GridColor = System.Drawing.Color.White;
             this.dataGridViewAlertAbsent.Location = new System.Drawing.Point(0, 51);
             this.dataGridViewAlertAbsent.Margin = new System.Windows.Forms.Padding(0);
             this.dataGridViewAlertAbsent.Name = "dataGridViewAlertAbsent";
             this.dataGridViewAlertAbsent.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle19.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle19.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle19.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle19.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle19.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle19.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewAlertAbsent.RowHeadersDefaultCellStyle = dataGridViewCellStyle19;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewAlertAbsent.RowHeadersDefaultCellStyle = dataGridViewCellStyle15;
             this.dataGridViewAlertAbsent.RowHeadersVisible = false;
             this.dataGridViewAlertAbsent.RowHeadersWidth = 51;
-            dataGridViewCellStyle20.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle20.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle20.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle20.SelectionForeColor = System.Drawing.Color.Black;
-            this.dataGridViewAlertAbsent.RowsDefaultCellStyle = dataGridViewCellStyle20;
+            dataGridViewCellStyle16.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle16.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.Color.Black;
+            this.dataGridViewAlertAbsent.RowsDefaultCellStyle = dataGridViewCellStyle16;
             this.dataGridViewAlertAbsent.RowTemplate.DividerHeight = 10;
             this.dataGridViewAlertAbsent.RowTemplate.Height = 40;
             this.dataGridViewAlertAbsent.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -1224,25 +1098,25 @@
             this.dataGridViewDayOffLogs.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridViewDayOffLogs.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dataGridViewDayOffLogs.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle21.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle21.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle21.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle21.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle21.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle21.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle21.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewDayOffLogs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle21;
+            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle17.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle17.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle17.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewDayOffLogs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle17;
             this.dataGridViewDayOffLogs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewDayOffLogs.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewTextBoxColumn5});
-            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle22.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle22.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            dataGridViewCellStyle22.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle22.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle22.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle22.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewDayOffLogs.DefaultCellStyle = dataGridViewCellStyle22;
+            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle18.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle18.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            dataGridViewCellStyle18.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewDayOffLogs.DefaultCellStyle = dataGridViewCellStyle18;
             this.dataGridViewDayOffLogs.EnableHeadersVisualStyles = false;
             this.dataGridViewDayOffLogs.GridColor = System.Drawing.Color.White;
             this.dataGridViewDayOffLogs.Location = new System.Drawing.Point(16, 65);
@@ -1250,21 +1124,21 @@
             this.dataGridViewDayOffLogs.Name = "dataGridViewDayOffLogs";
             this.dataGridViewDayOffLogs.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.dataGridViewDayOffLogs.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle23.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle23.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle23.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle23.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle23.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle23.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle23.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewDayOffLogs.RowHeadersDefaultCellStyle = dataGridViewCellStyle23;
+            dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle19.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle19.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle19.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle19.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle19.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle19.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewDayOffLogs.RowHeadersDefaultCellStyle = dataGridViewCellStyle19;
             this.dataGridViewDayOffLogs.RowHeadersVisible = false;
             this.dataGridViewDayOffLogs.RowHeadersWidth = 51;
-            dataGridViewCellStyle24.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle24.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle24.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle24.SelectionForeColor = System.Drawing.Color.Black;
-            this.dataGridViewDayOffLogs.RowsDefaultCellStyle = dataGridViewCellStyle24;
+            dataGridViewCellStyle20.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle20.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle20.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle20.SelectionForeColor = System.Drawing.Color.Black;
+            this.dataGridViewDayOffLogs.RowsDefaultCellStyle = dataGridViewCellStyle20;
             this.dataGridViewDayOffLogs.RowTemplate.DividerHeight = 10;
             this.dataGridViewDayOffLogs.RowTemplate.Height = 40;
             this.dataGridViewDayOffLogs.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -1293,17 +1167,6 @@
             this.dataGridViewImageColumn1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             this.dataGridViewImageColumn1.Width = 38;
             // 
-            // ColumnTrash
-            // 
-            this.ColumnTrash.FillWeight = 20F;
-            this.ColumnTrash.HeaderText = "";
-            this.ColumnTrash.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.TrashBin;
-            this.ColumnTrash.MinimumWidth = 6;
-            this.ColumnTrash.Name = "ColumnTrash";
-            this.ColumnTrash.ReadOnly = true;
-            this.ColumnTrash.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.ColumnTrash.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            // 
             // AdminOverview
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -1328,12 +1191,9 @@
             this.panelAbsent.PerformLayout();
             this.panelTotal.ResumeLayout(false);
             this.panelTotal.PerformLayout();
-            this.panelPayrollLog.ResumeLayout(false);
-            this.panelPayrollLog.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewPayrollLogs)).EndInit();
-            this.panelAdminLog.ResumeLayout(false);
-            this.panelAdminLog.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAdminLogs)).EndInit();
+            this.panelAuditTrails.ResumeLayout(false);
+            this.panelAuditTrails.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAuditTrails)).EndInit();
             this.tableLayoutPanelRight.ResumeLayout(false);
             this.panelTodo.ResumeLayout(false);
             this.panelTodo.PerformLayout();
@@ -1356,17 +1216,14 @@
         private System.Windows.Forms.Label labelOverviewDesc;
         private System.Windows.Forms.Label labelAdminOverview;
         private System.Windows.Forms.Panel panelAttendanceSummary;
-        private System.Windows.Forms.Panel panelPayrollLog;
-        private System.Windows.Forms.Panel panelAdminLog;
+        private System.Windows.Forms.Panel panelAuditTrails;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanelRight;
         private System.Windows.Forms.Panel panelTodo;
         private System.Windows.Forms.Panel panelAlert;
         private System.Windows.Forms.Panel panelDailyEmployeeLog;
         private System.Windows.Forms.Panel panelCalendar;
-        private System.Windows.Forms.DataGridView dataGridViewPayrollLogs;
-        private System.Windows.Forms.Label labelPayrollLog;
-        private System.Windows.Forms.Label labelAdminLog;
-        private System.Windows.Forms.DataGridView dataGridViewAdminLogs;
+        private System.Windows.Forms.Label labelAuditTrails;
+        private System.Windows.Forms.DataGridView dataGridViewAuditTrails;
         private System.Windows.Forms.Label labelDailyEmployeeLog;
         private System.Windows.Forms.DataGridView dataGridViewDayOffLogs;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn5;
@@ -1407,10 +1264,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn8;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn11;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn12;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
