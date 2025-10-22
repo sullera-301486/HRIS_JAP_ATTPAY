@@ -35,6 +35,10 @@
             this.labelUserType = new System.Windows.Forms.Label();
             this.buttonConfirm = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
+            this.tbPassword = new System.Windows.Forms.TextBox();
+            this.lblPassword = new System.Windows.Forms.Label();
+            this.cbEmpID = new System.Windows.Forms.ComboBox();
+            this.lblEmployeeID = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -55,7 +59,7 @@
             this.labelRequestConfirm.AutoSize = true;
             this.labelRequestConfirm.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelRequestConfirm.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(34)))), ((int)(((byte)(31)))));
-            this.labelRequestConfirm.Location = new System.Drawing.Point(13, 54);
+            this.labelRequestConfirm.Location = new System.Drawing.Point(13, 15);
             this.labelRequestConfirm.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelRequestConfirm.Name = "labelRequestConfirm";
             this.labelRequestConfirm.Size = new System.Drawing.Size(230, 31);
@@ -66,7 +70,7 @@
             // 
             this.labelMessage.AutoSize = true;
             this.labelMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelMessage.Location = new System.Drawing.Point(14, 104);
+            this.labelMessage.Location = new System.Drawing.Point(14, 115);
             this.labelMessage.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelMessage.Name = "labelMessage";
             this.labelMessage.Size = new System.Drawing.Size(303, 29);
@@ -82,7 +86,7 @@
             this.comboBoxUserType.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxUserType.ForeColor = System.Drawing.Color.White;
             this.comboBoxUserType.FormattingEnabled = true;
-            this.comboBoxUserType.Location = new System.Drawing.Point(188, 170);
+            this.comboBoxUserType.Location = new System.Drawing.Point(194, 148);
             this.comboBoxUserType.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxUserType.Name = "comboBoxUserType";
             this.comboBoxUserType.Size = new System.Drawing.Size(262, 33);
@@ -92,7 +96,7 @@
             // 
             this.labelUserType.AutoSize = true;
             this.labelUserType.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelUserType.Location = new System.Drawing.Point(14, 173);
+            this.labelUserType.Location = new System.Drawing.Point(20, 151);
             this.labelUserType.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelUserType.Name = "labelUserType";
             this.labelUserType.Size = new System.Drawing.Size(103, 25);
@@ -130,12 +134,60 @@
             this.buttonCancel.UseVisualStyleBackColor = false;
             this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
             // 
+            // tbPassword
+            // 
+            this.tbPassword.Location = new System.Drawing.Point(194, 191);
+            this.tbPassword.Name = "tbPassword";
+            this.tbPassword.Size = new System.Drawing.Size(262, 22);
+            this.tbPassword.TabIndex = 39;
+            // 
+            // lblPassword
+            // 
+            this.lblPassword.AutoSize = true;
+            this.lblPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPassword.Location = new System.Drawing.Point(20, 187);
+            this.lblPassword.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblPassword.Name = "lblPassword";
+            this.lblPassword.Size = new System.Drawing.Size(98, 25);
+            this.lblPassword.TabIndex = 40;
+            this.lblPassword.Text = "Password";
+            // 
+            // cbEmpID
+            // 
+            this.cbEmpID.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.cbEmpID.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.cbEmpID.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbEmpID.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbEmpID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.cbEmpID.ForeColor = System.Drawing.Color.White;
+            this.cbEmpID.FormattingEnabled = true;
+            this.cbEmpID.Location = new System.Drawing.Point(189, 74);
+            this.cbEmpID.Margin = new System.Windows.Forms.Padding(4);
+            this.cbEmpID.Name = "cbEmpID";
+            this.cbEmpID.Size = new System.Drawing.Size(266, 33);
+            this.cbEmpID.TabIndex = 41;
+            // 
+            // lblEmployeeID
+            // 
+            this.lblEmployeeID.AutoSize = true;
+            this.lblEmployeeID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblEmployeeID.Location = new System.Drawing.Point(20, 74);
+            this.lblEmployeeID.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblEmployeeID.Name = "lblEmployeeID";
+            this.lblEmployeeID.Size = new System.Drawing.Size(123, 25);
+            this.lblEmployeeID.TabIndex = 42;
+            this.lblEmployeeID.Text = "Employee ID";
+            // 
             // AddNewUser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(488, 293);
+            this.Controls.Add(this.lblEmployeeID);
+            this.Controls.Add(this.cbEmpID);
+            this.Controls.Add(this.lblPassword);
+            this.Controls.Add(this.tbPassword);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonConfirm);
             this.Controls.Add(this.labelUserType);
@@ -162,5 +214,9 @@
         private System.Windows.Forms.Label labelUserType;
         private System.Windows.Forms.Button buttonConfirm;
         private System.Windows.Forms.Button buttonCancel;
+        private System.Windows.Forms.TextBox tbPassword;
+        private System.Windows.Forms.Label lblPassword;
+        private System.Windows.Forms.ComboBox cbEmpID;
+        private System.Windows.Forms.Label lblEmployeeID;
     }
 }
