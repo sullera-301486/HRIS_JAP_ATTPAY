@@ -1057,7 +1057,7 @@ namespace HRIS_JAP_ATTPAY
                 labelSalaryInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelSickLeave.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelSickLeaveBalance.Font = AttributesClass.GetFont("Roboto-Light", 10f);
-                textBoxSickLeaveCredit.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelSickLeaveCredit.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelSickLeaveDebit.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelSSS.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelSSSAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
@@ -1067,7 +1067,7 @@ namespace HRIS_JAP_ATTPAY
                 labelSSSLoanDetails.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelVacationLeave.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelVacationLeaveBalance.Font = AttributesClass.GetFont("Roboto-Light", 10f);
-                textBoxVacationLeaveCredit.Font = AttributesClass.GetFont("Roboto-Light", 10f);
+                labelVacationLeaveCredit.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelVacationLeaveDebit.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 labelWithTax.Font = AttributesClass.GetFont("Roboto-Regular", 10f);
                 labelWithTaxAmountDebitInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);

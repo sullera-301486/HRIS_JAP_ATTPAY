@@ -127,8 +127,6 @@
             this.textBoxOthersDetails = new System.Windows.Forms.TextBox();
             this.textBoxCoopContriDetails = new System.Windows.Forms.TextBox();
             this.textBoxCashAdvanceDetails = new System.Windows.Forms.TextBox();
-            this.textBoxVacationLeaveCredit = new System.Windows.Forms.TextBox();
-            this.textBoxSickLeaveCredit = new System.Windows.Forms.TextBox();
             this.textBoxDailyRateInput = new System.Windows.Forms.TextBox();
             this.labelOvertimePerMinuteCredit = new System.Windows.Forms.Label();
             this.labelSSSLoanAmountDebitInput = new System.Windows.Forms.Label();
@@ -145,6 +143,8 @@
             this.labelCarLoanDetails = new System.Windows.Forms.Label();
             this.labelHousingLoanDetails = new System.Windows.Forms.Label();
             this.labelCoopLoanDetails = new System.Windows.Forms.Label();
+            this.labelVacationLeaveCredit = new System.Windows.Forms.Label();
+            this.labelSickLeaveCredit = new System.Windows.Forms.Label();
             this.panel3.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -1354,32 +1354,6 @@
             this.textBoxCashAdvanceDetails.TabIndex = 273;
             this.textBoxCashAdvanceDetails.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // textBoxVacationLeaveCredit
-            // 
-            this.textBoxVacationLeaveCredit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxVacationLeaveCredit.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxVacationLeaveCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxVacationLeaveCredit.ForeColor = System.Drawing.Color.White;
-            this.textBoxVacationLeaveCredit.Location = new System.Drawing.Point(229, 777);
-            this.textBoxVacationLeaveCredit.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxVacationLeaveCredit.Name = "textBoxVacationLeaveCredit";
-            this.textBoxVacationLeaveCredit.Size = new System.Drawing.Size(125, 26);
-            this.textBoxVacationLeaveCredit.TabIndex = 277;
-            this.textBoxVacationLeaveCredit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxSickLeaveCredit
-            // 
-            this.textBoxSickLeaveCredit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxSickLeaveCredit.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxSickLeaveCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxSickLeaveCredit.ForeColor = System.Drawing.Color.White;
-            this.textBoxSickLeaveCredit.Location = new System.Drawing.Point(229, 809);
-            this.textBoxSickLeaveCredit.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxSickLeaveCredit.Name = "textBoxSickLeaveCredit";
-            this.textBoxSickLeaveCredit.Size = new System.Drawing.Size(125, 26);
-            this.textBoxSickLeaveCredit.TabIndex = 278;
-            this.textBoxSickLeaveCredit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
             // textBoxDailyRateInput
             // 
             this.textBoxDailyRateInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
@@ -1573,12 +1547,38 @@
             this.labelCoopLoanDetails.Text = "N/A";
             this.labelCoopLoanDetails.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // labelVacationLeaveCredit
+            // 
+            this.labelVacationLeaveCredit.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelVacationLeaveCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelVacationLeaveCredit.Location = new System.Drawing.Point(225, 774);
+            this.labelVacationLeaveCredit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelVacationLeaveCredit.Name = "labelVacationLeaveCredit";
+            this.labelVacationLeaveCredit.Size = new System.Drawing.Size(129, 31);
+            this.labelVacationLeaveCredit.TabIndex = 295;
+            this.labelVacationLeaveCredit.Text = "N/A";
+            this.labelVacationLeaveCredit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // labelSickLeaveCredit
+            // 
+            this.labelSickLeaveCredit.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelSickLeaveCredit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSickLeaveCredit.Location = new System.Drawing.Point(225, 808);
+            this.labelSickLeaveCredit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSickLeaveCredit.Name = "labelSickLeaveCredit";
+            this.labelSickLeaveCredit.Size = new System.Drawing.Size(129, 31);
+            this.labelSickLeaveCredit.TabIndex = 296;
+            this.labelSickLeaveCredit.Text = "N/A";
+            this.labelSickLeaveCredit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // PayrollSummaryEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1219, 844);
+            this.Controls.Add(this.labelSickLeaveCredit);
+            this.Controls.Add(this.labelVacationLeaveCredit);
             this.Controls.Add(this.labelCoopLoanDetails);
             this.Controls.Add(this.labelHousingLoanDetails);
             this.Controls.Add(this.labelCarLoanDetails);
@@ -1595,8 +1595,6 @@
             this.Controls.Add(this.labelSSSLoanAmountDebitInput);
             this.Controls.Add(this.labelOvertimePerMinuteCredit);
             this.Controls.Add(this.textBoxDailyRateInput);
-            this.Controls.Add(this.textBoxSickLeaveCredit);
-            this.Controls.Add(this.textBoxVacationLeaveCredit);
             this.Controls.Add(this.textBoxOthersDetails);
             this.Controls.Add(this.textBoxCoopContriDetails);
             this.Controls.Add(this.textBoxCashAdvanceDetails);
@@ -1807,8 +1805,6 @@
         private System.Windows.Forms.TextBox textBoxOthersDetails;
         private System.Windows.Forms.TextBox textBoxCoopContriDetails;
         private System.Windows.Forms.TextBox textBoxCashAdvanceDetails;
-        private System.Windows.Forms.TextBox textBoxVacationLeaveCredit;
-        private System.Windows.Forms.TextBox textBoxSickLeaveCredit;
         private System.Windows.Forms.TextBox textBoxDailyRateInput;
         private System.Windows.Forms.Label labelOvertimePerMinuteCredit;
         private System.Windows.Forms.Label labelSSSLoanAmountDebitInput;
@@ -1825,5 +1821,7 @@
         private System.Windows.Forms.Label labelCarLoanDetails;
         private System.Windows.Forms.Label labelHousingLoanDetails;
         private System.Windows.Forms.Label labelCoopLoanDetails;
+        private System.Windows.Forms.Label labelVacationLeaveCredit;
+        private System.Windows.Forms.Label labelSickLeaveCredit;
     }
 }

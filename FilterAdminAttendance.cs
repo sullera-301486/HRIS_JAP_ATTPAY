@@ -58,6 +58,7 @@ namespace HRIS_JAP_ATTPAY
                 textBoxName.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxTimeIn.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxTimeOut.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                labelDateCutoff.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelDepartment.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelHoursWorked.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelID.Font = AttributesClass.GetFont("Roboto-Regular", 12f);

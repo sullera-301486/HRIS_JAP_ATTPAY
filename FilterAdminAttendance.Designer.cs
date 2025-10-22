@@ -59,7 +59,7 @@
             this.buttonApply = new System.Windows.Forms.Button();
             this.buttonReset = new System.Windows.Forms.Button();
             this.dtpCutOffSelector = new System.Windows.Forms.DateTimePicker();
-            this.label1 = new System.Windows.Forms.Label();
+            this.labelDateCutoff = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSortLogo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
             this.SuspendLayout();
@@ -455,21 +455,21 @@
             // 
             // dtpCutOffSelector
             // 
-            this.dtpCutOffSelector.Location = new System.Drawing.Point(202, 78);
+            this.dtpCutOffSelector.Location = new System.Drawing.Point(202, 76);
             this.dtpCutOffSelector.Name = "dtpCutOffSelector";
             this.dtpCutOffSelector.Size = new System.Drawing.Size(250, 22);
             this.dtpCutOffSelector.TabIndex = 51;
             // 
-            // label1
+            // labelDateCutoff
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(32, 75);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(121, 25);
-            this.label1.TabIndex = 52;
-            this.label1.Text = "Date Cutoff";
+            this.labelDateCutoff.AutoSize = true;
+            this.labelDateCutoff.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDateCutoff.Location = new System.Drawing.Point(32, 76);
+            this.labelDateCutoff.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDateCutoff.Name = "labelDateCutoff";
+            this.labelDateCutoff.Size = new System.Drawing.Size(121, 25);
+            this.labelDateCutoff.TabIndex = 52;
+            this.labelDateCutoff.Text = "Date Cutoff";
             // 
             // FilterAdminAttendance
             // 
@@ -477,7 +477,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(493, 661);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.labelDateCutoff);
             this.Controls.Add(this.dtpCutOffSelector);
             this.Controls.Add(this.buttonReset);
             this.Controls.Add(this.buttonApply);
@@ -554,6 +554,6 @@
         private System.Windows.Forms.Button buttonApply;
         private System.Windows.Forms.Button buttonReset;
         private System.Windows.Forms.DateTimePicker dtpCutOffSelector;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelDateCutoff;
     }
 }

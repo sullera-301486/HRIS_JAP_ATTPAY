@@ -31,6 +31,7 @@
             this.XpictureBox = new System.Windows.Forms.PictureBox();
             this.labelDeductionMatrix = new System.Windows.Forms.Label();
             this.labelUpdateLeaveData = new System.Windows.Forms.Label();
+            this.panelDeductionMatrix = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -66,22 +67,33 @@
             this.labelUpdateLeaveData.Location = new System.Drawing.Point(16, 80);
             this.labelUpdateLeaveData.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelUpdateLeaveData.Name = "labelUpdateLeaveData";
-            this.labelUpdateLeaveData.Size = new System.Drawing.Size(332, 29);
+            this.labelUpdateLeaveData.Size = new System.Drawing.Size(330, 29);
             this.labelUpdateLeaveData.TabIndex = 4;
-            this.labelUpdateLeaveData.Text = "Update Employee Leave Data";
+            this.labelUpdateLeaveData.Text = "View Government Deductions";
+            // 
+            // panelDeductionMatrix
+            // 
+            this.panelDeductionMatrix.AutoScroll = true;
+            this.panelDeductionMatrix.BackColor = System.Drawing.Color.Gray;
+            this.panelDeductionMatrix.Location = new System.Drawing.Point(1, 134);
+            this.panelDeductionMatrix.Name = "panelDeductionMatrix";
+            this.panelDeductionMatrix.Size = new System.Drawing.Size(1079, 753);
+            this.panelDeductionMatrix.TabIndex = 5;
             // 
             // DeductionMatrix
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1080, 1080);
+            this.ClientSize = new System.Drawing.Size(1080, 880);
+            this.Controls.Add(this.panelDeductionMatrix);
             this.Controls.Add(this.labelUpdateLeaveData);
             this.Controls.Add(this.labelDeductionMatrix);
             this.Controls.Add(this.XpictureBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "DeductionMatrix";
             this.Text = "DeductionMatrix";
+            this.Load += new System.EventHandler(this.DeductionMatrix_Load);
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -93,5 +105,6 @@
         private System.Windows.Forms.PictureBox XpictureBox;
         private System.Windows.Forms.Label labelDeductionMatrix;
         private System.Windows.Forms.Label labelUpdateLeaveData;
+        private System.Windows.Forms.Panel panelDeductionMatrix;
     }
 }
