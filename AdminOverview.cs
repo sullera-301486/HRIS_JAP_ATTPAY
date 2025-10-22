@@ -1293,13 +1293,15 @@ namespace HRIS_JAP_ATTPAY
                     return "Approved Leave";
                 case "Leave Rejected":
                     return "Rejected Leave";
-                // === ADD THESE PAYROLL CASES ===
+                // === PAYROLL AND DTR EXPORTS ===
                 case "Payroll Exported":
                     return "Exported Payroll";
                 case "Payroll Generated":
                     return "Generated Payroll";
                 case "Payroll Updated":
                     return "Updated Payroll";
+                case "DTR Exported":  // ADD THIS LINE
+                    return "Exported DTR Report";
                 // ===============================
                 case "Work Schedule Updated":
                     return "Updated Work Schedule";

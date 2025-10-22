@@ -113,6 +113,7 @@ namespace HRIS_JAP_ATTPAY
             public const string ADD_USER = "User Account Added";
             public const string UPDATE_USER = "User Account Updated";
             public const string REMOVE_USER = "User Account Removed";
+            public const string EXPORT_DTR = "DTR Exported";
         }
     }
     public static class PayrollLogService

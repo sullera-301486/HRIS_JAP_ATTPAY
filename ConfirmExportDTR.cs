@@ -60,7 +60,7 @@ namespace HRIS_JAP_ATTPAY
             this.Close();
         }
 
-        private void buttonConfirm_Click(object sender, EventArgs e)
+        private async void buttonConfirm_Click(object sender, EventArgs e)
         {
             try
             {
@@ -82,7 +82,10 @@ namespace HRIS_JAP_ATTPAY
                     {
                         // Create the Excel file
                         CreateExcelFile(saveFileDialog.FileName);
-                        
+
+                        // LOG THE EXPORT ACTION TO ADMIN LOGS
+                        await LogDTRExportAction(saveFileDialog.FileName);
+
                         MessageBox.Show("DTR exported successfully!", "Export Complete",
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -357,6 +360,40 @@ namespace HRIS_JAP_ATTPAY
             }
 
             return columnName;
+        }
+        private async Task LogDTRExportAction(string filePath)
+        {
+            try
+            {
+                string description = $"Exported DTR report: {System.IO.Path.GetFileName(filePath)}";
+
+                // Get date range information for the log description
+                if (!string.IsNullOrEmpty(exportDateRange))
+                {
+                    description += $" - {exportDateRange}";
+                }
+
+                // Get record count for the log
+                int recordCount = dataGridView?.Rows?.Count ?? 0;
+                if (recordCount > 0)
+                {
+                    description += $" ({recordCount} records)";
+                }
+
+                // Log the action using AdminLogService
+                await AdminLogService.LogAdminAction(
+                    AdminLogService.Actions.EXPORT_DTR,
+                    description,
+                    null // No specific employee affected for bulk export
+                );
+
+                Console.WriteLine($"DTR export logged: {description}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error logging DTR export: {ex.Message}");
+                // Don't show error to user to avoid interrupting export flow
+            }
         }
     }
 }
