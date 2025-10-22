@@ -46,7 +46,13 @@ namespace HRIS_JAP_ATTPAY
             {
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
-                     await PayrollExportAllData.GenerateAllPayrollsAsync(sfd.FileName);
+                    await PayrollExportAllData.GenerateAllPayrollsAsync(sfd.FileName);
+
+                    // === ADD THIS LINE ===
+                    await PayrollLogService.LogBulkPayrollExport();
+                    // =====================
+
+                    this.Close();
                 }
             }
         }

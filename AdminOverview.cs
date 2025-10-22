@@ -1293,10 +1293,14 @@ namespace HRIS_JAP_ATTPAY
                     return "Approved Leave";
                 case "Leave Rejected":
                     return "Rejected Leave";
-                case "Payroll Generated":
-                    return "Generated Payroll";
+                // === ADD THESE PAYROLL CASES ===
                 case "Payroll Exported":
                     return "Exported Payroll";
+                case "Payroll Generated":
+                    return "Generated Payroll";
+                case "Payroll Updated":
+                    return "Updated Payroll";
+                // ===============================
                 case "Work Schedule Updated":
                     return "Updated Work Schedule";
                 case "User Account Added":

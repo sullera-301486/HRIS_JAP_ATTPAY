@@ -59,19 +59,13 @@ namespace HRIS_JAP_ATTPAY
                         System.Diagnostics.Debug.WriteLine($"Warning: Could not set read-only attribute: {attrEx.Message}");
                     }
 
-                    // Log the export action to Firebase
-                    bool logSuccess = await LogPayrollExportToFirebase(_payrollData.EmployeeName, _payrollData.EmployeeId);
+                    // === ADD THIS LINE ===
+                    await PayrollLogService.LogIndividualPayrollExport(_payrollData.EmployeeId, _payrollData.EmployeeName);
+                    // =====================
 
-                    if (logSuccess)
-                    {
-                        MessageBox.Show("Payroll exported successfully as read-only and logged to system!", "Export Complete",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Payroll exported successfully as read-only, but failed to log to system.", "Export Complete",
-                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
+                    MessageBox.Show("Payroll exported successfully as read-only and logged to system!", "Export Complete",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                     this.Close();
                 }
             }
