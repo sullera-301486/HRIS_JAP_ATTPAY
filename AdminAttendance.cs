@@ -1878,7 +1878,7 @@ namespace HRIS_JAP_ATTPAY
                 }
             }
 
-            System.Diagnostics.Debug.WriteLine($"❌ Could not parse time string: '{timeStr}'");
+            System.Diagnostics.Debug.WriteLine($" Could not parse time string: '{timeStr}'");
             return false;
         }
         private bool IsInBiMonthlyRange(string attendanceDateStr, DateTime cutOffDate, bool isFirstHalf)
@@ -1915,6 +1915,13 @@ namespace HRIS_JAP_ATTPAY
         {
             Form parentForm = this.FindForm();
             ConfirmExportDTR confirmExportDTR = new ConfirmExportDTR();
+
+            // Get the current date range text from the label
+            string dateRange = labelAttendanceDate.Text;
+
+            // Pass the DataGridView and date range to the export form
+            confirmExportDTR.SetExportData(dataGridViewAttendance, dateRange);
+
             AttributesClass.ShowWithOverlay(parentForm, confirmExportDTR);
         }
     }
