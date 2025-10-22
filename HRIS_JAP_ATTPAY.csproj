@@ -286,6 +286,12 @@
     <Compile Include="AttributesClassAlt.cs" />
     <Compile Include="AttributesScanner.cs" />
     <Compile Include="AvtivityLogService.cs" />
+    <Compile Include="ConfirmAddNewUser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmAddNewUser.Designer.cs">
+      <DependentUpon>ConfirmAddNewUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="ConfirmAdminLeaveEntry.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -695,6 +701,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ConfirmAddLoan.resx">
       <DependentUpon>ConfirmAddLoan.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmAddNewUser.resx">
+      <DependentUpon>ConfirmAddNewUser.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ConfirmAdminLeaveEntry.resx">
       <DependentUpon>ConfirmAdminLeaveEntry.cs</DependentUpon>

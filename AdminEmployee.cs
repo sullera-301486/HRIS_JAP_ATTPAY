@@ -414,6 +414,7 @@ namespace HRIS_JAP_ATTPAY
                 labelFiltersName.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
                 labelAddEmployee.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 textBoxSearchEmployee.Font = AttributesClass.GetFont("Roboto-Light", 15f);
+                lblAddNewUser.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
             }
             catch (Exception ex)
             {
@@ -1127,6 +1128,13 @@ namespace HRIS_JAP_ATTPAY
             Form parentForm = this.FindForm();
             AdminArchives adminArchives = new AdminArchives();
             AttributesClass.ShowWithOverlay(parentForm, adminArchives);
+        }
+
+        private void lblAddNewUser_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            AddNewUser addNewUser = new AddNewUser();
+            AttributesClass.ShowWithOverlay(parentForm, addNewUser);
         }
     }
 
