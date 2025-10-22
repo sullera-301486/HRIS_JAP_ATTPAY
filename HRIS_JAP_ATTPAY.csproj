@@ -322,6 +322,12 @@
     <Compile Include="DeductionMatrix.Designer.cs">
       <DependentUpon>DeductionMatrix.cs</DependentUpon>
     </Compile>
+    <Compile Include="DeductionMatrixDetails.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DeductionMatrixDetails.Designer.cs">
+      <DependentUpon>DeductionMatrixDetails.cs</DependentUpon>
+    </Compile>
     <Compile Include="EditLeaveCredits.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -737,6 +743,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DeductionMatrix.resx">
       <DependentUpon>DeductionMatrix.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeductionMatrixDetails.resx">
+      <DependentUpon>DeductionMatrixDetails.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EditAttendance.resx">
       <DependentUpon>EditAttendance.cs</DependentUpon>

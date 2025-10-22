@@ -12,6 +12,8 @@ namespace HRIS_JAP_ATTPAY
 {
     public partial class DeductionMatrix : Form
     {
+        private AttributesClassAlt panelLoaderView;
+        private DeductionMatrixDetails deductionMatrixDetails;
         public DeductionMatrix()
         {
             InitializeComponent();
@@ -34,6 +36,13 @@ namespace HRIS_JAP_ATTPAY
             {
                 MessageBox.Show("Font load failed: " + ex.Message);
             }
+        }
+
+        private void DeductionMatrix_Load(object sender, EventArgs e)
+        {
+            panelLoaderView = new AttributesClassAlt(panelDeductionMatrix);
+            deductionMatrixDetails = new DeductionMatrixDetails();
+            panelLoaderView.LoadUserControl(deductionMatrixDetails);
         }
     }
 }
