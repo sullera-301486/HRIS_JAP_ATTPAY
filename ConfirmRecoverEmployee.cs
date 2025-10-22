@@ -35,7 +35,7 @@ namespace HRIS_JAP_ATTPAY
             // Update UI for single restoration
             if (!string.IsNullOrEmpty(empName))
             {
-                labelMessage.Text = $"Are you sure you want to restore {empName}?";
+                
             }
         }
 
@@ -46,9 +46,6 @@ namespace HRIS_JAP_ATTPAY
             setFont();
             this.employeeIds = empIds;
             this.isMultipleRestore = true;
-
-            // Update UI for multiple restoration
-            labelMessage.Text = $"Are you sure you want to restore {empIds.Count} employees?";
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
@@ -161,24 +158,56 @@ namespace HRIS_JAP_ATTPAY
                     archivedEmployee.employee_data = data.employee_data;
                 }
 
-                // Handle attendance_records
-                if (data.attendance_records != null)
+                // Handle employment_info
+                if (data.employment_info != null)
                 {
-                    archivedEmployee.attendance_records = new Dictionary<string, dynamic>();
-                    var attendanceJObject = data.attendance_records as JObject;
-                    if (attendanceJObject != null)
-                    {
-                        foreach (var prop in attendanceJObject.Properties())
-                        {
-                            archivedEmployee.attendance_records[prop.Name] = prop.Value;
-                        }
-                    }
+                    archivedEmployee.employment_info = data.employment_info;
                 }
 
                 // Handle leave_credits
                 if (data.leave_credits != null)
                 {
                     archivedEmployee.leave_credits = data.leave_credits;
+                }
+
+                // Handle attendance_records
+                if (data.attendance_records != null)
+                {
+                    archivedEmployee.attendance_records = new Dictionary<string, JObject>();
+                    var attendanceJObject = data.attendance_records as JObject;
+                    if (attendanceJObject != null)
+                    {
+                        foreach (var prop in attendanceJObject.Properties())
+                        {
+                            archivedEmployee.attendance_records[prop.Name] = prop.Value as JObject;
+                        }
+                    }
+                }
+
+                // Handle work_schedule
+                if (data.work_schedule != null)
+                {
+                    archivedEmployee.work_schedule = data.work_schedule as JArray;
+                }
+
+                // Handle user_data
+                if (data.user_data != null)
+                {
+                    archivedEmployee.user_data = data.user_data;
+                }
+
+                // Handle manage_leave_records
+                if (data.manage_leave_records != null)
+                {
+                    archivedEmployee.manage_leave_records = new Dictionary<string, JObject>();
+                    var leaveJObject = data.manage_leave_records as JObject;
+                    if (leaveJObject != null)
+                    {
+                        foreach (var prop in leaveJObject.Properties())
+                        {
+                            archivedEmployee.manage_leave_records[prop.Name] = prop.Value as JObject;
+                        }
+                    }
                 }
 
                 return archivedEmployee;
@@ -188,12 +217,11 @@ namespace HRIS_JAP_ATTPAY
                 throw new Exception($"Failed to convert archived data for {employeeId}: {ex.Message}", ex);
             }
         }
-
         private async Task RestoreEmployeeData(string empId, ArchivedEmployee archivedEmployee)
         {
             try
             {
-                // Restore employee data - convert JObject to Dictionary
+                // 1. Restore EmployeeDetails
                 if (archivedEmployee.employee_data != null)
                 {
                     var employeeDataDict = archivedEmployee.employee_data.ToObject<Dictionary<string, object>>();
@@ -203,7 +231,7 @@ namespace HRIS_JAP_ATTPAY
                         .PutAsync(employeeDataDict);
                 }
 
-                // Restore leave credits - convert JObject to Dictionary
+                // 2. Restore Leave Credits
                 if (archivedEmployee.leave_credits != null)
                 {
                     var leaveCreditsDict = archivedEmployee.leave_credits.ToObject<Dictionary<string, object>>();
@@ -213,25 +241,33 @@ namespace HRIS_JAP_ATTPAY
                         .PutAsync(leaveCreditsDict);
                 }
 
-                // Restore attendance records
+                // 3. Restore Attendance Records
                 if (archivedEmployee.attendance_records != null && archivedEmployee.attendance_records.Any())
                 {
                     foreach (var attendance in archivedEmployee.attendance_records)
                     {
-                        var attendanceDict = attendance.Value as JObject;
-                        if (attendanceDict != null)
-                        {
-                            var attendanceData = attendanceDict.ToObject<Dictionary<string, object>>();
-                            await firebase
-                                .Child("Attendance")
-                                .Child(attendance.Key)
-                                .PutAsync(attendanceData);
-                        }
+                        var attendanceDict = attendance.Value.ToObject<Dictionary<string, object>>();
+                        await firebase
+                            .Child("Attendance")
+                            .Child(attendance.Key)
+                            .PutAsync(attendance);
                     }
                 }
 
-                // Restore employment info
+                // 4. Restore Employment Info
                 await RestoreEmploymentInfo(empId, archivedEmployee);
+
+                // 5. Restore Work Schedule (if exists in archive)
+                await RestoreWorkSchedule(empId, archivedEmployee);
+
+                // 6. Restore User Account (if exists in archive)
+                await RestoreUserAccount(empId, archivedEmployee);
+
+                // 7. Restore Leave Records (if exists in archive)
+                await RestoreManageLeaveRecords(empId, archivedEmployee);
+
+                // 8. Restore Loan Data (if exists in archive)
+                await RestoreEmployeeLoans(empId, archivedEmployee);
             }
             catch (Exception ex)
             {
@@ -268,13 +304,15 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                // Get current EmploymentInfo
+                // Get current EmploymentInfo list
                 var employmentInfo = await firebase
                     .Child("EmploymentInfo")
                     .OnceAsync<dynamic>();
 
                 // Check if employee already exists in EmploymentInfo
                 bool exists = false;
+                string existingKey = null;
+
                 foreach (var item in employmentInfo)
                 {
                     if (item.Object != null)
@@ -283,57 +321,144 @@ namespace HRIS_JAP_ATTPAY
                         if (employeeIdProperty != null && employeeIdProperty.ToString() == empId)
                         {
                             exists = true;
+                            existingKey = item.Key;
                             break;
                         }
                     }
                 }
 
-                if (!exists)
+                if (exists && !string.IsNullOrEmpty(existingKey))
                 {
-                    // Find the next available index
-                    int maxIndex = 0;
-                    foreach (var item in employmentInfo)
+                    // Update existing employment info
+                    var employmentData = await GetEmploymentInfoFromArchive(archivedEmployee);
+                    if (employmentData != null)
                     {
-                        if (int.TryParse(item.Key, out int index) && index > maxIndex)
-                        {
-                            maxIndex = index;
-                        }
+                        await firebase
+                            .Child("EmploymentInfo")
+                            .Child(existingKey)
+                            .PutAsync(employmentData);
                     }
-
-                    // Get department and position from leave_credits JObject
-                    string department = "Not Assigned";
-                    string position = "Not Assigned";
-
-                    if (archivedEmployee.leave_credits != null)
-                    {
-                        var leaveCreditsDict = archivedEmployee.leave_credits.ToObject<Dictionary<string, object>>();
-                        department = leaveCreditsDict.ContainsKey("department") ? leaveCreditsDict["department"]?.ToString() : "Not Assigned";
-                        position = leaveCreditsDict.ContainsKey("position") ? leaveCreditsDict["position"]?.ToString() : "Not Assigned";
-                    }
-
-                    // Create new employment info
-                    var newEmploymentInfo = new Dictionary<string, object>
-            {
-                { "employee_id", empId },
-                { "department", department },
-                { "position", position },
-                { "contract_type", "" },
-                { "created_at", DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt") },
-                { "date_of_joining", "" },
-                { "date_of_exit", "" },
-                { "manager_name", "" }
-            };
-
-                    await firebase
-                        .Child("EmploymentInfo")
-                        .Child((maxIndex + 1).ToString())
-                        .PutAsync(newEmploymentInfo);
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Warning: Failed to restore employment info for {empId}: {ex.Message}");
-                // Don't throw here as employment info restoration is secondary
+            }
+        }
+
+        private async Task<Dictionary<string, object>> GetEmploymentInfoFromArchive(ArchivedEmployee archivedEmployee)
+        {
+            try
+            {
+                if (archivedEmployee.employment_info != null)
+                {
+                    return archivedEmployee.employment_info.ToObject<Dictionary<string, object>>();
+                }
+
+                // Fallback: Create from available data
+                string department = "Not Assigned";
+                string position = "Not Assigned";
+
+                if (archivedEmployee.leave_credits != null)
+                {
+                    var leaveCreditsDict = archivedEmployee.leave_credits.ToObject<Dictionary<string, object>>();
+                    department = leaveCreditsDict.ContainsKey("department") ?
+                        leaveCreditsDict["department"]?.ToString() : "Not Assigned";
+                    position = leaveCreditsDict.ContainsKey("position") ?
+                        leaveCreditsDict["position"]?.ToString() : "Not Assigned";
+                }
+
+                return new Dictionary<string, object>
+        {
+            { "employee_id", archivedEmployee.employee_data?["employee_id"]?.ToString() ?? "" },
+            { "department", department },
+            { "position", position },
+            { "contract_type", archivedEmployee.employment_info?["contract_type"]?.ToString() ?? "" },
+            { "created_at", DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt") },
+            { "date_of_joining", archivedEmployee.employment_info?["date_of_joining"]?.ToString() ?? "" },
+            { "date_of_exit", archivedEmployee.employment_info?["date_of_exit"]?.ToString() ?? "" },
+            { "manager_name", archivedEmployee.employment_info?["manager_name"]?.ToString() ?? "" }
+        };
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting employment info from archive: {ex.Message}");
+                return null;
+            }
+        }
+        private async Task RestoreWorkSchedule(string empId, ArchivedEmployee archivedEmployee)
+        {
+            try
+            {
+                if (archivedEmployee.work_schedule != null)
+                {
+                    var workSchedules = archivedEmployee.work_schedule as JArray;
+                    if (workSchedules != null)
+                    {
+                        // Get current work schedules
+                        var currentSchedules = await firebase
+                            .Child("Work_Schedule")
+                            .OnceAsync<dynamic>();
+
+                        // Remove existing schedules for this employee
+                        foreach (var schedule in currentSchedules)
+                        {
+                            if (schedule.Object != null && schedule.Object.employee_id?.ToString() == empId)
+                            {
+                                await firebase
+                                    .Child("Work_Schedule")
+                                    .Child(schedule.Key)
+                                    .DeleteAsync();
+                            }
+                        }
+
+                        // Restore archived schedules
+                        foreach (var schedule in workSchedules)
+                        {
+                            var scheduleDict = schedule.ToObject<Dictionary<string, object>>();
+                            await firebase
+                                .Child("Work_Schedule")
+                                .PostAsync(scheduleDict);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Warning: Failed to restore work schedule for {empId}: {ex.Message}");
+            }
+        }
+        private async Task RestoreUserAccount(string empId, ArchivedEmployee archivedEmployee)
+        {
+            try
+            {
+                if (archivedEmployee.user_data != null)
+                {
+                    var userDataDict = archivedEmployee.user_data.ToObject<Dictionary<string, object>>();
+                    var userId = userDataDict["user_id"]?.ToString();
+
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        // Check if user already exists
+                        var existingUser = await firebase
+                            .Child("Users")
+                            .Child(userId)
+                            .OnceSingleAsync<dynamic>();
+
+                        if (existingUser == null)
+                        {
+                            // Restore user account
+                            await firebase
+                                .Child("Users")
+                                .Child(userId)
+                                .PutAsync(userDataDict);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Warning: Failed to restore user account for {empId}: {ex.Message}");
             }
         }
 
@@ -377,5 +502,40 @@ namespace HRIS_JAP_ATTPAY
                 System.Diagnostics.Debug.WriteLine($"Error logging restoration: {ex.Message}");
             }
         }
+        private async Task RestoreManageLeaveRecords(string empId, ArchivedEmployee archivedEmployee)
+        {
+            try
+            {
+                if (archivedEmployee.manage_leave_records != null && archivedEmployee.manage_leave_records.Any())
+                {
+                    foreach (var leaveRecord in archivedEmployee.manage_leave_records)
+                    {
+                        var leaveRecordDict = leaveRecord.Value.ToObject<Dictionary<string, object>>();
+                        await firebase
+                            .Child("ManageLeave")
+                            .Child(leaveRecord.Key)
+                            .PutAsync(leaveRecordDict);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Warning: Failed to restore leave records for {empId}: {ex.Message}");
+            }
+        }
+
+        private async Task RestoreEmployeeLoans(string empId, ArchivedEmployee archivedEmployee)
+        {
+            try
+            {
+                // This would need to handle loan data restoration based on your archive structure
+                // Similar pattern to other restoration methods
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Warning: Failed to restore loans for {empId}: {ex.Message}");
+            }
+        }
+
     }
 }

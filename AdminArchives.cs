@@ -415,14 +415,21 @@ namespace HRIS_JAP_ATTPAY
         {
             LoadArchivedEmployees();
         }
+
     }
     public class ArchivedEmployee
     {
         public string archived_by { get; set; }
         public string archived_date { get; set; }
         public JObject employee_data { get; set; }
-        public Dictionary<string, dynamic> attendance_records { get; set; }
+        public JObject employment_info { get; set; }
         public JObject leave_credits { get; set; }
+        public Dictionary<string, JObject> attendance_records { get; set; }
+        public JArray work_schedule { get; set; }
+        public JObject user_data { get; set; }
+        public Dictionary<string, JObject> manage_leave_records { get; set; }
         public bool is_archived { get; set; }
+
+        // Add any other fields that exist in your archive structure
     }
 }

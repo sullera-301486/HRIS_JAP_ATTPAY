@@ -27,6 +27,7 @@ namespace HRIS_JAP_ATTPAY
             firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
             InitializeDepartmentComboBox();
             InitializeOtherComboBoxes();
+            InitializeOptionalDateFields(); // Add this line
             UpdateAlternateTextboxAccessibility();
         }
 
@@ -472,6 +473,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
+
         private async void AddNewEmployee_Load(object sender, EventArgs e)
         {
             await GenerateNextEmployeeId();
@@ -715,7 +717,8 @@ namespace HRIS_JAP_ATTPAY
                 string department = comboBoxDepartment.Text.Trim();
                 string contractType = cbContractType.SelectedItem?.ToString() ?? "";
                 string dateOfJoining = dtpDateStarted.Value.ToString("yyyy-MM-dd");
-                string dateOfExit = dtpDatePeriod.Value.ToString("yyyy-MM-dd");
+                // Set date_of_exit to null instead of using the DateTimePicker value
+                string dateOfExit = ""; // This will be stored as empty string in Firebase
                 string managerName = cbManager.SelectedItem?.ToString() ?? "";
 
                 string rfidTag = !string.IsNullOrEmpty(labelRFIDTagInput.Text) && labelRFIDTagInput.Text != "Scan RFID Tag"
@@ -754,28 +757,129 @@ namespace HRIS_JAP_ATTPAY
                     position = position,
                     manager_name = managerName,
                     date_of_joining = dateOfJoining,
-                    date_of_exit = dateOfExit,
+                    date_of_exit = dateOfExit, // This will be empty string (null equivalent in Firebase)
                     created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
                 };
 
+                // ✅ STEP 1: Add basic employee data
                 await firebase.Child("EmployeeDetails").Child(employeeId).PutAsync(employeeDetailsObj);
                 await firebase.Child("EmploymentInfo").Child(employmentId).PutAsync(employmentInfoObj);
 
+                // ✅ STEP 2: Add work schedules
                 await AddWorkSchedulesAsync(employeeId);
 
-                // ✅ ADD LEAVE CREDITS SECTION
+                // ✅ STEP 3: Add leave credits
                 await CreateDefaultLeaveCredits(employeeId, fullName);
 
-                // ✅ ADD ADMIN LOG FOR EMPLOYEE CREATION
+                // ✅ STEP 4: ADD PAYROLL DATA
+                await CreateBasePayrollData(employeeId, fullName, department, position);
+                await CreateBaseEmployeeDeductions(employeeId);
+                await CreateBaseGovernmentDeductions(employeeId);
+
+                // ✅ STEP 5: Add admin log
                 await AddAdminLog("Employee Created", employeeId, fullName, $"{fullName} added new employee: {fullName}");
 
-                MessageBox.Show("Employee successfully added to Firebase.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Employee successfully added to Firebase with complete payroll setup.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.Close();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error adding employee to Firebase: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+        // ✅ CREATE BASE GOVERNMENT DEDUCTIONS METHOD
+        private async Task CreateBaseGovernmentDeductions(string employeeId)
+        {
+            try
+            {
+                int nextArrayIndex = await GetNextGovernmentDeductionArrayIndex();
+                int nextGovDeductionId = await GetNextGovernmentDeductionId();
+
+                var governmentDeductionsObj = new
+                {
+                    gov_deduction_id = nextGovDeductionId.ToString(),
+                    last_updated = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt"),
+                    pagibig = "0.0",
+                    payroll_id = nextGovDeductionId.ToString(),
+                    philhealth = "0.0",
+                    sss = "0.0",
+                    total_gov_deductions = "0.0",
+                    withholding_tax = "0.0"
+                };
+
+                await AddToGovernmentDeductionsArray(nextArrayIndex, governmentDeductionsObj);
+                Console.WriteLine($"✅ Base government deductions created for {employeeId}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error creating base government deductions: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // ✅ HELPER METHOD TO GET NEXT GOVERNMENT DEDUCTION ARRAY INDEX
+        private async Task<int> GetNextGovernmentDeductionArrayIndex()
+        {
+            try
+            {
+                var govDeductions = await firebase
+                    .Child("GovernmentDeductions")
+                    .OnceAsync<dynamic>();
+
+                // Find the highest array index
+                int maxIndex = 0;
+                foreach (var deduction in govDeductions)
+                {
+                    if (int.TryParse(deduction.Key, out int index))
+                    {
+                        if (index > maxIndex) maxIndex = index;
+                    }
+                }
+                return maxIndex + 1;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting next government deduction array index: {ex.Message}");
+                return 3; // Based on your JSON, highest index is 2 (0=null, 1, 2, 3)
+            }
+        }
+
+        // ✅ HELPER METHOD TO GET NEXT GOVERNMENT DEDUCTION ID
+        private async Task<int> GetNextGovernmentDeductionId()
+        {
+            try
+            {
+                var govDeductions = await firebase
+                    .Child("GovernmentDeductions")
+                    .OnceAsync<dynamic>();
+
+                int maxId = 0;
+                foreach (var deduction in govDeductions)
+                {
+                    if (deduction.Object != null && deduction.Object.gov_deduction_id != null)
+                    {
+                        if (int.TryParse(deduction.Object.gov_deduction_id.ToString(), out int id))
+                        {
+                            if (id > maxId) maxId = id;
+                        }
+                    }
+                }
+                return maxId + 1;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting next government deduction ID: {ex.Message}");
+                return 4; // Based on your JSON, highest is 3
+            }
+        }
+
+        // ✅ HELPER METHOD TO ADD TO GOVERNMENT DEDUCTIONS ARRAY
+        private async Task AddToGovernmentDeductionsArray(int index, object govDeductionsObj)
+        {
+            await firebase
+                .Child("GovernmentDeductions")
+                .Child(index.ToString())
+                .PutAsync(govDeductionsObj);
         }
 
         // ✅ ADD ADMIN LOG METHOD
@@ -1258,6 +1362,8 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
+
+
                 // Extract numbers from archived employees
                 foreach (var emp in archivedEmployees)
                 {
@@ -1285,6 +1391,247 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
+        // ✅ CREATE BASE PAYROLL DATA METHOD - FIXED FOR EXACT ARRAY FORMAT
+        private async Task CreateBasePayrollData(string employeeId, string fullName, string department, string position)
+        {
+            try
+            {
+                // Get next array index and IDs
+                int nextPayrollArrayIndex = await GetNextPayrollArrayIndex();
+                int nextPayrollId = await GetNextPayrollId();
+
+                // Create base payroll record
+                var payrollObj = new
+                {
+                    created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt"),
+                    cutoff_end = DateTime.Now.ToString("yyyy-MM-dd"),
+                    cutoff_start = DateTime.Now.AddDays(-15).ToString("yyyy-MM-dd"),
+                    employee_id = employeeId,
+                    last_updated = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt"),
+                    net_pay = 0,
+                    payroll_id = nextPayrollId.ToString()
+                };
+
+                // Create base payroll earnings
+                var payrollEarningsObj = new
+                {
+                    basic_pay = "0.0",
+                    commission = "0.0",
+                    communication = "0.0",
+                    daily_rate = "0",
+                    days_present = "0",
+                    earning_id = nextPayrollId.ToString(),
+                    food_allowance = "0.0",
+                    gas_allowance = "0.0",
+                    gondola = "0.0",
+                    incentives = "0.0",
+                    last_updated = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt"),
+                    overtime_pay = "0.0",
+                    payroll_id = nextPayrollId.ToString(),
+                    total_earnings = "0.0"
+                };
+
+                // Create base payroll summary
+                var payrollSummaryObj = new
+                {
+                    gross_pay = "0.00",
+                    last_updated = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt"),
+                    net_pay = "0.00",
+                    payroll_id = nextPayrollId.ToString(),
+                    summary_id = nextPayrollId.ToString(),
+                    total_deductions = "0.00"
+                };
+
+                // Add to arrays using exact indices
+                await AddToPayrollArray(nextPayrollArrayIndex, payrollObj);
+                await AddToPayrollEarningsArray(nextPayrollArrayIndex, payrollEarningsObj);
+                await AddToPayrollSummaryArray(nextPayrollArrayIndex, payrollSummaryObj);
+
+                Console.WriteLine($"✅ Base payroll data created for {employeeId}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error creating base payroll data: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // ✅ UPDATED HELPER METHODS FOR EXACT ARRAY FORMAT
+
+        private async Task<int> GetNextPayrollArrayIndex()
+        {
+            try
+            {
+                var payrolls = await firebase
+                    .Child("Payroll")
+                    .OnceAsync<dynamic>();
+
+                // Find the highest array index (not payroll_id)
+                int maxIndex = 0;
+                foreach (var payroll in payrolls)
+                {
+                    if (int.TryParse(payroll.Key, out int index))
+                    {
+                        if (index > maxIndex) maxIndex = index;
+                    }
+                }
+                return maxIndex + 1;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting next payroll array index: {ex.Message}");
+                return 4; // Based on your JSON, highest index is 3
+            }
+        }
+
+        private async Task<int> GetNextPayrollId()
+        {
+            try
+            {
+                var payrolls = await firebase
+                    .Child("Payroll")
+                    .OnceAsync<dynamic>();
+
+                // Find the highest payroll_id
+                int maxId = 0;
+                foreach (var payroll in payrolls)
+                {
+                    if (payroll.Object != null && payroll.Object.payroll_id != null)
+                    {
+                        if (int.TryParse(payroll.Object.payroll_id.ToString(), out int id))
+                        {
+                            if (id > maxId) maxId = id;
+                        }
+                    }
+                }
+                return maxId + 1;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting next payroll ID: {ex.Message}");
+                return 4; // Based on your JSON, highest is 3
+            }
+        }
+
+        // ✅ UPDATED ARRAY MANAGEMENT METHODS - USING EXPLICIT INDICES
+
+        private async Task AddToPayrollArray(int index, object payrollObj)
+        {
+            await firebase
+                .Child("Payroll")
+                .Child(index.ToString())
+                .PutAsync(payrollObj);
+        }
+
+        private async Task AddToPayrollEarningsArray(int index, object earningsObj)
+        {
+            await firebase
+                .Child("PayrollEarnings")
+                .Child(index.ToString())
+                .PutAsync(earningsObj);
+        }
+
+        private async Task AddToPayrollSummaryArray(int index, object summaryObj)
+        {
+            await firebase
+                .Child("PayrollSummary")
+                .Child(index.ToString())
+                .PutAsync(summaryObj);
+        }
+
+        // ✅ SIMILAR UPDATES FOR DEDUCTIONS ARRAYS
+
+        private async Task<int> GetNextEmployeeDeductionArrayIndex()
+        {
+            try
+            {
+                var deductions = await firebase
+                    .Child("EmployeeDeductions")
+                    .OnceAsync<dynamic>();
+
+                int maxIndex = 0;
+                foreach (var deduction in deductions)
+                {
+                    if (int.TryParse(deduction.Key, out int index))
+                    {
+                        if (index > maxIndex) maxIndex = index;
+                    }
+                }
+                return maxIndex + 1;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting next deduction array index: {ex.Message}");
+                return 3; // Based on your JSON, highest index is 2
+            }
+        }
+
+        private async Task<int> GetNextEmployeeDeductionId()
+        {
+            try
+            {
+                var deductions = await firebase
+                    .Child("EmployeeDeductions")
+                    .OnceAsync<dynamic>();
+
+                int maxId = 0;
+                foreach (var deduction in deductions)
+                {
+                    if (deduction.Object != null && deduction.Object.deduction_id != null)
+                    {
+                        if (int.TryParse(deduction.Object.deduction_id.ToString(), out int id))
+                        {
+                            if (id > maxId) maxId = id;
+                        }
+                    }
+                }
+                return maxId + 1;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting next deduction ID: {ex.Message}");
+                return 4; // Based on your JSON, highest is 3
+            }
+        }
+
+        private async Task AddToEmployeeDeductionsArray(int index, object deductionsObj)
+        {
+            await firebase
+                .Child("EmployeeDeductions")
+                .Child(index.ToString())
+                .PutAsync(deductionsObj);
+        }
+
+        // Update the CreateBaseEmployeeDeductions method to use array indices
+        private async Task CreateBaseEmployeeDeductions(string employeeId)
+        {
+            try
+            {
+                int nextArrayIndex = await GetNextEmployeeDeductionArrayIndex();
+                int nextDeductionId = await GetNextEmployeeDeductionId();
+
+                var employeeDeductionsObj = new
+                {
+                    cash_advance = 0,
+                    coop_contribution = 0,
+                    created_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    deduction_id = nextDeductionId.ToString(),
+                    employee_id = employeeId,
+                    last_updated = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    other_deductions = 0,
+                    payroll_id = nextDeductionId.ToString()
+                };
+
+                await AddToEmployeeDeductionsArray(nextArrayIndex, employeeDeductionsObj);
+                Console.WriteLine($"✅ Base employee deductions created for {employeeId}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error creating base employee deductions: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private async Task CreateScheduleArrayEntry(int arrayIndex, int scheduleId, string employeeId, string dayOfWeek, string startTime, string endTime, string scheduleType)
         {
             var scheduleObj = new
@@ -1302,6 +1649,21 @@ namespace HRIS_JAP_ATTPAY
                 .Child("Work_Schedule")
                 .Child(arrayIndex.ToString())
                 .PutAsync(scheduleObj);
+        }
+        // Add this method to handle optional date of exit
+        private void InitializeOptionalDateFields()
+        {
+            // You could add a checkbox like "Set End Date" that enables/disables the date picker
+            // Or simply set the dtpDatePeriod to a default null state
+            dtpDatePeriod.Format = DateTimePickerFormat.Custom;
+            dtpDatePeriod.CustomFormat = " "; // Empty space to show as blank
+            dtpDatePeriod.ValueChanged += (s, e) =>
+            {
+                if (dtpDatePeriod.Value != dtpDatePeriod.MinDate)
+                {
+                    dtpDatePeriod.CustomFormat = "yyyy-MM-dd";
+                }
+            };
         }
     }
 }
