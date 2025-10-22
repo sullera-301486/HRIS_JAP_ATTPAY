@@ -35,9 +35,9 @@ namespace HRIS_JAP_ATTPAY
 
             // Initialize sorting options with only A-Z and Z-A based on first name
             InitializeSortingOptions();
+            InitializeDateRangeSelectors();
 
-            // ADD THIS: Initialize bi-monthly range
-            InitializeBiMonthlyRange();
+
         }
 
         private void XpictureBox_Click(object sender, EventArgs e)
@@ -78,7 +78,8 @@ namespace HRIS_JAP_ATTPAY
                 checkBoxLate.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 checkBoxOneHour.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 checkBoxPresent.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                dtpCutOffSelector.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                dtpCutOffSelector1.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                dtpCutOffSelector2.Font = AttributesClass.GetFont("Roboto-Light", 12f);
             }
             catch (Exception ex)
             {
@@ -275,8 +276,7 @@ namespace HRIS_JAP_ATTPAY
 
         private void buttonApply_Click(object sender, EventArgs e)
         {
-            // Check if user actually selected a cut-off date (format changed from blank)
-            bool hasCutOffDate = dtpCutOffSelector.CustomFormat != " ";
+            bool hasDateRange = dtpCutOffSelector1.CustomFormat != " " && dtpCutOffSelector2.CustomFormat != " ";
 
             var filters = new AttendanceFilterCriteria
             {
@@ -302,13 +302,13 @@ namespace HRIS_JAP_ATTPAY
                 OvertimeOneHour = checkBoxOneHour.Checked,
                 OvertimeTwoHoursPlus = checkBoxAboveTwoHours.Checked,
 
-                // Cut-off date - ONLY set if user selected one
-                UseCutOffDate = hasCutOffDate,
-                CutOffDate = hasCutOffDate ? (DateTime?)dtpCutOffSelector.Value : null,
-                IsFirstHalf = hasCutOffDate && dtpCutOffSelector.Value.Day <= 15
+                // Date range - ONLY set if both dates are selected
+                UseDateRange = hasDateRange,
+                StartDate = hasDateRange ? (DateTime?)dtpCutOffSelector1.Value : null,
+                EndDate = hasDateRange ? (DateTime?)dtpCutOffSelector2.Value : null
             };
 
-            System.Diagnostics.Debug.WriteLine($"Filter Apply: UseCutOffDate = {filters.UseCutOffDate}, CutOffDate = {filters.CutOffDate}");
+            System.Diagnostics.Debug.WriteLine($"Filter Apply: UseDateRange = {filters.UseDateRange}, StartDate = {filters.StartDate}, EndDate = {filters.EndDate}");
             FiltersApplied?.Invoke(filters);
             this.Close();
         }
@@ -342,9 +342,9 @@ namespace HRIS_JAP_ATTPAY
             checkBoxAboveTwoHours.Checked = false;
 
             // Reset DateTimePicker back to blank
-            dtpCutOffSelector.Format = DateTimePickerFormat.Custom;
-            dtpCutOffSelector.CustomFormat = " ";
-            dtpCutOffSelector.Value = DateTime.Today;
+            dtpCutOffSelector1.Format = DateTimePickerFormat.Custom;
+            dtpCutOffSelector1.CustomFormat = " ";
+            dtpCutOffSelector1.Value = DateTime.Today;
 
             FiltersReset?.Invoke();
             this.Close();
@@ -363,22 +363,55 @@ namespace HRIS_JAP_ATTPAY
 
             // Don't set default selection - let it be empty initially
         }
-        private void InitializeBiMonthlyRange()
+        private void InitializeDateRangeSelectors()
         {
-            // Leave the DateTimePicker empty/null by default
-            dtpCutOffSelector.Format = DateTimePickerFormat.Custom;
-            dtpCutOffSelector.CustomFormat = " "; // Shows as blank
-            dtpCutOffSelector.Value = DateTime.Today;
+            // Initialize both date pickers as blank
+            ResetDatePicker(dtpCutOffSelector1);
+            ResetDatePicker(dtpCutOffSelector2);
 
-            // Show date format when user clicks/selects
-            dtpCutOffSelector.ValueChanged += (s, e) => {
-                if (dtpCutOffSelector.Focused || dtpCutOffSelector.CustomFormat == " ")
-                {
-                    dtpCutOffSelector.Format = DateTimePickerFormat.Custom;
-                    dtpCutOffSelector.CustomFormat = "yyyy-MM-dd";
-                }
-            };
+            // Add event handlers for when user selects dates
+            dtpCutOffSelector1.ValueChanged += DtpCutOffSelector_ValueChanged;
+            dtpCutOffSelector2.ValueChanged += DtpCutOffSelector_ValueChanged;
         }
+        private void DtpCutOffSelector_ValueChanged(object sender, EventArgs e)
+        {
+            var picker = sender as DateTimePicker;
+            if (picker != null && (picker.Focused || picker.CustomFormat == " "))
+            {
+                picker.Format = DateTimePickerFormat.Custom;
+                picker.CustomFormat = "yyyy-MM-dd";
+            }
+        }
+        private void ResetDatePicker(DateTimePicker picker)
+        {
+            picker.Format = DateTimePickerFormat.Custom;
+            picker.CustomFormat = " "; // Shows as blank
+            picker.Value = DateTime.Today;
+        }
+        private void dtpCutOffSelector2_ValueChanged(object sender, EventArgs e)
+        {
+            // Validation: Ensure end date is not before start date
+            if (dtpCutOffSelector1.CustomFormat != " " && dtpCutOffSelector2.CustomFormat != " ")
+            {
+                if (dtpCutOffSelector2.Value < dtpCutOffSelector1.Value)
+                {
+                    MessageBox.Show("End date cannot be before start date.", "Invalid Date Range", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    dtpCutOffSelector2.Value = dtpCutOffSelector1.Value;
+                }
+            }
+        }
+        private void dtpCutOffSelector1_ValueChanged(object sender, EventArgs e)
+        {
+            // If start date changes and end date is before it, adjust end date
+            if (dtpCutOffSelector1.CustomFormat != " " && dtpCutOffSelector2.CustomFormat != " ")
+            {
+                if (dtpCutOffSelector2.Value < dtpCutOffSelector1.Value)
+                {
+                    dtpCutOffSelector2.Value = dtpCutOffSelector1.Value;
+                }
+            }
+        }
+
     }
 
     // Filter criteria class for attendance
@@ -409,6 +442,9 @@ namespace HRIS_JAP_ATTPAY
         public bool UseCutOffDate { get; set; } = false;
         public DateTime? CutOffDate { get; set; } = null;
         public bool IsFirstHalf { get; set; } = true;
+        public bool UseDateRange { get; set; } = false;
+        public DateTime? StartDate { get; set; } = null;
+        public DateTime? EndDate { get; set; } = null;
     }
     public class AttendanceRowData
     {

@@ -58,8 +58,9 @@
             this.checkBoxAboveTwoHours = new System.Windows.Forms.CheckBox();
             this.buttonApply = new System.Windows.Forms.Button();
             this.buttonReset = new System.Windows.Forms.Button();
-            this.dtpCutOffSelector = new System.Windows.Forms.DateTimePicker();
+            this.dtpCutOffSelector1 = new System.Windows.Forms.DateTimePicker();
             this.labelDateCutoff = new System.Windows.Forms.Label();
+            this.dtpCutOffSelector2 = new System.Windows.Forms.DateTimePicker();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSortLogo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
             this.SuspendLayout();
@@ -453,23 +454,30 @@
             this.buttonReset.UseVisualStyleBackColor = false;
             this.buttonReset.Click += new System.EventHandler(this.buttonReset_Click);
             // 
-            // dtpCutOffSelector
+            // dtpCutOffSelector1
             // 
-            this.dtpCutOffSelector.Location = new System.Drawing.Point(202, 76);
-            this.dtpCutOffSelector.Name = "dtpCutOffSelector";
-            this.dtpCutOffSelector.Size = new System.Drawing.Size(250, 22);
-            this.dtpCutOffSelector.TabIndex = 51;
+            this.dtpCutOffSelector1.Location = new System.Drawing.Point(36, 78);
+            this.dtpCutOffSelector1.Name = "dtpCutOffSelector1";
+            this.dtpCutOffSelector1.Size = new System.Drawing.Size(197, 22);
+            this.dtpCutOffSelector1.TabIndex = 51;
             // 
             // labelDateCutoff
             // 
             this.labelDateCutoff.AutoSize = true;
             this.labelDateCutoff.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelDateCutoff.Location = new System.Drawing.Point(32, 76);
+            this.labelDateCutoff.Location = new System.Drawing.Point(32, 50);
             this.labelDateCutoff.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelDateCutoff.Name = "labelDateCutoff";
-            this.labelDateCutoff.Size = new System.Drawing.Size(121, 25);
+            this.labelDateCutoff.Size = new System.Drawing.Size(125, 25);
             this.labelDateCutoff.TabIndex = 52;
-            this.labelDateCutoff.Text = "Date Cutoff";
+            this.labelDateCutoff.Text = "Date Range";
+            // 
+            // dtpCutOffSelector2
+            // 
+            this.dtpCutOffSelector2.Location = new System.Drawing.Point(255, 78);
+            this.dtpCutOffSelector2.Name = "dtpCutOffSelector2";
+            this.dtpCutOffSelector2.Size = new System.Drawing.Size(197, 22);
+            this.dtpCutOffSelector2.TabIndex = 53;
             // 
             // FilterAdminAttendance
             // 
@@ -477,8 +485,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(493, 661);
+            this.Controls.Add(this.dtpCutOffSelector2);
             this.Controls.Add(this.labelDateCutoff);
-            this.Controls.Add(this.dtpCutOffSelector);
+            this.Controls.Add(this.dtpCutOffSelector1);
             this.Controls.Add(this.buttonReset);
             this.Controls.Add(this.buttonApply);
             this.Controls.Add(this.checkBoxAboveTwoHours);
@@ -553,7 +562,8 @@
         private System.Windows.Forms.CheckBox checkBoxAboveTwoHours;
         private System.Windows.Forms.Button buttonApply;
         private System.Windows.Forms.Button buttonReset;
-        private System.Windows.Forms.DateTimePicker dtpCutOffSelector;
+        private System.Windows.Forms.DateTimePicker dtpCutOffSelector1;
         private System.Windows.Forms.Label labelDateCutoff;
+        private System.Windows.Forms.DateTimePicker dtpCutOffSelector2;
     }
 }

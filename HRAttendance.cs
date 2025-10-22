@@ -24,18 +24,13 @@ namespace HRIS_JAP_ATTPAY
         private Dictionary<string, (string Department, string Position)> employeeDepartmentMap = new Dictionary<string, (string Department, string Position)>();
         private Dictionary<int, string> attendanceKeyMap = new Dictionary<int, string>();
         private Dictionary<string, List<EmployeeSchedule>> employeeSchedules = new Dictionary<string, List<EmployeeSchedule>>();
-        private List<AttendanceRowData> allAttendanceData = new List<AttendanceRowData>();  
+        private List<AttendanceRowData> allAttendanceData = new List<AttendanceRowData>();
         private bool isLoading = false;
-
 
         public HRAttendance()
         {
             InitializeComponent();
 
-            // REMOVE: ComboBox event handlers
-            // comboBoxSelectDate.SelectedIndexChanged -= comboBoxSelectDate_SelectedIndexChanged;
-
-            // ADD: DateTimePicker event handler
             dtpSingleDateSelector.ValueChanged -= dtpSingleDateSelector_ValueChanged;
             dtpSingleDateSelector.ValueChanged += dtpSingleDateSelector_ValueChanged;
 
@@ -53,7 +48,7 @@ namespace HRIS_JAP_ATTPAY
         {
             currentAttendanceFilters = new AttendanceFilterCriteria();
             await LoadEmployeeDepartmentMap();
-            InitializeDateSelector(); 
+            InitializeDateSelector();
         }
 
         private async Task LoadEmployeeDepartmentMap()
@@ -68,29 +63,30 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // FILTER HANDLERS
+        // ========== EXACT COPY FROM ADMINATTENDANCE FILTER METHODS ==========
+
         private void ApplyAttendanceFilters(AttendanceFilterCriteria filters)
         {
-            System.Diagnostics.Debug.WriteLine($"HR ApplyAttendanceFilters called with SortBy: '{filters?.SortBy}', UseCutOffDate: {filters?.UseCutOffDate}");
+            System.Diagnostics.Debug.WriteLine($"ApplyAttendanceFilters called with SortBy: '{filters?.SortBy}', UseDateRange: {filters?.UseDateRange}");
             currentAttendanceFilters = filters ?? new AttendanceFilterCriteria();
 
-            // CRITICAL: If cut-off date is selected in filter, reload ALL data with date range
-            if (currentAttendanceFilters.UseCutOffDate && currentAttendanceFilters.CutOffDate.HasValue)
+            // CRITICAL: If date range is selected in filter, reload ALL data with date range
+            if (currentAttendanceFilters.UseDateRange && currentAttendanceFilters.StartDate.HasValue && currentAttendanceFilters.EndDate.HasValue)
             {
-                System.Diagnostics.Debug.WriteLine($"HR Loading with cut-off date range: {currentAttendanceFilters.CutOffDate.Value}, First Half: {currentAttendanceFilters.IsFirstHalf}");
-                LoadFirebaseAttendanceData(null); // null = use cut-off range instead of single date
+                System.Diagnostics.Debug.WriteLine($"Loading with date range: {currentAttendanceFilters.StartDate.Value} to {currentAttendanceFilters.EndDate.Value}");
+                LoadFirebaseAttendanceData(null); // null = use date range instead of single date
             }
             else
             {
-                // No cut-off date filter, just apply filters to currently loaded data (single date remains active)
-                System.Diagnostics.Debug.WriteLine("HR No cut-off date, applying filters to current view with single date selector");
+                // No date range filter, just apply filters to currently loaded data (single date remains active)
+                System.Diagnostics.Debug.WriteLine("No date range, applying filters to current view with single date selector");
                 ApplyAllAttendanceFilters();
             }
         }
 
         private void ResetAttendanceFilters()
         {
-            System.Diagnostics.Debug.WriteLine("=== HR RESETTING FILTERS ===");
+            System.Diagnostics.Debug.WriteLine("=== RESETTING FILTERS ===");
 
             // Reset the filter criteria
             currentAttendanceFilters = new AttendanceFilterCriteria();
@@ -114,7 +110,7 @@ namespace HRIS_JAP_ATTPAY
             // Reload the Firebase data with the CURRENT date selection (single date selector takes priority)
             LoadFirebaseAttendanceData(selectedDate);
 
-            System.Diagnostics.Debug.WriteLine("=== HR FILTERS RESET COMPLETE ===");
+            System.Diagnostics.Debug.WriteLine("=== FILTERS RESET COMPLETE ===");
         }
 
         private void ApplyAllAttendanceFilters()
@@ -131,7 +127,7 @@ namespace HRIS_JAP_ATTPAY
                     searchText = "";
                 }
 
-                System.Diagnostics.Debug.WriteLine($"HR ApplyAllAttendanceFilters: SearchText='{searchText}', SortBy='{currentAttendanceFilters?.SortBy}'");
+                System.Diagnostics.Debug.WriteLine($"ApplyAllAttendanceFilters: SearchText='{searchText}', SortBy='{currentAttendanceFilters?.SortBy}'");
 
                 // FIXED: Start with ALL loaded data, not just visible rows
                 var filteredData = new List<AttendanceRowData>();
@@ -148,22 +144,22 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                System.Diagnostics.Debug.WriteLine($"HR Matching rows count before sorting: {filteredData.Count}");
+                System.Diagnostics.Debug.WriteLine($"Matching rows count before sorting: {filteredData.Count}");
 
                 // Apply sorting if specified
                 List<AttendanceRowData> sortedData;
                 if (!string.IsNullOrEmpty(currentAttendanceFilters?.SortBy))
                 {
-                    System.Diagnostics.Debug.WriteLine($"HR Applying sorting: {currentAttendanceFilters.SortBy}");
+                    System.Diagnostics.Debug.WriteLine($"Applying sorting: {currentAttendanceFilters.SortBy}");
                     sortedData = ApplySortingToData(filteredData);
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("HR No sorting - using natural order");
+                    System.Diagnostics.Debug.WriteLine("No sorting - using natural order");
                     sortedData = filteredData;
                 }
 
-                System.Diagnostics.Debug.WriteLine($"HR Final rows count: {sortedData.Count}");
+                System.Diagnostics.Debug.WriteLine($"Final rows count: {sortedData.Count}");
 
                 // Clear the grid and re-add rows
                 dataGridViewAttendance.Rows.Clear();
@@ -200,6 +196,7 @@ namespace HRIS_JAP_ATTPAY
                 dataGridViewAttendance.Refresh();
             }
         }
+
         private List<AttendanceRowData> ApplySortingToData(List<AttendanceRowData> data)
         {
             System.Diagnostics.Debug.WriteLine($"ApplySortingToData called with {data.Count} items");
@@ -221,14 +218,22 @@ namespace HRIS_JAP_ATTPAY
                 {
                     case "a-z":
                         System.Diagnostics.Debug.WriteLine("Applying A-Z sort by FULL NAME");
-                        sortedData = data.OrderBy(d => d.FullName?.Trim() ?? "",
-                            StringComparer.OrdinalIgnoreCase).ToList();
+                        sortedData = data.OrderBy(d =>
+                        {
+                            string fullName = d.FullName?.Trim() ?? "";
+                            System.Diagnostics.Debug.WriteLine($"A-Z Sorting: '{fullName}'");
+                            return fullName;
+                        }, StringComparer.OrdinalIgnoreCase).ToList();
                         break;
 
                     case "z-a":
                         System.Diagnostics.Debug.WriteLine("Applying Z-A sort by FULL NAME");
-                        sortedData = data.OrderByDescending(d => d.FullName?.Trim() ?? "",
-                            StringComparer.OrdinalIgnoreCase).ToList();
+                        sortedData = data.OrderByDescending(d =>
+                        {
+                            string fullName = d.FullName?.Trim() ?? "";
+                            System.Diagnostics.Debug.WriteLine($"Z-A Sorting: '{fullName}'");
+                            return fullName;
+                        }, StringComparer.OrdinalIgnoreCase).ToList();
                         break;
 
                     default:
@@ -238,6 +243,13 @@ namespace HRIS_JAP_ATTPAY
                 }
 
                 System.Diagnostics.Debug.WriteLine($"After sorting, data count: {sortedData.Count}");
+
+                // Debug: Print the sorted order
+                foreach (var item in sortedData.Take(5))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Sorted Data: '{item.FullName}'");
+                }
+
                 return sortedData;
             }
             catch (Exception ex)
@@ -247,8 +259,6 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-
-        //  SEARCH / FILTER LOGIC
         private bool MatchesSearchText(AttendanceRowData rowData, string searchText)
         {
             if (string.IsNullOrWhiteSpace(searchText) || searchText == "find employee")
@@ -319,19 +329,13 @@ namespace HRIS_JAP_ATTPAY
                 bool statusMatch = false;
                 string status = rowData.Status ?? "";
 
-                if (currentAttendanceFilters.StatusPresent && status.Equals("On Time", StringComparison.OrdinalIgnoreCase))
-                    statusMatch = true;
-                if (currentAttendanceFilters.StatusAbsent && status.Equals("Absent", StringComparison.OrdinalIgnoreCase))
-                    statusMatch = true;
-                if (currentAttendanceFilters.StatusLate && status.Equals("Late", StringComparison.OrdinalIgnoreCase))
-                    statusMatch = true;
-                if (currentAttendanceFilters.StatusEarlyOut && status.Equals("Early Out", StringComparison.OrdinalIgnoreCase))
-                    statusMatch = true;
+                if (currentAttendanceFilters.StatusPresent && status.Equals("On Time", StringComparison.OrdinalIgnoreCase)) statusMatch = true;
+                if (currentAttendanceFilters.StatusAbsent && status.Equals("Absent", StringComparison.OrdinalIgnoreCase)) statusMatch = true;
+                if (currentAttendanceFilters.StatusLate && status.Equals("Late", StringComparison.OrdinalIgnoreCase)) statusMatch = true;
+                if (currentAttendanceFilters.StatusEarlyOut && status.Equals("Early Out", StringComparison.OrdinalIgnoreCase)) statusMatch = true;
 
-                if (currentAttendanceFilters.StatusLate && status.Equals("Late & Early Out", StringComparison.OrdinalIgnoreCase))
-                    statusMatch = true;
-                if (currentAttendanceFilters.StatusEarlyOut && status.Equals("Late & Early Out", StringComparison.OrdinalIgnoreCase))
-                    statusMatch = true;
+                if (currentAttendanceFilters.StatusLate && status.Equals("Late & Early Out", StringComparison.OrdinalIgnoreCase)) statusMatch = true;
+                if (currentAttendanceFilters.StatusEarlyOut && status.Equals("Late & Early Out", StringComparison.OrdinalIgnoreCase)) statusMatch = true;
 
                 if (!statusMatch) return false;
             }
@@ -372,6 +376,8 @@ namespace HRIS_JAP_ATTPAY
 
             return true;
         }
+
+        // ========== END OF COPIED FILTER METHODS ==========
 
         //  STATUS CALCULATION - EXACT COPY FROM ADMINATTENDANCE
         private async Task<string> CalculateStatusWithSchedule(string timeInStr, string timeOutStr, string employeeId, string attendanceDate, string existingStatus = "")
@@ -492,7 +498,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-       
+
         private string CalculateOvertimeHours(string overtimeStr, string hoursWorked, string employeeId, string scheduleId)
         {
             // First try to use the overtime_hours field directly from Firebase
@@ -636,12 +642,13 @@ namespace HRIS_JAP_ATTPAY
         {
             DateTime selectedDate = dtpSingleDateSelector.Value;
 
-            // CRITICAL: Clear the cut-off date filter when user manually changes the date
-            if (currentAttendanceFilters.UseCutOffDate)
+            // CRITICAL: Clear the date range filter when user manually changes the date
+            if (currentAttendanceFilters.UseDateRange)
             {
-                System.Diagnostics.Debug.WriteLine("HR DateTimePicker changed - clearing cut-off filter");
-                currentAttendanceFilters.UseCutOffDate = false;
-                currentAttendanceFilters.CutOffDate = null;
+                System.Diagnostics.Debug.WriteLine("DateTimePicker changed - clearing date range filter");
+                currentAttendanceFilters.UseDateRange = false;
+                currentAttendanceFilters.StartDate = null;
+                currentAttendanceFilters.EndDate = null;
             }
 
             // Refresh attendance with selected date
@@ -709,12 +716,12 @@ namespace HRIS_JAP_ATTPAY
 
                 switch (e.Value.ToString())
                 {
-                   case "On Time":
+                    case "On Time":
                         statusBackColor = Color.FromArgb(95, 218, 71); // Green
                         statusForeColor = Color.White;
                         break;
                     case "Late":
-                        statusBackColor = Color.FromArgb(255, 163, 74); 
+                        statusBackColor = Color.FromArgb(255, 163, 74);
                         statusForeColor = Color.White;
                         break;
                     case "Early Out":
@@ -726,15 +733,15 @@ namespace HRIS_JAP_ATTPAY
                         statusForeColor = Color.White;
                         break;
                     case "Absent":
-                        statusBackColor = Color.FromArgb(221, 60, 60); 
+                        statusBackColor = Color.FromArgb(221, 60, 60);
                         statusForeColor = Color.White;
                         break;
                     case "Leave":
-                        statusBackColor = Color.FromArgb(71, 93, 218); 
+                        statusBackColor = Color.FromArgb(71, 93, 218);
                         statusForeColor = Color.White;
                         break;
                     case "Day Off":
-                        statusBackColor = Color.FromArgb(71, 93, 218); 
+                        statusBackColor = Color.FromArgb(71, 93, 218);
                         statusForeColor = Color.White;
                         break;
                 }
@@ -861,31 +868,17 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        private bool IsInBiMonthlyRange(string attendanceDateStr, DateTime cutOffDate, bool isFirstHalf)
+        private bool IsInDateRange(string attendanceDateStr, DateTime startDate, DateTime endDate)
         {
             if (string.IsNullOrEmpty(attendanceDateStr) || attendanceDateStr == "N/A")
                 return false;
 
             if (DateTime.TryParse(attendanceDateStr, out DateTime attendanceDate))
             {
-                if (isFirstHalf)
-                {
-                    // First half: 1st to 15th of the SAME MONTH as cut-off date
-                    DateTime startDate = new DateTime(cutOffDate.Year, cutOffDate.Month, 1);
-                    DateTime endDate = new DateTime(cutOffDate.Year, cutOffDate.Month, 15);
-                    bool inRange = attendanceDate.Date >= startDate && attendanceDate.Date <= endDate;
-                    System.Diagnostics.Debug.WriteLine($"HR First Half Check: {attendanceDate:yyyy-MM-dd} between {startDate:yyyy-MM-dd} and {endDate:yyyy-MM-dd} = {inRange}");
-                    return inRange;
-                }
-                else
-                {
-                    // Second half: 16th to end of month of the SAME MONTH as cut-off date
-                    DateTime startDate = new DateTime(cutOffDate.Year, cutOffDate.Month, 16);
-                    DateTime endDate = new DateTime(cutOffDate.Year, cutOffDate.Month, DateTime.DaysInMonth(cutOffDate.Year, cutOffDate.Month));
-                    bool inRange = attendanceDate.Date >= startDate && attendanceDate.Date <= endDate;
-                    System.Diagnostics.Debug.WriteLine($"HR Second Half Check: {attendanceDate:yyyy-MM-dd} between {startDate:yyyy-MM-dd} and {endDate:yyyy-MM-dd} = {inRange}");
-                    return inRange;
-                }
+                // Include records where attendance date is between start date and end date (inclusive)
+                bool inRange = attendanceDate.Date >= startDate.Date && attendanceDate.Date <= endDate.Date;
+                System.Diagnostics.Debug.WriteLine($"Date Range Check: {attendanceDate:yyyy-MM-dd} between {startDate:yyyy-MM-dd} and {endDate:yyyy-MM-dd} = {inRange}");
+                return inRange;
             }
 
             return false;
@@ -1068,6 +1061,7 @@ namespace HRIS_JAP_ATTPAY
 
                 System.Diagnostics.Debug.WriteLine($"HR: Extracted - Employee: {employeeId}, Date: {attendanceDateStr}, TimeIn: {timeInStr}, TimeOut: {timeOutStr}, Status: {existingStatus}");
 
+                // UPDATED: Use date range filter instead of cut-off date
                 if (selectedDate.HasValue)
                 {
                     bool shouldInclude = false;
@@ -1266,10 +1260,9 @@ namespace HRIS_JAP_ATTPAY
             {
                 labelAttendanceDate.Invoke((MethodInvoker)delegate
                 {
-                    if (currentAttendanceFilters.UseCutOffDate && currentAttendanceFilters.CutOffDate.HasValue)
+                    if (currentAttendanceFilters.UseDateRange && currentAttendanceFilters.StartDate.HasValue && currentAttendanceFilters.EndDate.HasValue)
                     {
-                        string half = currentAttendanceFilters.IsFirstHalf ? "First Half" : "Second Half";
-                        labelAttendanceDate.Text = $"Attendance for {half} of {currentAttendanceFilters.CutOffDate.Value:MMMM yyyy}";
+                        labelAttendanceDate.Text = $"Attendance from {currentAttendanceFilters.StartDate.Value:yyyy-MM-dd} to {currentAttendanceFilters.EndDate.Value:yyyy-MM-dd}";
                     }
                     else if (selectedDate.HasValue)
                     {
@@ -1283,10 +1276,9 @@ namespace HRIS_JAP_ATTPAY
             }
             else
             {
-                if (currentAttendanceFilters.UseCutOffDate && currentAttendanceFilters.CutOffDate.HasValue)
+                if (currentAttendanceFilters.UseDateRange && currentAttendanceFilters.StartDate.HasValue && currentAttendanceFilters.EndDate.HasValue)
                 {
-                    string half = currentAttendanceFilters.IsFirstHalf ? "First Half" : "Second Half";
-                    labelAttendanceDate.Text = $"Attendance for {half} of {currentAttendanceFilters.CutOffDate.Value:MMMM yyyy}";
+                    labelAttendanceDate.Text = $"Attendance from {currentAttendanceFilters.StartDate.Value:yyyy-MM-dd} to {currentAttendanceFilters.EndDate.Value:yyyy-MM-dd}";
                 }
                 else if (selectedDate.HasValue)
                 {
@@ -1508,8 +1500,8 @@ namespace HRIS_JAP_ATTPAY
 
             return false;
         }
-        private async Task<AttendanceRowData> ProcessAttendanceRecordToData(dynamic attendance, Dictionary<string, dynamic> 
-            employeeDict,DateTime? selectedDate,string firebaseKey)
+        private async Task<AttendanceRowData> ProcessAttendanceRecordToData(dynamic attendance, Dictionary<string, dynamic>
+            employeeDict, DateTime? selectedDate, string firebaseKey)
         {
             try
             {
@@ -1582,18 +1574,15 @@ namespace HRIS_JAP_ATTPAY
 
                 System.Diagnostics.Debug.WriteLine($"HR Extracted - Employee: {employeeId}, Date: {attendanceDateStr}, TimeIn: {timeInStr}");
 
-                // 🔹 PRIORITY 1: Check if CUT-OFF DATE FILTER is active
-                if (currentAttendanceFilters.UseCutOffDate && currentAttendanceFilters.CutOffDate.HasValue)
+                // UPDATED: Check if DATE RANGE FILTER is active (from AdminAttendance)
+                if (currentAttendanceFilters.UseDateRange && currentAttendanceFilters.StartDate.HasValue && currentAttendanceFilters.EndDate.HasValue)
                 {
-                    System.Diagnostics.Debug.WriteLine($"HR Using CUT-OFF DATE filter: {currentAttendanceFilters.CutOffDate.Value}, First Half: {currentAttendanceFilters.IsFirstHalf}");
-                    shouldInclude = IsInBiMonthlyRange(attendanceDateStr,
-                        currentAttendanceFilters.CutOffDate.Value,
-                        currentAttendanceFilters.IsFirstHalf);
-
+                    System.Diagnostics.Debug.WriteLine($"HR Using DATE RANGE filter: {currentAttendanceFilters.StartDate.Value} to {currentAttendanceFilters.EndDate.Value}");
+                    shouldInclude = IsInDateRange(attendanceDateStr, currentAttendanceFilters.StartDate.Value, currentAttendanceFilters.EndDate.Value);
                     System.Diagnostics.Debug.WriteLine($"HR Record {firebaseKey} date {attendanceDateStr}: shouldInclude = {shouldInclude}");
                 }
-                // 🔹 PRIORITY 2: If NO cut-off filter, use SINGLE DATE from DateTimePicker (default behavior)
-                else if (!currentAttendanceFilters.UseCutOffDate && selectedDate.HasValue)
+                // UPDATED: If NO date range filter, use SINGLE DATE from DateTimePicker (default behavior)
+                else if (!currentAttendanceFilters.UseDateRange && selectedDate.HasValue)
                 {
                     System.Diagnostics.Debug.WriteLine($"HR Using SINGLE DATE filter: {selectedDate.Value}");
                     if (!string.IsNullOrEmpty(attendanceDateStr) && DateTime.TryParse(attendanceDateStr, out DateTime attendanceDate))
@@ -1607,7 +1596,7 @@ namespace HRIS_JAP_ATTPAY
 
                     System.Diagnostics.Debug.WriteLine($"HR Record {firebaseKey} date {attendanceDateStr}: shouldInclude = {shouldInclude}");
                 }
-                // 🔹 FALLBACK: If neither filter is active, include everything
+                // FALLBACK: If neither filter is active, include everything
                 else
                 {
                     System.Diagnostics.Debug.WriteLine("HR No date filter active, including all records");

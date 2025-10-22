@@ -64,22 +64,21 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🔹 FILTER HANDLERS - FIXED TO MATCH HRAttendance
         private void ApplyAttendanceFilters(AttendanceFilterCriteria filters)
         {
-            System.Diagnostics.Debug.WriteLine($"ApplyAttendanceFilters called with SortBy: '{filters?.SortBy}', UseCutOffDate: {filters?.UseCutOffDate}");
+            System.Diagnostics.Debug.WriteLine($"ApplyAttendanceFilters called with SortBy: '{filters?.SortBy}', UseDateRange: {filters?.UseDateRange}");
             currentAttendanceFilters = filters ?? new AttendanceFilterCriteria();
 
-            // CRITICAL: If cut-off date is selected in filter, reload ALL data with date range
-            if (currentAttendanceFilters.UseCutOffDate && currentAttendanceFilters.CutOffDate.HasValue)
+            // CRITICAL: If date range is selected in filter, reload ALL data with date range
+            if (currentAttendanceFilters.UseDateRange && currentAttendanceFilters.StartDate.HasValue && currentAttendanceFilters.EndDate.HasValue)
             {
-                System.Diagnostics.Debug.WriteLine($"Loading with cut-off date range: {currentAttendanceFilters.CutOffDate.Value}, First Half: {currentAttendanceFilters.IsFirstHalf}");
-                LoadFirebaseAttendanceData(null); // null = use cut-off range instead of single date
+                System.Diagnostics.Debug.WriteLine($"Loading with date range: {currentAttendanceFilters.StartDate.Value} to {currentAttendanceFilters.EndDate.Value}");
+                LoadFirebaseAttendanceData(null); // null = use date range instead of single date
             }
             else
             {
-                // No cut-off date filter, just apply filters to currently loaded data (single date remains active)
-                System.Diagnostics.Debug.WriteLine("No cut-off date, applying filters to current view with single date selector");
+                // No date range filter, just apply filters to currently loaded data (single date remains active)
+                System.Diagnostics.Debug.WriteLine("No date range, applying filters to current view with single date selector");
                 ApplyAllAttendanceFilters();
             }
         }
@@ -1154,8 +1153,6 @@ namespace HRIS_JAP_ATTPAY
                 Cursor.Current = Cursors.Default;
             }
         }
-
-
         private async Task<AttendanceRowData> ProcessAttendanceRecordToData(dynamic attendance, Dictionary<string, dynamic> employeeDict, DateTime? selectedDate, string firebaseKey)
         {
             try
@@ -1229,18 +1226,15 @@ namespace HRIS_JAP_ATTPAY
 
                 System.Diagnostics.Debug.WriteLine($"Extracted - Employee: {employeeId}, Date: {attendanceDateStr}, TimeIn: {timeInStr}");
 
-                // 🔹 PRIORITY 1: Check if CUT-OFF DATE FILTER is active
-                if (currentAttendanceFilters.UseCutOffDate && currentAttendanceFilters.CutOffDate.HasValue)
+                // 🔹 UPDATED: Check if DATE RANGE FILTER is active
+                if (currentAttendanceFilters.UseDateRange && currentAttendanceFilters.StartDate.HasValue && currentAttendanceFilters.EndDate.HasValue)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Using CUT-OFF DATE filter: {currentAttendanceFilters.CutOffDate.Value}, First Half: {currentAttendanceFilters.IsFirstHalf}");
-                    shouldInclude = IsInBiMonthlyRange(attendanceDateStr,
-                        currentAttendanceFilters.CutOffDate.Value,
-                        currentAttendanceFilters.IsFirstHalf);
-
+                    System.Diagnostics.Debug.WriteLine($"Using DATE RANGE filter: {currentAttendanceFilters.StartDate.Value} to {currentAttendanceFilters.EndDate.Value}");
+                    shouldInclude = IsInDateRange(attendanceDateStr, currentAttendanceFilters.StartDate.Value, currentAttendanceFilters.EndDate.Value);
                     System.Diagnostics.Debug.WriteLine($"Record {firebaseKey} date {attendanceDateStr}: shouldInclude = {shouldInclude}");
                 }
-                // 🔹 PRIORITY 2: If NO cut-off filter, use SINGLE DATE from DateTimePicker (default behavior)
-                else if (!currentAttendanceFilters.UseCutOffDate && selectedDate.HasValue)
+                // 🔹 PRIORITY 2: If NO date range filter, use SINGLE DATE from DateTimePicker (default behavior)
+                else if (!currentAttendanceFilters.UseDateRange && selectedDate.HasValue)
                 {
                     System.Diagnostics.Debug.WriteLine($"Using SINGLE DATE filter: {selectedDate.Value}");
                     if (!string.IsNullOrEmpty(attendanceDateStr) && DateTime.TryParse(attendanceDateStr, out DateTime attendanceDate))
@@ -1251,7 +1245,6 @@ namespace HRIS_JAP_ATTPAY
                     {
                         shouldInclude = false;
                     }
-
                     System.Diagnostics.Debug.WriteLine($"Record {firebaseKey} date {attendanceDateStr}: shouldInclude = {shouldInclude}");
                 }
                 // 🔹 FALLBACK: If neither filter is active, include everything
@@ -1311,6 +1304,21 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
+        private bool IsInDateRange(string attendanceDateStr, DateTime startDate, DateTime endDate)
+        {
+            if (string.IsNullOrEmpty(attendanceDateStr) || attendanceDateStr == "N/A")
+                return false;
+
+            if (DateTime.TryParse(attendanceDateStr, out DateTime attendanceDate))
+            {
+                // Include records where attendance date is between start date and end date (inclusive)
+                bool inRange = attendanceDate.Date >= startDate.Date && attendanceDate.Date <= endDate.Date;
+                System.Diagnostics.Debug.WriteLine($"Date Range Check: {attendanceDate:yyyy-MM-dd} between {startDate:yyyy-MM-dd} and {endDate:yyyy-MM-dd} = {inRange}");
+                return inRange;
+            }
+
+            return false;
+        }
 
         private void UpdateStatusLabel(DateTime? selectedDate)
         {
@@ -1318,29 +1326,30 @@ namespace HRIS_JAP_ATTPAY
             {
                 labelAttendanceDate.Invoke((MethodInvoker)delegate
                 {
-                    if (selectedDate.HasValue)
-                    {
-                        labelAttendanceDate.Text = $"Attendance for {selectedDate.Value.ToString("yyyy-MM-dd")}";
-                    }
-                    else
-                    {
-                        labelAttendanceDate.Text = "All Attendance Records";
-                    }
+                    UpdateStatusLabelText(selectedDate);
                 });
             }
             else
             {
-                if (selectedDate.HasValue)
-                {
-                    labelAttendanceDate.Text = $"Attendance for {selectedDate.Value.ToString("yyyy-MM-dd")}";
-                }
-                else
-                {
-                    labelAttendanceDate.Text = "All Attendance Records";
-                }
+                UpdateStatusLabelText(selectedDate);
             }
         }
 
+        private void UpdateStatusLabelText(DateTime? selectedDate)
+        {
+            if (currentAttendanceFilters.UseDateRange && currentAttendanceFilters.StartDate.HasValue && currentAttendanceFilters.EndDate.HasValue)
+            {
+                labelAttendanceDate.Text = $"Attendance from {currentAttendanceFilters.StartDate.Value:yyyy-MM-dd} to {currentAttendanceFilters.EndDate.Value:yyyy-MM-dd}";
+            }
+            else if (selectedDate.HasValue)
+            {
+                labelAttendanceDate.Text = $"Attendance for {selectedDate.Value:yyyy-MM-dd}";
+            }
+            else
+            {
+                labelAttendanceDate.Text = "All Attendance Records";
+            }
+        }
 
         private async Task<bool> ProcessAttendanceRecord(dynamic attendance, Dictionary<string, dynamic> employeeDict, DateTime? selectedDate, int counter, int rowIndex, string firebaseKey)
         {
