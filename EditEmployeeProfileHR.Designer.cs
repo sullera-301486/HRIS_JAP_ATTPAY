@@ -47,27 +47,17 @@
             this.checkBoxW = new System.Windows.Forms.CheckBox();
             this.checkBoxT = new System.Windows.Forms.CheckBox();
             this.checkBoxM = new System.Windows.Forms.CheckBox();
-            this.textBoxManager = new System.Windows.Forms.TextBox();
-            this.textBoxDateOfExit = new System.Windows.Forms.TextBox();
-            this.label33 = new System.Windows.Forms.Label();
-            this.textBoxDateOfJoining = new System.Windows.Forms.TextBox();
-            this.textBoxContractType = new System.Windows.Forms.TextBox();
-            this.label35 = new System.Windows.Forms.Label();
             this.textBoxAddress = new System.Windows.Forms.TextBox();
             this.textBoxEmail = new System.Windows.Forms.TextBox();
             this.label32 = new System.Windows.Forms.Label();
             this.textBoxContact = new System.Windows.Forms.TextBox();
             this.textBoxNationality = new System.Windows.Forms.TextBox();
             this.label31 = new System.Windows.Forms.Label();
-            this.textBoxDateOfBirth = new System.Windows.Forms.TextBox();
             this.textBoxLastName = new System.Windows.Forms.TextBox();
             this.label30 = new System.Windows.Forms.Label();
-            this.textBoxMaritalStatus = new System.Windows.Forms.TextBox();
-            this.textBoxGender = new System.Windows.Forms.TextBox();
             this.textBoxMiddleName = new System.Windows.Forms.TextBox();
             this.textBoxFirstName = new System.Windows.Forms.TextBox();
             this.labelEmployeeIDInput = new System.Windows.Forms.Label();
-            this.label34 = new System.Windows.Forms.Label();
             this.labelRFIDTagInput = new System.Windows.Forms.Label();
             this.labelPosition = new System.Windows.Forms.Label();
             this.labelEmployeeID = new System.Windows.Forms.Label();
@@ -104,7 +94,14 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.buttonScanRFID = new System.Windows.Forms.Button();
             this.XpictureBox = new System.Windows.Forms.PictureBox();
-            this.textBoxPositionInput = new System.Windows.Forms.TextBox();
+            this.cbManager = new System.Windows.Forms.ComboBox();
+            this.dtpDatePeriod = new System.Windows.Forms.DateTimePicker();
+            this.dtpDateStarted = new System.Windows.Forms.DateTimePicker();
+            this.cbContractType = new System.Windows.Forms.ComboBox();
+            this.dtpDateOfBirth = new System.Windows.Forms.DateTimePicker();
+            this.cbGender = new System.Windows.Forms.ComboBox();
+            this.cbMaritalStatus = new System.Windows.Forms.ComboBox();
+            this.cbPosition = new System.Windows.Forms.ComboBox();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxEmployee)).BeginInit();
             this.panel1.SuspendLayout();
@@ -381,82 +378,6 @@
             this.checkBoxM.Text = "M";
             this.checkBoxM.UseVisualStyleBackColor = false;
             // 
-            // textBoxManager
-            // 
-            this.textBoxManager.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxManager.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxManager.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxManager.ForeColor = System.Drawing.Color.White;
-            this.textBoxManager.Location = new System.Drawing.Point(921, 247);
-            this.textBoxManager.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxManager.Name = "textBoxManager";
-            this.textBoxManager.Size = new System.Drawing.Size(231, 30);
-            this.textBoxManager.TabIndex = 110;
-            this.textBoxManager.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxDateOfExit
-            // 
-            this.textBoxDateOfExit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxDateOfExit.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxDateOfExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxDateOfExit.ForeColor = System.Drawing.Color.White;
-            this.textBoxDateOfExit.Location = new System.Drawing.Point(921, 204);
-            this.textBoxDateOfExit.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxDateOfExit.Name = "textBoxDateOfExit";
-            this.textBoxDateOfExit.Size = new System.Drawing.Size(231, 30);
-            this.textBoxDateOfExit.TabIndex = 109;
-            this.textBoxDateOfExit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // label33
-            // 
-            this.label33.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label33.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label33.Location = new System.Drawing.Point(917, 208);
-            this.label33.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(236, 31);
-            this.label33.TabIndex = 108;
-            this.label33.Text = "N/A";
-            this.label33.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // textBoxDateOfJoining
-            // 
-            this.textBoxDateOfJoining.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxDateOfJoining.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxDateOfJoining.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxDateOfJoining.ForeColor = System.Drawing.Color.White;
-            this.textBoxDateOfJoining.Location = new System.Drawing.Point(921, 161);
-            this.textBoxDateOfJoining.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxDateOfJoining.Name = "textBoxDateOfJoining";
-            this.textBoxDateOfJoining.Size = new System.Drawing.Size(231, 30);
-            this.textBoxDateOfJoining.TabIndex = 107;
-            this.textBoxDateOfJoining.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxContractType
-            // 
-            this.textBoxContractType.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxContractType.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxContractType.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxContractType.ForeColor = System.Drawing.Color.White;
-            this.textBoxContractType.Location = new System.Drawing.Point(921, 118);
-            this.textBoxContractType.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxContractType.Name = "textBoxContractType";
-            this.textBoxContractType.Size = new System.Drawing.Size(231, 30);
-            this.textBoxContractType.TabIndex = 106;
-            this.textBoxContractType.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // label35
-            // 
-            this.label35.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label35.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label35.Location = new System.Drawing.Point(917, 122);
-            this.label35.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label35.Name = "label35";
-            this.label35.Size = new System.Drawing.Size(236, 31);
-            this.label35.TabIndex = 105;
-            this.label35.Text = "N/A";
-            this.label35.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // textBoxAddress
             // 
             this.textBoxAddress.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
@@ -533,19 +454,6 @@
             this.label31.Text = "N/A";
             this.label31.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // textBoxDateOfBirth
-            // 
-            this.textBoxDateOfBirth.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxDateOfBirth.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxDateOfBirth.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxDateOfBirth.ForeColor = System.Drawing.Color.White;
-            this.textBoxDateOfBirth.Location = new System.Drawing.Point(489, 202);
-            this.textBoxDateOfBirth.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxDateOfBirth.Name = "textBoxDateOfBirth";
-            this.textBoxDateOfBirth.Size = new System.Drawing.Size(231, 30);
-            this.textBoxDateOfBirth.TabIndex = 97;
-            this.textBoxDateOfBirth.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
             // textBoxLastName
             // 
             this.textBoxLastName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
@@ -570,32 +478,6 @@
             this.label30.TabIndex = 95;
             this.label30.Text = "N/A";
             this.label30.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // textBoxMaritalStatus
-            // 
-            this.textBoxMaritalStatus.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxMaritalStatus.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxMaritalStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxMaritalStatus.ForeColor = System.Drawing.Color.White;
-            this.textBoxMaritalStatus.Location = new System.Drawing.Point(489, 286);
-            this.textBoxMaritalStatus.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxMaritalStatus.Name = "textBoxMaritalStatus";
-            this.textBoxMaritalStatus.Size = new System.Drawing.Size(231, 30);
-            this.textBoxMaritalStatus.TabIndex = 94;
-            this.textBoxMaritalStatus.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // textBoxGender
-            // 
-            this.textBoxGender.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxGender.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxGender.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxGender.ForeColor = System.Drawing.Color.White;
-            this.textBoxGender.Location = new System.Drawing.Point(489, 242);
-            this.textBoxGender.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxGender.Name = "textBoxGender";
-            this.textBoxGender.Size = new System.Drawing.Size(231, 30);
-            this.textBoxGender.TabIndex = 93;
-            this.textBoxGender.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // textBoxMiddleName
             // 
@@ -634,18 +516,6 @@
             this.labelEmployeeIDInput.TabIndex = 90;
             this.labelEmployeeIDInput.Text = "N/A";
             this.labelEmployeeIDInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label34
-            // 
-            this.label34.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label34.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label34.Location = new System.Drawing.Point(485, 246);
-            this.label34.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label34.Name = "label34";
-            this.label34.Size = new System.Drawing.Size(236, 31);
-            this.label34.TabIndex = 71;
-            this.label34.Text = "N/A";
-            this.label34.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelRFIDTagInput
             // 
@@ -969,7 +839,14 @@
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.White;
-            this.panel2.Controls.Add(this.textBoxPositionInput);
+            this.panel2.Controls.Add(this.cbPosition);
+            this.panel2.Controls.Add(this.dtpDateOfBirth);
+            this.panel2.Controls.Add(this.cbGender);
+            this.panel2.Controls.Add(this.cbMaritalStatus);
+            this.panel2.Controls.Add(this.cbManager);
+            this.panel2.Controls.Add(this.dtpDatePeriod);
+            this.panel2.Controls.Add(this.dtpDateStarted);
+            this.panel2.Controls.Add(this.cbContractType);
             this.panel2.Controls.Add(this.comboBoxDepartment);
             this.panel2.Controls.Add(this.buttonChangePhoto);
             this.panel2.Controls.Add(this.labelDashB);
@@ -990,27 +867,17 @@
             this.panel2.Controls.Add(this.checkBoxW);
             this.panel2.Controls.Add(this.checkBoxT);
             this.panel2.Controls.Add(this.checkBoxM);
-            this.panel2.Controls.Add(this.textBoxManager);
-            this.panel2.Controls.Add(this.textBoxDateOfExit);
-            this.panel2.Controls.Add(this.label33);
-            this.panel2.Controls.Add(this.textBoxDateOfJoining);
-            this.panel2.Controls.Add(this.textBoxContractType);
-            this.panel2.Controls.Add(this.label35);
             this.panel2.Controls.Add(this.textBoxAddress);
             this.panel2.Controls.Add(this.textBoxEmail);
             this.panel2.Controls.Add(this.label32);
             this.panel2.Controls.Add(this.textBoxContact);
             this.panel2.Controls.Add(this.textBoxNationality);
             this.panel2.Controls.Add(this.label31);
-            this.panel2.Controls.Add(this.textBoxDateOfBirth);
             this.panel2.Controls.Add(this.textBoxLastName);
             this.panel2.Controls.Add(this.label30);
-            this.panel2.Controls.Add(this.textBoxMaritalStatus);
-            this.panel2.Controls.Add(this.textBoxGender);
             this.panel2.Controls.Add(this.textBoxMiddleName);
             this.panel2.Controls.Add(this.textBoxFirstName);
             this.panel2.Controls.Add(this.labelEmployeeIDInput);
-            this.panel2.Controls.Add(this.label34);
             this.panel2.Controls.Add(this.labelRFIDTagInput);
             this.panel2.Controls.Add(this.labelPosition);
             this.panel2.Controls.Add(this.labelEmployeeID);
@@ -1145,18 +1012,104 @@
             this.XpictureBox.TabStop = false;
             this.XpictureBox.Click += new System.EventHandler(this.XpictureBox_Click);
             // 
-            // textBoxPositionInput
+            // cbManager
             // 
-            this.textBoxPositionInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
-            this.textBoxPositionInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxPositionInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxPositionInput.ForeColor = System.Drawing.Color.White;
-            this.textBoxPositionInput.Location = new System.Drawing.Point(37, 386);
-            this.textBoxPositionInput.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxPositionInput.Name = "textBoxPositionInput";
-            this.textBoxPositionInput.Size = new System.Drawing.Size(231, 30);
-            this.textBoxPositionInput.TabIndex = 132;
-            this.textBoxPositionInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.cbManager.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.cbManager.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.cbManager.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbManager.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbManager.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbManager.ForeColor = System.Drawing.Color.White;
+            this.cbManager.FormattingEnabled = true;
+            this.cbManager.Location = new System.Drawing.Point(921, 250);
+            this.cbManager.Margin = new System.Windows.Forms.Padding(4);
+            this.cbManager.Name = "cbManager";
+            this.cbManager.Size = new System.Drawing.Size(229, 33);
+            this.cbManager.TabIndex = 135;
+            // 
+            // dtpDatePeriod
+            // 
+            this.dtpDatePeriod.Location = new System.Drawing.Point(920, 208);
+            this.dtpDatePeriod.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.dtpDatePeriod.Name = "dtpDatePeriod";
+            this.dtpDatePeriod.Size = new System.Drawing.Size(231, 29);
+            this.dtpDatePeriod.TabIndex = 134;
+            // 
+            // dtpDateStarted
+            // 
+            this.dtpDateStarted.Location = new System.Drawing.Point(920, 164);
+            this.dtpDateStarted.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.dtpDateStarted.Name = "dtpDateStarted";
+            this.dtpDateStarted.Size = new System.Drawing.Size(231, 29);
+            this.dtpDateStarted.TabIndex = 133;
+            // 
+            // cbContractType
+            // 
+            this.cbContractType.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.cbContractType.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.cbContractType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbContractType.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbContractType.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbContractType.ForeColor = System.Drawing.Color.White;
+            this.cbContractType.FormattingEnabled = true;
+            this.cbContractType.Location = new System.Drawing.Point(921, 119);
+            this.cbContractType.Margin = new System.Windows.Forms.Padding(4);
+            this.cbContractType.Name = "cbContractType";
+            this.cbContractType.Size = new System.Drawing.Size(229, 33);
+            this.cbContractType.TabIndex = 132;
+            // 
+            // dtpDateOfBirth
+            // 
+            this.dtpDateOfBirth.Location = new System.Drawing.Point(489, 198);
+            this.dtpDateOfBirth.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.dtpDateOfBirth.Name = "dtpDateOfBirth";
+            this.dtpDateOfBirth.Size = new System.Drawing.Size(228, 29);
+            this.dtpDateOfBirth.TabIndex = 138;
+            // 
+            // cbGender
+            // 
+            this.cbGender.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.cbGender.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.cbGender.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbGender.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbGender.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbGender.ForeColor = System.Drawing.Color.White;
+            this.cbGender.FormattingEnabled = true;
+            this.cbGender.Location = new System.Drawing.Point(489, 242);
+            this.cbGender.Margin = new System.Windows.Forms.Padding(4);
+            this.cbGender.Name = "cbGender";
+            this.cbGender.Size = new System.Drawing.Size(229, 33);
+            this.cbGender.TabIndex = 137;
+            // 
+            // cbMaritalStatus
+            // 
+            this.cbMaritalStatus.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.cbMaritalStatus.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.cbMaritalStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbMaritalStatus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbMaritalStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbMaritalStatus.ForeColor = System.Drawing.Color.White;
+            this.cbMaritalStatus.FormattingEnabled = true;
+            this.cbMaritalStatus.Location = new System.Drawing.Point(489, 283);
+            this.cbMaritalStatus.Margin = new System.Windows.Forms.Padding(4);
+            this.cbMaritalStatus.Name = "cbMaritalStatus";
+            this.cbMaritalStatus.Size = new System.Drawing.Size(229, 33);
+            this.cbMaritalStatus.TabIndex = 136;
+            // 
+            // cbPosition
+            // 
+            this.cbPosition.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(174)))), ((int)(((byte)(189)))));
+            this.cbPosition.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.cbPosition.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbPosition.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbPosition.ForeColor = System.Drawing.Color.White;
+            this.cbPosition.FormattingEnabled = true;
+            this.cbPosition.Location = new System.Drawing.Point(37, 386);
+            this.cbPosition.Margin = new System.Windows.Forms.Padding(4);
+            this.cbPosition.Name = "cbPosition";
+            this.cbPosition.Size = new System.Drawing.Size(217, 33);
+            this.cbPosition.TabIndex = 139;
             // 
             // EditEmployeeProfileHR
             // 
@@ -1203,27 +1156,17 @@
         private System.Windows.Forms.CheckBox checkBoxW;
         private System.Windows.Forms.CheckBox checkBoxT;
         private System.Windows.Forms.CheckBox checkBoxM;
-        private System.Windows.Forms.TextBox textBoxManager;
-        private System.Windows.Forms.TextBox textBoxDateOfExit;
-        private System.Windows.Forms.Label label33;
-        private System.Windows.Forms.TextBox textBoxDateOfJoining;
-        private System.Windows.Forms.TextBox textBoxContractType;
-        private System.Windows.Forms.Label label35;
         private System.Windows.Forms.TextBox textBoxAddress;
         private System.Windows.Forms.TextBox textBoxEmail;
         private System.Windows.Forms.Label label32;
         private System.Windows.Forms.TextBox textBoxContact;
         private System.Windows.Forms.TextBox textBoxNationality;
         private System.Windows.Forms.Label label31;
-        private System.Windows.Forms.TextBox textBoxDateOfBirth;
         private System.Windows.Forms.TextBox textBoxLastName;
         private System.Windows.Forms.Label label30;
-        private System.Windows.Forms.TextBox textBoxMaritalStatus;
-        private System.Windows.Forms.TextBox textBoxGender;
         private System.Windows.Forms.TextBox textBoxMiddleName;
         private System.Windows.Forms.TextBox textBoxFirstName;
         private System.Windows.Forms.Label labelEmployeeIDInput;
-        private System.Windows.Forms.Label label34;
         private System.Windows.Forms.Label labelRFIDTagInput;
         private System.Windows.Forms.Label labelPosition;
         private System.Windows.Forms.Label labelEmployeeID;
@@ -1260,6 +1203,13 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ComboBox comboBoxDepartment;
         private System.Windows.Forms.Button buttonScanRFID;
-        private System.Windows.Forms.TextBox textBoxPositionInput;
+        private System.Windows.Forms.ComboBox cbManager;
+        private System.Windows.Forms.DateTimePicker dtpDatePeriod;
+        private System.Windows.Forms.DateTimePicker dtpDateStarted;
+        private System.Windows.Forms.ComboBox cbContractType;
+        private System.Windows.Forms.DateTimePicker dtpDateOfBirth;
+        private System.Windows.Forms.ComboBox cbGender;
+        private System.Windows.Forms.ComboBox cbMaritalStatus;
+        private System.Windows.Forms.ComboBox cbPosition;
     }
 }

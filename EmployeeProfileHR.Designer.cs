@@ -87,6 +87,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.XpictureBox = new System.Windows.Forms.PictureBox();
             this.labelEmployeeProfile = new System.Windows.Forms.Label();
+            this.btnSalary = new System.Windows.Forms.Button();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel1.SuspendLayout();
@@ -801,6 +802,7 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.White;
+            this.panel1.Controls.Add(this.btnSalary);
             this.panel1.Controls.Add(this.XpictureBox);
             this.panel1.Controls.Add(this.labelPersonalAndEmploymentRecord);
             this.panel1.Controls.Add(this.labelEmployeeProfile);
@@ -833,6 +835,22 @@
             this.labelEmployeeProfile.Size = new System.Drawing.Size(239, 36);
             this.labelEmployeeProfile.TabIndex = 3;
             this.labelEmployeeProfile.Text = "Employee Profile";
+            // 
+            // btnSalary
+            // 
+            this.btnSalary.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(93)))), ((int)(((byte)(218)))));
+            this.btnSalary.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnSalary.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSalary.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSalary.ForeColor = System.Drawing.Color.White;
+            this.btnSalary.Location = new System.Drawing.Point(37, 63);
+            this.btnSalary.Margin = new System.Windows.Forms.Padding(4);
+            this.btnSalary.Name = "btnSalary";
+            this.btnSalary.Size = new System.Drawing.Size(191, 41);
+            this.btnSalary.TabIndex = 59;
+            this.btnSalary.Text = "Salary";
+            this.btnSalary.UseVisualStyleBackColor = false;
+            this.btnSalary.Click += new System.EventHandler(this.btnSalary_Click);
             // 
             // EmployeeProfileHR
             // 
@@ -918,5 +936,6 @@
         private System.Windows.Forms.Label labelPersonalAndEmploymentRecord;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label labelEmployeeProfile;
+        private System.Windows.Forms.Button btnSalary;
     }
 }

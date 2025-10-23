@@ -96,6 +96,10 @@ namespace HRIS_JAP_ATTPAY
                 cb.Checked = false;
             }
 
+            // Initialize combo boxes
+            InitializeOtherComboBoxes();
+            InitializeOptionalDateFields();
+
             // 🔹 Load employee data if an ID was passed
             if (!string.IsNullOrEmpty(selectedEmployeeId))
             {
@@ -124,9 +128,25 @@ namespace HRIS_JAP_ATTPAY
                     textBoxEmail.Text = empDetails.email ?? "";
                     textBoxContact.Text = empDetails.contact ?? "";
                     textBoxAddress.Text = empDetails.address ?? "";
-                    textBoxDateOfBirth.Text = empDetails.date_of_birth ?? "";
-                    textBoxGender.Text = empDetails.gender ?? "";
-                    textBoxMaritalStatus.Text = empDetails.marital_status ?? "";
+
+                    // Use DateTimePicker for Date of Birth
+                    if (DateTime.TryParse(empDetails.date_of_birth, out DateTime dob))
+                    {
+                        dtpDateOfBirth.Value = dob;
+                    }
+
+                    // Use ComboBox for Gender
+                    if (!string.IsNullOrEmpty(empDetails.gender))
+                    {
+                        cbGender.SelectedItem = empDetails.gender;
+                    }
+
+                    // Use ComboBox for Marital Status
+                    if (!string.IsNullOrEmpty(empDetails.marital_status))
+                    {
+                        cbMaritalStatus.SelectedItem = empDetails.marital_status;
+                    }
+
                     textBoxNationality.Text = empDetails.nationality ?? "";
                     labelEmployeeIDInput.Text = empDetails.employee_id ?? "";
                     labelRFIDTagInput.Text = empDetails.rfid_tag ?? "";
@@ -262,57 +282,78 @@ namespace HRIS_JAP_ATTPAY
                 comboBoxDepartment.Text = empObj["department"]?.ToString() ?? "";
             }
 
-            if (textBoxPositionInput.InvokeRequired)
+            // Use ComboBox for Position
+            if (cbPosition.InvokeRequired)
             {
-                textBoxPositionInput.Invoke(new Action(() =>
-                    textBoxPositionInput.Text = empObj["position"]?.ToString() ?? ""));
+                cbPosition.Invoke(new Action(() =>
+                    cbPosition.SelectedItem = empObj["position"]?.ToString() ?? ""));
             }
             else
             {
-                textBoxPositionInput.Text = empObj["position"]?.ToString() ?? "";
+                cbPosition.SelectedItem = empObj["position"]?.ToString() ?? "";
             }
 
-            if (textBoxContractType.InvokeRequired)
+            // Use ComboBox for Contract Type
+            if (cbContractType.InvokeRequired)
             {
-                textBoxContractType.Invoke(new Action(() =>
-                    textBoxContractType.Text = empObj["contract_type"]?.ToString() ?? ""));
+                cbContractType.Invoke(new Action(() =>
+                    cbContractType.SelectedItem = empObj["contract_type"]?.ToString() ?? ""));
             }
             else
             {
-                textBoxContractType.Text = empObj["contract_type"]?.ToString() ?? "";
+                cbContractType.SelectedItem = empObj["contract_type"]?.ToString() ?? "";
             }
 
-            if (textBoxDateOfJoining.InvokeRequired)
+            // Use DateTimePicker for Date of Joining
+            if (dtpDateStarted.InvokeRequired)
             {
-                textBoxDateOfJoining.Invoke(new Action(() =>
-                    textBoxDateOfJoining.Text = empObj["date_of_joining"]?.ToString() ?? ""));
+                dtpDateStarted.Invoke(new Action(() =>
+                {
+                    if (DateTime.TryParse(empObj["date_of_joining"]?.ToString(), out DateTime dateJoined))
+                    {
+                        dtpDateStarted.Value = dateJoined;
+                    }
+                }));
             }
             else
             {
-                textBoxDateOfJoining.Text = empObj["date_of_joining"]?.ToString() ?? "";
+                if (DateTime.TryParse(empObj["date_of_joining"]?.ToString(), out DateTime dateJoined))
+                {
+                    dtpDateStarted.Value = dateJoined;
+                }
             }
 
-            if (textBoxDateOfExit.InvokeRequired)
+            // Use DateTimePicker for Date of Exit
+            if (dtpDatePeriod.InvokeRequired)
             {
-                textBoxDateOfExit.Invoke(new Action(() =>
-                    textBoxDateOfExit.Text = empObj["date_of_exit"]?.ToString() ?? ""));
+                dtpDatePeriod.Invoke(new Action(() =>
+                {
+                    if (DateTime.TryParse(empObj["date_of_exit"]?.ToString(), out DateTime dateExit))
+                    {
+                        dtpDatePeriod.Value = dateExit;
+                    }
+                }));
             }
             else
             {
-                textBoxDateOfExit.Text = empObj["date_of_exit"]?.ToString() ?? "";
+                if (DateTime.TryParse(empObj["date_of_exit"]?.ToString(), out DateTime dateExit))
+                {
+                    dtpDatePeriod.Value = dateExit;
+                }
             }
 
-            if (textBoxManager.InvokeRequired)
+            // Use ComboBox for Manager
+            if (cbManager.InvokeRequired)
             {
-                textBoxManager.Invoke(new Action(() =>
-                    textBoxManager.Text = empObj["manager_name"]?.ToString() ?? ""));
+                cbManager.Invoke(new Action(() =>
+                    cbManager.SelectedItem = empObj["manager_name"]?.ToString() ?? ""));
             }
             else
             {
-                textBoxManager.Text = empObj["manager_name"]?.ToString() ?? "";
+                cbManager.SelectedItem = empObj["manager_name"]?.ToString() ?? "";
             }
-
         }
+
 
         // NEW METHOD: Set default employment info to UI
         private void SetDefaultEmploymentInfoUI()
@@ -326,51 +367,50 @@ namespace HRIS_JAP_ATTPAY
                 comboBoxDepartment.Text = "";
             }
 
-            if (textBoxPositionInput.InvokeRequired)
+            if (cbPosition.InvokeRequired)
             {
-                textBoxPositionInput.Invoke(new Action(() => textBoxPositionInput.Text = ""));
+                cbPosition.Invoke(new Action(() => cbPosition.SelectedIndex = -1));
             }
             else
             {
-                textBoxPositionInput.Text = "";
+                cbPosition.SelectedIndex = -1;
             }
 
-            if (textBoxContractType.InvokeRequired)
+            if (cbContractType.InvokeRequired)
             {
-                textBoxContractType.Invoke(new Action(() => textBoxContractType.Text = ""));
+                cbContractType.Invoke(new Action(() => cbContractType.SelectedIndex = -1));
             }
             else
             {
-                textBoxContractType.Text = "";
+                cbContractType.SelectedIndex = -1;
             }
 
-            if (textBoxDateOfJoining.InvokeRequired)
+            if (dtpDateStarted.InvokeRequired)
             {
-                textBoxDateOfJoining.Invoke(new Action(() => textBoxDateOfJoining.Text = ""));
+                dtpDateStarted.Invoke(new Action(() => dtpDateStarted.Value = DateTime.Now));
             }
             else
             {
-                textBoxDateOfJoining.Text = "";
+                dtpDateStarted.Value = DateTime.Now;
             }
 
-            if (textBoxDateOfExit.InvokeRequired)
+            if (dtpDatePeriod.InvokeRequired)
             {
-                textBoxDateOfExit.Invoke(new Action(() => textBoxDateOfExit.Text = ""));
+                dtpDatePeriod.Invoke(new Action(() => dtpDatePeriod.Value = DateTime.Now.AddYears(1)));
             }
             else
             {
-                textBoxDateOfExit.Text = "";
+                dtpDatePeriod.Value = DateTime.Now.AddYears(1);
             }
 
-            if (textBoxManager.InvokeRequired)
+            if (cbManager.InvokeRequired)
             {
-                textBoxManager.Invoke(new Action(() => textBoxManager.Text = ""));
+                cbManager.Invoke(new Action(() => cbManager.SelectedIndex = -1));
             }
             else
             {
-                textBoxManager.Text = "";
+                cbManager.SelectedIndex = -1;
             }
-
         }
 
         private void setFont()
@@ -407,7 +447,6 @@ namespace HRIS_JAP_ATTPAY
                 labelNationality.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelPersonalInformation.Font = AttributesClass.GetFont("Roboto-Regular", 15f);
                 labelPosition.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
-                textBoxPositionInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelRFIDTag.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 labelRFIDTagInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelShiftSchedule.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
@@ -417,20 +456,23 @@ namespace HRIS_JAP_ATTPAY
                 textBoxAltWorkHoursA.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxAltWorkHoursB.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxContact.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxContractType.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxDateOfBirth.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxDateOfExit.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxDateOfJoining.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxEmail.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxFirstName.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxGender.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxLastName.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxManager.Font = AttributesClass.GetFont("Roboto-Light", 12f);
-                textBoxMaritalStatus.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxMiddleName.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxNationality.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxWorkHoursA.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 textBoxWorkHoursB.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+
+                // Add font settings for new controls
+                cbGender.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                cbMaritalStatus.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                cbContractType.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                cbPosition.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                cbManager.Font = AttributesClass.GetFont("Roboto-Light", 12f);
+                dtpDateOfBirth.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
+                dtpDateStarted.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
+                dtpDatePeriod.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
             }
             catch (Exception ex)
             {
@@ -581,9 +623,9 @@ namespace HRIS_JAP_ATTPAY
                     first_name = string.IsNullOrWhiteSpace(textBoxFirstName.Text) ? existingEmployee?.first_name ?? "" : textBoxFirstName.Text,
                     middle_name = string.IsNullOrWhiteSpace(textBoxMiddleName.Text) ? existingEmployee?.middle_name ?? "" : textBoxMiddleName.Text,
                     last_name = string.IsNullOrWhiteSpace(textBoxLastName.Text) ? existingEmployee?.last_name ?? "" : textBoxLastName.Text,
-                    date_of_birth = string.IsNullOrWhiteSpace(textBoxDateOfBirth.Text) ? existingEmployee?.date_of_birth ?? "" : textBoxDateOfBirth.Text,
-                    gender = string.IsNullOrWhiteSpace(textBoxGender.Text) ? existingEmployee?.gender ?? "" : textBoxGender.Text,
-                    marital_status = string.IsNullOrWhiteSpace(textBoxMaritalStatus.Text) ? existingEmployee?.marital_status ?? "" : textBoxMaritalStatus.Text,
+                    date_of_birth = dtpDateOfBirth.Value.ToString("yyyy-MM-dd"),
+                    gender = cbGender.SelectedItem?.ToString() ?? existingEmployee?.gender ?? "",
+                    marital_status = cbMaritalStatus.SelectedItem?.ToString() ?? existingEmployee?.marital_status ?? "",
                     nationality = string.IsNullOrWhiteSpace(textBoxNationality.Text) ? existingEmployee?.nationality ?? "" : textBoxNationality.Text,
                     contact = string.IsNullOrWhiteSpace(textBoxContact.Text) ? existingEmployee?.contact ?? "" : textBoxContact.Text,
                     email = string.IsNullOrWhiteSpace(textBoxEmail.Text) ? existingEmployee?.email ?? "" : textBoxEmail.Text,
@@ -661,16 +703,16 @@ namespace HRIS_JAP_ATTPAY
                     existingCreatedAt = existingObj["created_at"]?.ToString() ?? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 }
 
-                // Create updated employment info
+                // Create updated employment info using the new controls
                 var employmentInfo = new EmploymentInfoModel
                 {
                     employee_id = selectedEmployeeId,
-                    position = string.IsNullOrWhiteSpace(textBoxPositionInput.Text) ? existingPosition : textBoxPositionInput.Text,
-                    department = string.IsNullOrWhiteSpace(comboBoxDepartment.Text) ? existingDepartment : comboBoxDepartment.Text,
-                    contract_type = string.IsNullOrWhiteSpace(textBoxContractType.Text) ? existingContractType : textBoxContractType.Text,
-                    date_of_joining = string.IsNullOrWhiteSpace(textBoxDateOfJoining.Text) ? existingDateOfJoining : textBoxDateOfJoining.Text,
-                    date_of_exit = string.IsNullOrWhiteSpace(textBoxDateOfExit.Text) ? existingDateOfExit : textBoxDateOfExit.Text,
-                    manager_name = string.IsNullOrWhiteSpace(textBoxManager.Text) ? existingManagerName : textBoxManager.Text,
+                    position = cbPosition.SelectedItem?.ToString() ?? existingPosition,
+                    department = comboBoxDepartment.Text ?? existingDepartment,
+                    contract_type = cbContractType.SelectedItem?.ToString() ?? existingContractType,
+                    date_of_joining = dtpDateStarted.Value.ToString("yyyy-MM-dd"),
+                    date_of_exit = dtpDatePeriod.Value.ToString("yyyy-MM-dd"),
+                    manager_name = cbManager.SelectedItem?.ToString() ?? existingManagerName,
                     created_at = existingCreatedAt
                 };
 
@@ -1418,7 +1460,72 @@ namespace HRIS_JAP_ATTPAY
                 throw;
             }
         }
+        private void InitializeOtherComboBoxes()
+        {
+            if (comboBoxDepartment.Items.Count == 0)
+            {
+                comboBoxDepartment.Items.AddRange(new string[] {
+            "Engineering",
+            "Purchasing",
+            "Operations",
+            "Finance",
+            "Human Resource"
+        });
+            }
+            // Initialize Gender ComboBox
+            cbGender.Items.AddRange(new string[] {
+        "Male",
+        "Female",
+        "Other"
+    });
 
+            // Initialize Marital Status ComboBox
+            cbMaritalStatus.Items.AddRange(new string[] {
+        "Single",
+        "Married",
+        "Widowed"
+    });
+
+            // Initialize Contract Type ComboBox
+            cbContractType.Items.AddRange(new string[] {
+        "Regular",
+        "Contractual"
+    });
+
+            // Initialize Position ComboBox
+            cbPosition.Items.AddRange(new string[] {
+        "Analyst",
+        "HR Manager",
+        "Accountanting Manager",
+        "Operations Manager",
+        "Assistant",
+        "Staff"
+    });
+
+            // Initialize Manager ComboBox
+            cbManager.Items.AddRange(new string[] {
+        "Franz Louies Deloritos",
+        "Charles Macaraig"
+    });
+
+            // Set default dates
+            dtpDateOfBirth.Value = DateTime.Now.AddYears(-25);
+            dtpDateStarted.Value = DateTime.Now;
+            dtpDatePeriod.Value = DateTime.Now.AddYears(1);
+        }
+
+        private void InitializeOptionalDateFields()
+        {
+            // Set custom format to match AdminAttendance (yyyy-MM-dd)
+            dtpDateOfBirth.Format = DateTimePickerFormat.Custom;
+            dtpDateOfBirth.CustomFormat = "yyyy-MM-dd";
+
+            dtpDateStarted.Format = DateTimePickerFormat.Custom;
+            dtpDateStarted.CustomFormat = "yyyy-MM-dd";
+
+            dtpDatePeriod.Format = DateTimePickerFormat.Custom;
+            dtpDatePeriod.CustomFormat = "yyyy-MM-dd";
+        }
     }
 
 
