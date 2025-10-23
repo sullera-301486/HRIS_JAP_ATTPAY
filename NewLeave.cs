@@ -228,7 +228,7 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // 🟢 Deduct leave credits (multi-day, Sundays excluded)
+        // 🟢 Deduct leave credits (only adjust remaining leave, keep base values)
         private async Task<bool> DeductLeaveBalanceAsync(string employeeName, string leaveType, int totalDays)
         {
             try
@@ -255,10 +255,16 @@ namespace HRIS_JAP_ATTPAY
                     return false;
                 }
 
-                int sickLeave = 6, vacationLeave = 6;
+                // 🔹 Load base values (unchanged)
+                int sickLeaveBase = 0, vacationLeaveBase = 0;
+                int sickLeave = 0, vacationLeave = 0;
+
+                try { sickLeaveBase = Convert.ToInt32(empData.sick_leave_base_value); } catch { }
+                try { vacationLeaveBase = Convert.ToInt32(empData.vacation_leave_base_value); } catch { }
                 try { sickLeave = Convert.ToInt32(empData.sick_leave); } catch { }
                 try { vacationLeave = Convert.ToInt32(empData.vacation_leave); } catch { }
 
+                // 🔹 Deduct only from the selected leave type
                 if (leaveType.ToLower().Contains("sick"))
                 {
                     if (sickLeave < totalDays)
@@ -280,13 +286,16 @@ namespace HRIS_JAP_ATTPAY
                     vacationLeave -= totalDays;
                 }
 
+                // 🔹 Keep base values intact — update only remaining leaves
                 var updatedCredits = new
                 {
                     employee_id = empData.employee_id ?? employeeId,
                     full_name = empData.full_name,
                     department = empData.department ?? "",
                     position = empData.position ?? "",
+                    sick_leave_base_value = sickLeaveBase,
                     sick_leave = sickLeave,
+                    vacation_leave_base_value = vacationLeaveBase,
                     vacation_leave = vacationLeave,
                     updated_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
                 };
@@ -305,6 +314,7 @@ namespace HRIS_JAP_ATTPAY
                 return false;
             }
         }
+
 
         private void XpictureBox_Click(object sender, EventArgs e)
         {

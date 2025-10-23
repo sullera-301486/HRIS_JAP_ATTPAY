@@ -27,7 +27,7 @@ namespace HRIS_JAP_ATTPAY
             firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
             InitializeDepartmentComboBox();
             InitializeOtherComboBoxes();
-            InitializeOptionalDateFields(); // Add this line
+            InitializeOptionalDateFields();
             UpdateAlternateTextboxAccessibility();
         }
 
@@ -146,6 +146,19 @@ namespace HRIS_JAP_ATTPAY
                         updated = true;
                     }
 
+                    // ✅ Add base values if they don't exist
+                    if (existing["sick_leave_base_value"] == null)
+                    {
+                        existing["sick_leave_base_value"] = 6;
+                        updated = true;
+                    }
+
+                    if (existing["vacation_leave_base_value"] == null)
+                    {
+                        existing["vacation_leave_base_value"] = 6;
+                        updated = true;
+                    }
+
                     if (updated)
                     {
                         await firebase
@@ -162,16 +175,19 @@ namespace HRIS_JAP_ATTPAY
                     return; // stop here — do not overwrite
                 }
 
-                // 🔹 STEP 3: Create only if not existing
+                // 🔹 STEP 3: Create only if not existing with both current and base values
                 var leaveCreditsObj = new
                 {
                     employee_id = employeeId,
                     full_name = fullName,
                     department = department,
                     position = position,
-                    sick_leave = 6,
-                    vacation_leave = 6,
-                    created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
+                    sick_leave = 6,  // Current available sick leave
+                    vacation_leave = 6,  // Current available vacation leave
+                    sick_leave_base_value = 6,  // Base value for sick leave
+                    vacation_leave_base_value = 6,  // Base value for vacation leave
+                    created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt"),
+                    updated_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
                 };
 
                 await firebase
@@ -179,7 +195,7 @@ namespace HRIS_JAP_ATTPAY
                     .Child(employeeId)
                     .PutAsync(leaveCreditsObj);
 
-                Console.WriteLine($"✅ Leave Credits created for {employeeId} ({department} - {position})");
+                Console.WriteLine($"✅ Leave Credits created for {employeeId} with base values of 6 each");
             }
             catch (Exception ex)
             {
@@ -192,11 +208,11 @@ namespace HRIS_JAP_ATTPAY
         {
             try
             {
-                string leaveCreditsUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits.json";
-                string employmentUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/EmploymentInfo.json";
-
                 using (var httpClient = new HttpClient())
                 {
+                    string leaveCreditsUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits.json";
+                    string employmentUrl = "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/EmploymentInfo.json";
+
                     string leaveJson = await httpClient.GetStringAsync(leaveCreditsUrl);
                     string empJson = await httpClient.GetStringAsync(employmentUrl);
 
@@ -221,6 +237,8 @@ namespace HRIS_JAP_ATTPAY
                         return;
                     }
 
+                    int fixedCount = 0;
+
                     foreach (var item in leaveData)
                     {
                         string empId = item.Key;
@@ -242,17 +260,31 @@ namespace HRIS_JAP_ATTPAY
                             }
                         }
 
+                        // ✅ Add base values if they don't exist
+                        if (leaveObj["sick_leave_base_value"] == null)
+                        {
+                            leaveObj["sick_leave_base_value"] = 6;
+                        }
+
+                        if (leaveObj["vacation_leave_base_value"] == null)
+                        {
+                            leaveObj["vacation_leave_base_value"] = 6;
+                        }
+
                         leaveObj["department"] = department;
                         leaveObj["position"] = position;
+                        leaveObj["updated_at"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                        string updateUrl =
-                            $"https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits/{empId}.json";
+                        string updateUrl = $"https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits/{empId}.json";
 
                         var jsonBody = new StringContent(leaveObj.ToString(), System.Text.Encoding.UTF8, "application/json");
                         await httpClient.PutAsync(updateUrl, jsonBody);
+                        fixedCount++;
                     }
-                }
 
+                    MessageBox.Show($"Fixed {fixedCount} existing leave records with base values.",
+                        "Fix Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
             catch (Exception ex)
             {
@@ -303,6 +335,7 @@ namespace HRIS_JAP_ATTPAY
                         existingLeave = JObject.Parse(leaveJson);
 
                     int created = 0;
+                    int updated = 0;
                     int skipped = 0;
 
                     // 4️⃣ Loop through EmployeeDetails
@@ -315,13 +348,6 @@ namespace HRIS_JAP_ATTPAY
                         string middleName = empObj["middle_name"]?.ToString() ?? "";
                         string lastName = empObj["last_name"]?.ToString() ?? "";
                         string fullName = $"{firstName} {middleName} {lastName}".Trim();
-
-                        // ✅ If record already exists → skip it (don't overwrite existing balances)
-                        if (existingLeave.ContainsKey(empId))
-                        {
-                            skipped++;
-                            continue;
-                        }
 
                         // 🔹 Find position and department from EmploymentInfo
                         string position = "Unknown";
@@ -337,26 +363,70 @@ namespace HRIS_JAP_ATTPAY
                             }
                         }
 
-                        // 🔹 Create new leave record
-                        var leaveObj = new
+                        // Check if record already exists
+                        if (existingLeave.ContainsKey(empId))
                         {
-                            employee_id = empId,
-                            full_name = fullName,
-                            position = position,
-                            department = department,
-                            sick_leave = 6,
-                            vacation_leave = 6,
-                            created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
-                        };
+                            JObject existingRecord = (JObject)existingLeave[empId];
 
-                        string putUrl = $"https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits/{empId}.json";
-                        string jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(leaveObj);
-                        var response = await httpClient.PutAsync(putUrl, new StringContent(jsonBody, System.Text.Encoding.UTF8, "application/json"));
-                        if (response.IsSuccessStatusCode)
-                            created++;
+                            // ✅ Update existing record to ensure base values exist
+                            bool needsUpdate = false;
+
+                            if (existingRecord["sick_leave_base_value"] == null)
+                            {
+                                existingRecord["sick_leave_base_value"] = 6;
+                                needsUpdate = true;
+                            }
+
+                            if (existingRecord["vacation_leave_base_value"] == null)
+                            {
+                                existingRecord["vacation_leave_base_value"] = 6;
+                                needsUpdate = true;
+                            }
+
+                            if (needsUpdate)
+                            {
+                                existingRecord["department"] = department;
+                                existingRecord["position"] = position;
+                                existingRecord["updated_at"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                                string putUrl = $"https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits/{empId}.json";
+                                string jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(existingRecord);
+                                var response = await httpClient.PutAsync(putUrl, new StringContent(jsonBody, System.Text.Encoding.UTF8, "application/json"));
+                                if (response.IsSuccessStatusCode)
+                                    updated++;
+                            }
+                            else
+                            {
+                                skipped++;
+                            }
+                        }
+                        else
+                        {
+                            // 🔹 Create new leave record with both current and base values
+                            var leaveObj = new
+                            {
+                                employee_id = empId,
+                                full_name = fullName,
+                                position = position,
+                                department = department,
+                                sick_leave = 6,  // Current available sick leave
+                                vacation_leave = 6,  // Current available vacation leave
+                                sick_leave_base_value = 6,  // Base value for sick leave
+                                vacation_leave_base_value = 6,  // Base value for vacation leave
+                                created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt"),
+                                updated_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                            };
+
+                            string putUrl = $"https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/Leave%20Credits/{empId}.json";
+                            string jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(leaveObj);
+                            var response = await httpClient.PutAsync(putUrl, new StringContent(jsonBody, System.Text.Encoding.UTF8, "application/json"));
+                            if (response.IsSuccessStatusCode)
+                                created++;
+                        }
                     }
 
-                    Console.WriteLine($"✅ Leave Credits sync complete. Added {created}, skipped {skipped} existing.");
+                    MessageBox.Show($"Leave Credits sync completed:\n• Created: {created}\n• Updated: {updated}\n• Skipped: {skipped}",
+                        "Sync Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
@@ -419,7 +489,7 @@ namespace HRIS_JAP_ATTPAY
                         string empId = emp.Key;
                         JObject empObj = (JObject)emp.Value;
 
-                        // ✅ Skip employees who already have a leave record (don't reset their balance)
+                        // ✅ Skip employees who already have a leave record
                         if (existingLeave.ContainsKey(empId))
                         {
                             skipped++;
@@ -445,16 +515,19 @@ namespace HRIS_JAP_ATTPAY
                             }
                         }
 
-                        // Build new Leave Credit record
+                        // Build new Leave Credit record with both current and base values
                         var leaveRecord = new
                         {
                             employee_id = empId,
                             full_name = fullName,
                             department = department,
                             position = position,
-                            sick_leave = 6,
-                            vacation_leave = 6,
-                            created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt")
+                            sick_leave = 6,  // Current available sick leave
+                            vacation_leave = 6,  // Current available vacation leave
+                            sick_leave_base_value = 6,  // Base value for sick leave
+                            vacation_leave_base_value = 6,  // Base value for vacation leave
+                            created_at = DateTime.Now.ToString("dd-MMM-yy hh:mm:ss tt"),
+                            updated_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
                         };
 
                         // Upload only for missing employees
@@ -465,6 +538,9 @@ namespace HRIS_JAP_ATTPAY
                         if (response.IsSuccessStatusCode)
                             added++;
                     }
+
+                    MessageBox.Show($"Missing Leave Credits sync completed:\n• Added: {added}\n• Skipped: {skipped}",
+                        "Sync Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
@@ -472,7 +548,6 @@ namespace HRIS_JAP_ATTPAY
                 MessageBox.Show("❌ Error syncing Leave Credits:\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
 
         private async void AddNewEmployee_Load(object sender, EventArgs e)
         {
@@ -768,7 +843,7 @@ namespace HRIS_JAP_ATTPAY
                 // ✅ STEP 2: Add work schedules
                 await AddWorkSchedulesAsync(employeeId);
 
-                // ✅ STEP 3: Add leave credits
+                // ✅ STEP 3: Add leave credits with base values
                 await CreateDefaultLeaveCredits(employeeId, fullName);
 
                 // ✅ STEP 4: ADD PAYROLL DATA
@@ -787,6 +862,7 @@ namespace HRIS_JAP_ATTPAY
                 MessageBox.Show("Error adding employee to Firebase: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         // ✅ CREATE BASE GOVERNMENT DEDUCTIONS METHOD
         private async Task CreateBaseGovernmentDeductions(string employeeId)
         {
@@ -1043,7 +1119,7 @@ namespace HRIS_JAP_ATTPAY
             cbContractType.Items.AddRange(new string[] {
                 "Regular",
                 "Contractual"
-                
+
             });
 
             // Initialize Position ComboBox
@@ -1362,8 +1438,6 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-
-
                 // Extract numbers from archived employees
                 foreach (var emp in archivedEmployees)
                 {
@@ -1650,6 +1724,7 @@ namespace HRIS_JAP_ATTPAY
                 .Child(arrayIndex.ToString())
                 .PutAsync(scheduleObj);
         }
+
         // Add this method to handle optional date of exit
         private void InitializeOptionalDateFields()
         {

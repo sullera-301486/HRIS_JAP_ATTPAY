@@ -181,6 +181,7 @@ namespace HRIS_JAP_ATTPAY
             }
 
         //  When revoke is clicked, restore leave + delete record from Firebase
+        //  When revoke is clicked, restore leave + delete record from Firebase
         private async void btnRevoke_Click(object sender, EventArgs e)
         {
             try
@@ -206,7 +207,6 @@ namespace HRIS_JAP_ATTPAY
                     string startPart = parts[0].Trim();
                     string endPart = parts[1].Trim();
 
-                    // 🟢 Support multiple date formats (numeric + long names)
                     string[] formats = {
                 "MM/dd/yyyy", "M/d/yyyy", "yyyy-MM-dd",
                 "dd/MM/yyyy", "d/M/yyyy",
@@ -247,7 +247,7 @@ namespace HRIS_JAP_ATTPAY
                     return;
                 }
 
-                // ✅ Step 2: Add back the totalDays leave credits
+                // ✅ Step 2: Find employee record
                 var employees = await firebase.Child("Leave Credits").OnceAsync<dynamic>();
                 string employeeId = null;
                 dynamic empData = null;
@@ -270,13 +270,24 @@ namespace HRIS_JAP_ATTPAY
                     return;
                 }
 
-                int sickLeave = empData.sick_leave != null ? (int)empData.sick_leave : 6;
-                int vacationLeave = empData.vacation_leave != null ? (int)empData.vacation_leave : 6;
+                // ✅ Step 3: Get current + base leave values
+                int sickLeave = 0, vacationLeave = 0;
+                int sickLeaveBase = 0, vacationLeaveBase = 0;
 
+                try { sickLeave = Convert.ToInt32(empData.sick_leave); } catch { }
+                try { vacationLeave = Convert.ToInt32(empData.vacation_leave); } catch { }
+                try { sickLeaveBase = Convert.ToInt32(empData.sick_leave_base_value); } catch { }
+                try { vacationLeaveBase = Convert.ToInt32(empData.vacation_leave_base_value); } catch { }
+
+                // ✅ Step 4: Restore leave (do NOT touch base values)
                 if (leaveType.ToLower().Contains("sick"))
+                {
                     sickLeave += totalDays;
+                }
                 else if (leaveType.ToLower().Contains("vacation"))
+                {
                     vacationLeave += totalDays;
+                }
 
                 var updatedCredits = new
                 {
@@ -284,14 +295,16 @@ namespace HRIS_JAP_ATTPAY
                     full_name = empData.full_name,
                     department = empData.department ?? "",
                     position = empData.position ?? "",
+                    sick_leave_base_value = sickLeaveBase,
                     sick_leave = sickLeave,
+                    vacation_leave_base_value = vacationLeaveBase,
                     vacation_leave = vacationLeave,
                     updated_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
                 };
 
                 await firebase.Child("Leave Credits").Child(employeeId).PutAsync(updatedCredits);
 
-                // ✅ Step 3: Remove record from ManageLeave
+                // ✅ Step 5: Remove record from ManageLeave
                 var leaves = await firebase.Child("ManageLeave").OnceAsync<dynamic>();
                 foreach (var leave in leaves)
                 {
@@ -310,11 +323,11 @@ namespace HRIS_JAP_ATTPAY
                     }
                 }
 
-                // ✅ Step 4: Remove from UI + trigger refresh
+                // ✅ Step 6: Remove from UI + trigger refresh
                 this.Parent?.Controls.Remove(this);
                 RevokeClicked?.Invoke(this, EventArgs.Empty);
 
-                // ✅ Step 5: Refresh ManageLeave form (if open)
+                // ✅ Step 7: Refresh ManageLeave form (if open)
                 Form parentForm = this.FindForm();
                 if (parentForm is ManageLeave manageLeaveForm)
                 {
@@ -330,6 +343,7 @@ namespace HRIS_JAP_ATTPAY
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
     }
 }

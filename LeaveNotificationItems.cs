@@ -324,64 +324,71 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // ✅ Deduct leave balance logic
+        // ✅ Deduct leave balance logic (preserves base values)
         private static async Task DeductLeaveBalanceAsync(string employeeName, string leaveType, int totalDays)
         {
             try
             {
-                var employees = await firebase.Child("EmployeeDetails").OnceAsync<dynamic>();
+                var employees = await firebase.Child("Leave Credits").OnceAsync<dynamic>();
                 string employeeId = null;
-                string fullName = null;
+                dynamic empData = null;
 
                 foreach (var emp in employees)
                 {
-                    string firstName = (emp.Object.first_name ?? "").ToString().Trim();
-                    string middleName = (emp.Object.middle_name ?? "").ToString().Trim();
-                    string lastName = (emp.Object.last_name ?? "").ToString().Trim();
-
-                    string fullNameWithMiddle = $"{firstName} {middleName} {lastName}".Replace("  ", " ").Trim();
-                    string fullNameNoMiddle = $"{firstName} {lastName}".Trim();
-
-                    if (string.Equals(fullNameWithMiddle, employeeName, StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(fullNameNoMiddle, employeeName, StringComparison.OrdinalIgnoreCase))
+                    string fullName = emp.Object.full_name?.ToString().Trim();
+                    if (string.Equals(fullName, employeeName, StringComparison.OrdinalIgnoreCase))
                     {
                         employeeId = emp.Key;
-                        fullName = fullNameWithMiddle;
+                        empData = emp.Object;
                         break;
                     }
                 }
 
                 if (string.IsNullOrEmpty(employeeId))
                 {
-                    MessageBox.Show($"Employee '{employeeName}' not found.", "Error",
+                    MessageBox.Show($"Employee '{employeeName}' not found in Leave Credits.", "Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                var currentLeave = await firebase
-                    .Child("Leave Credits")
-                    .Child(employeeId)
-                    .OnceSingleAsync<dynamic>();
+                int sickLeave = 6, vacationLeave = 6;
+                int sickLeaveBase = 6, vacationLeaveBase = 6;
 
-                int sickLeave = 6;
-                int vacationLeave = 6;
-
-                if (currentLeave != null)
-                {
-                    try { sickLeave = Convert.ToInt32(currentLeave.sick_leave); } catch { }
-                    try { vacationLeave = Convert.ToInt32(currentLeave.vacation_leave); } catch { }
-                }
+                try { sickLeave = Convert.ToInt32(empData.sick_leave); } catch { }
+                try { vacationLeave = Convert.ToInt32(empData.vacation_leave); } catch { }
+                try { sickLeaveBase = Convert.ToInt32(empData.sick_leave_base_value); } catch { }
+                try { vacationLeaveBase = Convert.ToInt32(empData.vacation_leave_base_value); } catch { }
 
                 if (leaveType.ToLower().Contains("sick"))
-                    sickLeave = Math.Max(0, sickLeave - totalDays);
+                {
+                    if (sickLeave < totalDays)
+                    {
+                        MessageBox.Show($"{employeeName} has only {sickLeave} sick leave(s) left but requested {totalDays}.",
+                            "Insufficient Sick Leave", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    sickLeave -= totalDays;
+                }
                 else if (leaveType.ToLower().Contains("vacation"))
-                    vacationLeave = Math.Max(0, vacationLeave - totalDays);
+                {
+                    if (vacationLeave < totalDays)
+                    {
+                        MessageBox.Show($"{employeeName} has only {vacationLeave} vacation leave(s) left but requested {totalDays}.",
+                            "Insufficient Vacation Leave", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    vacationLeave -= totalDays;
+                }
 
                 var updatedCredits = new
                 {
-                    employee_id = employeeId,
-                    full_name = fullName,
+                    employee_id = empData.employee_id ?? employeeId,
+                    full_name = empData.full_name,
+                    department = empData.department ?? "",
+                    position = empData.position ?? "",
+                    sick_leave_base_value = sickLeaveBase,
                     sick_leave = sickLeave,
+                    vacation_leave_base_value = vacationLeaveBase,
                     vacation_leave = vacationLeave,
                     updated_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
                 };

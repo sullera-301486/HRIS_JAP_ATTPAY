@@ -1,21 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HRIS_JAP_ATTPAY
 {
     public partial class EditLeaveCredits : Form
     {
+        private readonly LeaveCreditModel _credit;
+
         public EditLeaveCredits()
         {
             InitializeComponent();
             setFont();
+        }
+
+        public EditLeaveCredits(LeaveCreditModel credit)
+        {
+            InitializeComponent();
+            _credit = credit;
+            setFont();
+            LoadEmployeeDetails();
+        }
+
+        private void LoadEmployeeDetails()
+        {
+            if (_credit == null) return;
+
+            labelIDInput.Text = _credit.employee_id ?? "N/A";
+            labelNameInput.Text = _credit.full_name ?? "N/A";
+            labelDepartmentInput.Text = _credit.department ?? "N/A";
+            labelPositionInput.Text = _credit.position ?? "N/A";
+            labelSLLeftInput.Text = _credit.sick_leave.ToString();
+            labelVLLeftInput.Text = _credit.vacation_leave.ToString();
+            comboBoxSLCreditInput.Text = _credit.sick_leave_base_value.ToString();
+            comboBoxVLCreditInput.Text = _credit.vacation_leave_base_value.ToString();
+
+            labelTotalCreditInput.Text = (_credit.sick_leave_base_value + _credit.vacation_leave_base_value).ToString();
+            labelCreditLeftInput.Text = (_credit.sick_leave + _credit.vacation_leave).ToString();
         }
 
         private void XpictureBox_Click_1(object sender, EventArgs e)
