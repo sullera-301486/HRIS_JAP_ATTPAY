@@ -41,6 +41,7 @@ namespace HRIS_JAP_ATTPAY
             {
                 buttonArchive.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
                 buttonEdit.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
+                btnSalary.Font = AttributesClass.GetFont("Roboto-Regular", 14f);
                 labelAddress.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
                 labelAddressInput.Font = AttributesClass.GetFont("Roboto-Light", 12f);
                 labelAltWorkDays.Font = AttributesClass.GetFont("Roboto-Regular", 12f, FontStyle.Bold);
@@ -665,6 +666,13 @@ namespace HRIS_JAP_ATTPAY
                 Console.WriteLine($"Error loading password info: {ex.Message}");
                 SafeSetLabelText(labelPasswordInput, "*******");
             }
+        }
+
+        private void btnSalary_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            EmployeeSalaryDetails EmployeeSalaryDetailsForm = new EmployeeSalaryDetails();
+            AttributesClass.ShowWithOverlay(parentForm, EmployeeSalaryDetailsForm);
         }
     }
 }

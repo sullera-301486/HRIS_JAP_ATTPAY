@@ -1986,6 +1986,13 @@ namespace HRIS_JAP_ATTPAY
         {
 
         }
+
+        private void btnSalary_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            EmployeeSalaryDetails EmployeeSalaryDetailsForm = new EmployeeSalaryDetails();
+            AttributesClass.ShowWithOverlay(parentForm, EmployeeSalaryDetailsForm);
+        }
     }
 
     // 🔹 Firebase models

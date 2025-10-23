@@ -292,6 +292,12 @@
     <Compile Include="ConfirmAddNewUser.Designer.cs">
       <DependentUpon>ConfirmAddNewUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="ConfirmAddSalary.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmAddSalary.Designer.cs">
+      <DependentUpon>ConfirmAddSalary.cs</DependentUpon>
+    </Compile>
     <Compile Include="ConfirmAdminLeaveEntry.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -303,6 +309,12 @@
     </Compile>
     <Compile Include="ConfirmBackup.Designer.cs">
       <DependentUpon>ConfirmBackup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfirmEditSalary.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmEditSalary.Designer.cs">
+      <DependentUpon>ConfirmEditSalary.cs</DependentUpon>
     </Compile>
     <Compile Include="ConfirmExportDTR.cs">
       <SubType>Form</SubType>
@@ -339,6 +351,24 @@
     </Compile>
     <Compile Include="EditLeaveCredits.Designer.cs">
       <DependentUpon>EditLeaveCredits.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EmployeeSalaryDetails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmployeeSalaryDetails.Designer.cs">
+      <DependentUpon>EmployeeSalaryDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EmployeeSalaryDetailsEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmployeeSalaryDetailsEdit.Designer.cs">
+      <DependentUpon>EmployeeSalaryDetailsEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EmployeeSalaryDetailsList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="EmployeeSalaryDetailsList.Designer.cs">
+      <DependentUpon>EmployeeSalaryDetailsList.cs</DependentUpon>
     </Compile>
     <Compile Include="EmployeeSchedules.cs" />
     <Compile Include="Calendar.cs">
@@ -413,6 +443,12 @@
     </Compile>
     <Compile Include="ManageLeaveCredits.Designer.cs">
       <DependentUpon>ManageLeaveCredits.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NewEmployeeSalary.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewEmployeeSalary.Designer.cs">
+      <DependentUpon>NewEmployeeSalary.cs</DependentUpon>
     </Compile>
     <Compile Include="ReliableAttendanceService.cs" />
     <Compile Include="EditAttendance.cs">
@@ -711,6 +747,9 @@
     <EmbeddedResource Include="ConfirmAddNewUser.resx">
       <DependentUpon>ConfirmAddNewUser.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmAddSalary.resx">
+      <DependentUpon>ConfirmAddSalary.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ConfirmAdminLeaveEntry.resx">
       <DependentUpon>ConfirmAdminLeaveEntry.cs</DependentUpon>
     </EmbeddedResource>
@@ -722,6 +761,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ConfirmArchive.resx">
       <DependentUpon>ConfirmArchive.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmEditSalary.resx">
+      <DependentUpon>ConfirmEditSalary.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ConfirmExportDTR.resx">
       <DependentUpon>ConfirmExportDTR.cs</DependentUpon>
@@ -773,6 +815,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EmployeeProfileHR.resx">
       <DependentUpon>EmployeeProfileHR.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmployeeSalaryDetails.resx">
+      <DependentUpon>EmployeeSalaryDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmployeeSalaryDetailsEdit.resx">
+      <DependentUpon>EmployeeSalaryDetailsEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmployeeSalaryDetailsList.resx">
+      <DependentUpon>EmployeeSalaryDetailsList.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FilterAdminLoan.resx">
       <DependentUpon>FilterAdminLoan.cs</DependentUpon>
@@ -845,6 +896,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="LogOut.resx">
       <DependentUpon>LogOut.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewEmployeeSalary.resx">
+      <DependentUpon>NewEmployeeSalary.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="NewLeave.resx">
       <DependentUpon>NewLeave.cs</DependentUpon>

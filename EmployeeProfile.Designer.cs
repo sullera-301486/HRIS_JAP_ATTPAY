@@ -89,6 +89,7 @@
             this.labelDashB = new System.Windows.Forms.Label();
             this.labelDashA = new System.Windows.Forms.Label();
             this.pictureBoxEmployee = new System.Windows.Forms.PictureBox();
+            this.btnSalary = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
             this.panel2.SuspendLayout();
@@ -411,6 +412,7 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.White;
+            this.panel1.Controls.Add(this.btnSalary);
             this.panel1.Controls.Add(this.XpictureBox);
             this.panel1.Controls.Add(this.labelPersonalAndEmploymentRecord);
             this.panel1.Controls.Add(this.labelEmployeeProfile);
@@ -424,7 +426,7 @@
             this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
             this.XpictureBox.Location = new System.Drawing.Point(863, 0);
-            this.XpictureBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.XpictureBox.Margin = new System.Windows.Forms.Padding(2);
             this.XpictureBox.Name = "XpictureBox";
             this.XpictureBox.Size = new System.Drawing.Size(38, 41);
             this.XpictureBox.TabIndex = 4;
@@ -801,6 +803,21 @@
             this.pictureBoxEmployee.TabIndex = 0;
             this.pictureBoxEmployee.TabStop = false;
             // 
+            // btnSalary
+            // 
+            this.btnSalary.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(93)))), ((int)(((byte)(218)))));
+            this.btnSalary.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnSalary.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSalary.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSalary.ForeColor = System.Drawing.Color.White;
+            this.btnSalary.Location = new System.Drawing.Point(28, 51);
+            this.btnSalary.Name = "btnSalary";
+            this.btnSalary.Size = new System.Drawing.Size(143, 33);
+            this.btnSalary.TabIndex = 58;
+            this.btnSalary.Text = "Salary";
+            this.btnSalary.UseVisualStyleBackColor = false;
+            this.btnSalary.Click += new System.EventHandler(this.btnSalary_Click);
+            // 
             // EmployeeProfile
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -885,5 +902,6 @@
         private System.Windows.Forms.Label labelDashA;
         private System.Windows.Forms.Label labelEmployeeIDInput;
         private System.Windows.Forms.Label labelPositionInput;
+        private System.Windows.Forms.Button btnSalary;
     }
 }
