@@ -526,13 +526,13 @@ namespace HRIS_JAP_ATTPAY
                 comboBoxNamesSelected.Font = AttributesClass.GetFont("Roboto-Regular", 12f);
                 lblCurrentInformations.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
                 lblPreviousSalaryHistory.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
-
+                lblNameInput.Font = AttributesClass.GetFont("Roboto-Regular", 16f);
                 lblEffectivityDate.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
                 lblDepartment.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
                 lblPosition.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
                 lblDailyRate.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
                 lblSalary.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
-
+                lblEmployeeIDInput.Font = AttributesClass.GetFont("Roboto-Regular", 11f, FontStyle.Bold);
                 tBEffectivityDateInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 cBDepartmentInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);
                 cBPositionInput.Font = AttributesClass.GetFont("Roboto-Light", 10f);

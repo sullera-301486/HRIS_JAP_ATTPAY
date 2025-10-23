@@ -42,6 +42,10 @@
             this.lblDepartment = new System.Windows.Forms.Label();
             this.lblEffectivityDate = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.lblNameInput = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.lblEmployeeIDInput = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.lblSalaryPSH = new System.Windows.Forms.Label();
             this.lblDailyRatePSH = new System.Windows.Forms.Label();
@@ -54,10 +58,6 @@
             this.lblSalaryInput = new System.Windows.Forms.Label();
             this.lblPreviousSalaryHistory = new System.Windows.Forms.Label();
             this.lblCurrentInformations = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.lblEmployeeIDInput = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.lblNameInput = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.XpictureBox)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -107,17 +107,18 @@
             this.panel1.Controls.Add(this.lblEmployeeSalaryDetails);
             this.panel1.Controls.Add(this.lblSelected);
             this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(940, 134);
             this.panel1.TabIndex = 4;
             // 
             // comboBoxNamesSelected
             // 
+            this.comboBoxNamesSelected.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxNamesSelected.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxNamesSelected.FormattingEnabled = true;
             this.comboBoxNamesSelected.Location = new System.Drawing.Point(183, 70);
-            this.comboBoxNamesSelected.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxNamesSelected.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxNamesSelected.Name = "comboBoxNamesSelected";
             this.comboBoxNamesSelected.Size = new System.Drawing.Size(197, 33);
             this.comboBoxNamesSelected.TabIndex = 5;
@@ -141,7 +142,7 @@
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonCancel.ForeColor = System.Drawing.Color.White;
             this.buttonCancel.Location = new System.Drawing.Point(716, 444);
-            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(180, 41);
             this.buttonCancel.TabIndex = 58;
@@ -156,7 +157,7 @@
             this.buttonEdit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonEdit.ForeColor = System.Drawing.Color.White;
             this.buttonEdit.Location = new System.Drawing.Point(507, 444);
-            this.buttonEdit.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonEdit.Margin = new System.Windows.Forms.Padding(4);
             this.buttonEdit.Name = "buttonEdit";
             this.buttonEdit.Size = new System.Drawing.Size(180, 41);
             this.buttonEdit.TabIndex = 57;
@@ -248,10 +249,56 @@
             this.panel2.Controls.Add(this.lblCurrentInformations);
             this.panel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.panel2.Location = new System.Drawing.Point(0, 137);
-            this.panel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(940, 514);
             this.panel2.TabIndex = 5;
+            // 
+            // lblNameInput
+            // 
+            this.lblNameInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lblNameInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblNameInput.Location = new System.Drawing.Point(503, 18);
+            this.lblNameInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblNameInput.Name = "lblNameInput";
+            this.lblNameInput.Size = new System.Drawing.Size(161, 31);
+            this.lblNameInput.TabIndex = 83;
+            this.lblNameInput.Text = "N/A";
+            this.lblNameInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(381, 21);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(114, 24);
+            this.label2.TabIndex = 82;
+            this.label2.Text = "Emp Name";
+            // 
+            // lblEmployeeIDInput
+            // 
+            this.lblEmployeeIDInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lblEmployeeIDInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblEmployeeIDInput.Location = new System.Drawing.Point(779, 18);
+            this.lblEmployeeIDInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblEmployeeIDInput.Name = "lblEmployeeIDInput";
+            this.lblEmployeeIDInput.Size = new System.Drawing.Size(161, 31);
+            this.lblEmployeeIDInput.TabIndex = 81;
+            this.lblEmployeeIDInput.Text = "N/A";
+            this.lblEmployeeIDInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(693, 20);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(78, 24);
+            this.label1.TabIndex = 80;
+            this.label1.Text = "Emp ID";
             // 
             // flowLayoutPanel1
             // 
@@ -391,52 +438,6 @@
             this.lblCurrentInformations.TabIndex = 1;
             this.lblCurrentInformations.Text = "Current Information";
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(642, 20);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(129, 24);
-            this.label1.TabIndex = 80;
-            this.label1.Text = "Employee ID";
-            // 
-            // lblEmployeeIDInput
-            // 
-            this.lblEmployeeIDInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lblEmployeeIDInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblEmployeeIDInput.Location = new System.Drawing.Point(779, 18);
-            this.lblEmployeeIDInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblEmployeeIDInput.Name = "lblEmployeeIDInput";
-            this.lblEmployeeIDInput.Size = new System.Drawing.Size(161, 31);
-            this.lblEmployeeIDInput.TabIndex = 81;
-            this.lblEmployeeIDInput.Text = "N/A";
-            this.lblEmployeeIDInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(276, 20);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(165, 24);
-            this.label2.TabIndex = 82;
-            this.label2.Text = "Employee Name";
-            // 
-            // lblNameInput
-            // 
-            this.lblNameInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lblNameInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblNameInput.Location = new System.Drawing.Point(449, 14);
-            this.lblNameInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblNameInput.Name = "lblNameInput";
-            this.lblNameInput.Size = new System.Drawing.Size(161, 31);
-            this.lblNameInput.TabIndex = 83;
-            this.lblNameInput.Text = "N/A";
-            this.lblNameInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // EmployeeSalaryDetails
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -446,7 +447,7 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panel2);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "EmployeeSalaryDetails";
             this.ShowInTaskbar = false;
             this.Text = "EmployeeSalaryDetails";
