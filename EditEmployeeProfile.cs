@@ -21,7 +21,7 @@ namespace HRIS_JAP_ATTPAY
     {
         private string selectedEmployeeId;
         private string localImagePath; // Store the selected image path
-
+        private readonly string employeeId;
         // ---- Firebase Configuration for v7.3 ----
         private readonly FirebaseClient firebase = new FirebaseClient("https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/");
         private static readonly string FirebaseStorageBucket = "thesis151515.firebasestorage.app";
@@ -1990,7 +1990,7 @@ namespace HRIS_JAP_ATTPAY
         private void btnSalary_Click(object sender, EventArgs e)
         {
             Form parentForm = this.FindForm();
-            EmployeeSalaryDetails EmployeeSalaryDetailsForm = new EmployeeSalaryDetails();
+            EmployeeSalaryDetails EmployeeSalaryDetailsForm = new EmployeeSalaryDetails(employeeId);
             AttributesClass.ShowWithOverlay(parentForm, EmployeeSalaryDetailsForm);
         }
     }

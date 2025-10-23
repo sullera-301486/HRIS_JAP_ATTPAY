@@ -21,5 +21,10 @@ namespace HRIS_JAP_ATTPAY
         {
             this.Close();
         }
+
+        private void buttonConfirm_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
