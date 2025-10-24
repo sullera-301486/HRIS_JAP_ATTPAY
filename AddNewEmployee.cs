@@ -282,8 +282,6 @@ namespace HRIS_JAP_ATTPAY
                         fixedCount++;
                     }
 
-                    MessageBox.Show($"Fixed {fixedCount} existing leave records with base values.",
-                        "Fix Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
@@ -425,8 +423,6 @@ namespace HRIS_JAP_ATTPAY
                         }
                     }
 
-                    MessageBox.Show($"Leave Credits sync completed:\n• Created: {created}\n• Updated: {updated}\n• Skipped: {skipped}",
-                        "Sync Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
@@ -539,8 +535,6 @@ namespace HRIS_JAP_ATTPAY
                             added++;
                     }
 
-                    MessageBox.Show($"Missing Leave Credits sync completed:\n• Added: {added}\n• Skipped: {skipped}",
-                        "Sync Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
