@@ -48,10 +48,10 @@
             // 
             this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
-            this.XpictureBox.Location = new System.Drawing.Point(425, 11);
-            this.XpictureBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.XpictureBox.Location = new System.Drawing.Point(319, 9);
+            this.XpictureBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.XpictureBox.Name = "XpictureBox";
-            this.XpictureBox.Size = new System.Drawing.Size(51, 50);
+            this.XpictureBox.Size = new System.Drawing.Size(38, 41);
             this.XpictureBox.TabIndex = 3;
             this.XpictureBox.TabStop = false;
             this.XpictureBox.Click += new System.EventHandler(this.XpictureBox_Click);
@@ -61,23 +61,21 @@
             this.labelRequestConfirm.AutoSize = true;
             this.labelRequestConfirm.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelRequestConfirm.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(34)))), ((int)(((byte)(31)))));
-            this.labelRequestConfirm.Location = new System.Drawing.Point(13, 15);
-            this.labelRequestConfirm.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelRequestConfirm.Location = new System.Drawing.Point(10, 12);
             this.labelRequestConfirm.Name = "labelRequestConfirm";
-            this.labelRequestConfirm.Size = new System.Drawing.Size(230, 31);
+            this.labelRequestConfirm.Size = new System.Drawing.Size(195, 26);
             this.labelRequestConfirm.TabIndex = 20;
-            this.labelRequestConfirm.Text = "Add New Account";
+            this.labelRequestConfirm.Text = "Grant User Access";
             // 
             // labelMessage
             // 
             this.labelMessage.AutoSize = true;
             this.labelMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelMessage.Location = new System.Drawing.Point(21, 60);
-            this.labelMessage.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelMessage.Location = new System.Drawing.Point(16, 49);
             this.labelMessage.Name = "labelMessage";
-            this.labelMessage.Size = new System.Drawing.Size(339, 29);
+            this.labelMessage.Size = new System.Drawing.Size(208, 24);
             this.labelMessage.TabIndex = 21;
-            this.labelMessage.Text = "Select ID and user type to add.";
+            this.labelMessage.Text = "Select ID and user type.";
             // 
             // comboBoxUserType
             // 
@@ -88,10 +86,9 @@
             this.comboBoxUserType.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxUserType.ForeColor = System.Drawing.Color.White;
             this.comboBoxUserType.FormattingEnabled = true;
-            this.comboBoxUserType.Location = new System.Drawing.Point(189, 183);
-            this.comboBoxUserType.Margin = new System.Windows.Forms.Padding(4);
+            this.comboBoxUserType.Location = new System.Drawing.Point(142, 149);
             this.comboBoxUserType.Name = "comboBoxUserType";
-            this.comboBoxUserType.Size = new System.Drawing.Size(266, 33);
+            this.comboBoxUserType.Size = new System.Drawing.Size(200, 28);
             this.comboBoxUserType.TabIndex = 35;
             this.comboBoxUserType.SelectedIndexChanged += new System.EventHandler(this.comboBoxUserType_SelectedIndexChanged);
             // 
@@ -99,10 +96,9 @@
             // 
             this.labelUserType.AutoSize = true;
             this.labelUserType.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelUserType.Location = new System.Drawing.Point(19, 186);
-            this.labelUserType.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelUserType.Location = new System.Drawing.Point(14, 151);
             this.labelUserType.Name = "labelUserType";
-            this.labelUserType.Size = new System.Drawing.Size(103, 25);
+            this.labelUserType.Size = new System.Drawing.Size(81, 20);
             this.labelUserType.TabIndex = 36;
             this.labelUserType.Text = "User Type";
             // 
@@ -113,10 +109,9 @@
             this.buttonConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonConfirm.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonConfirm.ForeColor = System.Drawing.Color.White;
-            this.buttonConfirm.Location = new System.Drawing.Point(71, 262);
-            this.buttonConfirm.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonConfirm.Location = new System.Drawing.Point(53, 213);
             this.buttonConfirm.Name = "buttonConfirm";
-            this.buttonConfirm.Size = new System.Drawing.Size(135, 41);
+            this.buttonConfirm.Size = new System.Drawing.Size(101, 33);
             this.buttonConfirm.TabIndex = 37;
             this.buttonConfirm.Text = "Confirm";
             this.buttonConfirm.UseVisualStyleBackColor = false;
@@ -129,10 +124,9 @@
             this.buttonCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonCancel.ForeColor = System.Drawing.Color.White;
-            this.buttonCancel.Location = new System.Drawing.Point(264, 262);
-            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonCancel.Location = new System.Drawing.Point(198, 213);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(135, 41);
+            this.buttonCancel.Size = new System.Drawing.Size(101, 33);
             this.buttonCancel.TabIndex = 38;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = false;
@@ -140,9 +134,10 @@
             // 
             // tbPassword
             // 
-            this.tbPassword.Location = new System.Drawing.Point(189, 226);
+            this.tbPassword.Location = new System.Drawing.Point(142, 184);
+            this.tbPassword.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tbPassword.Name = "tbPassword";
-            this.tbPassword.Size = new System.Drawing.Size(266, 22);
+            this.tbPassword.Size = new System.Drawing.Size(200, 20);
             this.tbPassword.TabIndex = 39;
             this.tbPassword.TextChanged += new System.EventHandler(this.tbPassword_TextChanged);
             // 
@@ -150,10 +145,9 @@
             // 
             this.lblPassword.AutoSize = true;
             this.lblPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPassword.Location = new System.Drawing.Point(19, 222);
-            this.lblPassword.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblPassword.Location = new System.Drawing.Point(14, 180);
             this.lblPassword.Name = "lblPassword";
-            this.lblPassword.Size = new System.Drawing.Size(98, 25);
+            this.lblPassword.Size = new System.Drawing.Size(78, 20);
             this.lblPassword.TabIndex = 40;
             this.lblPassword.Text = "Password";
             // 
@@ -166,10 +160,9 @@
             this.cbEmpID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.cbEmpID.ForeColor = System.Drawing.Color.White;
             this.cbEmpID.FormattingEnabled = true;
-            this.cbEmpID.Location = new System.Drawing.Point(189, 142);
-            this.cbEmpID.Margin = new System.Windows.Forms.Padding(4);
+            this.cbEmpID.Location = new System.Drawing.Point(142, 115);
             this.cbEmpID.Name = "cbEmpID";
-            this.cbEmpID.Size = new System.Drawing.Size(266, 33);
+            this.cbEmpID.Size = new System.Drawing.Size(200, 28);
             this.cbEmpID.TabIndex = 41;
             this.cbEmpID.SelectedIndexChanged += new System.EventHandler(this.cbEmpID_SelectedIndexChanged);
             // 
@@ -177,10 +170,9 @@
             // 
             this.lblEmployeeID.AutoSize = true;
             this.lblEmployeeID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblEmployeeID.Location = new System.Drawing.Point(21, 145);
-            this.lblEmployeeID.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblEmployeeID.Location = new System.Drawing.Point(16, 118);
             this.lblEmployeeID.Name = "lblEmployeeID";
-            this.lblEmployeeID.Size = new System.Drawing.Size(123, 25);
+            this.lblEmployeeID.Size = new System.Drawing.Size(100, 20);
             this.lblEmployeeID.TabIndex = 42;
             this.lblEmployeeID.Text = "Employee ID";
             // 
@@ -188,10 +180,9 @@
             // 
             this.lblUserIDD.AutoSize = true;
             this.lblUserIDD.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblUserIDD.Location = new System.Drawing.Point(21, 106);
-            this.lblUserIDD.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblUserIDD.Location = new System.Drawing.Point(16, 86);
             this.lblUserIDD.Name = "lblUserIDD";
-            this.lblUserIDD.Size = new System.Drawing.Size(77, 25);
+            this.lblUserIDD.Size = new System.Drawing.Size(64, 20);
             this.lblUserIDD.TabIndex = 43;
             this.lblUserIDD.Text = "User ID";
             // 
@@ -199,19 +190,18 @@
             // 
             this.lblUserID.AutoSize = true;
             this.lblUserID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblUserID.Location = new System.Drawing.Point(270, 106);
-            this.lblUserID.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblUserID.Location = new System.Drawing.Point(202, 86);
             this.lblUserID.Name = "lblUserID";
-            this.lblUserID.Size = new System.Drawing.Size(46, 25);
+            this.lblUserID.Size = new System.Drawing.Size(35, 20);
             this.lblUserID.TabIndex = 44;
             this.lblUserID.Text = "N/A";
             // 
             // AddNewUser
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(488, 341);
+            this.ClientSize = new System.Drawing.Size(366, 277);
             this.Controls.Add(this.lblUserID);
             this.Controls.Add(this.lblUserIDD);
             this.Controls.Add(this.lblEmployeeID);
@@ -226,6 +216,7 @@
             this.Controls.Add(this.labelRequestConfirm);
             this.Controls.Add(this.XpictureBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "AddNewUser";
             this.ShowInTaskbar = false;
             this.Text = "AddNewUser";

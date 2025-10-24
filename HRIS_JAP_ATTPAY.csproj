@@ -438,6 +438,12 @@
     <Compile Include="ConfirmProfileUpdate.Designer.cs">
       <DependentUpon>ConfirmProfileUpdate.cs</DependentUpon>
     </Compile>
+    <Compile Include="FilterAuditTrails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FilterAuditTrails.Designer.cs">
+      <DependentUpon>FilterAuditTrails.cs</DependentUpon>
+    </Compile>
     <Compile Include="ManageLeaveCredits.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -827,6 +833,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FilterAdminLoan.resx">
       <DependentUpon>FilterAdminLoan.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FilterAuditTrails.resx">
+      <DependentUpon>FilterAuditTrails.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FilterHREmployee.resx">
       <DependentUpon>FilterHREmployee.cs</DependentUpon>

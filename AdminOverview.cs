@@ -21,6 +21,7 @@ namespace HRIS_JAP_ATTPAY
         private const int CACHE_EXPIRY_MINUTES = 5;
         private string currentUserId;
         private Dictionary<int, string> todoItemKeys = new Dictionary<int, string>();
+        private AuditTrailFilterCriteria currentAuditFilters = null;
 
         public AdminOverview(string userId)
         {
@@ -1155,14 +1156,44 @@ namespace HRIS_JAP_ATTPAY
                                 timestamp = DateTime.Now;
                             }
 
-                            // Format date and time in the required format
-                            string date = timestamp.ToString("M - d - yy"); // "6 - 10 - 25"
-                            string time = timestamp.ToString("h:mm tt");    // "10:30 PM"
+                            // Apply filters if set
+                            bool passesFilter = true;
 
-                            // Format the action and details
-                            string action = FormatActionType(actionType);
+                            if (currentAuditFilters != null)
+                            {
+                                // Filter by action type
+                                if (!string.IsNullOrEmpty(currentAuditFilters.ActionType) &&
+                                    currentAuditFilters.ActionType != "Select action type")
+                                {
+                                    if (!actionType.Equals(currentAuditFilters.ActionType, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        passesFilter = false;
+                                    }
+                                }
 
-                            logEntries.Add((timestamp, date, time, action, description));
+                                // Filter by date if needed
+                                if (!string.IsNullOrEmpty(currentAuditFilters.Date) &&
+                                    currentAuditFilters.Date != "Select date")
+                                {
+                                    string logDate = timestamp.ToString("yyyy-MM-dd");
+                                    if (logDate != currentAuditFilters.Date)
+                                    {
+                                        passesFilter = false;
+                                    }
+                                }
+                            }
+
+                            if (passesFilter)
+                            {
+                                // Format date and time in the required format
+                                string date = timestamp.ToString("M - d - yy"); // "6 - 10 - 25"
+                                string time = timestamp.ToString("h:mm tt");    // "10:30 PM"
+
+                                // Format the action and details
+                                string action = FormatActionType(actionType);
+
+                                logEntries.Add((timestamp, date, time, action, description));
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -1199,8 +1230,17 @@ namespace HRIS_JAP_ATTPAY
             }
         }
 
-        // Helper method to format action types
-        // Helper method to format action types
+        private void OnAuditFiltersApplied(AuditTrailFilterCriteria filters)
+        {
+            currentAuditFilters = filters;
+            LoadAdminLogs(); // Reload with filters
+        }
+
+        private void OnAuditFiltersReset()
+        {
+            currentAuditFilters = null;
+            LoadAdminLogs(); // Reload without filters
+        }
         private string CalculateStatus(string timeInStr, string timeOutStr, string existingStatus = "")
         {
             // If the existing status is already "Day Off", preserve it
@@ -1314,6 +1354,18 @@ namespace HRIS_JAP_ATTPAY
                 default:
                     return actionType;
             }
+        }
+
+        private void pictureBoxFilters_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            FilterAuditTrails filterForm = new FilterAuditTrails();
+
+            // Subscribe to filter events
+            filterForm.FiltersApplied += OnAuditFiltersApplied;
+            filterForm.FiltersReset += OnAuditFiltersReset;
+
+            AttributesClass.ShowWithOverlay(parentForm, filterForm);
         }
     }
 }
