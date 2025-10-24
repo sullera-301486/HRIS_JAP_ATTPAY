@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using Firebase.Database;
+using Firebase.Database.Query;
+using System.Threading.Tasks;
 
 namespace HRIS_JAP_ATTPAY
 {
     public partial class EditLeaveCredits : Form
     {
         private readonly LeaveCreditModel _credit;
-
-        public EditLeaveCredits()
-        {
-            InitializeComponent();
-            setFont();
-        }
+        private readonly FirebaseClient firebase = new FirebaseClient(
+            "https://thesis151515-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        );
 
         public EditLeaveCredits(LeaveCreditModel credit)
         {
@@ -20,6 +20,16 @@ namespace HRIS_JAP_ATTPAY
             _credit = credit;
             setFont();
             LoadEmployeeDetails();
+            LoadDropdowns();
+        }
+
+        private void LoadDropdowns()
+        {
+            for (int i = 1; i <= 15; i++)
+            {
+                comboBoxSLCreditInput.Items.Add(i);
+                comboBoxVLCreditInput.Items.Add(i);
+            }
         }
 
         private void LoadEmployeeDetails()
@@ -87,9 +97,63 @@ namespace HRIS_JAP_ATTPAY
 
         private void buttonSendRequest_Click(object sender, EventArgs e)
         {
+            // 🔹 Create and show confirmation overlay
             Form parentForm = this.FindForm();
-            ConfirmLeaveUpdate confirmLeaveUpdate = new ConfirmLeaveUpdate();
+            ConfirmLeaveUpdate confirmLeaveUpdate = new ConfirmLeaveUpdate(_credit.full_name);
+
+            // 🔹 Subscribe to the Confirm event (trigger Firebase update)
+            confirmLeaveUpdate.Confirmed += async (s, args) =>
+            {
+                await UpdateLeaveCreditsAsync();
+            };
+
+            // 🔹 Show using your overlay style
             AttributesClass.ShowWithOverlay(parentForm, confirmLeaveUpdate);
+        }
+
+        private async Task UpdateLeaveCreditsAsync()
+        {
+            try
+            {
+                string employeeId = _credit.employee_id;
+
+                if (comboBoxSLCreditInput.SelectedItem == null || comboBoxVLCreditInput.SelectedItem == null)
+                {
+                    MessageBox.Show("Please select base values for both Sick and Vacation Leave.", "Warning",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                int newSickBase = Convert.ToInt32(comboBoxSLCreditInput.SelectedItem);
+                int newVacationBase = Convert.ToInt32(comboBoxVLCreditInput.SelectedItem);
+
+                await firebase
+                    .Child("Leave Credits")
+                    .Child(employeeId)
+                    .PatchAsync(new
+                    {
+                        sick_leave_base_value = newSickBase,
+                        vacation_leave_base_value = newVacationBase,
+                        sick_leave = newSickBase,
+                        vacation_leave = newVacationBase,
+                        updated_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                    });
+
+                MessageBox.Show("Leave credits and base values updated successfully!", "Success",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                _credit.sick_leave_base_value = newSickBase;
+                _credit.vacation_leave_base_value = newVacationBase;
+                _credit.sick_leave = newSickBase;
+                _credit.vacation_leave = newVacationBase;
+
+                LoadEmployeeDetails();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error updating leave credits: " + ex.Message, "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }
