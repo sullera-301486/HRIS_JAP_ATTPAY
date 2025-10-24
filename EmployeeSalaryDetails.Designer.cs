@@ -42,6 +42,10 @@
             this.lblDepartment = new System.Windows.Forms.Label();
             this.lblEffectivityDate = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.lblNameInput = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.lblEmployeeIDInput = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.lblSalaryPSH = new System.Windows.Forms.Label();
             this.lblDailyRatePSH = new System.Windows.Forms.Label();
@@ -64,9 +68,10 @@
             this.lblEmployeeSalaryDetails.AutoSize = true;
             this.lblEmployeeSalaryDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblEmployeeSalaryDetails.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(34)))), ((int)(((byte)(31)))));
-            this.lblEmployeeSalaryDetails.Location = new System.Drawing.Point(14, 19);
+            this.lblEmployeeSalaryDetails.Location = new System.Drawing.Point(19, 23);
+            this.lblEmployeeSalaryDetails.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblEmployeeSalaryDetails.Name = "lblEmployeeSalaryDetails";
-            this.lblEmployeeSalaryDetails.Size = new System.Drawing.Size(275, 29);
+            this.lblEmployeeSalaryDetails.Size = new System.Drawing.Size(336, 36);
             this.lblEmployeeSalaryDetails.TabIndex = 3;
             this.lblEmployeeSalaryDetails.Text = "Employee Salary Details";
             // 
@@ -74,9 +79,10 @@
             // 
             this.lblEffectivityDateInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblEffectivityDateInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblEffectivityDateInput.Location = new System.Drawing.Point(17, 104);
+            this.lblEffectivityDateInput.Location = new System.Drawing.Point(23, 128);
+            this.lblEffectivityDateInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblEffectivityDateInput.Name = "lblEffectivityDateInput";
-            this.lblEffectivityDateInput.Size = new System.Drawing.Size(121, 25);
+            this.lblEffectivityDateInput.Size = new System.Drawing.Size(161, 31);
             this.lblEffectivityDateInput.TabIndex = 69;
             this.lblEffectivityDateInput.Text = "N/A";
             this.lblEffectivityDateInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -85,10 +91,10 @@
             // 
             this.XpictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.XpictureBox.Image = global::HRIS_JAP_ATTPAY.Properties.Resources.XButton;
-            this.XpictureBox.Location = new System.Drawing.Point(659, -2);
-            this.XpictureBox.Margin = new System.Windows.Forms.Padding(2);
+            this.XpictureBox.Location = new System.Drawing.Point(879, -2);
+            this.XpictureBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.XpictureBox.Name = "XpictureBox";
-            this.XpictureBox.Size = new System.Drawing.Size(38, 41);
+            this.XpictureBox.Size = new System.Drawing.Size(51, 50);
             this.XpictureBox.TabIndex = 4;
             this.XpictureBox.TabStop = false;
             this.XpictureBox.Click += new System.EventHandler(this.XpictureBox_Click);
@@ -101,26 +107,30 @@
             this.panel1.Controls.Add(this.lblEmployeeSalaryDetails);
             this.panel1.Controls.Add(this.lblSelected);
             this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(705, 109);
+            this.panel1.Size = new System.Drawing.Size(940, 134);
             this.panel1.TabIndex = 4;
             // 
             // comboBoxNamesSelected
             // 
+            this.comboBoxNamesSelected.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxNamesSelected.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxNamesSelected.FormattingEnabled = true;
-            this.comboBoxNamesSelected.Location = new System.Drawing.Point(137, 57);
+            this.comboBoxNamesSelected.Location = new System.Drawing.Point(183, 70);
+            this.comboBoxNamesSelected.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxNamesSelected.Name = "comboBoxNamesSelected";
-            this.comboBoxNamesSelected.Size = new System.Drawing.Size(149, 28);
+            this.comboBoxNamesSelected.Size = new System.Drawing.Size(197, 33);
             this.comboBoxNamesSelected.TabIndex = 5;
             // 
             // lblSelected
             // 
             this.lblSelected.AutoSize = true;
             this.lblSelected.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSelected.Location = new System.Drawing.Point(15, 60);
+            this.lblSelected.Location = new System.Drawing.Point(20, 74);
+            this.lblSelected.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSelected.Name = "lblSelected";
-            this.lblSelected.Size = new System.Drawing.Size(80, 20);
+            this.lblSelected.Size = new System.Drawing.Size(97, 25);
             this.lblSelected.TabIndex = 3;
             this.lblSelected.Text = "Selected";
             // 
@@ -131,9 +141,10 @@
             this.buttonCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonCancel.ForeColor = System.Drawing.Color.White;
-            this.buttonCancel.Location = new System.Drawing.Point(537, 361);
+            this.buttonCancel.Location = new System.Drawing.Point(716, 444);
+            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(135, 33);
+            this.buttonCancel.Size = new System.Drawing.Size(180, 41);
             this.buttonCancel.TabIndex = 58;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = false;
@@ -145,9 +156,10 @@
             this.buttonEdit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonEdit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonEdit.ForeColor = System.Drawing.Color.White;
-            this.buttonEdit.Location = new System.Drawing.Point(380, 361);
+            this.buttonEdit.Location = new System.Drawing.Point(507, 444);
+            this.buttonEdit.Margin = new System.Windows.Forms.Padding(4);
             this.buttonEdit.Name = "buttonEdit";
-            this.buttonEdit.Size = new System.Drawing.Size(135, 33);
+            this.buttonEdit.Size = new System.Drawing.Size(180, 41);
             this.buttonEdit.TabIndex = 57;
             this.buttonEdit.Text = "Edit";
             this.buttonEdit.UseVisualStyleBackColor = false;
@@ -157,9 +169,10 @@
             // 
             this.lblSalary.AutoSize = true;
             this.lblSalary.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSalary.Location = new System.Drawing.Point(597, 55);
+            this.lblSalary.Location = new System.Drawing.Point(796, 68);
+            this.lblSalary.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSalary.Name = "lblSalary";
-            this.lblSalary.Size = new System.Drawing.Size(55, 18);
+            this.lblSalary.Size = new System.Drawing.Size(67, 24);
             this.lblSalary.TabIndex = 24;
             this.lblSalary.Text = "Salary";
             // 
@@ -167,9 +180,10 @@
             // 
             this.lblDailyRate.AutoSize = true;
             this.lblDailyRate.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDailyRate.Location = new System.Drawing.Point(446, 55);
+            this.lblDailyRate.Location = new System.Drawing.Point(595, 68);
+            this.lblDailyRate.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblDailyRate.Name = "lblDailyRate";
-            this.lblDailyRate.Size = new System.Drawing.Size(85, 18);
+            this.lblDailyRate.Size = new System.Drawing.Size(103, 24);
             this.lblDailyRate.TabIndex = 7;
             this.lblDailyRate.Text = "Daily Rate";
             // 
@@ -177,9 +191,10 @@
             // 
             this.lblPosition.AutoSize = true;
             this.lblPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPosition.Location = new System.Drawing.Point(317, 55);
+            this.lblPosition.Location = new System.Drawing.Point(423, 68);
+            this.lblPosition.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblPosition.Name = "lblPosition";
-            this.lblPosition.Size = new System.Drawing.Size(70, 18);
+            this.lblPosition.Size = new System.Drawing.Size(84, 24);
             this.lblPosition.TabIndex = 6;
             this.lblPosition.Text = "Position";
             // 
@@ -187,9 +202,10 @@
             // 
             this.lblDepartment.AutoSize = true;
             this.lblDepartment.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDepartment.Location = new System.Drawing.Point(169, 55);
+            this.lblDepartment.Location = new System.Drawing.Point(225, 68);
+            this.lblDepartment.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblDepartment.Name = "lblDepartment";
-            this.lblDepartment.Size = new System.Drawing.Size(95, 18);
+            this.lblDepartment.Size = new System.Drawing.Size(117, 24);
             this.lblDepartment.TabIndex = 5;
             this.lblDepartment.Text = "Department";
             // 
@@ -197,15 +213,20 @@
             // 
             this.lblEffectivityDate.AutoSize = true;
             this.lblEffectivityDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblEffectivityDate.Location = new System.Drawing.Point(17, 55);
+            this.lblEffectivityDate.Location = new System.Drawing.Point(23, 68);
+            this.lblEffectivityDate.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblEffectivityDate.Name = "lblEffectivityDate";
-            this.lblEffectivityDate.Size = new System.Drawing.Size(121, 18);
+            this.lblEffectivityDate.Size = new System.Drawing.Size(145, 24);
             this.lblEffectivityDate.TabIndex = 4;
             this.lblEffectivityDate.Text = "Effectivity Date";
             // 
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.White;
+            this.panel2.Controls.Add(this.lblNameInput);
+            this.panel2.Controls.Add(this.label2);
+            this.panel2.Controls.Add(this.lblEmployeeIDInput);
+            this.panel2.Controls.Add(this.label1);
             this.panel2.Controls.Add(this.flowLayoutPanel1);
             this.panel2.Controls.Add(this.lblSalaryPSH);
             this.panel2.Controls.Add(this.lblDailyRatePSH);
@@ -227,19 +248,66 @@
             this.panel2.Controls.Add(this.lblPreviousSalaryHistory);
             this.panel2.Controls.Add(this.lblCurrentInformations);
             this.panel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.panel2.Location = new System.Drawing.Point(0, 111);
+            this.panel2.Location = new System.Drawing.Point(0, 137);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(705, 418);
+            this.panel2.Size = new System.Drawing.Size(940, 514);
             this.panel2.TabIndex = 5;
+            // 
+            // lblNameInput
+            // 
+            this.lblNameInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lblNameInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblNameInput.Location = new System.Drawing.Point(503, 18);
+            this.lblNameInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblNameInput.Name = "lblNameInput";
+            this.lblNameInput.Size = new System.Drawing.Size(161, 31);
+            this.lblNameInput.TabIndex = 83;
+            this.lblNameInput.Text = "N/A";
+            this.lblNameInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(381, 21);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(114, 24);
+            this.label2.TabIndex = 82;
+            this.label2.Text = "Emp Name";
+            // 
+            // lblEmployeeIDInput
+            // 
+            this.lblEmployeeIDInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lblEmployeeIDInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblEmployeeIDInput.Location = new System.Drawing.Point(779, 18);
+            this.lblEmployeeIDInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblEmployeeIDInput.Name = "lblEmployeeIDInput";
+            this.lblEmployeeIDInput.Size = new System.Drawing.Size(161, 31);
+            this.lblEmployeeIDInput.TabIndex = 81;
+            this.lblEmployeeIDInput.Text = "N/A";
+            this.lblEmployeeIDInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(693, 20);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(78, 24);
+            this.label1.TabIndex = 80;
+            this.label1.Text = "Emp ID";
             // 
             // flowLayoutPanel1
             // 
             this.flowLayoutPanel1.AutoScroll = true;
             this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 244);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(16, 300);
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(681, 114);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(908, 140);
             this.flowLayoutPanel1.TabIndex = 79;
             this.flowLayoutPanel1.WrapContents = false;
             // 
@@ -247,9 +315,10 @@
             // 
             this.lblSalaryPSH.AutoSize = true;
             this.lblSalaryPSH.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSalaryPSH.Location = new System.Drawing.Point(597, 207);
+            this.lblSalaryPSH.Location = new System.Drawing.Point(796, 255);
+            this.lblSalaryPSH.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSalaryPSH.Name = "lblSalaryPSH";
-            this.lblSalaryPSH.Size = new System.Drawing.Size(55, 18);
+            this.lblSalaryPSH.Size = new System.Drawing.Size(67, 24);
             this.lblSalaryPSH.TabIndex = 78;
             this.lblSalaryPSH.Text = "Salary";
             // 
@@ -257,9 +326,10 @@
             // 
             this.lblDailyRatePSH.AutoSize = true;
             this.lblDailyRatePSH.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDailyRatePSH.Location = new System.Drawing.Point(446, 207);
+            this.lblDailyRatePSH.Location = new System.Drawing.Point(595, 255);
+            this.lblDailyRatePSH.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblDailyRatePSH.Name = "lblDailyRatePSH";
-            this.lblDailyRatePSH.Size = new System.Drawing.Size(85, 18);
+            this.lblDailyRatePSH.Size = new System.Drawing.Size(103, 24);
             this.lblDailyRatePSH.TabIndex = 77;
             this.lblDailyRatePSH.Text = "Daily Rate";
             // 
@@ -267,9 +337,10 @@
             // 
             this.lblPositionPSH.AutoSize = true;
             this.lblPositionPSH.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPositionPSH.Location = new System.Drawing.Point(317, 207);
+            this.lblPositionPSH.Location = new System.Drawing.Point(423, 255);
+            this.lblPositionPSH.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblPositionPSH.Name = "lblPositionPSH";
-            this.lblPositionPSH.Size = new System.Drawing.Size(70, 18);
+            this.lblPositionPSH.Size = new System.Drawing.Size(84, 24);
             this.lblPositionPSH.TabIndex = 76;
             this.lblPositionPSH.Text = "Position";
             // 
@@ -277,9 +348,10 @@
             // 
             this.lblDepartmentPSH.AutoSize = true;
             this.lblDepartmentPSH.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDepartmentPSH.Location = new System.Drawing.Point(169, 207);
+            this.lblDepartmentPSH.Location = new System.Drawing.Point(225, 255);
+            this.lblDepartmentPSH.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblDepartmentPSH.Name = "lblDepartmentPSH";
-            this.lblDepartmentPSH.Size = new System.Drawing.Size(95, 18);
+            this.lblDepartmentPSH.Size = new System.Drawing.Size(117, 24);
             this.lblDepartmentPSH.TabIndex = 75;
             this.lblDepartmentPSH.Text = "Department";
             // 
@@ -287,9 +359,10 @@
             // 
             this.lblEffectivityDatePSH.AutoSize = true;
             this.lblEffectivityDatePSH.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblEffectivityDatePSH.Location = new System.Drawing.Point(17, 207);
+            this.lblEffectivityDatePSH.Location = new System.Drawing.Point(23, 255);
+            this.lblEffectivityDatePSH.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblEffectivityDatePSH.Name = "lblEffectivityDatePSH";
-            this.lblEffectivityDatePSH.Size = new System.Drawing.Size(121, 18);
+            this.lblEffectivityDatePSH.Size = new System.Drawing.Size(145, 24);
             this.lblEffectivityDatePSH.TabIndex = 74;
             this.lblEffectivityDatePSH.Text = "Effectivity Date";
             // 
@@ -297,9 +370,10 @@
             // 
             this.lblDepartmentInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblDepartmentInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDepartmentInput.Location = new System.Drawing.Point(154, 104);
+            this.lblDepartmentInput.Location = new System.Drawing.Point(205, 128);
+            this.lblDepartmentInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblDepartmentInput.Name = "lblDepartmentInput";
-            this.lblDepartmentInput.Size = new System.Drawing.Size(121, 25);
+            this.lblDepartmentInput.Size = new System.Drawing.Size(161, 31);
             this.lblDepartmentInput.TabIndex = 73;
             this.lblDepartmentInput.Text = "N/A";
             this.lblDepartmentInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -308,9 +382,10 @@
             // 
             this.lblPositionInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblPositionInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPositionInput.Location = new System.Drawing.Point(291, 104);
+            this.lblPositionInput.Location = new System.Drawing.Point(388, 128);
+            this.lblPositionInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblPositionInput.Name = "lblPositionInput";
-            this.lblPositionInput.Size = new System.Drawing.Size(121, 25);
+            this.lblPositionInput.Size = new System.Drawing.Size(161, 31);
             this.lblPositionInput.TabIndex = 72;
             this.lblPositionInput.Text = "N/A";
             this.lblPositionInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -319,9 +394,10 @@
             // 
             this.lblDailyRateInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblDailyRateInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDailyRateInput.Location = new System.Drawing.Point(428, 104);
+            this.lblDailyRateInput.Location = new System.Drawing.Point(571, 128);
+            this.lblDailyRateInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblDailyRateInput.Name = "lblDailyRateInput";
-            this.lblDailyRateInput.Size = new System.Drawing.Size(121, 25);
+            this.lblDailyRateInput.Size = new System.Drawing.Size(161, 31);
             this.lblDailyRateInput.TabIndex = 71;
             this.lblDailyRateInput.Text = "N/A";
             this.lblDailyRateInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -330,9 +406,10 @@
             // 
             this.lblSalaryInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblSalaryInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSalaryInput.Location = new System.Drawing.Point(565, 104);
+            this.lblSalaryInput.Location = new System.Drawing.Point(753, 128);
+            this.lblSalaryInput.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSalaryInput.Name = "lblSalaryInput";
-            this.lblSalaryInput.Size = new System.Drawing.Size(121, 25);
+            this.lblSalaryInput.Size = new System.Drawing.Size(161, 31);
             this.lblSalaryInput.TabIndex = 70;
             this.lblSalaryInput.Text = "N/A";
             this.lblSalaryInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -342,9 +419,10 @@
             this.lblPreviousSalaryHistory.AutoSize = true;
             this.lblPreviousSalaryHistory.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblPreviousSalaryHistory.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(23)))), ((int)(((byte)(112)))));
-            this.lblPreviousSalaryHistory.Location = new System.Drawing.Point(16, 159);
+            this.lblPreviousSalaryHistory.Location = new System.Drawing.Point(21, 196);
+            this.lblPreviousSalaryHistory.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblPreviousSalaryHistory.Name = "lblPreviousSalaryHistory";
-            this.lblPreviousSalaryHistory.Size = new System.Drawing.Size(201, 24);
+            this.lblPreviousSalaryHistory.Size = new System.Drawing.Size(260, 29);
             this.lblPreviousSalaryHistory.TabIndex = 2;
             this.lblPreviousSalaryHistory.Text = "Previous Salary History";
             // 
@@ -353,22 +431,23 @@
             this.lblCurrentInformations.AutoSize = true;
             this.lblCurrentInformations.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCurrentInformations.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(23)))), ((int)(((byte)(112)))));
-            this.lblCurrentInformations.Location = new System.Drawing.Point(15, 11);
+            this.lblCurrentInformations.Location = new System.Drawing.Point(20, 14);
+            this.lblCurrentInformations.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblCurrentInformations.Name = "lblCurrentInformations";
-            this.lblCurrentInformations.Size = new System.Drawing.Size(195, 25);
+            this.lblCurrentInformations.Size = new System.Drawing.Size(248, 31);
             this.lblCurrentInformations.TabIndex = 1;
             this.lblCurrentInformations.Text = "Current Information";
-            this.lblCurrentInformations.Click += new System.EventHandler(this.lblCurrentInformations_Click);
             // 
             // EmployeeSalaryDetails
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(705, 530);
+            this.ClientSize = new System.Drawing.Size(940, 652);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panel2);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "EmployeeSalaryDetails";
             this.ShowInTaskbar = false;
             this.Text = "EmployeeSalaryDetails";
@@ -408,5 +487,9 @@
         private System.Windows.Forms.Label lblDepartmentPSH;
         private System.Windows.Forms.Label lblEffectivityDatePSH;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        private System.Windows.Forms.Label lblEmployeeIDInput;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblNameInput;
+        private System.Windows.Forms.Label label2;
     }
 }

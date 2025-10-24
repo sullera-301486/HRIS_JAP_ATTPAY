@@ -654,5 +654,12 @@ namespace HRIS_JAP_ATTPAY
             }
             return null;
         }
+
+        private void btnSalary_Click(object sender, EventArgs e)
+        {
+            Form parentForm = this.FindForm();
+            EmployeeSalaryDetails EmployeeSalaryDetailsForm = new EmployeeSalaryDetails(employeeId);
+            AttributesClass.ShowWithOverlay(parentForm, EmployeeSalaryDetailsForm);
+        }
     }
 }
